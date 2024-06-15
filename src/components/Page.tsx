@@ -21,6 +21,7 @@ const Root = styled.div<{ noPadding?: boolean }>`
   overflow-x: hidden;
   overflow-y: auto;
   background-color: ${theme.colors.silverLighter};
+  box-sizing: border-box;
 `;
 
 export default Page

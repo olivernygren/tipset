@@ -1,12 +1,16 @@
+import { text } from "stream/consumers";
+
 export const theme = {
   colors: {
     primary: '#0070f3',
     primaryLight: '#3291ff',
     primaryDark: '#0766d8',
+    primaryDarker: '#0544a6',
     white: '#ffffff',
     black: '#000000',
     textDefault: '#333333',
     textLight: '#666666',
+    textLighter: '#e1e1e1',
     silver: '#cccccc',
     silverLight: '#f2f2f2',
     silverLighter: '#f5f5f5',
