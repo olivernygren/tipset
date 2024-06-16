@@ -5,21 +5,27 @@ import { EmphasisTypography } from '../typography/Typography';
 
 interface ButtonProps {
   variant?: 'primary' | 'secondary';
-  onClick: () => void;
+  onClick?: () => void;
   children: any;
   disabled?: boolean;
   fullWidth?: boolean;
   color?: string;
+  size?: 's' | 'm' | 'l';
 }
 
-const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, color }: ButtonProps) => {
+const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, color, size = 'm' }: ButtonProps) => {
   return (
     <StyledButton
       variant={variant || 'primary'}
-      onClick={onClick}
+      onClick={() => {
+        if (onClick) {
+          onClick();
+        }
+      }}
       disabled={disabled}
       fullWidth={fullWidth}
       color={color}
+      size={size}
     >
       <EmphasisTypography variant='m' color={variant === 'primary' ? theme.colors.white : color}>
         {children}
@@ -30,7 +36,8 @@ const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, c
 
 const StyledButton = styled.button<ButtonProps>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
-  padding: ${theme.spacing.xs} ${theme.spacing.s};
+  /* padding: ${theme.spacing.xs} ${theme.spacing.s}; */
+  padding: ${({ size }) => size === 's' ? `${theme.spacing.xs} ${theme.spacing.xs}` : size === 'm' ? `${theme.spacing.xs} ${theme.spacing.s}` : `${theme.spacing.s} ${theme.spacing.m}`};
   border-radius: ${theme.borderRadius.m};
   background-color: ${({ color, variant }) => variant === 'primary' ? (color || theme.colors.primary) : 'transparent'};
   border-color: ${({ color, variant }) => variant === 'secondary' ? (color || theme.colors.primary) : 'none'};

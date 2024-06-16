@@ -48,7 +48,7 @@ const TestPage = () => {
     fetchLeagues();
   }, []);
 
-  console.log('leagues', leagues);
+  // console.log('leagues', leagues);
 
   const handleCalculatePoints = () => {
     if (homeGoals === '' || awayGoals === '' || resultHomeGoals === '' || resultAwayGoals === '') {
