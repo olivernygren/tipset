@@ -167,7 +167,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 2,
     age: 23,
     country: CountryEnum.FRANCE,
-  }, {
+  }, 
+  {
     id: 'defb8rgb9fbf0fhwh34r',
     name: ArsenalPlayersEnum.BEN_WHITE,
     position: {
@@ -177,7 +178,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 4,
     age: 26,
     country: CountryEnum.ENGLAND,
-  }, {
+  }, 
+  {
     id: 'jdb38fg9fhwwh9wfhw0fe',
     name: ArsenalPlayersEnum.TAKEHIRO_TOMIYASU,
     position: {
@@ -197,7 +199,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 12,
     age: 22,
     country: CountryEnum.NETHERLANDS,
-  }, {
+  }, 
+  {
     id: 'moehg9n0h01rh0fhfdk',
     name: ArsenalPlayersEnum.GABRIEL_MAGALHAES,
     position: {
@@ -207,7 +210,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 6,
     age: 26,
     country: CountryEnum.BRAZIL,
-  }, {
+  }, 
+  {
     id: 'g8h9e8g4eg98eg7seg0fegr',
     name: ArsenalPlayersEnum.JAKUB_KIWIOR,
     position: {
@@ -227,7 +231,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 35,
     age: 27,
     country: CountryEnum.UKRAINE,
-  }, {
+  }, 
+  {
     id: '3r6eegh129r29r1odhdmed',
     name: ArsenalPlayersEnum.THOMAS_PARTEY,
     position: {
@@ -237,7 +242,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 5,
     age: 30,
     country: CountryEnum.GHANA,
-  }, {
+  }, 
+  {
     id: '39rj2j10rw9gn9rnwenw2j',
     name: ArsenalPlayersEnum.DECLAN_RICE,
     position: {
@@ -247,7 +253,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 41,
     age: 25,
     country: CountryEnum.ENGLAND,
-  }, {
+  }, 
+  {
     id: 'ge732fr72rgugbutg0u9w',
     name: ArsenalPlayersEnum.ALBERT_SAMBI_LOKONGA,
     position: {
@@ -257,7 +264,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 23,
     age: 24,
     country: CountryEnum.BELGIUM,
-  }, {
+  }, 
+  {
     id: 'ne3yfr8ehfengw9itohq3',
     name: ArsenalPlayersEnum.JORGINHO,
     position: {
@@ -267,7 +275,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 20,
     age: 32,
     country: CountryEnum.ITALY,
-  }, {
+  }, 
+  {
     id: 'rh27tg9fofh9w4ghnfoif',
     name: ArsenalPlayersEnum.FABIO_VIEIRA,
     position: {
@@ -277,7 +286,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 21,
     age: 24,
     country: CountryEnum.PORTUGAL,
-  }, {
+  }, 
+  {
     id: 'fnwbgwjqekq0r0wpekpj',
     name: ArsenalPlayersEnum.EMILE_SMITH_ROWE,
     position: {
@@ -287,7 +297,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 10,
     age: 23,
     country: CountryEnum.ENGLAND,
-  }, {
+  }, 
+  {
     id: 'mwokepoe2yr4wr8yr4owru',
     name: ArsenalPlayersEnum.MARTIN_ODEGAARD,
     position: {
@@ -297,7 +308,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 8,
     age: 25,
     country: CountryEnum.NORWAY,
-  }, {
+  }, 
+  {
     id: 'cbwgr8h90ejqrjwf8gwrf',
     name: ArsenalPlayersEnum.BUKAYO_SAKA,
     position: {
@@ -307,7 +319,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 7,
     age: 22,
     country: CountryEnum.ENGLAND,
-  }, {
+  }, 
+  {
     id: '83rtgfjwheg9heo9rowdw',
     name: ArsenalPlayersEnum.REISS_NELSON,
     position: {
@@ -327,7 +340,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 11,
     age: 22,
     country: CountryEnum.BRAZIL,
-  }, {
+  }, 
+  {
     id: 'qfujw0jw0rj90g3pork3po3',
     name: ArsenalPlayersEnum.LEANDRO_TROSSARD,
     position: {
@@ -347,7 +361,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 29,
     age: 25,
     country: CountryEnum.GERMANY,
-  }, {
+  }, 
+  {
     id: 'bgwehroqnrbuwbuiwnfwifbe',
     name: ArsenalPlayersEnum.GABRIEL_JESUS,
     position: {
@@ -357,7 +372,8 @@ export const ArsenalPlayers: Array<Player> = [
     number: 9,
     age: 27,
     country: CountryEnum.BRAZIL,
-  }, {
+  }, 
+  {
     id: 'v14se6fvewhwe9rgqrh9',
     name: ArsenalPlayersEnum.EDDIE_NKETIAH,
     position: {

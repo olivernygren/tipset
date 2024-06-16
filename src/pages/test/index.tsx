@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { Divider } from '../../components/Divider';
 import Page from '../../components/Page';
@@ -10,6 +10,11 @@ import { Section } from '../../components/section/Section';
 import { HeadingsTypography, NormalTypography, EmphasisTypography } from '../../components/typography/Typography';
 import { theme } from '../../theme';
 import { Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById } from '../../utils/Players';
+import { addDoc, collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
+import { PredictionLeague, PredictionLeagueInput } from '../../utils/League';
+import IconButton from '../../components/buttons/IconButton';
+import { Trash } from '@phosphor-icons/react';
 
 const TestPage = () => {
   const [homeGoals, setHomeGoals] = useState<string>('');
@@ -20,6 +25,30 @@ const TestPage = () => {
   const [correctPlayerPrediction, setCorrectPlayerPrediction] = useState<boolean>(false);
   const [points, setPoints] = useState<number>(0);
   const [correctPredictionPoints, setCorrectPredictionPoints] = useState<Array<{ prediction: string, pointsGained: number }>>([]);
+  const [newLeagueName, setNewLeagueName] = useState('');
+
+  const [leagues, setLeagues] = useState<Array<PredictionLeague>>([]);
+
+  const leagueCollectionRef = collection(db, 'leagues');
+
+  const fetchLeagues = async () => {
+    try {
+      const data = await getDocs(leagueCollectionRef);
+      const leagues = data.docs.map(doc => ({
+        ...doc.data() as PredictionLeague,
+        documentId: doc.id,
+      }));
+      setLeagues(leagues);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeagues();
+  }, []);
+
+  console.log('leagues', leagues);
 
   const handleCalculatePoints = () => {
     if (homeGoals === '' || awayGoals === '' || resultHomeGoals === '' || resultAwayGoals === '') {
@@ -142,10 +171,57 @@ const TestPage = () => {
     }
   }
 
+  const handleCreateLeague = async () => {
+    if (newLeagueName.length === 0) return;
+
+    const newLeague: PredictionLeagueInput = {
+      name: newLeagueName,
+      description: '',
+      creatorId: auth?.currentUser?.email || '',
+    }
+
+    try {
+      await addDoc(leagueCollectionRef, newLeague);
+      fetchLeagues();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeleteLeague = async (id: string) => {
+    const leagueDoc = doc(db, 'leagues', id);
+    console.log(leagueDoc);
+    await deleteDoc(leagueDoc);
+    fetchLeagues();
+  }
+
   return (
     <Page user={undefined}>
       <Wrapper>
-        <HeadingsTypography variant="h1">Tipset</HeadingsTypography>
+        <Section gap='s' backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
+          <HeadingsTypography variant='h3'>Dina ligor</HeadingsTypography>
+          {leagues.length > 0 && (
+            <Section gap='s'>
+              {leagues.map((league) => (
+                <Section key={league.documentId} gap='xxxs' flexDirection='row' alignItems='center'>
+                  <NormalTypography variant='m'>{league.name}</NormalTypography>
+                  <IconButton icon={<Trash size={24}/>} colors={{normal: theme.colors.primary}} onClick={() => handleDeleteLeague(league.documentId)} />
+                </Section>
+              ))}
+            </Section>
+          )}
+        </Section>
+        <Section gap='s' backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
+          <HeadingsTypography variant='h3'>Skapa liga</HeadingsTypography>
+          <Input 
+            placeholder='Liganamn'
+            value={newLeagueName}
+            onChange={(e) => setNewLeagueName(e.currentTarget.value)}
+          />
+          <Button variant='primary' onClick={handleCreateLeague}>
+            Skapa liga
+          </Button>
+        </Section>
         <Section 
           backgroundColor={theme.colors.white}
           padding={theme.spacing.m}

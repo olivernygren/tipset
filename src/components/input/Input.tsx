@@ -4,6 +4,7 @@ import { theme } from '../../theme';
 
 interface InputProps {
   type?: 'text' | 'password';
+  name?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   maxWidth?: string;
@@ -24,9 +25,10 @@ interface StyledInputProps {
   fontWeight?: string;
 }
 
-const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, fullWidth, textAlign, fontSize, fontWeight }: InputProps) => {
+const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, fullWidth, textAlign, fontSize, fontWeight, name }: InputProps) => {
   return (
     <StyledInput
+      name={name}
       type={type || 'text'}
       value={value}
       onChange={onChange}

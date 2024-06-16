@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { Divider } from '../Divider';
 import FormIcon from '../form/FormIcon';
 import Select from '../input/Select';
+import Button from '../buttons/Button';
 
 interface GamePredictorProps {
   game: Game;
@@ -32,13 +33,11 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
 
     return (
       <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
-      {/* <Section gap='xxxs'> */}
         <Section flexDirection={isAwayTeam ? 'row-reverse' : 'row'} alignItems='center' gap='xxs' justifyContent='flex-end'>
           <Avatar src={logoUrl} size={AvatarSize.M} alt={`${name} logo`} />
-          <EmphasisTypography variant='l'>{name}</EmphasisTypography>
+          <EmphasisTypography variant='l' align={isAwayTeam ? 'left' : 'right'}>{name}</EmphasisTypography>
         </Section>
         {getTeamForm(isAwayTeam)}
-      {/* </Section> */}
       </TeamContainer>
     )
   };
@@ -117,19 +116,47 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
 
     return [
       {
-        label: 'Försvarare (6p)',
+        label: 'Försvarare (8p)',
         options: defenders.map(getOptionItem)
       },
       {
-        label: 'Mittfältare (3p)',
+        label: 'Mittfältare (4p)',
         options: midfielders.map(getOptionItem)
       },
       {
-        label: 'Anfallare (2p)',
+        label: 'Anfallare (3p)',
         options: forwards.map(getOptionItem)
       }
     ]
   };
+
+  const handleInputChange = (team: 'home' | 'away', value: string) => {
+    if (value !== '' && !/^[0-9]$/.test(value)) {
+      return;
+    }
+    if (team === 'home') {
+      setHomeGoals(value);
+    } else {
+      setAwayGoals(value);
+    }
+    onResultUpdate(gameNumber, homeGoals, awayGoals);
+  }
+
+  const handleSave = () => {
+    fetch('http://localhost:8000/test', {
+      method: 'GET', // or 'POST'
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': 'Bearer ' + token // if you have a token
+      },
+      // body: JSON.stringify(data), // if you're sending data
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
   
   return (
     <Section gap='xs' alignItems='center'>
@@ -155,7 +182,7 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
           />
           <Input
             value={homeGoals}
-            onChange={(e) => setHomeGoals(e.currentTarget.value)}
+            onChange={(e) => handleInputChange('home', e.currentTarget.value)}
             placeholder='0'
             maxWidth='50px'
             textAlign='center'
@@ -179,7 +206,7 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
           />
           <Input
             value={awayGoals}
-            onChange={(e) => setAwayGoals(e.currentTarget.value)}
+            onChange={(e) => handleInputChange('away', e.currentTarget.value)}
             placeholder='0'
             maxWidth='50px'
             textAlign='center'
@@ -195,16 +222,21 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
         </Section>
         {getTeam(game.awayTeam, true)}
       </GameWrapper>
-      <Divider />
-      <Section flexDirection='row' justifyContent='space-between' padding="12px 0 0 0" alignItems='center'>
-        <EmphasisTypography variant='m'>Välj målskytt i matchen</EmphasisTypography>
-        <Select 
-          options={[]}
-          optionGroups={getOptionGroups()}
-          value={predictedPlayerToScore?.id || ''}
-          onChange={(value) => setPredictedPlayerToScore(getPlayerById(value))}
-        />
-      </Section>
+      {game.shouldPredictGoalScorer && (
+        <>
+          <Divider />
+          <Section flexDirection='row' justifyContent='space-between' padding="12px 0 0 0" alignItems='center'>
+            <EmphasisTypography variant='m'>Välj målskytt i matchen</EmphasisTypography>
+            <Select 
+              options={[]}
+              optionGroups={getOptionGroups()}
+              value={predictedPlayerToScore?.id || ''}
+              onChange={(value) => setPredictedPlayerToScore(getPlayerById(value))}
+              />
+          </Section>
+        </>
+      )}
+      <Button variant='primary' onClick={handleSave}>Spara</Button>
     </Section>
   )
 }

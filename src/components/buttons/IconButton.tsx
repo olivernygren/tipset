@@ -9,9 +9,9 @@ interface ButtonProps {
   disabled?: boolean;
   colors: {
     normal: string;
-    hover: string;
-    active: string;
-    disabled: string;
+    hover?: string;
+    active?: string;
+    disabled?: string;
   }
 }
 
@@ -20,9 +20,9 @@ interface StyledButtonProps {
   disabled?: boolean;
   colors: {
     normal: string;
-    hover: string;
-    active: string;
-    disabled: string;
+    hover?: string;
+    active?: string;
+    disabled?: string;
   }
 }
 

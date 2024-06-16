@@ -28,6 +28,7 @@ export interface Game {
   awayTeamForm: Array<TeamMatchOutcomeEnum>;
   kickOffTime: Date;
   finalResult?: GameResult;
+  shouldPredictGoalScorer?: boolean;
 }
 
 export interface Prediction {
@@ -36,4 +37,9 @@ export interface Prediction {
   awayGoals: number;
   points?: number;
   goalScorer?: Player;
+}
+
+export interface GameWeek {
+  games: Array<Game>;
+  deadline: Date;
 }
