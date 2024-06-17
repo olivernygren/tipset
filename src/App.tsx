@@ -10,17 +10,63 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import AdminPage from './pages/admin';
 import PrivateRoute from './components/auth/PrivateRoute';
 import AdminLayout from './layouts/AdminLayout';
+import AdminUsersPage from './pages/admin/users';
+import path from 'path';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // initialize loading state as true
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setUser(user);
-      setIsLoading(false); // set loading state to false when user data has been fetched
+      setIsLoading(false);
     });
   }, []);
+
+  const pages = [
+    {
+      pageComponentElement: <HomePage />,
+      path: '/',
+    },
+    {
+      pageComponentElement: <TestPage />,
+      path: '/test',
+    },
+    {
+      pageComponentElement: <LoginPage />,
+      path: '/login',
+    },
+  ]
+
+  const adminPages = [
+    {
+      pageComponentElement: <AdminPage />,
+      path: '/admin',
+    },
+    {
+      pageComponentElement: <AdminUsersPage />,
+      path: '/admin/users',
+    }
+  ];
+
+  const getPage = (pageComponentElement: JSX.Element, path: string) => {
+    return (
+      <Route path={path} element={pageComponentElement} />
+    );
+  }
+
+  const getAdminPage = (pageComponentElement: JSX.Element, path: string) => {
+    return (
+      <Route path={path} element={
+        <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin={true}>
+          <AdminLayout>
+            {pageComponentElement}
+          </AdminLayout>
+        </PrivateRoute>
+      } />
+    );
+  }
 
   return (
     <Root>
@@ -28,17 +74,8 @@ const App = () => {
       <Router>
         <div className="App">
           <Routes>
-            {/* Define your routes here */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/test" element={<TestPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={
-              <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin={true}>
-                <AdminLayout>
-                  <AdminPage />
-                </AdminLayout>
-              </PrivateRoute>
-            } />
+            {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
+            {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
           </Routes>
         </div>
       </Router>
