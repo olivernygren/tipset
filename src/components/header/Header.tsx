@@ -26,6 +26,8 @@ const Header = ({ user }: HeaderProps) => {
       console.error(e);
     }
   }
+
+  console.log(user)
   
   return (
     <StyledHeader>
@@ -34,18 +36,18 @@ const Header = ({ user }: HeaderProps) => {
         {isSignedIn && (
           <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
         )}
-        <InvisibleLink href={RoutesEnum.TEST}>
+        <InvisibleLink href={`/${RoutesEnum.TEST}`}>
           <Button variant='secondary' size='m'>Test</Button>
         </InvisibleLink>
         {isSignedIn && (
-          <InvisibleLink href={RoutesEnum.ADMIN}>
+          <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
             <Button variant='secondary' size='m'>Admin</Button>
           </InvisibleLink>
         )}
         {isSignedIn ? (
           <Button variant='primary' size='m' onClick={handleSignOut}>Logga ut</Button>
         ) : (
-          <InvisibleLink href={RoutesEnum.LOGIN}>
+          <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
             <Button variant='primary' size='m'>Logga in</Button>
           </InvisibleLink>
         )}

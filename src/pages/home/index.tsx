@@ -4,13 +4,9 @@ import { theme } from '../../theme';
 import GamePredictor from '../../components/game/GamePredictor';
 import { Game, TeamMatchOutcomeEnum } from '../../utils/Game';
 import { Section } from '../../components/section/Section';
-import { HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
+import { HeadingsTypography } from '../../components/typography/Typography';
 import { Divider } from '../../components/Divider';
 import { getTeamByName } from '../../utils/Team';
-import { db } from '../../config/firebase';
-import { PredictionLeague } from '../../utils/League';
-import { useEffect, useState } from 'react';
-import { getDocs, collection } from 'firebase/firestore';
 
 const MockGame1: Game = {
   homeTeam: getTeamByName('England')!,

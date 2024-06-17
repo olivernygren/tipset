@@ -3,15 +3,24 @@ import { Section } from '../section/Section'
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Input from '../input/Input';
 import Button from '../buttons/Button';
-import { auth, provider as googleProvider } from '../../config/firebase';
-import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { auth, db, provider as googleProvider } from '../../config/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import { theme } from '../../theme';
 import { Divider } from '../Divider';
+import { addDoc, collection } from 'firebase/firestore';
+import { CollectionEnum } from '../../utils/Firebase';
+import { CreateUserInput, RolesEnum } from '../../utils/Auth';
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [firstname, setFirstname] = useState<string>('');
+  const [lastname, setLastname] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [showRegisterView, setShowRegisterView] = useState<boolean>(false);
 
   const handleSignIn = async () => {
     if (!email || !password || email === '' || password === '') {
@@ -25,7 +34,8 @@ const Auth = () => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/home');
     } catch (e) {
       console.error(e);
     }
@@ -39,20 +49,33 @@ const Auth = () => {
     }
   }
 
-  const handleSignOut = async () => {
+  const handleCreateAccount = async () => {
+    const input: CreateUserInput = {
+      email,
+      firstname,
+      lastname,
+      role: RolesEnum.USER
+    }
+
     try {
-      await signOut(auth);
+      await createUserWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db, CollectionEnum.USERS), input);
+      await updateProfile(auth.currentUser!, {
+        displayName: `${firstname} ${lastname}`,
+      });
+
+      navigate('/home');
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   console.log(auth?.currentUser?.email);
 
   return (
     <Section gap='m'>
       <HeadingsTypography variant='h2'>
-        Logga in
+        {showRegisterView ? 'Skapa konto' : 'Logga in'}
       </HeadingsTypography>
       {auth?.currentUser?.email ? (
         <NormalTypography variant='m'>
@@ -76,16 +99,32 @@ const Auth = () => {
         value={password}
         onChange={(e) => setPassword(e.currentTarget.value)}
       />
+      {showRegisterView && (
+        <>
+          <Input
+            type='text'
+            placeholder='Förnamn'
+            value={firstname}
+            onChange={(e) => setFirstname(e.currentTarget.value)}
+          />
+          <Input
+            type='text'
+            placeholder='Efternamn'
+            value={lastname}
+            onChange={(e) => setLastname(e.currentTarget.value)}
+          />
+        </>
+      )}
       {error.length > 0 && <NormalTypography variant='m' color={theme.colors.textDefault}>{error}</NormalTypography>}
+      <Button variant='primary' onClick={showRegisterView ? handleCreateAccount : handleSignIn}>
+        {showRegisterView ? 'Skapa konto' : 'Logga in'}
+      </Button>
       <Button variant='secondary' onClick={handleGoogleSignIn}>
         Logga in med Google
       </Button>
-      <Button variant='primary' onClick={handleSignIn}>
-        Logga in
-      </Button>
       <Divider color={theme.colors.silver} />
-      <Button variant='secondary' onClick={handleSignOut}>
-        Logga ut
+      <Button variant='secondary' onClick={() => setShowRegisterView(!showRegisterView)}>
+        {showRegisterView ? 'Logga in' : 'Skapa konto'}
       </Button>
     </Section>
   )

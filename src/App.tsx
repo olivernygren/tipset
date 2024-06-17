@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import AdminPage from './pages/admin';
 import PrivateRoute from './components/auth/PrivateRoute';
+import AdminLayout from './layouts/AdminLayout';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +34,9 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={
               <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin={true}>
-                <AdminPage />
+                <AdminLayout>
+                  <AdminPage />
+                </AdminLayout>
               </PrivateRoute>
             } />
           </Routes>
