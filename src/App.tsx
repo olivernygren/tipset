@@ -12,6 +12,9 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import AdminLayout from './layouts/AdminLayout';
 import AdminUsersPage from './pages/admin/users';
 import AdminLeaguesPage from './pages/admin/leagues';
+import PredictionLeaguesPage from './pages/leagues';
+import { RoutesEnum } from './utils/Routes';
+import { AnimatePresence } from 'framer-motion';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,26 +34,30 @@ const App = () => {
     },
     {
       pageComponentElement: <TestPage />,
-      path: '/test',
+      path: `/${RoutesEnum.TEST}`,
     },
     {
       pageComponentElement: <LoginPage />,
-      path: '/login',
+      path: `/${RoutesEnum.LOGIN}`,
+    },
+    {
+      pageComponentElement: <PredictionLeaguesPage />,
+      path: `/${RoutesEnum.LEAGUES}`,
     },
   ]
 
   const adminPages = [
     {
       pageComponentElement: <AdminPage />,
-      path: '/admin',
+      path: `/${RoutesEnum.ADMIN}`,
     },
     {
       pageComponentElement: <AdminUsersPage />,
-      path: '/admin/users',
+      path: `/${RoutesEnum.ADMIN_USERS}`,
     },
     {
       pageComponentElement: <AdminLeaguesPage />,
-      path: '/admin/leagues',
+      path: `/${RoutesEnum.ADMIN_LEAGUES}`,
     }
   ];
 
@@ -73,17 +80,19 @@ const App = () => {
   }
 
   return (
-    <Root>
-      <Header user={user} />
-      <Router>
-        <div className="App">
-          <Routes>
-            {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
-            {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
-          </Routes>
-        </div>
-      </Router>
-    </Root>
+    <AnimatePresence>
+      <Root>
+        <Header user={user} />
+        <Router>
+          <div className="App">
+            <Routes>
+              {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
+              {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
+            </Routes>
+          </div>
+        </Router>
+      </Root>
+    </AnimatePresence>
   );
 }
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
+import { Section } from '../section/Section';
+import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 
 interface InputProps {
   type?: 'text' | 'password';
@@ -15,6 +17,8 @@ interface InputProps {
   textAlign?: 'left' | 'center' | 'right';
   fontSize?: string;
   fontWeight?: string;
+  compact?: boolean;
+  label?: string;
 }
 
 interface StyledInputProps {
@@ -23,24 +27,38 @@ interface StyledInputProps {
   textAlign?: 'left' | 'center' | 'right';
   fontSize?: string;
   fontWeight?: string;
+  compact?: boolean;
 }
 
-const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, fullWidth, textAlign, fontSize, fontWeight, name }: InputProps) => {
+const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact }: InputProps) => {
   return (
-    <StyledInput
-      name={name}
-      type={type || 'text'}
-      value={value}
-      onChange={onChange}
-      maxLength={maxLength}
-      maxWidth={maxWidth}
-      placeholder={placeholder}
-      disabled={disabled}
-      fullWidth={fullWidth}
-      textAlign={textAlign}
-      fontSize={fontSize}
-      fontWeight={fontWeight}
-    />
+    <Section gap='xxxs'>
+      {label && (
+        <LabelContainer>
+          <EmphasisTypography variant='s'>{label}</EmphasisTypography>
+        </LabelContainer>
+      )}
+      <StyledInput
+        name={name}
+        type={type || 'text'}
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
+        maxWidth={maxWidth}
+        placeholder={placeholder}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        textAlign={textAlign}
+        fontSize={fontSize}
+        fontWeight={fontWeight}
+        compact={compact}
+      />
+      {maxLength && (
+        <NormalTypography variant='s' color={theme.colors.textLight}>
+          {value.length} / {maxLength} tecken
+        </NormalTypography>
+      )}
+    </Section>
   )
 }
 
@@ -59,6 +77,7 @@ const StyledInput = styled.input<StyledInputProps>`
   transition: border-color 0.1s;
   box-sizing: border-box;
   color: ${theme.colors.textDefault};
+  height: ${({ compact }) => compact ? '40px' : '48px'};
 
   &:focus {
     border-color: ${theme.colors.primary};
@@ -73,6 +92,10 @@ const StyledInput = styled.input<StyledInputProps>`
     color: ${theme.colors.textLight};
     cursor: not-allowed;
   }
+`;
+
+const LabelContainer = styled.div`
+  margin-bottom: ${theme.spacing.xxxs};
 `;
 
 export default Input;

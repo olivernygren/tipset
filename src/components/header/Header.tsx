@@ -26,37 +26,37 @@ const Header = ({ user }: HeaderProps) => {
       console.error(e);
     }
   }
-
-  console.log(user)
   
   return (
     <StyledHeader>
-      <InvisibleLink href="/">
-        <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
-      </InvisibleLink>
-      <Section gap="s" alignItems='center' flexDirection='row' fitContent>
-        <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
-          <NormalTypography variant='m' color={theme.colors.primary}>Ligor</NormalTypography>
-        </StyledNavLink>
-        {isSignedIn && (
-          <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
-        )}
-        <InvisibleLink href={`/${RoutesEnum.TEST}`}>
-          <Button variant='secondary' size='m'>Test</Button>
+      <Content>
+        <InvisibleLink href="/">
+          <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
         </InvisibleLink>
-        {isSignedIn && (
-          <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
-            <Button variant='secondary' size='m'>Admin</Button>
-          </InvisibleLink>
-        )}
-        {isSignedIn ? (
-          <Button variant='primary' size='m' onClick={handleSignOut}>Logga ut</Button>
-        ) : (
-          <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
-            <Button variant='primary' size='m'>Logga in</Button>
-          </InvisibleLink>
-        )}
-      </Section>
+        <Section gap="s" alignItems='center' flexDirection='row' fitContent>
+          <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
+            <EmphasisTypography variant='m' color={theme.colors.primary}>Ligor</EmphasisTypography>
+          </StyledNavLink>
+          {isSignedIn && (
+            <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
+          )}
+          {/* <InvisibleLink href={`/${RoutesEnum.TEST}`}>
+            <Button variant='secondary' size='m'>Test</Button>
+          </InvisibleLink> */}
+          {isSignedIn && (
+            <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
+              <Button variant='secondary' size='m'>Admin</Button>
+            </InvisibleLink>
+          )}
+          {isSignedIn ? (
+            <Button variant='primary' size='m' onClick={handleSignOut}>Logga ut</Button>
+          ) : (
+            <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
+              <Button variant='primary' size='m'>Logga in</Button>
+            </InvisibleLink>
+          )}
+        </Section>
+      </Content>
     </StyledHeader>
   )
 }
@@ -65,12 +65,18 @@ const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
   border-bottom: 1px solid ${theme.colors.silver};
   padding: 0 ${theme.spacing.l};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   width: 100vw;
   height: 80px;
   box-sizing: border-box;
+`;
+
+const Content = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
 `;
 
 const InvisibleLink = styled.a`

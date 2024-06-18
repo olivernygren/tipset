@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../../config/firebase';
 import { generateLeagueInviteCode, withDocumentId } from '../../../utils/helpers';
@@ -8,7 +8,7 @@ import { HeadingsTypography, NormalTypography } from '../../../components/typogr
 import styled from 'styled-components';
 import IconButton from '../../../components/buttons/IconButton';
 import { Trash } from '@phosphor-icons/react';
-import { PredictionLeague, PredictionLeagueInput } from '../../../utils/League';
+import { PredictionLeague, CreatePredictionLeagueInput } from '../../../utils/League';
 import { CollectionEnum } from '../../../utils/Firebase';
 import Button from '../../../components/buttons/Button';
 import Input from '../../../components/input/Input';
@@ -41,31 +41,26 @@ const AdminLeaguesPage = () => {
     fetchLeagues(); 
   }
 
-  // create /leagues page
-  // render leagues that user is part of (fetch multiple league docs where uid is in participants array)
-  // if no leagues, show input to enter league invitation code or create league
-
-  // create /league/:id page
-  // render league info, participants, matches, predictions
-  // if uid is in participants array, show content - if not, show button to accept invitation
-
-  // when joining league, add uid to participants array and add league id to user "leagues" field?
-
   const handleCreateLeague = async () => {
     if (leagueName.length === 0) return;
 
-    const newLeague: PredictionLeagueInput = {
+    const today = new Date();
+    const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
+
+    const newLeague: CreatePredictionLeagueInput = {
       name: leagueName,
       description: leagueDescription,
-      creatorId: auth?.currentUser?.uid ?? '',
-      participants: [auth?.currentUser?.uid ?? '']
+      creatorId: auth.currentUser?.uid ?? '',
+      participants: [auth.currentUser?.uid ?? ''],
+      inviteCode: generateLeagueInviteCode(),
+      createdAt: new Date().toISOString(),
+      invitedUsers: [],
+      standings: [],
+      deadlineToJoin: oneMonthFromNow.toISOString(),
     }
 
     try {
-      await addDoc(leagueCollectionRef, {
-        ...newLeague,
-        inviteCode: generateLeagueInviteCode()
-      });
+      await addDoc(leagueCollectionRef, newLeague);
       setShowCreateLeagueForm(false);
       fetchLeagues();
     } catch (e) {

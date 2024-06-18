@@ -16,7 +16,7 @@ const AdminUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [])
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -26,7 +26,7 @@ const AdminUsersPage = () => {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const handleDeleteUser = async (documentId: string) => {
     if (auth.currentUser?.uid === documentId) {
@@ -35,7 +35,7 @@ const AdminUsersPage = () => {
     }
     const userDoc = doc(db, 'leagues', documentId);
     await deleteDoc(userDoc);
-    fetchUsers(); 
+    fetchUsers();
   }
 
   return (

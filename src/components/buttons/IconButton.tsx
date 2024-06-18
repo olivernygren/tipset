@@ -43,7 +43,7 @@ const StyledButton = styled.button<StyledButtonProps>`
   border: none;
   background-color: ${({ backgroundColor }) => backgroundColor || 'transparent'};
   cursor: pointer;
-  padding: ${theme.spacing.xs};
+  padding: ${theme.spacing.xxxs};
   border-radius: 50%;
 
   svg {

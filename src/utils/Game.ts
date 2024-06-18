@@ -32,14 +32,10 @@ export interface Game {
 }
 
 export interface Prediction {
+  userId: string;
   game: Game;
   homeGoals: number;
   awayGoals: number;
   points?: number;
   goalScorer?: Player;
-}
-
-export interface GameWeek {
-  games: Array<Game>;
-  deadline: Date;
 }

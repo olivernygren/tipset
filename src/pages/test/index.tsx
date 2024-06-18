@@ -12,10 +12,10 @@ import { theme } from '../../theme';
 import { Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById } from '../../utils/Players';
 import { addDoc, collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
-import { PredictionLeague, PredictionLeagueInput } from '../../utils/League';
+import { PredictionLeague, CreatePredictionLeagueInput } from '../../utils/League';
 import IconButton from '../../components/buttons/IconButton';
 import { Trash } from '@phosphor-icons/react';
-import { withDocumentId } from '../../utils/helpers';
+import { generateLeagueInviteCode, withDocumentId } from '../../utils/helpers';
 
 const TestPage = () => {
   const [homeGoals, setHomeGoals] = useState<string>('');
@@ -172,11 +172,19 @@ const TestPage = () => {
   const handleCreateLeague = async () => {
     if (newLeagueName.length === 0) return;
 
-    const newLeague: PredictionLeagueInput = {
+    const today = new Date();
+    const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
+
+    const newLeague: CreatePredictionLeagueInput = {
       name: newLeagueName,
       description: '',
-      creatorId: auth?.currentUser?.email || '',
-      participants: []
+      creatorId: auth.currentUser?.uid ?? '',
+      participants: [auth.currentUser?.uid ?? ''],
+      inviteCode: generateLeagueInviteCode(),
+      createdAt: new Date().toISOString(),
+      invitedUsers: [],
+      standings: [],
+      deadlineToJoin: oneMonthFromNow.toISOString(),
     }
 
     try {
