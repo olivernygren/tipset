@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { theme } from '../../theme';
 
 export enum AvatarSize {
   S = 'small',
@@ -12,11 +13,28 @@ interface AvatarProps {
   src: string;
   size: AvatarSize;
   alt?: string;
+  objectFit?: 'cover' | 'contain';
+  showBorder?: boolean;
+  customBorderColor?: string;
 }
 
-const Avatar = ({ src, size = AvatarSize.M, alt }: AvatarProps) => {
+interface StyledAvatarProps {
+  size: AvatarSize;
+  showBorder: boolean;
+  customBorderColor?: string;
+  objectFit: 'cover' | 'contain';
+}
+
+const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor }: AvatarProps) => {
   return (
-    <StyledAvatar src={src} size={size} alt={alt ?? 'avatar'} />
+    <StyledAvatar
+      size={size}
+      showBorder={showBorder}
+      customBorderColor={customBorderColor}
+      objectFit={objectFit}
+    >
+      <img src={src} alt={alt ?? 'avatar'} />
+    </StyledAvatar>
   )
 }
 
@@ -35,12 +53,31 @@ const getAvatarSize = (size: AvatarSize) => {
   }
 }
 
-const StyledAvatar = styled.img<AvatarProps>`
-  /* border-radius: 50%; */
+// const StyledAvatar = styled.img<AvatarProps>`
+//   border-radius: ${({ shape }) => shape === 'circle' ? '50%' : theme.borderRadius.xs};
+//   width: ${({ size }) => getAvatarSize(size)};
+//   height: ${({ size }) => getAvatarSize(size)};
+//   object-fit: ${({ objectFit }) => objectFit};
+//   object-position: center;
+//   border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silverLight}` : 'none'};
+//   padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
+// `;
+
+const StyledAvatar = styled.div<StyledAvatarProps>`
+  display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  object-fit: contain;
-  object-position: center;
+  border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silverLight}` : 'none'};
+  padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
+  overflow: hidden;
+  border-radius: 50%;
+
+  & > img {
+    width: 100%;
+    height: 100%;
+    object-fit: ${({ objectFit }) => objectFit};
+    object-position: center;
+  }
 `;
 
 export default Avatar;

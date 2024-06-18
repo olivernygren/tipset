@@ -176,6 +176,7 @@ const TestPage = () => {
       name: newLeagueName,
       description: '',
       creatorId: auth?.currentUser?.email || '',
+      participants: []
     }
 
     try {

@@ -14,6 +14,8 @@ import { Divider } from '../Divider';
 import FormIcon from '../form/FormIcon';
 import Select from '../input/Select';
 import Button from '../buttons/Button';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
 
 interface GamePredictorProps {
   game: Game;
@@ -33,9 +35,28 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
 
     return (
       <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
-        <Section flexDirection={isAwayTeam ? 'row-reverse' : 'row'} alignItems='center' gap='xxs' justifyContent='flex-end'>
-          <Avatar src={logoUrl} size={AvatarSize.M} alt={`${name} logo`} />
+        {/* <Section flexDirection={isAwayTeam ? 'row-reverse' : 'row'} alignItems='center' gap='xxs' justifyContent='flex-end'>
+          <Avatar 
+            src={logoUrl} 
+            size={AvatarSize.M} 
+            alt={`${name} logo`}
+            shape='square'
+          />
           <EmphasisTypography variant='l' align={isAwayTeam ? 'left' : 'right'}>{name}</EmphasisTypography>
+        </Section> */}
+        <Section gap='xxs' alignItems='center' fitContent>
+          <ClubAvatar 
+            clubName={name}
+            logoUrl={logoUrl} 
+            size={AvatarSize.L}
+            showBorder={false}
+          />
+          {/* <NationAvatar
+            nationName={name}
+            flagUrl={logoUrl}
+            size={AvatarSize.L}
+          /> */}
+          <EmphasisTypography variant='m'>{name}</EmphasisTypography>
         </Section>
         {getTeamForm(isAwayTeam)}
       </TeamContainer>

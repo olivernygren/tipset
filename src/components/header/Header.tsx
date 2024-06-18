@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { theme } from '../../theme';
-import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { Section } from '../section/Section';
 import Button from '../buttons/Button';
 import { RoutesEnum } from '../../utils/Routes';
@@ -31,8 +31,13 @@ const Header = ({ user }: HeaderProps) => {
   
   return (
     <StyledHeader>
-      <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
+      <InvisibleLink href="/">
+        <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
+      </InvisibleLink>
       <Section gap="s" alignItems='center' flexDirection='row' fitContent>
+        <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
+          <NormalTypography variant='m' color={theme.colors.primary}>Ligor</NormalTypography>
+        </StyledNavLink>
         {isSignedIn && (
           <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
         )}
@@ -71,6 +76,20 @@ const StyledHeader = styled.header`
 const InvisibleLink = styled.a`
   text-decoration: none;
   color: inherit;
-`;  
+`;
+
+const StyledNavLink = styled.a`
+  text-decoration: none;
+  padding: ${theme.spacing.s};
+  border-radius: ${theme.borderRadius.m};
+  > span {
+    &:hover {
+      color: ${theme.colors.primaryDark};
+    }
+    &:active {
+      color: ${theme.colors.primaryDarker};
+    }
+  }
+`;
 
 export default Header;

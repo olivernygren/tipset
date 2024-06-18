@@ -16,12 +16,6 @@ interface StyledSidebarLinkProps {
 const SidebarLink = ({ label, href, icon }: SidebarLinkProps) => {
   const isActive = href === window.location.pathname;
 
-  // const handleClick = () => {
-  //   if (isActive) return;
-
-
-  // }
-
   return (
     <InvisibleLink href={href}>
       <StyledSidebarLink active={isActive}>

@@ -11,7 +11,7 @@ import AdminPage from './pages/admin';
 import PrivateRoute from './components/auth/PrivateRoute';
 import AdminLayout from './layouts/AdminLayout';
 import AdminUsersPage from './pages/admin/users';
-import path from 'path';
+import AdminLeaguesPage from './pages/admin/leagues';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -47,6 +47,10 @@ const App = () => {
     {
       pageComponentElement: <AdminUsersPage />,
       path: '/admin/users',
+    },
+    {
+      pageComponentElement: <AdminLeaguesPage />,
+      path: '/admin/leagues',
     }
   ];
 

@@ -9,8 +9,8 @@ import { Divider } from '../../components/Divider';
 import { getTeamByName } from '../../utils/Team';
 
 const MockGame1: Game = {
-  homeTeam: getTeamByName('England')!,
-  awayTeam: getTeamByName('Norge')!,
+  homeTeam: getTeamByName('Arsenal')!,
+  awayTeam: getTeamByName('Ipswich')!,
   stadium: 'Emirates Stadium',
   tournament: 'Premier League',
   homeTeamForm: [TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.NONE],
@@ -21,7 +21,7 @@ const MockGame1: Game = {
 
 const MockGame2: Game = {
   homeTeam: getTeamByName('IFK Göteborg')!,
-  awayTeam: getTeamByName('IFK Norrköping')!,
+  awayTeam: getTeamByName('Västerås SK')!,
   stadium: 'Gamla Ullevi',
   tournament: 'Allsvenskan',
   homeTeamForm: [TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.NONE],

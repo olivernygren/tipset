@@ -59,7 +59,7 @@ const RootTypography = styled.div<RootTypographyProps>`
 
 export const NormalTypography = styled(RootTypography)<RegularTypographyProps>`
   font-size: ${({ variant }) => getRegularTypographySize(variant ?? 'm')};
-  font-weight: 300;
+  font-weight: 400;
 `;
 
 export const EmphasisTypography = styled(RootTypography)<RegularTypographyProps>`

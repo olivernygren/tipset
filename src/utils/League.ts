@@ -13,4 +13,5 @@ export interface PredictionLeagueInput {
   name: string;
   description: string;
   creatorId: string;
+  participants: Array<string>;
 }
