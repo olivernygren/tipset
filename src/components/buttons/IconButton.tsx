@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
+import { motion } from 'framer-motion';
 
 interface ButtonProps {
   icon: React.ReactNode;
@@ -12,7 +13,8 @@ interface ButtonProps {
     hover?: string;
     active?: string;
     disabled?: string;
-  }
+  };
+  shape?: 'circle' | 'square';
 }
 
 interface StyledButtonProps {
@@ -23,28 +25,37 @@ interface StyledButtonProps {
     hover?: string;
     active?: string;
     disabled?: string;
-  }
+  };
+  shape?: 'circle' | 'square';
 }
 
-const IconButton = ({ icon, backgroundColor, onClick, disabled, colors }: ButtonProps) => {
+const IconButton = ({ icon, backgroundColor, onClick, disabled, colors, shape = 'circle' }: ButtonProps) => {
   return (
     <StyledButton
       onClick={onClick}
       disabled={disabled}
       backgroundColor={backgroundColor}
       colors={colors}
+      shape={shape}
+      whileHover={{ 
+        scale: 1.05, 
+        backgroundColor: backgroundColor ? backgroundColor : 'transparent', 
+      }}
+      whileTap={{ 
+        backgroundColor: backgroundColor ? backgroundColor : 'transparent', 
+      }}
     >
       {icon}
     </StyledButton>
   )
 }
 
-const StyledButton = styled.button<StyledButtonProps>`
+const StyledButton = styled(motion.button)<StyledButtonProps>`
   border: none;
   background-color: ${({ backgroundColor }) => backgroundColor || 'transparent'};
   cursor: pointer;
   padding: ${theme.spacing.xxxs};
-  border-radius: 50%;
+  border-radius: ${({ shape }) => shape === 'circle' ? '50%' : theme.borderRadius.s};
   height: fit-content;
   display: flex;
   justify-content: center;

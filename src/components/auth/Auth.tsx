@@ -4,7 +4,7 @@ import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Input from '../input/Input';
 import Button from '../buttons/Button';
 import { auth, db, provider as googleProvider } from '../../config/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { theme } from '../../theme';
 import { Divider } from '../Divider';
 import { addDoc, collection } from 'firebase/firestore';
@@ -69,8 +69,6 @@ const Auth = () => {
       console.error(e);
     }
   };
-
-  console.log(auth?.currentUser?.email);
 
   return (
     <Section gap='m'>

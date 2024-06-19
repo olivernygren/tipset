@@ -29,7 +29,9 @@ const PredictionLeaguesPage = () => {
   const [showJoinLeagueModal, setShowJoinLeagueModal] = useState<boolean>(false);
   const [joinLeagueCodeValue, setJoinLeagueCodeValue] = useState<string>('');
   const [showJoinLeagueError, setShowJoinLeagueError] = useState<string>('');
-  const [leagueCardHovered, setLeagueCardHovered] = useState<string | undefined>(undefined)
+  const [leagueCardHovered, setLeagueCardHovered] = useState<string | undefined>(undefined);
+  const [createLeagueLoading, setCreateLeagueLoading] = useState<boolean>(false);
+  const [joinLeagueLoading, setJoinLeagueLoading] = useState<boolean>(false);
 
   const currentUserId = auth.currentUser?.uid ?? '';
   const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
@@ -59,8 +61,12 @@ const PredictionLeaguesPage = () => {
   };
 
   const handleCreateLeague = async () => {
+    setCreateLeagueLoading(true);
+
     const today = new Date();
     const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
+
+    if (newLeagueName.length === 0) return;
 
     const newLeague: CreatePredictionLeagueInput = {
       name: newLeagueName,
@@ -82,6 +88,8 @@ const PredictionLeaguesPage = () => {
     } catch (e) {
       console.error(e);
     }
+
+    setCreateLeagueLoading(false);
   };
 
   const getLeagueByInvitationCode = async (inviteCode: string) => {
@@ -98,6 +106,7 @@ const PredictionLeaguesPage = () => {
   }
 
   const handleJoinLeague = async () => {
+    setJoinLeagueLoading(true);
     setShowJoinLeagueError('');
   
     const leagueDoc = await getLeagueByInvitationCode(joinLeagueCodeValue);
@@ -110,18 +119,20 @@ const PredictionLeaguesPage = () => {
     const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
   
     if (leagueData.participants.includes(currentUserId)) {
-      console.log('already in league');
       setShowJoinLeagueError('Du är redan med i denna liga');
+      setJoinLeagueLoading(false);
       return;
     }
 
     if (new Date(leagueData.deadlineToJoin) < new Date()) {
       setShowJoinLeagueError('Deadline för att gå med i denna liga har passerat');
+      setJoinLeagueLoading(false);
       return;
     }
 
     if (leagueData.participants.length >= 40) {
       setShowJoinLeagueError('Ligan har redan full kapacitet');
+      setJoinLeagueLoading(false);
       return;
     }
   
@@ -133,6 +144,8 @@ const PredictionLeaguesPage = () => {
       console.error(e);
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
     }
+
+    setJoinLeagueLoading(false);
   };
 
   const getLeagueCard = (league: PredictionLeague) => {
@@ -234,7 +247,13 @@ const PredictionLeaguesPage = () => {
               <Button variant='secondary' onClick={() => setShowCreateLeagueModal(false)} fullWidth>
                 Avbryt
               </Button>
-              <Button variant='primary' onClick={handleCreateLeague} disabled={newLeagueName.length === 0}fullWidth>
+              <Button
+                variant='primary'
+                onClick={handleCreateLeague} 
+                disabled={newLeagueName.length === 0}
+                loading={createLeagueLoading}
+                fullWidth
+              >
                 Skapa
               </Button>
             </ModalButtons>
@@ -263,7 +282,13 @@ const PredictionLeaguesPage = () => {
               <Button variant='secondary' onClick={() => setShowJoinLeagueModal(false)} fullWidth>
                 Avbryt
               </Button>
-              <Button variant='primary' onClick={handleJoinLeague} disabled={joinLeagueCodeValue.length === 0} fullWidth>
+              <Button
+                variant='primary'
+                onClick={handleJoinLeague} 
+                disabled={joinLeagueCodeValue.length === 0}
+                loading={joinLeagueLoading}
+                fullWidth
+              >
                 Gå med
               </Button>
             </ModalButtons>

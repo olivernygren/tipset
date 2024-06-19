@@ -15,6 +15,7 @@ import AdminLeaguesPage from './pages/admin/leagues';
 import PredictionLeaguesPage from './pages/leagues';
 import { RoutesEnum } from './utils/Routes';
 import { AnimatePresence } from 'framer-motion';
+import PredictionLeaguePage from './pages/admin/leagues/[leagueId]';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -44,6 +45,10 @@ const App = () => {
       pageComponentElement: <PredictionLeaguesPage />,
       path: `/${RoutesEnum.LEAGUES}`,
     },
+    {
+      pageComponentElement: <PredictionLeaguePage />,
+      path: `/${RoutesEnum.LEAGUE}`,
+    }
   ]
 
   const adminPages = [

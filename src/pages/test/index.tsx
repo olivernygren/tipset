@@ -16,6 +16,7 @@ import { PredictionLeague, CreatePredictionLeagueInput } from '../../utils/Leagu
 import IconButton from '../../components/buttons/IconButton';
 import { Trash } from '@phosphor-icons/react';
 import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
+import { CollectionEnum } from '../../utils/Firebase';
 
 const TestPage = () => {
   const [homeGoals, setHomeGoals] = useState<string>('');
@@ -196,7 +197,7 @@ const TestPage = () => {
   };
 
   const handleDeleteLeague = async (id: string) => {
-    const leagueDoc = doc(db, 'leagues', id);
+    const leagueDoc = doc(db, CollectionEnum.LEAGUES, id);
     console.log(leagueDoc);
     await deleteDoc(leagueDoc);
     fetchLeagues();

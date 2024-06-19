@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 import { motion } from 'framer-motion';
+import { SpinnerGap } from '@phosphor-icons/react';
 
 interface ButtonProps {
   variant?: 'primary' | 'secondary';
@@ -13,9 +14,10 @@ interface ButtonProps {
   color?: string;
   size?: 's' | 'm' | 'l';
   icon?: React.ReactNode;
+  loading?: boolean;
 }
 
-const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = theme.colors.primary, size = 'm', icon }: ButtonProps) => {
+const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = theme.colors.primary, size = 'm', icon, loading }: ButtonProps) => {
   return (
     <StyledButton
       variant={variant || 'primary'}
@@ -24,12 +26,12 @@ const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, c
           onClick();
         }
       }}
-      disabled={disabled}
+      disabled={disabled || loading}
       fullWidth={fullWidth}
       color={color}
       size={size}
       whileHover={{ 
-        scale: 1.05, 
+        scale: 1.03, 
         backgroundColor: variant === 'primary' ? theme.colors.primaryDark : 'transparent', 
         borderColor: variant === 'secondary' ? theme.colors.primaryDark : 'none' 
       }}
@@ -39,9 +41,15 @@ const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, c
       }}
     >
       {icon}
-      <EmphasisTypography variant='m' color={variant === 'primary' ? theme.colors.white : color} align='center'>
-        {children}
-      </EmphasisTypography>
+      {loading ? (
+        <RotationalSpinner>
+          <SpinnerGap size={24} color={variant === 'primary' ? theme.colors.white : theme.colors.primary} />
+        </RotationalSpinner>
+      ) : (
+        <EmphasisTypography variant='m' color={variant === 'primary' ? theme.colors.white : color} align='center'>
+          {children}
+        </EmphasisTypography>
+      )}
     </StyledButton>
   )
 }
@@ -61,20 +69,22 @@ const StyledButton = styled(motion.button)<ButtonProps>`
   justify-content: center;
   gap: ${theme.spacing.xxs};
 
-  /* &:hover {
-    background-color: ${({ color, variant }) => variant === 'primary' ? (color || theme.colors.primaryDark) : 'transparent'};
-    border-color: ${({ color, variant }) => variant === 'secondary' ? (theme.colors.primaryDark) : 'none'};
-  }
-
-  &:active {
-    background-color: ${({ color, variant }) => variant === 'primary' ? (color || theme.colors.primaryLight) : 'transparent'};
-    border-color: ${({ color, variant }) => variant === 'secondary' ? (theme.colors.primaryLight) : 'none'};
-  } */
-
   &:disabled {
     background-color: ${theme.colors.silver};
     border-color: ${theme.colors.silver};
     cursor: not-allowed;
+  }
+`;
+
+const RotationalSpinner = styled.div`
+  animation: spin 1s linear infinite;
+  height: 24px;
+  width: 24px;
+
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 

@@ -23,4 +23,5 @@ export const Section = styled.section<SectionProps>`
   border-radius: ${({ borderRadius }) => borderRadius || 0};
   box-sizing: border-box;
   width: ${({ fitContent }) => fitContent ? 'fit-content' : '100%'};
+  position: relative;
 `;
