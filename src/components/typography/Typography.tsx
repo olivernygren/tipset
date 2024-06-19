@@ -49,7 +49,7 @@ const getHeadingsTypographySize = (variant: HeadingsTypographyProps['variant']) 
   }
 }
 
-const RootTypography = styled.div<RootTypographyProps>`
+const RootTypography = styled.span<RootTypographyProps>`
   font-family: "Readex Pro", sans-serif;
   margin: 0;
   color: ${({ color }) => (color || theme.colors.textDefault)};

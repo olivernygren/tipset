@@ -16,6 +16,7 @@ import Select from '../input/Select';
 import Button from '../buttons/Button';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
+import GoalsInput from './GoalsInput';
 
 interface GamePredictorProps {
   game: Game;
@@ -35,16 +36,16 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
 
     return (
       <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
-        {/* <Section flexDirection={isAwayTeam ? 'row-reverse' : 'row'} alignItems='center' gap='xxs' justifyContent='flex-end'>
-          <Avatar 
-            src={logoUrl} 
-            size={AvatarSize.M} 
-            alt={`${name} logo`}
-            shape='square'
+        {/* <Section flexDirection={isAwayTeam ? 'row-reverse' : 'row'} alignItems='center' gap='xxxs' justifyContent='flex-end'>
+          <ClubAvatar 
+            clubName={name}
+            logoUrl={logoUrl} 
+            size={AvatarSize.M}
+            showBorder={false}
           />
-          <EmphasisTypography variant='l' align={isAwayTeam ? 'left' : 'right'}>{name}</EmphasisTypography>
+          <EmphasisTypography variant='m' align={isAwayTeam ? 'left' : 'right'}>{name}</EmphasisTypography>
         </Section> */}
-        <Section gap='xxs' alignItems='center' fitContent>
+        <AvatarAndTeamName>
           <ClubAvatar 
             clubName={name}
             logoUrl={logoUrl} 
@@ -57,8 +58,8 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
             size={AvatarSize.L}
           /> */}
           <EmphasisTypography variant='m'>{name}</EmphasisTypography>
-        </Section>
-        {getTeamForm(isAwayTeam)}
+        </AvatarAndTeamName>
+        {/* {getTeamForm(isAwayTeam)} */}
       </TeamContainer>
     )
   };
@@ -182,65 +183,33 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
   return (
     <Section gap='xs' alignItems='center'>
       <Section flexDirection='row' gap='s' alignItems='center' justifyContent='center'>
-          <Section flexDirection='row' gap='xxxs' alignItems='center' fitContent>
-            <MapPin size={20} weight="fill" />
-            <NormalTypography variant='m'>{game.stadium}</NormalTypography>
-          </Section>
-          <NormalTypography variant='m'>•</NormalTypography>
-          <NormalTypography variant='m'>{getKickoffTime()}</NormalTypography>
-          <NormalTypography variant='m'>•</NormalTypography>
-          <NormalTypography variant='m'>{game.tournament}</NormalTypography>
+        <Section flexDirection='row' gap='xxxs' alignItems='center' fitContent>
+          <MapPin size={16} weight="fill" />
+          <NormalTypography variant='s' align='center'>{game.stadium}</NormalTypography>
+        </Section>
+        <NormalTypography variant='s'>•</NormalTypography>
+        <NormalTypography variant='s' align='center'>{getKickoffTime()}</NormalTypography>
+        <NormalTypography variant='s'>•</NormalTypography>
+        <NormalTypography variant='s' align='center'>{game.tournament}</NormalTypography>
       </Section>
       <Divider />
       <GameWrapper>
         {getTeam(game.homeTeam, false)}
-        <Section alignItems='center' fitContent>
-          <IconButton 
-            icon={<PlusCircle size={24} />}
-            onClick={() => handleIncreaseGoals('home')}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silver }}
-            disabled={homeGoals === '9'}
-          />
-          <Input
-            value={homeGoals}
-            onChange={(e) => handleInputChange('home', e.currentTarget.value)}
-            placeholder='0'
-            maxWidth='50px'
-            textAlign='center'
-            fontSize='30px'
-            fontWeight='600'
-          />
-          <IconButton 
-            icon={<MinusCircle size={24} />}
-            onClick={() => handleDecreaseGoals('home')}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silver }}
-            disabled={homeGoals === '0' || homeGoals === ''}
-          />
-        </Section>
+        <GoalsInput
+          team='home'
+          goals={homeGoals}
+          onIncrease={() => handleIncreaseGoals('home')}
+          onDecrease={() => handleDecreaseGoals('home')}
+          onInputChange={(value) => handleInputChange('home', value)}
+        />
         <NormalTypography variant='l'>–</NormalTypography>
-        <Section alignItems='center' fitContent>
-          <IconButton
-            icon={<PlusCircle size={24} />}
-            onClick={() => handleIncreaseGoals('away')}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silver }}
-            disabled={awayGoals === '9'}
-          />
-          <Input
-            value={awayGoals}
-            onChange={(e) => handleInputChange('away', e.currentTarget.value)}
-            placeholder='0'
-            maxWidth='50px'
-            textAlign='center'
-            fontSize='30px'
-            fontWeight='600'
-          />
-          <IconButton
-            icon={<MinusCircle size={24} />}
-            onClick={() => handleDecreaseGoals('away')}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silver}}
-            disabled={awayGoals === '0' || awayGoals === ''}
-          />
-        </Section>
+        <GoalsInput
+          team='away'
+          goals={awayGoals}
+          onIncrease={() => handleIncreaseGoals('away')}
+          onDecrease={() => handleDecreaseGoals('away')}
+          onInputChange={(value) => handleInputChange('away', value)}
+        />
         {getTeam(game.awayTeam, true)}
       </GameWrapper>
       {game.shouldPredictGoalScorer && (
@@ -269,19 +238,7 @@ const GameWrapper = styled.div`
   align-items: center;
   justify-items: center;
   width: 100%;
-`;
-
-const KickOffTime = styled.div`
-  background-color: ${theme.colors.silverLight};
-  padding: ${theme.spacing.xxs} ${theme.spacing.s};
-  border-radius: ${theme.borderRadius.s};
   margin-bottom: ${theme.spacing.xxxs};
-`;
-
-const StadiumAndTournament = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.xs};
 `;
 
 const TeamContainer = styled.div<{team: 'home' | 'away'}>`
@@ -292,6 +249,16 @@ const TeamContainer = styled.div<{team: 'home' | 'away'}>`
   align-items: ${({ team }) => team === 'home' ? 'flex-end' : 'flex-start'};
   padding-left: ${({ team }) => team === 'home' ? '0' : theme.spacing.m};
   padding-right: ${({ team }) => team === 'away' ? '0' : theme.spacing.m};
+`;
+
+const AvatarAndTeamName = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  flex-direction: column;
+  justify-content: center;
+  /* height: 100%; */
+  box-sizing: border-box;
+  align-items: center;
 `;
 
 export default GamePredictor;

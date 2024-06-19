@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../../config/firebase';
-import { generateLeagueInviteCode, withDocumentId } from '../../../utils/helpers';
+import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
 import { Section } from '../../../components/section/Section';
 import { theme } from '../../../theme';
 import { HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
@@ -28,7 +28,7 @@ const AdminLeaguesPage = () => {
   const fetchLeagues = async () => {
     try {
       const data = await getDocs(collection(db, CollectionEnum.LEAGUES));
-      const leagues = withDocumentId<PredictionLeague>(data.docs);
+      const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
       setLeagues(leagues);
     } catch (err) {
       console.error(err);

@@ -15,7 +15,7 @@ import { auth, db } from '../../config/firebase';
 import { PredictionLeague, CreatePredictionLeagueInput } from '../../utils/League';
 import IconButton from '../../components/buttons/IconButton';
 import { Trash } from '@phosphor-icons/react';
-import { generateLeagueInviteCode, withDocumentId } from '../../utils/helpers';
+import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
 
 const TestPage = () => {
   const [homeGoals, setHomeGoals] = useState<string>('');
@@ -35,7 +35,7 @@ const TestPage = () => {
   const fetchLeagues = async () => {
     try {
       const data = await getDocs(leagueCollectionRef);
-      const leagues = withDocumentId<PredictionLeague>(data.docs);
+      const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
       setLeagues(leagues);
     } catch (e) {
       console.error(e);

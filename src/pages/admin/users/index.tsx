@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { User } from '../../../utils/Auth';
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../../config/firebase';
-import { withDocumentId } from '../../../utils/helpers';
+import { withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
 import { Section } from '../../../components/section/Section';
 import { theme } from '../../../theme';
 import { HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
@@ -21,7 +21,7 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     try {
       const data = await getDocs(collection(db, CollectionEnum.USERS));
-      const users = withDocumentId<User>(data.docs);
+      const users = withDocumentIdOnObjectsInArray<User>(data.docs);
       setUsers(users);
     } catch (err) {
       console.error(err);

@@ -1,12 +1,12 @@
-import { getDocs, collection, where, query, addDoc } from 'firebase/firestore';
+import { getDocs, collection, where, query, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react'
 import { auth, db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { generateLeagueInviteCode, withDocumentId } from '../../utils/helpers';
+import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
 import { CreatePredictionLeagueInput, PredictionLeague } from '../../utils/League';
 import styled from 'styled-components';
 import { theme } from '../../theme';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
+import { HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
 import { Section } from '../../components/section/Section';
 import Button from '../../components/buttons/Button';
 import { PlusCircle, UserPlus } from '@phosphor-icons/react';
@@ -21,8 +21,9 @@ const PredictionLeaguesPage = () => {
   const [newLeagueName, setNewLeagueName] = useState<string>('');
   const [newLeagueDescription, setNewLeagueDescription] = useState<string>('');
   const [showCreateLeagueModal, setShowCreateLeagueModal] = useState<boolean>(false);
-  const [showJoinLeagueInput, setShowJoinLeagueInput] = useState<boolean>(false);
+  const [showJoinLeagueModal, setShowJoinLeagueModal] = useState<boolean>(false);
   const [joinLeagueCodeValue, setJoinLeagueCodeValue] = useState<string>('');
+  const [showJoinLeagueError, setShowJoinLeagueError] = useState<string>('');
 
   const currentUserId = auth.currentUser?.uid ?? '';
   const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
@@ -37,7 +38,7 @@ const PredictionLeaguesPage = () => {
   const fetchLeagues = async () => {    
     try {
       const data = await getDocs(query(collection(db, CollectionEnum.LEAGUES), where("participants", "array-contains", currentUserId)));
-      const currentUserLeagues = withDocumentId<PredictionLeague>(data.docs);      
+      const currentUserLeagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);      
       
       const creatorLeagues = currentUserLeagues.filter((league) => league.creatorId === currentUserId);
       const participantLeagues = currentUserLeagues.filter((league) => league.participants.includes(currentUserId ?? '---') && league.creatorId !== currentUserId);
@@ -46,9 +47,9 @@ const PredictionLeaguesPage = () => {
       setCreatorLeagues(creatorLeagues);
       setFetchLoading(false);
 
-      if (participantLeagues.length === 0 && creatorLeagues.length === 0) {
-        setShowJoinLeagueInput(true);
-      }
+      // if (participantLeagues.length === 0 && creatorLeagues.length === 0) {
+      //   setShowJoinLeagueModal(true);
+      // }
     } catch (err) {
       console.error(err);
       setFetchLoading(false);
@@ -74,12 +75,56 @@ const PredictionLeaguesPage = () => {
     try {
       await addDoc(leagueCollectionRef, newLeague);
       setShowCreateLeagueModal(false);
-      setShowJoinLeagueInput(false);
+      setShowJoinLeagueModal(false);
       fetchLeagues();
     } catch (e) {
       console.error(e);
     }
   };
+
+  const getLeagueByInvitationCode = async (inviteCode: string) => {
+    const q = query(collection(db, CollectionEnum.LEAGUES), where("inviteCode", "==", inviteCode));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const leagueDoc = querySnapshot.docs[0];
+      return leagueDoc;
+    } else {
+      console.log('No such document!');
+      return null;
+    }
+  }
+
+  const handleJoinLeague = async () => {
+    setShowJoinLeagueError('');
+  
+    const leagueDoc = await getLeagueByInvitationCode(joinLeagueCodeValue);
+  
+    if (!leagueDoc) {
+      setShowJoinLeagueError('Felaktig inbjudningskod');
+      return;
+    }
+  
+    const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
+  
+    console.log(leagueData);
+    console.log('currentUserId', currentUserId);
+  
+    if (leagueData.participants.includes(currentUserId)) {
+      console.log('already in league');
+      setShowJoinLeagueError('Du är redan med i denna liga');
+      return;
+    }
+  
+    try {
+      await updateDoc(leagueDoc.ref, { participants: [...leagueData.participants, currentUserId] });
+      setShowJoinLeagueModal(false);
+      fetchLeagues();
+    } catch (e) {
+      console.error(e);
+      setShowJoinLeagueError('Ett fel uppstod. Försök igen');
+    }
+  }
   
   return (
     <Page>
@@ -97,7 +142,7 @@ const PredictionLeaguesPage = () => {
           <Button 
             variant='secondary'
             size='s'
-            onClick={() => setShowJoinLeagueInput(true)}
+            onClick={() => setShowJoinLeagueModal(true)}
             icon={<UserPlus size={24} color={theme.colors.primary} />}
           >
             Gå med i liga
@@ -105,16 +150,6 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {showJoinLeagueInput && (
-          <Section fitContent>
-            <Input
-              label="Ange inbjudningskod"
-              type='text'
-              value={joinLeagueCodeValue}
-              onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
-            />
-          </Section>
-        )}
         {fetchLoading ? <NormalTypography variant='m'>Laddar ligor...</NormalTypography> : (
           <>
             <Section gap='s'>
@@ -178,6 +213,35 @@ const PredictionLeaguesPage = () => {
               </Button>
               <Button variant='primary' onClick={handleCreateLeague} disabled={newLeagueName.length === 0}fullWidth>
                 Skapa
+              </Button>
+            </ModalButtons>
+          </Section>
+        </Modal>
+      )}
+      {showJoinLeagueModal && (
+        <Modal
+          size='s'
+          title='Gå med i liga'
+          onClose={() => setShowJoinLeagueModal(false)}
+        >
+          <Section gap='m'>
+            <Input
+              label='Inbjudningskod'
+              type='text'
+              placeholder='t.ex. DHU8M2GL'
+              value={joinLeagueCodeValue}
+              onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
+              fullWidth
+            />
+            {showJoinLeagueError.length > 0 && (
+              <NormalTypography variant='s' color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+            )}
+            <ModalButtons>
+              <Button variant='secondary' onClick={() => setShowJoinLeagueModal(false)} fullWidth>
+                Avbryt
+              </Button>
+              <Button variant='primary' onClick={handleJoinLeague} disabled={joinLeagueCodeValue.length === 0} fullWidth>
+                Gå med
               </Button>
             </ModalButtons>
           </Section>

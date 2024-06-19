@@ -1,7 +1,7 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react'
 import { PredictionLeague } from '../../utils/League';
-import { withDocumentId } from '../../utils/helpers';
+import { withDocumentIdOnObjectsInArray } from '../../utils/helpers';
 import { db } from '../../config/firebase';
 import { User } from '../../utils/Auth';
 import { Section } from '../../components/section/Section';
@@ -22,8 +22,8 @@ const AdminDashboard = () => {
         getDocs(anotherCollectionRef),
       ]);
   
-      const leagues = withDocumentId<PredictionLeague>(leagueData.docs);
-      const anotherCollection = withDocumentId<User>(anotherData.docs);
+      const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(leagueData.docs);
+      const anotherCollection = withDocumentIdOnObjectsInArray<User>(anotherData.docs);
   
       setLeagues(leagues);
       setUsers(anotherCollection);

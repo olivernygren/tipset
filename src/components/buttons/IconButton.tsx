@@ -45,6 +45,10 @@ const StyledButton = styled.button<StyledButtonProps>`
   cursor: pointer;
   padding: ${theme.spacing.xxxs};
   border-radius: 50%;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   svg {
     fill: ${({ colors }) => colors.normal};
