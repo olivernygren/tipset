@@ -2,13 +2,16 @@ export const theme = {
   colors: {
     primary: '#0070f3',
     primaryLight: '#3291ff',
+    primaryLighter: '#7abaff',
+    primaryBleach: '#ebf7ff',
+    primaryFade: '#f0f7ff',
     primaryDark: '#0766d8',
     primaryDarker: '#0544a6',
     white: '#ffffff',
     black: '#000000',
     textDefault: '#333333',
-    textLight: '#777777',
-    textLighter: '#e1e1e1',
+    textLight: '#7D93A1',
+    textLighter: '#A9B8C1',
     silver: '#cccccc',
     silverLight: '#f2f2f2',
     silverLighter: '#f5f5f5',
@@ -38,4 +41,13 @@ export const theme = {
     xl: '16px',
     xxl: '24px',
   },
+}
+
+export const devices = {
+  mobile: `(min-width: 375px)`,
+  mobileL: `(min-width: 425px)`,
+  tablet: `(min-width: 768px)`,
+  laptop: `(min-width: 1024px)`,
+  desktop: `(min-width: 1440px)`,
+  desktopL: `(min-width: 2560px)`,
 }

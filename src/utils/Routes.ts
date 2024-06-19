@@ -7,3 +7,9 @@ export enum RoutesEnum {
   ADMIN_LEAGUES = 'admin/leagues',
   ADMIN_USERS = 'admin/users',
 }
+
+export enum QueryEnum {
+  ADMIN = 'admin',
+  LEAGUES = 'leagues',
+  USERS = 'users',
+}

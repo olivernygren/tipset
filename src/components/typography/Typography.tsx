@@ -60,11 +60,13 @@ const RootTypography = styled.span<RootTypographyProps>`
 export const NormalTypography = styled(RootTypography)<RegularTypographyProps>`
   font-size: ${({ variant }) => getRegularTypographySize(variant ?? 'm')};
   font-weight: 400;
+  transition: color 0.2s;
 `;
 
 export const EmphasisTypography = styled(RootTypography)<RegularTypographyProps>`
   font-size: ${({ variant }) => getRegularTypographySize(variant ?? 'm')};
   font-weight: 500;
+  transition: color 0.2s;
 `;
 
 export const HeadingsTypography = styled(RootTypography).attrs<HeadingsTypographyProps>(({ variant }) => ({
@@ -72,4 +74,5 @@ export const HeadingsTypography = styled(RootTypography).attrs<HeadingsTypograph
 }))<HeadingsTypographyProps>`
   font-size: ${({ variant }) => getHeadingsTypographySize(variant)};
   font-weight: 700;
+  transition: color 0.2s;
 `;

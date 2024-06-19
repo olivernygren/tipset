@@ -11,6 +11,7 @@ export interface PredictionLeague {
   invitedUsers: Array<string>;
   standings: Array<PredictionLeagueStanding>;
   deadlineToJoin: Date;
+  gameWeeks?: Array<LeagueGameWeek>;
 }
 
 export interface CreatePredictionLeagueInput {
