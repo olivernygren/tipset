@@ -1,32 +1,3 @@
-export enum ArsenalPlayersEnum {
-  DAVID_RAYA = 'David Raya',
-  AARON_RAMSDALE = 'Aaron Ramsdale',
-  KARL_HEIN = 'Karl Hein',
-  BEN_WHITE = 'Ben White',
-  TAKEHIRO_TOMIYASU = 'Takehiro Tomiyasu',
-  JURRIEN_TIMBER = 'Jurrien Timber',
-  GABRIEL_MAGALHAES = 'Gabriel Magalhães',
-  WILLAIM_SALIBA = 'William Saliba',
-  JAKUB_KIWIOR = 'Jakub Kiwior',
-  OLEKSANDR_ZINCHENKO = 'Oleksandr Zinchenko',
-  KIERAN_TIERNEY = 'Kieran Tierney',
-  NUNO_TAVARES = 'Nuno Tavares',
-  THOMAS_PARTEY = 'Thomas Partey',
-  DECLAN_RICE = 'Declan Rice',
-  ALBERT_SAMBI_LOKONGA = 'Albert Sambi Lokonga',
-  JORGINHO = 'Jorginho',
-  FABIO_VIEIRA = 'Fabio Vieira',
-  EMILE_SMITH_ROWE = 'Emile Smith Rowe',
-  MARTIN_ODEGAARD = 'Martin Ødegaard',
-  BUKAYO_SAKA = 'Bukayo Saka',
-  REISS_NELSON = 'Reiss Nelson',
-  GABRIEL_MARTINELLI = 'Gabriel Martinelli',
-  LEANDRO_TROSSARD = 'Leandro Trossard',
-  KAI_HAVERTZ = 'Kai Havertz',
-  GABRIEL_JESUS = 'Gabriel Jesus',
-  EDDIE_NKETIAH = 'Eddie Nketiah',
-}
-
 export enum ExactPositionEnum {
   GK = 'GK',
   RB = 'RB',
@@ -111,6 +82,7 @@ export enum CountryEnum {
   ESTONIA = 'Estonia',
 }
 
+
 export interface Player {
   id: string
   name: string;
@@ -121,6 +93,82 @@ export interface Player {
   number: number;
   age: number;
   country: CountryEnum;
+}
+
+export const getPlayersByGeneralPosition = (generalPosition: GeneralPositionEnum): Array<Player> => {
+  return ArsenalPlayers.filter((player) => player.position.general === generalPosition);
+}
+
+export const getPlayerById = (id: string): Player | undefined => {
+  return ArsenalPlayers.find((player) => player.id === id);
+}
+
+export const getAgeByBirthDate = (birthDate: string): number => {
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const month = today.getMonth() - birthDateObj.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDateObj.getDate())) {
+    age--;
+  }
+  return age;
+};
+
+export enum ArsenalPlayersEnum {
+  DAVID_RAYA = 'David Raya',
+  AARON_RAMSDALE = 'Aaron Ramsdale',
+  KARL_HEIN = 'Karl Hein',
+  BEN_WHITE = 'Ben White',
+  TAKEHIRO_TOMIYASU = 'Takehiro Tomiyasu',
+  JURRIEN_TIMBER = 'Jurrien Timber',
+  GABRIEL_MAGALHAES = 'Gabriel Magalhães',
+  WILLAIM_SALIBA = 'William Saliba',
+  JAKUB_KIWIOR = 'Jakub Kiwior',
+  OLEKSANDR_ZINCHENKO = 'Oleksandr Zinchenko',
+  KIERAN_TIERNEY = 'Kieran Tierney',
+  NUNO_TAVARES = 'Nuno Tavares',
+  THOMAS_PARTEY = 'Thomas Partey',
+  DECLAN_RICE = 'Declan Rice',
+  ALBERT_SAMBI_LOKONGA = 'Albert Sambi Lokonga',
+  JORGINHO = 'Jorginho',
+  FABIO_VIEIRA = 'Fabio Vieira',
+  EMILE_SMITH_ROWE = 'Emile Smith Rowe',
+  MARTIN_ODEGAARD = 'Martin Ødegaard',
+  BUKAYO_SAKA = 'Bukayo Saka',
+  REISS_NELSON = 'Reiss Nelson',
+  GABRIEL_MARTINELLI = 'Gabriel Martinelli',
+  LEANDRO_TROSSARD = 'Leandro Trossard',
+  KAI_HAVERTZ = 'Kai Havertz',
+  GABRIEL_JESUS = 'Gabriel Jesus',
+  EDDIE_NKETIAH = 'Eddie Nketiah',
+}
+
+export enum IFKGoteborgPlayersEnum {
+  PONTUS_DAHLBERG = 'Pontus Dahlberg',
+  ADAM_BENEDIKTSSON = 'Adam Benediktsson',
+  ELIS_BISHESARI = 'Elis Bishesari',
+  ANDERS_KRISTIANSEN = 'Anders Kristiansen',
+  EMIL_SALOMONSSON = 'Emil Salomonsson',
+  SEBASTIAN_OHLSSON = 'Sebastian Ohlsson',
+  GUSTAV_SVENSSON = 'Gustav Svensson',
+  SEBASTIAN_HAUSNER = 'Sebastian Hausner',
+  ADAM_CARLEN = 'Adam Carlén',
+  ANDERS_TRONDSEN = 'Anders Trondsen',
+  OSCAR_WENDT = 'Oscar Wendt',
+  KOLBEINN_THORDARSON = 'Kolbeinn Thordarson',
+  MALICK_YALCOUYE = 'Malick Yalcouyé',
+  ABUNDANCE_SALAOU = 'Abundance Salaou',
+  LUCAS_KAHED = 'Lucas Kåhed',
+  BENJAMIN_BRANTLIND = 'Benjamin Brantlind',
+  HUSSEIN_CARNEIL = 'Hussein Carneil',
+  THOMAS_SANTOS = 'Thomas Santos',
+  OSCAR_PETTERSSON = 'Oscar Pettersson',
+  ARBNOR_MUCOLLI = 'Arbnor Mucolli',
+  GUSTAF_NORLIN = 'Gustaf Norlin',
+  PAULOS_ABRAHAM = 'Paulos Abraham',
+  SULEIMAN_ABDULLAHI = 'Suleiman Abdullahi',
+  LINUS_CARLSTRAND = 'Linus Carlstrand',
+  LAURS_SKJELLERUP = 'Laurs Skjellerup',
 }
 
 export const ArsenalPlayers: Array<Player> = [
@@ -386,10 +434,49 @@ export const ArsenalPlayers: Array<Player> = [
   }
 ];
 
-export const getPlayersByGeneralPosition = (generalPosition: GeneralPositionEnum): Array<Player> => {
-  return ArsenalPlayers.filter((player) => player.position.general === generalPosition);
-}
-
-export const getPlayerById = (id: string): Player | undefined => {
-  return ArsenalPlayers.find((player) => player.id === id);
-}
+export const IFKGoteborgPlayers: Array<Player> = [
+  {
+    id: '3r9h39tf03ht03hfi',
+    name: IFKGoteborgPlayersEnum.PONTUS_DAHLBERG,
+    position: {
+      exact: ExactPositionEnum.GK,
+      general: GeneralPositionEnum.GK,
+    },
+    number: 1,
+    age: getAgeByBirthDate('1999-01-21'),
+    country: CountryEnum.SWEDEN,
+  },
+  {
+    id: 'gh9rgbberofv34hoigf3goh',
+    name: IFKGoteborgPlayersEnum.ADAM_BENEDIKTSSON,
+    position: {
+      exact: ExactPositionEnum.GK,
+      general: GeneralPositionEnum.GK,
+    },
+    number: 12,
+    age: getAgeByBirthDate('2002-10-28'),
+    country: CountryEnum.ICELAND,
+  },
+  {
+    id: 'gnrhwgf94wnfgpff4hgpgo',
+    name: IFKGoteborgPlayersEnum.ELIS_BISHESARI,
+    position: {
+      exact: ExactPositionEnum.GK,
+      general: GeneralPositionEnum.GK,
+    },
+    number: 25,
+    age: getAgeByBirthDate('2005-05-09'),
+    country: CountryEnum.SWEDEN,
+  },
+  {
+    id: 'gnrhwgf94wnfgpff4hgpgo',
+    name: IFKGoteborgPlayersEnum.ANDERS_KRISTIANSEN,
+    position: {
+      exact: ExactPositionEnum.GK,
+      general: GeneralPositionEnum.GK,
+    },
+    number: 34,
+    age: getAgeByBirthDate('1990-03-17'),
+    country: CountryEnum.NORWAY,
+  },
+];

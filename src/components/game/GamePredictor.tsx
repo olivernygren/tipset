@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Section } from '../section/Section';
 import Input from '../input/Input';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
-import { Game } from '../../utils/Game';
+import { Fixture } from '../../utils/Fixture';
 import { GeneralPositionEnum, Player, getPlayerById, getPlayersByGeneralPosition } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import { MapPin, MinusCircle, PlusCircle } from '@phosphor-icons/react';
@@ -19,7 +19,7 @@ import NationAvatar from '../avatar/NationAvatar';
 import GoalsInput from './GoalsInput';
 
 interface GamePredictorProps {
-  game: Game;
+  game: Fixture;
   gameNumber: number;
   onResultUpdate: (gameNumber: number, homeGoals: string, awayGoals: string) => void;
   onPlayerPredictionUpdate: (gameNumber: number, player: Player | undefined) => void;

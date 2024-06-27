@@ -7,7 +7,7 @@ import { auth, db, provider as googleProvider } from '../../config/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { theme } from '../../theme';
 import { Divider } from '../Divider';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { CollectionEnum } from '../../utils/Firebase';
 import { CreateUserInput, RolesEnum } from '../../utils/Auth';
 import { useNavigate } from 'react-router-dom';
@@ -70,6 +70,38 @@ const Auth = () => {
     }
   };
 
+  const handleCreateAccountWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+  
+      const displayNameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+      const firstname = displayNameParts[0];
+      let lastname = displayNameParts.slice(1).join(' ');
+  
+      // If there's no space in the displayName, you might decide to leave lastname empty or handle it differently
+      if (!user.displayName || displayNameParts.length === 1) {
+        lastname = ''; // Or any other fallback logic you prefer
+      }
+  
+      const input = {
+        email: user.email, // Google account's email
+        firstname,
+        lastname,
+        role: RolesEnum.USER
+      };
+  
+      await setDoc(doc(db, CollectionEnum.USERS, user.uid), input);  
+      await updateProfile(user, {
+        displayName: `${firstname} ${lastname}`,
+      });
+  
+      navigate('/home');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   return (
     <Section gap='m'>
       <HeadingsTypography variant='h2'>
@@ -117,8 +149,8 @@ const Auth = () => {
       <Button variant='primary' onClick={showRegisterView ? handleCreateAccount : handleSignIn}>
         {showRegisterView ? 'Skapa konto' : 'Logga in'}
       </Button>
-      <Button variant='secondary' onClick={handleGoogleSignIn}>
-        Logga in med Google
+      <Button variant='secondary' onClick={showRegisterView ? handleCreateAccountWithGoogle : handleGoogleSignIn}>
+        {showRegisterView ? 'Skapa konto med Google' : 'Logga in med Google'}
       </Button>
       <Divider color={theme.colors.silver} />
       <Button variant='secondary' onClick={() => setShowRegisterView(!showRegisterView)}>

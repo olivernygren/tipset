@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { auth, db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
-import { CreatePredictionLeagueInput, PredictionLeague } from '../../utils/League';
+import { CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximalParticipants } from '../../utils/League';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -16,9 +16,12 @@ import Modal from '../../components/modal/Modal';
 import Page from '../../components/Page';
 import Input from '../../components/input/Input';
 import { QueryEnum } from '../../utils/Routes';
+import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
+import { useUser } from '../../context/UserContext';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const [fetchLoading, setFetchLoading] = useState(true);
   const [participantLeagues, setParticipantLeagues] = useState<Array<PredictionLeague>>([]);
@@ -27,11 +30,12 @@ const PredictionLeaguesPage = () => {
   const [newLeagueDescription, setNewLeagueDescription] = useState<string>('');
   const [showCreateLeagueModal, setShowCreateLeagueModal] = useState<boolean>(false);
   const [showJoinLeagueModal, setShowJoinLeagueModal] = useState<boolean>(false);
+  const [joinLeagueCodeValueInModal, setJoinLeagueCodeValueInModal] = useState<string>('');
   const [joinLeagueCodeValue, setJoinLeagueCodeValue] = useState<string>('');
   const [showJoinLeagueError, setShowJoinLeagueError] = useState<string>('');
   const [leagueCardHovered, setLeagueCardHovered] = useState<string | undefined>(undefined);
   const [createLeagueLoading, setCreateLeagueLoading] = useState<boolean>(false);
-  const [joinLeagueLoading, setJoinLeagueLoading] = useState<boolean>(false);
+  const [joinLeagueLoading, setJoinLeagueLoading] = useState<string | null>(null);
 
   const currentUserId = auth.currentUser?.uid ?? '';
   const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
@@ -92,24 +96,14 @@ const PredictionLeaguesPage = () => {
     setCreateLeagueLoading(false);
   };
 
-  const getLeagueByInvitationCode = async (inviteCode: string) => {
-    const q = query(collection(db, CollectionEnum.LEAGUES), where("inviteCode", "==", inviteCode));
-    const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      const leagueDoc = querySnapshot.docs[0];
-      return leagueDoc;
-    } else {
-      console.log('No such document!');
-      return null;
-    }
-  }
-
   const handleJoinLeague = async () => {
-    setJoinLeagueLoading(true);
+    if (!currentUserId || !user) return;
+
+    setJoinLeagueLoading('modal');
     setShowJoinLeagueError('');
-  
-    const leagueDoc = await getLeagueByInvitationCode(joinLeagueCodeValue);
+
+    const code = joinLeagueCodeValueInModal.length > 0 ? joinLeagueCodeValueInModal.trim() : joinLeagueCodeValue.trim();
+    const leagueDoc = await getLeagueByInvitationCode(code);
   
     if (!leagueDoc) {
       setShowJoinLeagueError('Felaktig inbjudningskod');
@@ -120,24 +114,35 @@ const PredictionLeaguesPage = () => {
   
     if (leagueData.participants.includes(currentUserId)) {
       setShowJoinLeagueError('Du är redan med i denna liga');
-      setJoinLeagueLoading(false);
+      setJoinLeagueLoading(null);
       return;
     }
 
     if (new Date(leagueData.deadlineToJoin) < new Date()) {
       setShowJoinLeagueError('Deadline för att gå med i denna liga har passerat');
-      setJoinLeagueLoading(false);
+      setJoinLeagueLoading(null);
       return;
     }
 
-    if (leagueData.participants.length >= 40) {
+    if (leagueData.participants.length >= leagueMaximalParticipants) {
       setShowJoinLeagueError('Ligan har redan full kapacitet');
-      setJoinLeagueLoading(false);
+      setJoinLeagueLoading(null);
       return;
+    }
+
+    const newParticipantStandingsObj: PredictionLeagueStanding = {
+      userId: currentUserId,
+      username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
+      points: 0,
+      position: leagueData.participants.length + 1,
+      correctResults: 0,
     }
   
     try {
-      await updateDoc(leagueDoc.ref, { participants: [...leagueData.participants, currentUserId] });
+      await updateDoc(leagueDoc.ref, { 
+        participants: [...leagueData.participants, currentUserId],
+        standings: [...leagueData.standings, newParticipantStandingsObj]
+      });
       setShowJoinLeagueModal(false);
       fetchLeagues();
     } catch (e) {
@@ -145,7 +150,7 @@ const PredictionLeaguesPage = () => {
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
     }
 
-    setJoinLeagueLoading(false);
+    setJoinLeagueLoading(null);
   };
 
   const getLeagueCard = (league: PredictionLeague) => {
@@ -200,23 +205,56 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {fetchLoading ? <NormalTypography variant='m'>Laddar ligor...</NormalTypography> : (
+        {fetchLoading && <NormalTypography variant='m'>Laddar ligor...</NormalTypography>}
+        {!fetchLoading && [...creatorLeagues, ...participantLeagues].length > 0 && (
           <>
-            <Section gap='s'>
-              <HeadingsTypography variant='h3'>Dina skapade ligor</HeadingsTypography>
-              <LeaguesContainer>
-                {creatorLeagues.length > 0 ? creatorLeagues.map((league) => getLeagueCard(league)) : (
-                  <NormalTypography variant='m'>Du har inte skapat några ligor ännu.</NormalTypography>
-                )}
-              </LeaguesContainer>
-            </Section>
-            <Section gap='s'>
-              <HeadingsTypography variant='h3'>Andra ligor du deltar i</HeadingsTypography>
-              <LeaguesContainer>
-                {participantLeagues.length > 0 ? participantLeagues.map((league) => getLeagueCard(league)) : (
-                  <NormalTypography variant='m'>Du har inte gått med i några ligor ännu.</NormalTypography>
-                )}
-              </LeaguesContainer>
+            {creatorLeagues.length > 0 && (
+              <Section gap='s'>
+                <HeadingsTypography variant='h3'>Dina skapade ligor</HeadingsTypography>
+                <LeaguesContainer>
+                  {creatorLeagues.map((league) => getLeagueCard(league))}
+                </LeaguesContainer>
+              </Section>
+            )}
+            {participantLeagues.length > 0 && (
+              <Section gap='s'>
+                <HeadingsTypography variant='h3'>Ligor du deltar i</HeadingsTypography>
+                <LeaguesContainer>
+                  {participantLeagues.map((league) => getLeagueCard(league))}
+                </LeaguesContainer>
+              </Section>
+            )}
+          </>
+        )}
+        {!fetchLoading && [...creatorLeagues, ...participantLeagues].length === 0 && (
+          <>
+            <NormalTypography variant='m'>Du är inte med i några ligor ännu.</NormalTypography>
+            <Section flexDirection='row' gap='l'>
+              <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
+                <HeadingsTypography variant='h3'>Gå med i liga</HeadingsTypography>
+                <Input
+                  label='Ange inbjudningskod'
+                  type='text'
+                  placeholder='t.ex. KNT342G9'
+                  value={joinLeagueCodeValue}
+                  onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
+                />
+                <Button 
+                  onClick={handleJoinLeague}
+                  loading={joinLeagueLoading === 'input'}
+                  disabled={joinLeagueCodeValue.length === 0}
+                >
+                  Gå med
+                </Button>
+              </Section>
+              <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
+                <HeadingsTypography variant='h3'>Skapa liga</HeadingsTypography>
+                <Button 
+                  onClick={() => setShowCreateLeagueModal(true)}
+                >
+                  Skapa liga
+                </Button>
+              </Section>
             </Section>
           </>
         )}
@@ -271,8 +309,8 @@ const PredictionLeaguesPage = () => {
               label='Inbjudningskod'
               type='text'
               placeholder='t.ex. DHU8M2GL'
-              value={joinLeagueCodeValue}
-              onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
+              value={joinLeagueCodeValueInModal}
+              onChange={(e) => setJoinLeagueCodeValueInModal(e.currentTarget.value)}
               fullWidth
             />
             {showJoinLeagueError.length > 0 && (
@@ -285,8 +323,8 @@ const PredictionLeaguesPage = () => {
               <Button
                 variant='primary'
                 onClick={handleJoinLeague} 
-                disabled={joinLeagueCodeValue.length === 0}
-                loading={joinLeagueLoading}
+                disabled={joinLeagueCodeValueInModal.length === 0}
+                loading={joinLeagueLoading === 'modal'}
                 fullWidth
               >
                 Gå med
@@ -356,10 +394,9 @@ const BottomRow = styled.div`
 
 export default PredictionLeaguesPage;
 
-  // render leagues that user is part of (fetch multiple league docs where uid is in participants array)
   // if no leagues, show input to enter league invitation code or create league
 
-  // create /league/:id page
+  // /league/:id page
   // render league info, participants, matches, predictions
   // if uid is in participants array, show content - if not, show button to accept invitation
 

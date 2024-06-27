@@ -1,4 +1,6 @@
-import { Game, Prediction } from "./Game";
+import { Fixture, Prediction } from "./Fixture";
+
+export const leagueMaximalParticipants = 25;
 
 export interface PredictionLeague {
   documentId: string;
@@ -31,12 +33,13 @@ export interface PredictionLeagueStanding {
   username: string;
   points: number;
   position: number;
+  correctResults: number;
 }
 
 export interface LeagueGameWeek {
   id: string;
   round: number;
   deadline: Date;
-  games: Array<Game>;
+  games: Array<Fixture>;
   predictions: Array<Prediction>;
 }

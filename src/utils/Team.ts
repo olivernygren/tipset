@@ -16,6 +16,17 @@ export enum LeagueEnum {
   NATIONS = 'Landslag',
 }
 
+export const getTeamByNameAndLeague = (teamName: string, league: string) => {
+  return Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
+}
+
+export const getTeamByName = (teamName: string) => {
+  for (const league in Teams) {
+    const team = Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
+    if (team) return team;
+  }
+}
+
 export const Teams = {
   [LeagueEnum.PREMIER_LEAGUE]: [
     {
@@ -387,15 +398,4 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
     }
   ]
-}
-
-export const getTeamByNameAndLeague = (teamName: string, league: string) => {
-  return Teams[league as LeagueEnum].find(team => team.name === teamName);
-}
-
-export const getTeamByName = (teamName: string) => {
-  for (const league in Teams) {
-    const team = Teams[league as LeagueEnum].find((team) => team.name === teamName);
-    if (team) return team;
-  }
-}
+};

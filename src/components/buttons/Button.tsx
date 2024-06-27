@@ -5,7 +5,7 @@ import { EmphasisTypography } from '../typography/Typography';
 import { motion } from 'framer-motion';
 import { SpinnerGap } from '@phosphor-icons/react';
 
-interface ButtonProps {
+export interface ButtonProps {
   variant?: 'primary' | 'secondary';
   onClick?: () => void;
   children: any;

@@ -1,11 +1,11 @@
 import React from 'react';
-import { TeamMatchOutcomeEnum } from '../../utils/Game';
+import { FixtureOutcomeEnum } from '../../utils/Fixture';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 
 interface FormIconProps {
-  outcome: TeamMatchOutcomeEnum;
+  outcome: FixtureOutcomeEnum;
 }
 
 const FormIcon = ({ outcome }: FormIconProps) => {
@@ -16,13 +16,13 @@ const FormIcon = ({ outcome }: FormIconProps) => {
   )
 };
 
-const getBackgroundColor = (outcome: TeamMatchOutcomeEnum) => {
+const getBackgroundColor = (outcome: FixtureOutcomeEnum) => {
   switch (outcome) {
-    case TeamMatchOutcomeEnum.WIN:
+    case FixtureOutcomeEnum.WIN:
       return '#56BD47';
-    case TeamMatchOutcomeEnum.DRAW:
+    case FixtureOutcomeEnum.DRAW:
       return '#EEC803';
-    case TeamMatchOutcomeEnum.LOSS:
+    case FixtureOutcomeEnum.LOSS:
       return '#DC1414';
     default:
       return theme.colors.silver;

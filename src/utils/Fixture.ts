@@ -1,39 +1,39 @@
 import { Player } from "./Players";
 import { Team } from "./Team";
 
-export enum TeamMatchOutcomeEnum {
+export enum FixtureOutcomeEnum {
   WIN = 'V',
   DRAW = 'O',
   LOSS = 'F',
   NONE = '-',
 }
 
-export enum OutcomeEnum {
+export enum PredictionOutcomeEnum {
   HOME_TEAM_WIN = '1',
   DRAW = 'X',
   AWAY_TEAM_WIN = '2',
 }
 
-export interface GameResult {
+export interface FixtureResult {
   homeTeamGoals: number;
   awayTeamGoals: number;
 }
 
-export interface Game {
+export interface Fixture {
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
   tournament: string;
-  homeTeamForm: Array<TeamMatchOutcomeEnum>;
-  awayTeamForm: Array<TeamMatchOutcomeEnum>;
+  homeTeamForm: Array<FixtureOutcomeEnum>;
+  awayTeamForm: Array<FixtureOutcomeEnum>;
   kickOffTime: Date;
-  finalResult?: GameResult;
+  finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
 }
 
 export interface Prediction {
   userId: string;
-  game: Game;
+  fixture: Fixture;
   homeGoals: number;
   awayGoals: number;
   points?: number;

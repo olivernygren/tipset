@@ -21,6 +21,8 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('🟢', user);
+      
       if (user) {
         const userDocRef = doc(db, CollectionEnum.USERS, user.uid);
         const userDocSnap = await getDoc(userDocRef);

@@ -2,30 +2,30 @@ import styled from 'styled-components';
 import Page from '../../components/Page';
 import { theme } from '../../theme';
 import GamePredictor from '../../components/game/GamePredictor';
-import { Game, TeamMatchOutcomeEnum } from '../../utils/Game';
+import { Fixture, FixtureOutcomeEnum } from '../../utils/Fixture';
 import { Section } from '../../components/section/Section';
 import { HeadingsTypography } from '../../components/typography/Typography';
 import { Divider } from '../../components/Divider';
 import { getTeamByName } from '../../utils/Team';
 
-const MockGame1: Game = {
+const MockGame1: Fixture = {
   homeTeam: getTeamByName('Arsenal')!,
   awayTeam: getTeamByName('Ipswich')!,
   stadium: 'Emirates Stadium',
   tournament: 'Premier League',
-  homeTeamForm: [TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.NONE],
-  awayTeamForm: [TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.NONE],
+  homeTeamForm: [FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.NONE],
+  awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.NONE],
   kickOffTime: new Date('2024-10-10T18:15:00'),
   shouldPredictGoalScorer: true,
 }
 
-const MockGame2: Game = {
+const MockGame2: Fixture = {
   homeTeam: getTeamByName('IFK Göteborg')!,
   awayTeam: getTeamByName('Västerås SK')!,
   stadium: 'Gamla Ullevi',
   tournament: 'Allsvenskan',
-  homeTeamForm: [TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.LOSS, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.NONE],
-  awayTeamForm: [TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.WIN, TeamMatchOutcomeEnum.DRAW, TeamMatchOutcomeEnum.NONE],
+  homeTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.NONE],
+  awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.NONE],
   kickOffTime: new Date('2024-10-10T15:00:00'),
   shouldPredictGoalScorer: false,
 }
