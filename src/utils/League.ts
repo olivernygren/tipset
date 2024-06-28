@@ -32,14 +32,29 @@ export interface PredictionLeagueStanding {
   userId: string;
   username: string;
   points: number;
-  position: number;
   correctResults: number;
 }
 
+export interface LeagueGameWeekFixtures {
+  fixtures: Array<Fixture>;
+  predictions: Array<Prediction>;
+}
+
 export interface LeagueGameWeek {
-  id: string;
+  leagueId: string;
   round: number;
   deadline: Date;
-  games: Array<Fixture>;
-  predictions: Array<Prediction>;
+  startDate: Date;
+  games: LeagueGameWeekFixtures;
+  hasBeenCorrected?: boolean;
+  hasEnded?: boolean;
+}
+export interface LeagueGameWeekInput {
+  leagueId: string;
+  round: number;
+  deadline: string;
+  startDate: string;
+  games: LeagueGameWeekFixtures;
+  hasBeenCorrected?: boolean;
+  hasEnded?: boolean;
 }

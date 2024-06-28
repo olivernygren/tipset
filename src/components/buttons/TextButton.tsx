@@ -24,15 +24,9 @@ const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidt
       color={color}
       size={size}
       noPadding={noPadding}
-      // whileHover={{ 
-      //   scale: 1.03, 
-      //   backgroundColor: variant === 'primary' ? theme.colors.primaryDark : 'transparent', 
-      //   borderColor: variant === 'secondary' ? theme.colors.primaryDark : 'none' 
-      // }}
-      // whileTap={{ 
-      //   backgroundColor: variant === 'primary' ? theme.colors.primaryDarker : 'transparent', 
-      //   borderColor: variant === 'secondary' ? theme.colors.primaryDarker : 'none' 
-      // }}
+      whileHover={{ 
+        scale: 1.03,
+      }}
     >
       {icon}
       {loading ? (

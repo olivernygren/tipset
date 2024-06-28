@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import DatePicker, { registerLocale } from "react-datepicker";
 import { sv } from 'date-fns/locale';
 import "react-datepicker/dist/react-datepicker.css";
@@ -41,6 +40,7 @@ const CustomDatePicker = ({ selectedDate, onChange, includeTime = true, label, i
           inline={inline}
           disabled={disabled}
           disabledKeyboardNavigation
+          minDate={new Date()}
         />
         <Calendar size={24} color={theme.colors.textLight} />
       </DatePickerWrapper>

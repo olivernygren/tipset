@@ -20,6 +20,7 @@ export const theme = {
     red: '#E22B2B',
     redDark: '#B81A1A',
     redDarker: '#7D0707',
+    gold: '#FFD700',
   },
   spacing: {
     xxxs: '4px',

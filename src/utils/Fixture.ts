@@ -17,6 +17,7 @@ export enum PredictionOutcomeEnum {
 export interface FixtureResult {
   homeTeamGoals: number;
   awayTeamGoals: number;
+  goalScorers?: Array<string>;
 }
 
 export interface Fixture {
@@ -29,13 +30,38 @@ export interface Fixture {
   kickOffTime: Date;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
+  goalScorerFromTeam?: Array<string> | null; // team names
+}
+
+export interface FixtureInput {
+  homeTeam: Team;
+  awayTeam: Team;
+  stadium: string;
+  tournament: string;
+  homeTeamForm: Array<FixtureOutcomeEnum>;
+  awayTeamForm: Array<FixtureOutcomeEnum>;
+  kickOffTime: string;
+  finalResult?: FixtureResult;
+  shouldPredictGoalScorer?: boolean;
+  goalScorerFromTeam?: Array<string> | null; // team names
+}
+
+export interface PredictionPoints {
+  correctResult: number;
+  correctOutcome: number;
+  correctGoalScorer: number;
+  correctGoalDifference: number;
+  correctGoalsByHomeTeam: number;
+  correctGoalsByAwayTeam: number;
+  total: number;
 }
 
 export interface Prediction {
   userId: string;
-  fixture: Fixture;
+  // fixture: Fixture;
   homeGoals: number;
   awayGoals: number;
-  points?: number;
+  outcome: PredictionOutcomeEnum;
+  points?: PredictionPoints;
   goalScorer?: Player;
 }

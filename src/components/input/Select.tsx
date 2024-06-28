@@ -3,39 +3,43 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import { CaretDown } from '@phosphor-icons/react';
 
-export interface Option {
+export interface OptionItem {
   value: string;
   label: string;
-  options?: Object;
+  additionalOptions?: Object;
 }
 
 export interface OptionGroup {
   label: string;
-  options: Array<Option>;
+  options: Array<OptionItem>;
 }
 
 interface SelectProps {
-  options: Array<Option>;
+  options: Array<OptionItem>;
   optionGroups?: Array<OptionGroup>;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   fullWidth?: boolean;
+  compact?: boolean;
 }
 
 interface StyledSelectProps {
   fullWidth?: boolean;
   disabled?: boolean;
+  compact?: boolean;
 }
 
-const Select = ({ options, optionGroups, value, onChange, placeholder, disabled, fullWidth }: SelectProps) => {
+const Select = ({ options, optionGroups, value, onChange, placeholder, disabled, fullWidth, compact }: SelectProps) => {
   return (
     <SelectWrapper
       disabled={disabled}
       fullWidth={fullWidth}
+      compact={compact}
     >
       <StyledSelect
+        defaultValue={'Välj'}
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.currentTarget.value)}
@@ -65,7 +69,7 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   justify-content: flex-end;
   align-items: center;
   min-width: 200px;
-  min-height: 36px;
+  min-height: ${({ compact }) => compact ? '36px' : '44px'};
   width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
   padding-right: ${theme.spacing.xxs};
   position: relative;
@@ -89,7 +93,8 @@ const StyledSelect = styled.select`
   position: absolute;
   inset: 0 0 0 8px;
   cursor: pointer;
-  /* width: 100%; */
+  font-family: 'Readex Pro', sans-serif;
+  font-size: 16px;
   border: none;
   background: transparent;
   outline: none;

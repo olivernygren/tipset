@@ -134,7 +134,6 @@ const PredictionLeaguesPage = () => {
       userId: currentUserId,
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
-      position: leagueData.participants.length + 1,
       correctResults: 0,
     }
   

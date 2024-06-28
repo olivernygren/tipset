@@ -116,10 +116,10 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
   };
 
   const getKickoffTime = () => {
-    const weekday = game.kickOffTime.toLocaleDateString('sv-SE', { weekday: 'long', });
+    const weekday = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { weekday: 'long', });
     const weekdayCapitalized = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-    const date = game.kickOffTime.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' });
-    const time = game.kickOffTime.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+    const date = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' });
+    const time = new Date(game.kickOffTime).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
 
     return `${weekdayCapitalized} ${date} ${time}`;
   };
@@ -181,8 +181,8 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
   }
   
   return (
-    <Section gap='xs' alignItems='center'>
-      <Section flexDirection='row' gap='s' alignItems='center' justifyContent='center'>
+    <Card>
+      <CardHeader>
         <Section flexDirection='row' gap='xxxs' alignItems='center' fitContent>
           <MapPin size={16} weight="fill" />
           <NormalTypography variant='s' align='center'>{game.stadium}</NormalTypography>
@@ -191,7 +191,7 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
         <NormalTypography variant='s' align='center'>{getKickoffTime()}</NormalTypography>
         <NormalTypography variant='s'>•</NormalTypography>
         <NormalTypography variant='s' align='center'>{game.tournament}</NormalTypography>
-      </Section>
+      </CardHeader>
       <Divider />
       <GameWrapper>
         {getTeam(game.homeTeam, false)}
@@ -215,21 +215,48 @@ const GamePredictor = ({ game, gameNumber, onPlayerPredictionUpdate, onResultUpd
       {game.shouldPredictGoalScorer && (
         <>
           <Divider />
-          <Section flexDirection='row' justifyContent='space-between' padding="12px 0 0 0" alignItems='center'>
+          <GoalScorerSection>
             <EmphasisTypography variant='m'>Välj målskytt i matchen</EmphasisTypography>
             <Select 
               options={[]}
               optionGroups={getOptionGroups()}
               value={predictedPlayerToScore?.id || ''}
               onChange={(value) => setPredictedPlayerToScore(getPlayerById(value))}
-              />
-          </Section>
+            />
+          </GoalScorerSection>
+          <Divider />
         </>
       )}
-      <Button variant='primary' onClick={handleSave}>Spara</Button>
-    </Section>
+      <SaveButtonSection>
+        <Button variant='primary' onClick={handleSave} fullWidth>
+          Spara
+        </Button>
+      </SaveButtonSection>
+    </Card>
   )
 }
+
+const Card = styled.div`
+  border-radius: ${theme.borderRadius.m};
+  border: 2px solid ${theme.colors.primary};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  /* gap: ${theme.spacing.s}; */
+  /* padding: ${theme.spacing.s}; */
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing.s};
+  width: 100%;
+  box-sizing: border-box;
+  /* border-bottom: 1px solid ${theme.colors.silver}; */
+`;
 
 const GameWrapper = styled.div`
   display: grid;
@@ -238,7 +265,9 @@ const GameWrapper = styled.div`
   align-items: center;
   justify-items: center;
   width: 100%;
-  margin-bottom: ${theme.spacing.xxxs};
+  /* margin-bottom: ${theme.spacing.xxxs}; */
+  margin: auto 0;
+  padding: ${theme.spacing.s} 0;
 `;
 
 const TeamContainer = styled.div<{team: 'home' | 'away'}>`
@@ -247,8 +276,8 @@ const TeamContainer = styled.div<{team: 'home' | 'away'}>`
   gap: ${theme.spacing.xxxs};
   width: 100%;
   align-items: ${({ team }) => team === 'home' ? 'flex-end' : 'flex-start'};
-  padding-left: ${({ team }) => team === 'home' ? '0' : theme.spacing.m};
-  padding-right: ${({ team }) => team === 'away' ? '0' : theme.spacing.m};
+  padding-left: ${({ team }) => team === 'home' ? '0' : theme.spacing.s};
+  padding-right: ${({ team }) => team === 'away' ? '0' : theme.spacing.s};
 `;
 
 const AvatarAndTeamName = styled.div`
@@ -259,6 +288,22 @@ const AvatarAndTeamName = styled.div`
   /* height: 100%; */
   box-sizing: border-box;
   align-items: center;
+`;
+
+const GoalScorerSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${theme.spacing.s};
+  /* border-top: 1px solid ${theme.colors.silverLight}; */
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const SaveButtonSection = styled.div`
+  background-color: ${theme.colors.primary};
+  width: 100%;
+  margin-top: auto;
 `;
 
 export default GamePredictor;

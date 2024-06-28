@@ -44,6 +44,7 @@ const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
+  font-family: 'Readex Pro', sans-serif;
 `;
 
 const CheckboxText = styled.span`

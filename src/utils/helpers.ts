@@ -17,3 +17,10 @@ export const withDocumentIdOnObject = <T>(docSnap: DocumentSnapshot): T & { docu
 export const generateLeagueInviteCode = (): string => {
   return Math.random().toString(20).substring(2, 8).toUpperCase();
 }
+
+export const hasInvalidTeamName = (teamName: string): boolean => {
+  if (teamName === 'Välj lag' || teamName === '') {
+    return true;
+  }
+  return false;
+}

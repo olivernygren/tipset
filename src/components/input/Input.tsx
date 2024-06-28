@@ -5,7 +5,7 @@ import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 
 interface InputProps {
-  type?: 'text' | 'password';
+  type?: 'text' | 'password' | 'number';
   name?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -19,6 +19,7 @@ interface InputProps {
   fontWeight?: string;
   compact?: boolean;
   label?: string;
+  minDate?: string;
 }
 
 interface StyledInputProps {
@@ -30,7 +31,7 @@ interface StyledInputProps {
   compact?: boolean;
 }
 
-const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact }: InputProps) => {
+const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, minDate }: InputProps) => {
   return (
     <Section gap='xxxs'>
       {label && (
@@ -52,6 +53,7 @@ const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabl
         fontSize={fontSize}
         fontWeight={fontWeight}
         compact={compact}
+        min={minDate}
       />
       {maxLength && (
         <NormalTypography variant='s' color={theme.colors.textLight}>

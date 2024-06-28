@@ -30,14 +30,19 @@ const Button = ({ variant = 'primary', onClick, children, disabled, fullWidth, c
       fullWidth={fullWidth}
       color={color}
       size={size}
+      initial={{ 
+        scale: 1,
+        backgroundColor: disabled ? theme.colors.silver : variant === 'primary' ? theme.colors.primary : 'transparent',
+        borderColor: disabled ? theme.colors.silver : variant === 'primary' ? theme.colors.primary : color
+      }}
       whileHover={{ 
-        scale: 1.03, 
-        backgroundColor: variant === 'primary' ? theme.colors.primaryDark : 'transparent', 
-        borderColor: variant === 'secondary' ? theme.colors.primaryDark : 'none' 
+        scale: disabled ? 1 : 1.03, 
+        backgroundColor: disabled ? theme.colors.silver : variant === 'primary' ? theme.colors.primaryDark : 'transparent', 
+        borderColor: disabled ? theme.colors.silver : theme.colors.primaryDark
       }}
       whileTap={{ 
-        backgroundColor: variant === 'primary' ? theme.colors.primaryDarker : 'transparent', 
-        borderColor: variant === 'secondary' ? theme.colors.primaryDarker : 'none' 
+        backgroundColor: disabled ? theme.colors.silver : variant === 'primary' ? theme.colors.primaryDarker : 'transparent', 
+        borderColor: disabled ? theme.colors.silver : theme.colors.primaryDarker 
       }}
     >
       {icon}
@@ -58,10 +63,10 @@ const StyledButton = styled(motion.button)<ButtonProps>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
   padding: ${({ size }) => size === 's' ? `${theme.spacing.xs} ${theme.spacing.xs}` : size === 'm' ? `${theme.spacing.xs} ${theme.spacing.s}` : `${theme.spacing.s} ${theme.spacing.m}`};
   border-radius: ${theme.borderRadius.m};
-  background-color: ${({ color, variant }) => variant === 'primary' ? (color || theme.colors.primary) : 'transparent'};
-  border-color: ${({ color, variant }) => variant === 'secondary' ? (color || theme.colors.primary) : 'none'};
-  border-width: ${({ variant }) => variant === 'secondary' ? '2px' : 0};
-  border-style: ${({ variant }) => variant === 'secondary' ? 'solid' : 'none'};
+  background-color: ${({ color, variant, disabled }) => disabled ? theme.colors.silverLight : variant === 'primary' ? (color || theme.colors.primary) : 'transparent'};
+  border-color: ${({ color, variant }) => variant === 'primary' ? theme.colors.primary : variant === 'secondary' ? (color || theme.colors.primary) : color};
+  border-width: 2px;
+  border-style: solid;
   cursor: pointer;
   box-sizing: border-box;
   display: flex;
@@ -70,8 +75,8 @@ const StyledButton = styled(motion.button)<ButtonProps>`
   gap: ${theme.spacing.xxs};
 
   &:disabled {
-    background-color: ${theme.colors.silver};
-    border-color: ${theme.colors.silver};
+    background-color: ${theme.colors.silver} !important; 
+    border-color: ${theme.colors.silver} !important; 
     cursor: not-allowed;
   }
 `;
