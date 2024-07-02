@@ -28,3 +28,7 @@ export const getSortedLeagueStandings = (standings: Array<PredictionLeagueStandi
 export const getUserStandingPositionInLeague = (userId: string, sortedStandings: Array<PredictionLeagueStanding>) => {
   return sortedStandings.findIndex(standing => standing.userId === userId) + 1;
 }
+
+export const generateRandomID = () => {
+  return Math.random().toString(32).substring(2, 9);
+}

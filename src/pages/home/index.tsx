@@ -2,13 +2,14 @@ import styled from 'styled-components';
 import Page from '../../components/Page';
 import { theme } from '../../theme';
 import GamePredictor from '../../components/game/GamePredictor';
-import { Fixture, FixtureOutcomeEnum } from '../../utils/Fixture';
+import { Fixture, FixtureOutcomeEnum, TeamType } from '../../utils/Fixture';
 import { Section } from '../../components/section/Section';
 import { HeadingsTypography } from '../../components/typography/Typography';
 import { Divider } from '../../components/Divider';
 import { getTeamByName } from '../../utils/Team';
 
 const MockGame1: Fixture = {
+  id: 'hrh97rgfwolöoirpqh3r3r43r',
   homeTeam: getTeamByName('Arsenal')!,
   awayTeam: getTeamByName('Ipswich')!,
   stadium: 'Emirates Stadium',
@@ -17,9 +18,11 @@ const MockGame1: Fixture = {
   awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.NONE],
   kickOffTime: new Date('2024-10-10T18:15:00'),
   shouldPredictGoalScorer: true,
+  teamType: TeamType.CLUBS,
 }
 
 const MockGame2: Fixture = {
+  id: 'fiewdsbgoewurq0ejqoiofw',
   homeTeam: getTeamByName('IFK Göteborg')!,
   awayTeam: getTeamByName('Västerås SK')!,
   stadium: 'Gamla Ullevi',
@@ -28,6 +31,7 @@ const MockGame2: Fixture = {
   awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.NONE],
   kickOffTime: new Date('2024-10-10T15:00:00'),
   shouldPredictGoalScorer: false,
+  teamType: TeamType.CLUBS,
 }
 
 const HomePage = () => {
@@ -51,6 +55,7 @@ const HomePage = () => {
                 game={MockGame1} 
                 onResultUpdate={(homeGoals, awayGoals) => console.log(homeGoals, awayGoals)}
                 onPlayerPredictionUpdate={(player) => console.log(player)}
+                onSave={() => {}}
               />
             </Section>
             <Section
@@ -66,6 +71,7 @@ const HomePage = () => {
                 game={MockGame2} 
                 onResultUpdate={(homeGoals, awayGoals) => console.log(homeGoals, awayGoals)}
                 onPlayerPredictionUpdate={(player) => console.log(player)}
+                onSave={() => {}}
               />
             </Section>
           </Wrapper>

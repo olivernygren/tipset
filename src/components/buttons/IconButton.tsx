@@ -39,10 +39,10 @@ const IconButton = ({ icon, backgroundColor, onClick, disabled, colors, shape = 
       shape={shape}
       whileHover={{ 
         scale: 1.05, 
-        backgroundColor: backgroundColor ? backgroundColor : 'transparent', 
+        backgroundColor: backgroundColor ? backgroundColor : 'rgba(0, 0, 0, 0)', 
       }}
       whileTap={{ 
-        backgroundColor: backgroundColor ? backgroundColor : 'transparent', 
+        backgroundColor: backgroundColor ? backgroundColor : 'rgba(0, 0, 0, 0)', 
       }}
     >
       {icon}

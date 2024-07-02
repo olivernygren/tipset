@@ -10,7 +10,7 @@ interface TextButtonProps extends ButtonProps {
   noPadding?: boolean
 }
 
-const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = theme.colors.primary, size = 'm', icon, loading, noPadding }: TextButtonProps) => {
+const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = "primary", size = 'm', icon, loading, noPadding }: TextButtonProps) => {
   return (
     <StyledButton
       variant={variant || 'primary'}

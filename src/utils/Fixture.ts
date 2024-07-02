@@ -14,6 +14,11 @@ export enum PredictionOutcomeEnum {
   AWAY_TEAM_WIN = '2',
 }
 
+export enum TeamType {
+  CLUBS = 'clubs',
+  NATIONS = 'nations',
+}
+
 export interface FixtureResult {
   homeTeamGoals: number;
   awayTeamGoals: number;
@@ -21,6 +26,7 @@ export interface FixtureResult {
 }
 
 export interface Fixture {
+  id: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
@@ -31,9 +37,11 @@ export interface Fixture {
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names
+  teamType: TeamType;
 }
 
 export interface FixtureInput {
+  id: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
@@ -44,6 +52,7 @@ export interface FixtureInput {
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names
+  teamType: TeamType;
 }
 
 export interface PredictionPoints {
@@ -58,10 +67,25 @@ export interface PredictionPoints {
 
 export interface Prediction {
   userId: string;
-  // fixture: Fixture;
+  fixtureId: string;
   homeGoals: number;
   awayGoals: number;
   outcome: PredictionOutcomeEnum;
   points?: PredictionPoints;
   goalScorer?: Player;
+}
+
+export interface PredictionInput {
+  userId: string;
+  fixtureId: string;
+  homeGoals: number;
+  awayGoals: number;
+  outcome: PredictionOutcomeEnum;
+  goalScorer?: Player;
+}
+
+export enum PredictionStatus {
+  NOT_PREDICTED = 'NOT_PREDICTED',
+  UPDATED = 'UPDATED',
+  PREDICTED = 'PREDICTED',
 }

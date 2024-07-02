@@ -315,7 +315,6 @@ const TestPage = () => {
           <Button
             onClick={handleResetAll}
             variant='secondary'
-            // color={theme.colors.primary}
           >
             Återställ
           </Button>

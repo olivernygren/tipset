@@ -5,9 +5,10 @@ interface NationAvatarProps {
   nationName: string;
   flagUrl: string;
   size: AvatarSize;
+  isDarkMode?: boolean;
 }
 
-const NationAvatar = ({ nationName, flagUrl, size }: NationAvatarProps) => {
+const NationAvatar = ({ nationName, flagUrl, size, isDarkMode }: NationAvatarProps) => {
   return (
     <Avatar 
       src={flagUrl} 
@@ -15,6 +16,7 @@ const NationAvatar = ({ nationName, flagUrl, size }: NationAvatarProps) => {
       alt={`${nationName} logo`}
       showBorder
       objectFit='cover'
+      isDarkMode={isDarkMode}
     />
   )
 }

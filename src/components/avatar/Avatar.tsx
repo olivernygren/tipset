@@ -16,6 +16,7 @@ interface AvatarProps {
   objectFit?: 'cover' | 'contain';
   showBorder?: boolean;
   customBorderColor?: string;
+  isDarkMode?: boolean;
 }
 
 interface StyledAvatarProps {
@@ -23,15 +24,17 @@ interface StyledAvatarProps {
   showBorder: boolean;
   customBorderColor?: string;
   objectFit: 'cover' | 'contain';
+  isDarkMode?: boolean;
 }
 
-const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor }: AvatarProps) => {
+const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode }: AvatarProps) => {
   return (
     <StyledAvatar
       size={size}
       showBorder={showBorder}
       customBorderColor={customBorderColor}
       objectFit={objectFit}
+      isDarkMode={isDarkMode}
     >
       <img src={src} alt={alt ?? 'avatar'} />
     </StyledAvatar>
@@ -71,6 +74,7 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
   overflow: hidden;
   border-radius: 50%;
+  background-color: ${({ isDarkMode }) => isDarkMode ? theme.colors.white : 'transparent'};
 
   & > img {
     width: 100%;

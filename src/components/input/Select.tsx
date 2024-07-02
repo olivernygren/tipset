@@ -73,6 +73,7 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
   padding-right: ${theme.spacing.xxs};
   position: relative;
+  background-color: ${theme.colors.white};
 
   border-radius: ${theme.borderRadius.s};
   border: 1px solid #ccc;
@@ -103,7 +104,7 @@ const StyledSelect = styled.select`
 `;
 
 const StyledOption = styled.option`
-
+  color: ${theme.colors.textDefault};
 `;
 
 export default Select;
