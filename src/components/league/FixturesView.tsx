@@ -715,18 +715,17 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <HeadingsTypography variant='h4'>Föregående omgångar</HeadingsTypography>
         {previousGameWeeks && previousGameWeeks.length > 0 ? (
           <>
-            {previousGameWeeks.map((gameWeek) => (
+            {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
               <Section key={gameWeek.round} gap='s' backgroundColor={theme.colors.silverLighter} padding={theme.spacing.s} borderRadius={theme.borderRadius.m}>
                 <Section justifyContent='space-between' alignItems='center' flexDirection='row'>
                   <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {gameWeek.round}</HeadingsTypography>
                   <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
                 </Section>
                 <Divider color={theme.colors.silver} />
-                <Section gap='xxxs'>
+                <Section gap='xxs'>
                   {gameWeek.games.fixtures.map((fixture) => (
                     <FixtureResultPreview 
                       fixture={fixture}
-                      // onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
                       predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
                     />
                   ))}

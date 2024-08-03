@@ -53,3 +53,18 @@ export const getAwayTeamPredictedGoals = (gameWeek: LeagueGameWeek, fixtureId: s
   const prediction = gameWeek.games.predictions.find((prediction) => prediction.userId === userId && prediction.fixtureId === fixtureId);
   return prediction ? prediction.awayGoals : undefined;
 };
+
+export const getGeneralPositionShorthand = (position: string) => {
+  switch (position) {
+    case 'Forward':
+      return 'ANF';
+    case 'Midfielder':
+      return 'MF';
+    case 'Defender':
+      return 'FÖR';
+    case 'Goalkeeper':
+      return 'MV';
+    default:
+      return '';
+  }
+}

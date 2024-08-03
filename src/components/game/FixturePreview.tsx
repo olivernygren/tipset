@@ -1,5 +1,5 @@
 import React from 'react'
-import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
+import { Fixture, TeamType } from '../../utils/Fixture';
 import { Section } from '../section/Section';
 import styled from 'styled-components';
 import { theme } from '../../theme';
