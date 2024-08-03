@@ -6,8 +6,7 @@ import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typ
 import UserName from '../typography/UserName';
 import styled from 'styled-components';
 import { theme } from '../../theme';
-import { CaretLineDown } from '@phosphor-icons/react/dist/ssr';
-import { Calculator, CheckSquareOffset } from '@phosphor-icons/react';
+import { Calculator } from '@phosphor-icons/react';
 import IconButton from '../buttons/IconButton';
 import { Prediction, FixtureResult, PredictionPoints } from '../../utils/Fixture';
 import Input from '../input/Input';
@@ -158,9 +157,9 @@ const PredictionsModal = ({ onClose, gameId, league, ongoingGameWeek }: Predicti
 
     switch (predictedPlayerToScore.position.general) {
       case GeneralPositionEnum.DF:
-        return 6;
+        return 8;
       case GeneralPositionEnum.MF:
-        return 3;
+        return 4;
       case GeneralPositionEnum.FW:
         return 2;
       default:

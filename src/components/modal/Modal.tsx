@@ -30,29 +30,31 @@ const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalPro
 
   return (
     <>
-        <Backdrop onMouseDown={(e) => {
-          if (e.target === e.currentTarget) {
-            onClose();
-          }
-        }}>
-          <ModalContainer
-            width={getModalWidth()}
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Header headerDivider={headerDivider}>
-              {title && <HeadingsTypography variant='h3'>{title}</HeadingsTypography>}
-              <IconButton 
-                icon={<X size={24} />} 
-                colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textLight }}
-                onClick={onClose}
-                />
-            </Header>
+      <Backdrop onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}>
+        <ModalContainer
+          width={getModalWidth()}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.92 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Header headerDivider={headerDivider}>
+            {title && <HeadingsTypography variant='h3'>{title}</HeadingsTypography>}
+            <IconButton 
+              icon={<X size={24} />} 
+              colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textLight }}
+              onClick={onClose}
+              />
+          </Header>
+          <ModalContent headerDivider={headerDivider}>
             {children}
-          </ModalContainer>
-        </Backdrop>
+          </ModalContent>
+        </ModalContainer>
+      </Backdrop>
       <GlobalStyle />
     </>
   )
@@ -72,13 +74,22 @@ const ModalContainer = styled(motion.div)<{ width: string }>`
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.m};
-  padding: ${theme.spacing.l};
   background-color: ${theme.colors.white};
   max-height: 85vh;
   height: fit-content;
   width: ${({ width }) => width};
   border-radius: ${theme.borderRadius.l};
+`;
+
+const ModalContent = styled.div<{ headerDivider?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.m};
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: ${({ headerDivider }) => headerDivider ? theme.spacing.l : 0} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
 `;
 
 const Header = styled.div<{ headerDivider?: boolean }>`
@@ -87,6 +98,7 @@ const Header = styled.div<{ headerDivider?: boolean }>`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  padding: ${theme.spacing.l};
   
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};

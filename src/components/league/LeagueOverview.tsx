@@ -9,6 +9,8 @@ import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typ
 import { LeagueTabs } from '../../pages/admin/leagues/[leagueId]';
 import { useEffect, useState } from 'react';
 import FixturePreview from '../game/FixturePreview';
+import { Divider } from '../Divider';
+import FixtureResultPreview from '../game/FixtureResultPreview';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -20,6 +22,7 @@ interface LeagueOverviewProps {
 
 const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab }: LeagueOverviewProps) => {
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
+  const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -30,6 +33,15 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
 
       if (currentGameWeek) {
         setCurrentGameWeek(currentGameWeek);
+      }
+
+      const previousGameWeek = league.gameWeeks.find((gameWeek) => {
+        const now = new Date();
+        return new Date(gameWeek.startDate) < now && new Date(gameWeek.deadline) < now && gameWeek.hasBeenCorrected === true;
+      });
+
+      if (previousGameWeek) {
+        setPreviousGameWeek(previousGameWeek);
       }
     }
   }, []);
@@ -71,84 +83,102 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
   };
 
   return (
-    <OverviewGrid>
-      <GridSection>
-        <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
-        {currentGameWeek ? (
-          <Section gap='xxxs'>
-            {currentGameWeek.games.fixtures.map((fixture) => (
-              <FixturePreview fixture={fixture} />
-            ))}
-          </Section>
-        ) : (
-          <>
-            <NormalTypography variant='m' color={theme.colors.textLight}>Inga omgångar finns</NormalTypography>
-            {isCreator && (
-              <MarginTopButton>
-                <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
-                  Skapa omgång
-                </Button>
-              </MarginTopButton>
-            )}
-          </>
-        )}
-      </GridSection>
-      <GridSection>
-        <TableSectionHeader>
-          <HeadingsTypography variant='h3'>Tabell</HeadingsTypography>
-          {league.standings && league.standings.length > 0 && (
+    <>
+      <OverviewGrid>
+        <GridSection>
+          <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
+          {currentGameWeek ? (
+            <Section gap='xxxs'>
+              {currentGameWeek.games.fixtures.map((fixture) => (
+                <FixturePreview
+                  fixture={fixture} 
+                  hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                />
+              ))}
+            </Section>
+          ) : (
             <>
-              <EmphasisTypography variant='l' color={theme.colors.textLight}>Din placering: {getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}</EmphasisTypography>
-              {/* Show separate user placing somewhere if they are outside the top 5 */}
-              {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
+              <NormalTypography variant='m' color={theme.colors.textLight}>Inga omgångar finns</NormalTypography>
+              {isCreator && (
+                <MarginTopButton>
+                  <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
+                    Skapa omgång
+                  </Button>
+                </MarginTopButton>
+              )}
             </>
           )}
-        </TableSectionHeader>
-        {league.standings && league.standings.length > 0 ? (
-          <LeagueStandings>
-            <LeagueStandingsHeader>
-              <EmphasisTypography variant='s' color={theme.colors.textLight}>Namn</EmphasisTypography>
-              <RightAlignedGridItem>
-                <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Korrekta resultat</EmphasisTypography>
-              </RightAlignedGridItem>
-              <RightAlignedGridItem>
-                <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Poäng</EmphasisTypography>
-              </RightAlignedGridItem>
-            </LeagueStandingsHeader>
-            {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
-          </LeagueStandings>
-        ) : (
-          <NormalTypography variant='m' color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
-        )}
-      </GridSection>
-      <GridSection>
-        <HeadingsTypography variant='h3'>Förra omgången</HeadingsTypography>
-        {league.gameWeeks && league.gameWeeks.length > 0 ? 
-          league.gameWeeks.map((gameWeek) => (
-            <></>
-          )
-        ) : (
-          <NormalTypography variant='m' color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
-        )}
-      </GridSection>
-      <GridSection>
-        <HeadingsTypography variant='h3'>Information</HeadingsTypography>
-        {league.description && (
+        </GridSection>
+        <GridSection>
+          <TableSectionHeader>
+            <HeadingsTypography variant='h3'>Tabell</HeadingsTypography>
+            {league.standings && league.standings.length > 0 && (
+              <>
+                <EmphasisTypography variant='l' color={theme.colors.textLight}>Din placering: {getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}</EmphasisTypography>
+                {/* Show separate user placing somewhere if they are outside the top 5 */}
+                {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
+              </>
+            )}
+          </TableSectionHeader>
+          {league.standings && league.standings.length > 0 ? (
+            <LeagueStandings>
+              <LeagueStandingsHeader>
+                <EmphasisTypography variant='s' color={theme.colors.textLight}>Namn</EmphasisTypography>
+                <RightAlignedGridItem>
+                  <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Korrekta resultat</EmphasisTypography>
+                </RightAlignedGridItem>
+                <RightAlignedGridItem>
+                  <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Poäng</EmphasisTypography>
+                </RightAlignedGridItem>
+              </LeagueStandingsHeader>
+              {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
+            </LeagueStandings>
+          ) : (
+            <NormalTypography variant='m' color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
+          )}
+        </GridSection>
+        <GridSection>
+          <HeadingsTypography variant='h3'>Förra omgången</HeadingsTypography>
+          {previousGameWeek ? (
+            <Section gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+              <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
+                <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {previousGameWeek.round}</HeadingsTypography>
+                <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(previousGameWeek.deadline).toLocaleDateString()}</NormalTypography>
+              </Section>
+              <Divider color={theme.colors.silver} />
+              <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
+                {previousGameWeek.games.fixtures.map((fixture) => (
+                  <FixtureResultPreview 
+                    fixture={fixture}
+                    predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                    compact
+                  />
+                ))}
+              </Section>
+            </Section>
+          ) : (
+            <NormalTypography variant='m' color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
+          )}
+        </GridSection>
+        <GridSection>
+          <HeadingsTypography variant='h3'>Information</HeadingsTypography>
+          {league.description && (
+            <Section gap='xxxs'>
+              <EmphasisTypography variant='s' color={theme.colors.textLight}>Beskrivning</EmphasisTypography>
+              <NormalTypography variant='m'>{league.description}</NormalTypography>
+            </Section>
+          )}
           <Section gap='xxxs'>
-            <EmphasisTypography variant='s' color={theme.colors.textLight}>Beskrivning</EmphasisTypography>
-            <NormalTypography variant='m'>{league.description}</NormalTypography>
+            <EmphasisTypography variant='s' color={theme.colors.textLight}>Inbjudningskod</EmphasisTypography>
+            <NormalTypography variant='m'>{league.inviteCode}</NormalTypography>
           </Section>
-        )}
-        <Section gap='xxxs'>
-          <EmphasisTypography variant='s' color={theme.colors.textLight}>Inbjudningskod</EmphasisTypography>
-          <NormalTypography variant='m'>{league.inviteCode}</NormalTypography>
-        </Section>
-        <Section gap='xxxs'>
-          <EmphasisTypography variant='s' color={theme.colors.textLight}>Deadline för att gå med</EmphasisTypography>
-          <NormalTypography variant='m'>{getFormattedDeadline()}</NormalTypography>
-        </Section>
-      </GridSection>
-    </OverviewGrid>
+          <Section gap='xxxs'>
+            <EmphasisTypography variant='s' color={theme.colors.textLight}>Deadline för att gå med</EmphasisTypography>
+            <NormalTypography variant='m'>{getFormattedDeadline()}</NormalTypography>
+          </Section>
+        </GridSection>
+      </OverviewGrid>
+    </>
   )
 };
 

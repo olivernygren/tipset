@@ -21,12 +21,10 @@ import CustomDatePicker from '../input/DatePicker';
 import TextButton from '../buttons/TextButton';
 import Checkbox from '../input/Checkbox';
 import GamePredictor from '../game/GamePredictor';
-import { generateRandomID, getUserNameById } from '../../utils/firebaseHelpers';
+import { generateRandomID } from '../../utils/firebaseHelpers';
 import { Player } from '../../utils/Players';
 import IconButton from '../buttons/IconButton';
 import FixturePreview from '../game/FixturePreview';
-import UserName from '../typography/UserName';
-import Modal from '../modal/Modal';
 import PredictionsModal from './PredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 
@@ -294,13 +292,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       tournament: newFixtureTournament,
       homeTeamForm: [],
       awayTeamForm: [],
-      kickOffTime: newFixtureKickoffDateTime.toISOString(),
+      kickOffTime: new Date(newFixtureKickoffDateTime).toISOString(),
       shouldPredictGoalScorer: newFixtureShouldPredictGoalScorer,
       ...(newFixtureShouldPredictGoalScorer && { goalScorerFromTeam: newFixtureGoalScorerTeam }),
       teamType,
     }
 
-    setNewGameWeekFixtures([...newGameWeekFixtures, { ...newFixtureInput, kickOffTime: newFixtureKickoffDateTime }]);
+    setNewGameWeekFixtures([...newGameWeekFixtures, { ...newFixtureInput }]);
     setAddFixtureViewOpen(false);
     handleResetNewFixture();
   };
@@ -344,8 +342,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0) return;
 
-    // TODO: Check if the deadline has passed
-    // if (new Date(ongoingGameWeek.deadline) < new Date()) return;
+    if (new Date(ongoingGameWeek.deadline) < new Date()) return;
 
     setPredictionLoading(fixture.id);
 
@@ -727,6 +724,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     <FixtureResultPreview 
                       fixture={fixture}
                       predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                      compact={false}
                     />
                   ))}
                 </Section>

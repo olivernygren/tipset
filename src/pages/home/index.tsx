@@ -16,7 +16,7 @@ const MockGame1: Fixture = {
   tournament: 'Premier League',
   homeTeamForm: [FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.NONE],
   awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.NONE],
-  kickOffTime: new Date('2024-10-10T18:15:00'),
+  kickOffTime: new Date('2024-10-10T18:15:00').toISOString(),
   shouldPredictGoalScorer: true,
   teamType: TeamType.CLUBS,
 }
@@ -29,7 +29,7 @@ const MockGame2: Fixture = {
   tournament: 'Allsvenskan',
   homeTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.LOSS, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.NONE],
   awayTeamForm: [FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.WIN, FixtureOutcomeEnum.DRAW, FixtureOutcomeEnum.NONE],
-  kickOffTime: new Date('2024-10-10T15:00:00'),
+  kickOffTime: new Date('2024-10-10T15:00:00').toISOString(),
   shouldPredictGoalScorer: false,
   teamType: TeamType.CLUBS,
 }

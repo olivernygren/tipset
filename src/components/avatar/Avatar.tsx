@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 
 export enum AvatarSize {
+  XS = 'xSmall',
   S = 'small',
   M = 'medium',
   L = 'large',
@@ -35,6 +36,7 @@ const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBord
       customBorderColor={customBorderColor}
       objectFit={objectFit}
       isDarkMode={isDarkMode}
+      className='avatar'
     >
       <img src={src} alt={alt ?? 'avatar'} />
     </StyledAvatar>
@@ -43,6 +45,8 @@ const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBord
 
 const getAvatarSize = (size: AvatarSize) => {
   switch (size) {
+    case AvatarSize.XS:
+      return '16px';
     case AvatarSize.S:
       return '24px';
     case AvatarSize.M:

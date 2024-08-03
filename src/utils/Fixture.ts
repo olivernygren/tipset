@@ -33,7 +33,7 @@ export interface Fixture {
   tournament: string;
   homeTeamForm: Array<FixtureOutcomeEnum>;
   awayTeamForm: Array<FixtureOutcomeEnum>;
-  kickOffTime: Date;
+  kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names

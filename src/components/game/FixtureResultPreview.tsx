@@ -5,54 +5,55 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { theme } from '../../theme';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
 import TextButton from '../buttons/TextButton';
-import { CaretDown } from '@phosphor-icons/react';
 import PredictionScoreCard from './PredictionScoreCard';
 import { useUser } from '../../context/UserContext';
+import Modal from '../modal/Modal';
 
 interface FixtureResultPreviewProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
+  compact?: boolean;
 }
 
-const FixtureResultPreview = ({ fixture, predictions }: FixtureResultPreviewProps) => {
-  const { user } = useUser()
+// Lägg till totalpoäng för omgången på varje omgång i listan "Föregående omgångar" - bredvid omgångsnumret eller deadline datumet
 
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+const FixtureResultPreview = ({ fixture, predictions, compact }: FixtureResultPreviewProps) => {
+  const { user } = useUser();
+
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  }
 
   return (
-    <Section gap='xs'>
-      <Section
-        justifyContent='space-between'
-        alignItems='center'
-        flexDirection='row'
-        backgroundColor={theme.colors.white}
-        borderRadius={theme.borderRadius.s}
-      >
-        <Teams>
-          <FullTimeIndicator>
-            <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>FT</EmphasisTypography>
-          </FullTimeIndicator>
-          <TeamContainer>
+    <>
+      <FixtureContainer>
+        <FullTimeIndicator>
+          <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>FT</EmphasisTypography>
+        </FullTimeIndicator>
+        <Teams compact={compact}>
+          <TeamContainer compact={compact}>
             {fixture.teamType === TeamType.CLUBS ? (
               <ClubAvatar
                 logoUrl={fixture.homeTeam.logoUrl}
                 clubName={fixture.homeTeam.name}
-                size={AvatarSize.S}
+                size={compact ? AvatarSize.XS : AvatarSize.S}
               />
             ) : (
               <NationAvatar
                 flagUrl={fixture.homeTeam.logoUrl}
                 nationName={fixture.homeTeam.name}
-                size={AvatarSize.S}
+                size={compact ? AvatarSize.XS : AvatarSize.S}
               />
             )}
             <EmphasisTypography variant='m'>{fixture.homeTeam.name}</EmphasisTypography>
           </TeamContainer>
           <NormalTypography variant='s' color={theme.colors.textLight}>vs</NormalTypography>
-          <TeamContainer>
+          <TeamContainer compact={compact}>
             <EmphasisTypography variant='m'>{fixture.awayTeam.name}</EmphasisTypography>
             {fixture.teamType === TeamType.CLUBS ? (
               <ClubAvatar
@@ -69,7 +70,7 @@ const FixtureResultPreview = ({ fixture, predictions }: FixtureResultPreviewProp
             )}
           </TeamContainer>
         </Teams>
-        <Section gap='xs' flexDirection='row' alignItems='center' fitContent>
+        <Section flexDirection='row' alignItems='center' justifyContent='flex-end'>
           <ResultContainer>
             <NormalTypography variant='m' color={theme.colors.primaryDark}>{fixture.finalResult?.homeTeamGoals ?? '?'} - {fixture.finalResult?.awayTeamGoals ?? '?'}</NormalTypography>
           </ResultContainer>
@@ -80,33 +81,35 @@ const FixtureResultPreview = ({ fixture, predictions }: FixtureResultPreviewProp
           )}
           {predictions && predictions.length > 0 && (
             <TextButton 
-              onClick={() => setIsExpanded(!isExpanded)}
-              endIcon={
-                <DropdownIconContainer isExpanded={isExpanded}>
-                  <CaretDown size={16} color={theme.colors.primary} weight="bold" />
-                </DropdownIconContainer>
-              }
+              onClick={handleOpenModal}
             >
-              Visa tips
+              Se allas tips
             </TextButton>
           )}
         </Section>
-      </Section>
-      {isExpanded && predictions && (
-        <PredictionsContainer>
-          {predictions.map((prediction, index, array) => (
-            <PredictionScoreCard prediction={prediction} />
-          ))}
-        </PredictionsContainer>
+      </FixtureContainer>
+      {modalOpen && (
+        <Modal
+          title='Vad tippade alla?'
+          onClose={() => setModalOpen(false)}
+          size='l'
+          headerDivider
+        >
+          <PredictionsContainer>
+            {predictions?.map((prediction) => (
+              <PredictionScoreCard prediction={prediction} />
+            ))}
+          </PredictionsContainer>
+        </Modal>
       )}
-    </Section>
+    </>
   )
 };
 
 const FullTimeIndicator = styled.div`
+  min-height: 44px;
   height: 100%;
   width: fit-content;
-  /* margin-right: ${theme.spacing.xs}; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,22 +119,44 @@ const FullTimeIndicator = styled.div`
   padding: 0 ${theme.spacing.xs};
 `;
 
-const Teams = styled.div`
+const Teams = styled.div<{ compact?: boolean }>`
   display: flex;
-  gap: ${theme.spacing.xs};
-  align-items: center;
-  height: 44px;
+  gap: ${({ compact }) => compact ? 0 : theme.spacing.xs};
+  min-height: ${({ compact }) => compact ? '50px' : '44px'};
+  height: 100%;
+  align-items: ${({ compact }) => compact ? 'flex-start' : 'center'};
+  flex-direction: ${({ compact }) => compact ? 'column' : 'row'};
+  margin-left: ${theme.spacing.xs};
+  justify-content: ${({ compact }) => compact ? 'center' : 'flex-start'};
+  
+  ${({ compact }) => compact && css`
+    width: fit-content;
+
+    > :nth-child(2) {
+      display: none;
+    }
+  `}
 `;
 
-const TeamContainer = styled.div`
+const FixtureContainer = styled.div`
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  background-color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.s};
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const TeamContainer = styled.div<{ compact?: boolean }>`
   display: flex;
   gap: ${theme.spacing.xxxs};
-  align-items: center;
-`;
+  align-items: ${({ compact }) => compact ? 'flex-start' : 'center'};
 
-const DropdownIconContainer = styled.div<{ isExpanded: boolean }>`
-  transform: ${({ isExpanded }) => isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
-  transition: transform 0.2s ease;
+  ${({ compact }) => compact && css`
+    > .avatar {
+      display: none;
+    }
+  `}
 `;
 
 const PredictionsContainer = styled.div`
@@ -147,20 +172,20 @@ const ResultContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.s};
+  padding: 0 ${theme.spacing.xxs};
   background-color: ${theme.colors.primaryBleach};
   width: fit-content;
+  height: 100%;
 `;
 
 const PointsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.s};
+  padding: 0 ${theme.spacing.xxs};
   background-color: ${theme.colors.primaryDark};
   width: fit-content;
+  height: 100%;
 `;
 
 export default FixtureResultPreview;
