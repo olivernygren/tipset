@@ -7,12 +7,14 @@ import { SpinnerGap } from '@phosphor-icons/react';
 import { ButtonProps } from './Button';
 
 interface TextButtonProps extends ButtonProps {
-  noPadding?: boolean
+  noPadding?: boolean;
+  title?: string;
 }
 
-const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = "primary", size = 'm', icon, loading, noPadding }: TextButtonProps) => {
+const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = "primary", size = 'm', icon, loading, noPadding, title, endIcon }: TextButtonProps) => {
   return (
     <StyledButton
+      title={title}
       variant={variant || 'primary'}
       onClick={() => {
         if (onClick) {
@@ -25,19 +27,20 @@ const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidt
       size={size}
       noPadding={noPadding}
       whileHover={{ 
-        scale: 1.03,
+        scale: 1.02,
       }}
     >
       {icon}
       {loading ? (
         <RotationalSpinner>
-          <SpinnerGap size={24} color={color || theme.colors.primary} />
+          <SpinnerGap size={24} color={theme.colors[color] || theme.colors.primary} />
         </RotationalSpinner>
       ) : (
-        <EmphasisTypography variant='m' color={color || theme.colors.primary} align='center'>
+        <EmphasisTypography variant='m' color={theme.colors[color] || theme.colors.primary} align='center'>
           {children}
         </EmphasisTypography>
       )}
+      {endIcon}
     </StyledButton>
   )
 }

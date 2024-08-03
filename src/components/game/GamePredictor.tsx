@@ -215,7 +215,7 @@ const GamePredictor = ({
           onInputChange={(value) => handleInputChange('home', value)}
           hasPredicted={hasPredicted}
         />
-        <NormalTypography variant='l'>–</NormalTypography>
+        <NormalTypography variant='l' color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>–</NormalTypography>
         <GoalsInput
           team='away'
           goals={awayGoals}

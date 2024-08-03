@@ -15,6 +15,7 @@ interface ButtonProps {
     disabled?: string;
   };
   shape?: 'circle' | 'square';
+  title?: string;
 }
 
 interface StyledButtonProps {
@@ -29,7 +30,7 @@ interface StyledButtonProps {
   shape?: 'circle' | 'square';
 }
 
-const IconButton = ({ icon, backgroundColor, onClick, disabled, colors, shape = 'circle' }: ButtonProps) => {
+const IconButton = ({ icon, backgroundColor, onClick, disabled, colors, shape = 'circle', title }: ButtonProps) => {
   return (
     <StyledButton
       onClick={onClick}
@@ -37,6 +38,7 @@ const IconButton = ({ icon, backgroundColor, onClick, disabled, colors, shape = 
       backgroundColor={backgroundColor}
       colors={colors}
       shape={shape}
+      title={title}
       whileHover={{ 
         scale: 1.05, 
         backgroundColor: backgroundColor ? backgroundColor : 'rgba(0, 0, 0, 0)', 

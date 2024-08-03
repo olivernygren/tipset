@@ -1,7 +1,9 @@
-import { collection, where, getDocs, query } from "firebase/firestore";
+import { collection, where, getDocs, query, getDoc, doc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { CollectionEnum } from "./Firebase";
 import { PredictionLeagueStanding } from "./League";
+import { withDocumentIdOnObject } from "./helpers";
+import { User } from "./Auth";
 
 export const getLeagueByInvitationCode = async (inviteCode: string) => {
   const q = query(collection(db, CollectionEnum.LEAGUES), where("inviteCode", "==", inviteCode));
@@ -31,4 +33,15 @@ export const getUserStandingPositionInLeague = (userId: string, sortedStandings:
 
 export const generateRandomID = () => {
   return Math.random().toString(32).substring(2, 9);
+};
+
+export const getUserNameById = async (userId: string) => {
+  const userDocRef = doc(db, CollectionEnum.USERS, userId);
+  const userDoc = await getDoc(userDocRef);
+  
+  if (userDoc.exists()) {
+    const userData = withDocumentIdOnObject<User>(userDoc);
+    return `${userData.firstname} ${userData.lastname}`;
+  }
+  return '';
 }

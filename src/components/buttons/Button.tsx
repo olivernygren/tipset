@@ -16,11 +16,12 @@ export interface ButtonProps {
   textColor?: string;
   size?: 's' | 'm' | 'l';
   icon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   loading?: boolean;
 }
 
 const Button = ({ 
-  variant = "primary", onClick, children, disabled, disabledInvisible, fullWidth, color = "primary", textColor = theme.colors.white, size = 'm', icon, loading
+  variant = "primary", onClick, children, disabled, disabledInvisible, fullWidth, color = "primary", textColor = theme.colors.white, size = 'm', icon, loading, endIcon,
 }: ButtonProps) => {
   const getBackgroundColor = (hover?: boolean, active?: boolean) => {
     if (variant === 'secondary') {
@@ -92,6 +93,7 @@ const Button = ({
           {children}
         </EmphasisTypography>
       )}
+      {endIcon}
     </StyledButton>
   )
 }

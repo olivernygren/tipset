@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { theme } from '../../theme';
 import { HeadingsTypography } from '../typography/Typography';
 import IconButton from '../buttons/IconButton';
@@ -11,9 +11,10 @@ interface ModalProps {
   children: React.ReactNode;
   onClose: () => void;
   size?: 's' | 'm' | 'l';
+  headerDivider?: boolean;
 }
 
-const Modal = ({ title, children, onClose, size = 'm' }: ModalProps) => {
+const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalProps) => {
   const getModalWidth = () => {
     switch (size) {
       case 's':
@@ -41,7 +42,7 @@ const Modal = ({ title, children, onClose, size = 'm' }: ModalProps) => {
             exit={{ opacity: 0, scale: 0.92 }}
             transition={{ duration: 0.2 }}
           >
-            <Header>
+            <Header headerDivider={headerDivider}>
               {title && <HeadingsTypography variant='h3'>{title}</HeadingsTypography>}
               <IconButton 
                 icon={<X size={24} />} 
@@ -68,10 +69,6 @@ const Backdrop = styled.div`
 `;
 
 const ModalContainer = styled(motion.div)<{ width: string }>`
-  /* position: fixed;
-  z-index: 20;
-  left: 50%;
-  top: 50%; */
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -84,12 +81,17 @@ const ModalContainer = styled(motion.div)<{ width: string }>`
   border-radius: ${theme.borderRadius.l};
 `;
 
-const Header = styled.div`
+const Header = styled.div<{ headerDivider?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  
+  ${({ headerDivider }) => headerDivider && css`
+    border-bottom: 1px solid ${theme.colors.silverLight};
+    padding-bottom: ${theme.spacing.s};
+  `}
 `;
 
 const GlobalStyle = createGlobalStyle`

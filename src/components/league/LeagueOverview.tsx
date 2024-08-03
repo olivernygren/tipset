@@ -1,4 +1,4 @@
-import { PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
+import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import styled from 'styled-components';
 import { PlusCircle } from '@phosphor-icons/react';
 import { theme, devices } from '../../theme';
@@ -7,6 +7,8 @@ import Button from '../buttons/Button';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
 import { LeagueTabs } from '../../pages/admin/leagues/[leagueId]';
+import { useEffect, useState } from 'react';
+import FixturePreview from '../game/FixturePreview';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -17,6 +19,20 @@ interface LeagueOverviewProps {
 }
 
 const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab }: LeagueOverviewProps) => {
+  const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
+
+  useEffect(() => {
+    if (league && league.gameWeeks && league.gameWeeks.length > 0) {
+      const currentGameWeek = league.gameWeeks.find((gameWeek) => {
+        const now = new Date();
+        return new Date(gameWeek.startDate) < now && (new Date(gameWeek.deadline) > now || gameWeek.hasBeenCorrected === false);
+      });
+
+      if (currentGameWeek) {
+        setCurrentGameWeek(currentGameWeek);
+      }
+    }
+  }, []);
 
   const getFormattedDeadline = () => {
     if (!league) return '';
@@ -58,10 +74,12 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
     <OverviewGrid>
       <GridSection>
         <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
-        {league.gameWeeks && league.gameWeeks.length > 0 ? 
-          league.gameWeeks.map((gameWeek) => (
-            <></>
-          )
+        {currentGameWeek ? (
+          <Section gap='xxxs'>
+            {currentGameWeek.games.fixtures.map((fixture) => (
+              <FixturePreview fixture={fixture} />
+            ))}
+          </Section>
         ) : (
           <>
             <NormalTypography variant='m' color={theme.colors.textLight}>Inga omgångar finns</NormalTypography>

@@ -81,6 +81,7 @@ export interface PredictionInput {
   homeGoals: number;
   awayGoals: number;
   outcome: PredictionOutcomeEnum;
+  points?: PredictionPoints;
   goalScorer?: Player;
 }
 

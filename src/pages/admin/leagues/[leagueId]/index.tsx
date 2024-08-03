@@ -41,8 +41,6 @@ const PredictionLeaguePage = () => {
   const navigate = useNavigate();
   const { user, hasAdminRights } = useUser();
 
-  console.log(user);
-
   const [league, setLeague] = useState<PredictionLeague | undefined>();
   const [initialFetchLoading, setInitialFetchLoading] = useState<boolean>(true);
   const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
@@ -158,8 +156,6 @@ const PredictionLeaguePage = () => {
     setJoinLeagueLoading(false);
   };
 
-  console.log(league);
-
   const getTabText = (tab: LeagueTabs) => {
     switch (tab) {
       case LeagueTabs.OVERVIEW:
@@ -211,6 +207,7 @@ const PredictionLeaguePage = () => {
           <FixturesView 
             league={league}
             isCreator={isCreator}
+            refetchLeague={fetchLeagueData}
           />
         );
       case LeagueTabs.PARTICIPANTS:
