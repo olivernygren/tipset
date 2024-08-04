@@ -22,6 +22,7 @@ import Button from '../../../../components/buttons/Button';
 import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../../utils/firebaseHelpers';
 import LeagueOverview from '../../../../components/league/LeagueOverview';
 import FixturesView from '../../../../components/league/FixturesView';
+import ParticipantsView from '../../../../components/league/ParticipantsView';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -212,7 +213,11 @@ const PredictionLeaguePage = () => {
         );
       case LeagueTabs.PARTICIPANTS:
         return (
-          <></>
+          <ParticipantsView
+            league={league}
+            isCreator={isCreator}
+            refetchLeague={fetchLeagueData}
+          />
         );
       case LeagueTabs.EDIT:
         return (

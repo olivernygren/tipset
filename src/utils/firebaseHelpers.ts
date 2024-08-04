@@ -45,3 +45,14 @@ export const getUserNameById = async (userId: string) => {
   }
   return '';
 }
+
+export const getUserDataById = async (userId: string) => {
+  const userDocRef = doc(db, CollectionEnum.USERS, userId);
+  const userDoc = await getDoc(userDocRef);
+  
+  if (userDoc.exists()) {
+    const userData = withDocumentIdOnObject<User>(userDoc);
+    return userData;
+  }
+  return null;
+}

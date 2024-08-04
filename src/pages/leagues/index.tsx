@@ -80,7 +80,12 @@ const PredictionLeaguesPage = () => {
       inviteCode: generateLeagueInviteCode(),
       createdAt: new Date().toISOString(),
       invitedUsers: [],
-      standings: [],
+      standings: [{
+        userId: auth.currentUser?.uid ?? '',
+        username: (user?.lastname ? `${user?.firstname} ${user?.lastname}` : user?.firstname) ?? '?',
+        points: 0,
+        correctResults: 0,
+      }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
     }
 
@@ -97,6 +102,8 @@ const PredictionLeaguesPage = () => {
   };
 
   const handleJoinLeague = async () => {
+    console.log(currentUserId, user);
+    
     if (!currentUserId || !user) return;
 
     setJoinLeagueLoading('modal');

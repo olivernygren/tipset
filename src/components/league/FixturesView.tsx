@@ -28,7 +28,6 @@ import FixturePreview from '../game/FixturePreview';
 import PredictionsModal from './PredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
-import { get } from 'http';
 
 interface FixturesViewProps {
   league: PredictionLeague;

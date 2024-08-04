@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserNameById } from '../../utils/firebaseHelpers';
+import { getUserDataById, getUserNameById } from '../../utils/firebaseHelpers';
 
 interface UserNameProps {
   userId: string;
@@ -19,5 +19,21 @@ const UserName = ({ userId }: UserNameProps) => {
 
   return <>{name || 'Loading...'}</>;
 };
+
+export const UserEmail = ({ userId }: UserNameProps) => {
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const user = await getUserDataById(userId);
+      const userEmail = user?.email || '';
+      setEmail(userEmail);
+    };
+
+    fetchUserEmail();
+  }, [userId]);
+
+  return <>{email || 'Loading...'}</>;
+}
 
 export default UserName;

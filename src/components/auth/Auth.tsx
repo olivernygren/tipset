@@ -7,7 +7,7 @@ import { auth, db, provider as googleProvider } from '../../config/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { theme } from '../../theme';
 import { Divider } from '../Divider';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { CollectionEnum } from '../../utils/Firebase';
 import { CreateUserInput, RolesEnum } from '../../utils/Auth';
 import { useNavigate } from 'react-router-dom';
@@ -56,14 +56,17 @@ const Auth = () => {
       lastname,
       role: RolesEnum.USER
     }
-
+  
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      await addDoc(collection(db, CollectionEnum.USERS), input);
-      await updateProfile(auth.currentUser!, {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+  
+      // Ensure the document ID matches the user's uid
+      await setDoc(doc(db, CollectionEnum.USERS, user.uid), input);
+      await updateProfile(user, {
         displayName: `${firstname} ${lastname}`,
       });
-
+  
       navigate('/home');
     } catch (e) {
       console.error(e);
