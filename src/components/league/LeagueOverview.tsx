@@ -1,6 +1,6 @@
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import styled from 'styled-components';
-import { ArrowCircleRight, PlusCircle } from '@phosphor-icons/react';
+import { ArrowCircleRight, PencilSimple, PlusCircle } from '@phosphor-icons/react';
 import { theme, devices } from '../../theme';
 import { getUserStandingPositionInLeague } from '../../utils/firebaseHelpers';
 import Button from '../buttons/Button';
@@ -12,6 +12,7 @@ import FixturePreview from '../game/FixturePreview';
 import { Divider } from '../Divider';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import { useUser } from '../../context/UserContext';
+import IconButton from '../buttons/IconButton';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -22,7 +23,7 @@ interface LeagueOverviewProps {
 }
 
 const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab }: LeagueOverviewProps) => {
-  const { user } = useUser();
+  const { user, hasAdminRights } = useUser();
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
@@ -179,7 +180,16 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
           )}
         </GridSection>
         <GridSection>
-          <HeadingsTypography variant='h3'>Information</HeadingsTypography>
+          <Section justifyContent='space-between' alignItems='center' flexDirection='row'>
+            <HeadingsTypography variant='h3'>Information</HeadingsTypography>
+            {(isCreator || hasAdminRights) && (
+              <IconButton 
+                onClick={() => onChangeTab(LeagueTabs.EDIT)} 
+                icon={<PencilSimple size={24} />}
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+              />
+            )}
+          </Section>
           {league.description && (
             <Section gap='xxxs'>
               <EmphasisTypography variant='s' color={theme.colors.textLight}>Beskrivning</EmphasisTypography>

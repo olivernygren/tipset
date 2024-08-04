@@ -23,6 +23,7 @@ import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../..
 import LeagueOverview from '../../../../components/league/LeagueOverview';
 import FixturesView from '../../../../components/league/FixturesView';
 import ParticipantsView from '../../../../components/league/ParticipantsView';
+import EditLeagueView from '../../../../components/league/EditLeagueView';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -221,7 +222,11 @@ const PredictionLeaguePage = () => {
         );
       case LeagueTabs.EDIT:
         return (
-          <></>
+          <EditLeagueView
+            league={league}
+            isCreator={isCreator}
+            refetchLeague={fetchLeagueData}
+          />
         );
       default:
         return null;
@@ -314,6 +319,7 @@ const TabsContainer = styled.div`
   border-radius: ${theme.borderRadius.m};
   width: 100%;
   box-sizing: border-box;
+  overflow-x: auto;
 `;
 
 const Tab = styled(motion.div)<{ active?: boolean }>`

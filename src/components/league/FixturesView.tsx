@@ -654,7 +654,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   
   return (
     <Section gap='m'>
-      <Divider color={theme.colors.silver} />
       {isCreator && !showCreateGameWeekSection && (
         <Section flexDirection='row' gap='s'>
           <Button 
