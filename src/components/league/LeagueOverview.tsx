@@ -1,6 +1,6 @@
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import styled from 'styled-components';
-import { PlusCircle } from '@phosphor-icons/react';
+import { ArrowCircleRight, PlusCircle } from '@phosphor-icons/react';
 import { theme, devices } from '../../theme';
 import { getUserStandingPositionInLeague } from '../../utils/firebaseHelpers';
 import Button from '../buttons/Button';
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import FixturePreview from '../game/FixturePreview';
 import { Divider } from '../Divider';
 import FixtureResultPreview from '../game/FixtureResultPreview';
+import { useUser } from '../../context/UserContext';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -21,6 +22,8 @@ interface LeagueOverviewProps {
 }
 
 const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab }: LeagueOverviewProps) => {
+  const { user } = useUser();
+
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
 
@@ -44,6 +47,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         setPreviousGameWeek(previousGameWeek);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getFormattedDeadline = () => {
@@ -88,13 +92,20 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         <GridSection>
           <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
           {currentGameWeek ? (
-            <Section gap='xxxs'>
+            <Section gap='xxxs' height='100%'>
               {currentGameWeek.games.fixtures.map((fixture) => (
                 <FixturePreview
                   fixture={fixture} 
                   hidePredictions={new Date(fixture.kickOffTime) > new Date()}
                 />
               ))}
+              {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
+                <MarginTopButton>
+                  <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight='fill' size={24} color={theme.colors.white} />}>
+                    Tippa matcher
+                  </Button>
+                </MarginTopButton>
+              )}
             </Section>
           ) : (
             <>
@@ -143,7 +154,14 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
             <Section gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
               <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                 <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {previousGameWeek.round}</HeadingsTypography>
-                <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(previousGameWeek.deadline).toLocaleDateString()}</NormalTypography>
+                <Section flexDirection='row' gap='s' alignItems='center' fitContent>
+                  <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(previousGameWeek.deadline).toLocaleDateString()}</NormalTypography>
+                  <RoundPointsContainer>
+                    <EmphasisTypography variant='m' color={theme.colors.gold}>
+                      {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)} poäng
+                    </EmphasisTypography>
+                  </RoundPointsContainer>
+                </Section>
               </Section>
               <Divider color={theme.colors.silver} />
               <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
@@ -190,7 +208,7 @@ const OverviewGrid = styled.div`
 
   @media ${devices.tablet} {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: repeat(2, auto);
   }
 `;
 
@@ -201,6 +219,9 @@ const GridSection = styled.div`
   background-color: ${theme.colors.white};
   padding: ${theme.spacing.m};
   border-radius: ${theme.borderRadius.m};
+  max-height: 500px;
+  overflow-y: auto;
+  min-height: 240px;
 `;
 
 const MarginTopButton = styled.div`
@@ -252,6 +273,15 @@ const TableSectionHeader = styled.div`
   box-sizing: border-box;
   padding-bottom: ${theme.spacing.xs};
   border-bottom: 1px solid ${theme.colors.silverLight};
+`;
+
+const RoundPointsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.primaryDark};
+  border-radius: ${theme.borderRadius.s};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
 `;
 
 export default LeagueOverview;

@@ -27,6 +27,8 @@ import IconButton from '../buttons/IconButton';
 import FixturePreview from '../game/FixturePreview';
 import PredictionsModal from './PredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
+import EditGameWeekView from './EditGameWeekView';
+import { get } from 'http';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -56,7 +58,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekDeadline, setNewGameWeekDeadline] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
+
   const [addFixtureViewOpen, setAddFixtureViewOpen] = useState<boolean>(false);
+  const [editGameWeekViewOpen, setEditGameWeekViewOpen] = useState<boolean>(false);
 
   const [teamType, setTeamType] = useState<TeamType>(TeamType.CLUBS);
   const [newFixtureHomeTeam, setNewFixtureHomeTeam] = useState<Team | undefined>();
@@ -417,6 +421,39 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     };
   };
 
+  const getOngoingGameWeekContent = () => {
+    if (!ongoingGameWeek) return;
+
+    if (editGameWeekViewOpen) {
+      return (
+        <EditGameWeekView
+          gameWeek={ongoingGameWeek}
+          onClose={() => setEditGameWeekViewOpen(false)}
+        />
+      )
+    }
+
+    if (showCorrectGameWeekContent) return getCorrectGameWeekContent();
+
+    return (
+      <FixturesGrid>
+        {ongoingGameWeek.games.fixtures.map((fixture, index) => (
+          <GamePredictor 
+            key={fixture.id} 
+            gameNumber={index + 1} 
+            game={fixture}
+            onResultUpdate={() => handleUpdatePredictionScoreline(fixture.id)}
+            onPlayerPredictionUpdate={(_, playerToScore) => handleUpdatePlayerPrediction(fixture.id, playerToScore)}
+            onSave={(homeGoals, awayGoals, playerToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore)}
+            hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
+            predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
+            loading={predictionLoading === fixture.id}
+          />
+        ))}
+      </FixturesGrid>
+    )
+  };
+
   const getAddNewFixtureContent = () => (
     <AddFixtureContainer
       initial={{ opacity: 0 }}
@@ -656,34 +693,20 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                   <IconButton 
                     icon={<PencilSimple size={24} />} 
                     colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                    onClick={() => {}}
+                    onClick={() => setEditGameWeekViewOpen(true)}
                   />
-                  <IconButton 
-                    icon={<CheckSquareOffset size={24} />} 
-                    colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                    onClick={() => setShowCorrectGameWeekContent(true)}
-                  />
+                  {new Date(ongoingGameWeek.deadline) < new Date() && (
+                    <IconButton 
+                      icon={<CheckSquareOffset size={24} />} 
+                      colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                      onClick={() => setShowCorrectGameWeekContent(true)}
+                    />
+                  )}
                 </>
               )}
             </Section>
           </Section>
-          {showCorrectGameWeekContent ? getCorrectGameWeekContent() : (
-            <FixturesGrid>
-              {ongoingGameWeek.games.fixtures.map((fixture, index) => (
-                <GamePredictor 
-                  key={fixture.id} 
-                  gameNumber={index + 1} 
-                  game={fixture}
-                  onResultUpdate={() => handleUpdatePredictionScoreline(fixture.id)}
-                  onPlayerPredictionUpdate={(_, playerToScore) => handleUpdatePlayerPrediction(fixture.id, playerToScore)}
-                  onSave={(homeGoals, awayGoals, playerToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore)}
-                  hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
-                  predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
-                  loading={predictionLoading === fixture.id}
-                />
-              ))}
-            </FixturesGrid>
-          )}
+          {getOngoingGameWeekContent()}
         </Section>
       )}
       <Section 
@@ -713,13 +736,20 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         {previousGameWeeks && previousGameWeeks.length > 0 ? (
           <>
             {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
-              <Section key={gameWeek.round} gap='s' backgroundColor={theme.colors.silverLighter} padding={theme.spacing.s} borderRadius={theme.borderRadius.m}>
-                <Section justifyContent='space-between' alignItems='center' flexDirection='row'>
+              <Section key={gameWeek.round} gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+                <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                   <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {gameWeek.round}</HeadingsTypography>
-                  <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
+                  <Section flexDirection='row' gap='s' alignItems='center' fitContent>
+                    <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
+                    <RoundPointsContainer>
+                      <EmphasisTypography variant='m' color={theme.colors.gold}>
+                        {gameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)} poäng
+                      </EmphasisTypography>
+                    </RoundPointsContainer>
+                  </Section>
                 </Section>
                 <Divider color={theme.colors.silver} />
-                <Section gap='xxs'>
+                <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
                   {gameWeek.games.fixtures.map((fixture) => (
                     <FixtureResultPreview 
                       fixture={fixture}
@@ -806,6 +836,15 @@ const FixturesGrid = styled.div`
   gap: ${theme.spacing.m};
   width: 100%;
   box-sizing: border-box;
+`;
+
+const RoundPointsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.primaryDark};
+  border-radius: ${theme.borderRadius.s};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
 `;
 
 export default FixturesView;

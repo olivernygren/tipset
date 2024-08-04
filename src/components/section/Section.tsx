@@ -10,6 +10,7 @@ interface SectionProps {
   backgroundColor?: string;
   borderRadius?: string;
   fitContent?: boolean;
+  height?: string;
 }
 
 export const Section = styled.section<SectionProps>`
@@ -24,4 +25,5 @@ export const Section = styled.section<SectionProps>`
   box-sizing: border-box;
   width: ${({ fitContent }) => fitContent ? 'fit-content' : '100%'};
   position: relative;
+  height: ${({ height }) => height || 'auto'};
 `;

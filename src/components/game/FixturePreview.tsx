@@ -16,7 +16,16 @@ interface FixturePreviewProps {
   onShowPredictionsClick?: () => void;
 };
 
-const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick }: FixturePreviewProps) => {  
+const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick }: FixturePreviewProps) => {
+  const getFormattedKickoffTime = (kickoffTime: string) => {
+    const date = new Date(kickoffTime);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${day}/${month} ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+  };
+
   return (
     <Section 
       flexDirection='row' 
@@ -26,6 +35,9 @@ const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPred
       backgroundColor={theme.colors.silverLighter}
       borderRadius={theme.borderRadius.s}
     >
+      <KickoffTime>
+        <NormalTypography variant='m' color={theme.colors.silverDarker}>{getFormattedKickoffTime(fixture.kickOffTime)}</NormalTypography>
+      </KickoffTime>
       <Teams showPrediction={!hidePredictions}>
         <TeamContainer>
           {fixture.teamType === TeamType.CLUBS ? (
@@ -90,6 +102,14 @@ const TeamContainer = styled.div`
   align-items: center;
   gap: ${theme.spacing.xxxs};
   width: fit-content;
+`;
+
+const KickoffTime = styled.div`
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  white-space: nowrap;
+  margin-left: ${theme.spacing.xxs};
 `;
 
 export default FixturePreview;
