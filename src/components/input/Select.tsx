@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { theme } from '../../theme';
 import { CaretDown } from '@phosphor-icons/react';
 
@@ -58,7 +58,7 @@ const Select = ({ options, optionGroups, value, onChange, placeholder, disabled,
           </>
         )}
       </StyledSelect>
-      <CaretDown size={16} weight='bold' />
+      <CaretDown size={16} weight='bold' color={disabled ? theme.colors.silverDark : theme.colors.textDefault} />
     </SelectWrapper>
   )
 };
@@ -76,7 +76,7 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   background-color: ${theme.colors.white};
 
   border-radius: ${theme.borderRadius.s};
-  border: 1px solid #ccc;
+  border: 1px solid ${({ disabled }) => disabled ? theme.colors.silverLight : theme.colors.silver};
   box-sizing: border-box;
 
   &:focus-within {
@@ -84,10 +84,10 @@ const SelectWrapper = styled.div<StyledSelectProps>`
     border-color: ${theme.colors.primary};
   }
 
-  &:disabled {
+  ${({ disabled }) => disabled && css`
     background-color: ${theme.colors.silverLighter};
     cursor: not-allowed;
-  }
+  `}
 `;
 
 const StyledSelect = styled.select`

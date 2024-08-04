@@ -226,21 +226,22 @@ const GamePredictor = ({
         />
         {getTeam(game.awayTeam, true)}
       </GameWrapper>
-      {game.shouldPredictGoalScorer && (
-        <>
-          <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-          <GoalScorerSection>
-            <EmphasisTypography variant='m' color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>Välj målskytt i matchen</EmphasisTypography>
-            <Select 
-              options={[]}
-              optionGroups={getOptionGroups()}
-              value={predictedPlayerToScore?.id || ''}
-              onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
-            />
-          </GoalScorerSection>
-          <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        </>
-      )}
+      <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+      <GoalScorerSection>
+        {game.shouldPredictGoalScorer ? (
+          <EmphasisTypography variant='m' color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>Välj målskytt i matchen</EmphasisTypography>
+        ) : (
+          <EmphasisTypography variant='m' color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silverDarker}>Ingen målskytt ska tippas</EmphasisTypography>
+        )}
+        <Select 
+          options={[]}
+          optionGroups={getOptionGroups()}
+          value={predictedPlayerToScore?.id || ''}
+          onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
+          disabled={!game.shouldPredictGoalScorer}
+        />
+      </GoalScorerSection>
+      <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
       <SaveButtonSection hasPredicted={hasPredicted}>
         <Button 
           variant='primary' 

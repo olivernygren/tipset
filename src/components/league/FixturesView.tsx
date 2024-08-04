@@ -28,6 +28,9 @@ import FixturePreview from '../game/FixturePreview';
 import PredictionsModal from './PredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
+import RootToast from '../toast/RootToast';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
+import { error } from 'console';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -118,6 +121,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
   useEffect(() => {
     if (!league || !predictionStatuses.length) return;
+    console.log(predictionStatuses);
+    
 
     if (predictionStatuses.some(({ status }) => status === PredictionStatus.UPDATED)) {
       setGameWeekPredictionStatus(GameWeekPredictionStatus.UNSAVED_CHANGES);
@@ -255,9 +260,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setNewFixtureKickoffDateTime(date);
   
     const currentFixtureKickoffTimes = newGameWeekFixtures.map((fixture) => new Date(fixture.kickOffTime).getTime());
-    const anyFixtureHasLaterKickoff = currentFixtureKickoffTimes.some(kickoffTime => kickoffTime > date.getTime());
+    const earliestKickoffTime = Math.min(...currentFixtureKickoffTimes);
   
-    if (!anyFixtureHasLaterKickoff) {
+    if (date.getTime() < earliestKickoffTime) {
       setNewGameWeekDeadline(date);
     }
   };
@@ -398,9 +403,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         return prediction;
       });
       setPredictionStatuses(updatedPredictionStatuses);
+      successNotify('Tips sparades');
       refetchLeague();
     } catch (err) {
       console.log(err);
+      errorNotify('Något gick fel, försök igen senare');
     }
     setPredictionLoading(null);
   };
@@ -653,117 +660,120 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   }
   
   return (
-    <Section gap='m'>
-      {isCreator && !showCreateGameWeekSection && (
-        <Section flexDirection='row' gap='s'>
-          <Button 
-            color="primary"
-            size='m' 
-            icon={<PlusCircle size={20} color={theme.colors.white} />} 
-            onClick={isCreator || hasAdminRights ? () => setShowCreateGameWeekSection(!showCreateGameWeekSection) : () => {}}
+    <>
+      <Section gap='m'>
+        {isCreator && !showCreateGameWeekSection && (
+          <Section flexDirection='row' gap='s'>
+            <Button 
+              color="primary"
+              size='m' 
+              icon={<PlusCircle size={20} color={theme.colors.white} />} 
+              onClick={isCreator || hasAdminRights ? () => setShowCreateGameWeekSection(!showCreateGameWeekSection) : () => {}}
+            >
+              Skapa ny omgång
+            </Button>
+          </Section>
+        )}
+        {showCreateGameWeekSection && getCreateGameWeekContent()}
+        {ongoingGameWeek && (
+          <Section 
+            backgroundColor={theme.colors.white} 
+            borderRadius={theme.borderRadius.l}
+            padding={theme.spacing.m}
+            gap='s'
           >
-            Skapa ny omgång
-          </Button>
-        </Section>
-      )}
-      {showCreateGameWeekSection && getCreateGameWeekContent()}
-      {ongoingGameWeek && (
+            <Section flexDirection='row' justifyContent='space-between' alignItems='center'>
+              <HeadingsTypography variant='h4'>Pågående omgång</HeadingsTypography>
+              <Section flexDirection='row' alignItems='center' gap='s' fitContent>
+                <NormalTypography variant='m' color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+                <Section
+                  backgroundColor={theme.colors.primaryFade}
+                  padding={theme.spacing.xxs}
+                  borderRadius={theme.borderRadius.s}
+                  fitContent
+                >
+                  <EmphasisTypography variant='m' color={theme.colors.primaryDark}>Omgång {ongoingGameWeek.round}</EmphasisTypography>
+                </Section>
+                {(isCreator || hasAdminRights) && (
+                  <>
+                    <IconButton 
+                      icon={<PencilSimple size={24} />} 
+                      colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                      onClick={() => setEditGameWeekViewOpen(true)}
+                    />
+                    {new Date(ongoingGameWeek.deadline) < new Date() && (
+                      <IconButton 
+                        icon={<CheckSquareOffset size={24} />} 
+                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                        onClick={() => setShowCorrectGameWeekContent(true)}
+                      />
+                    )}
+                  </>
+                )}
+              </Section>
+            </Section>
+            {getOngoingGameWeekContent()}
+          </Section>
+        )}
         <Section 
           backgroundColor={theme.colors.white} 
           borderRadius={theme.borderRadius.l}
           padding={theme.spacing.m}
           gap='s'
         >
-          <Section flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <HeadingsTypography variant='h4'>Pågående omgång</HeadingsTypography>
-            <Section flexDirection='row' alignItems='center' gap='s' fitContent>
-              <NormalTypography variant='m' color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
-              <Section
-                backgroundColor={theme.colors.primaryFade}
-                padding={theme.spacing.xxs}
-                borderRadius={theme.borderRadius.s}
-                fitContent
-              >
-                <EmphasisTypography variant='m' color={theme.colors.primaryDark}>Omgång {ongoingGameWeek.round}</EmphasisTypography>
-              </Section>
-              {(isCreator || hasAdminRights) && (
-                <>
-                  <IconButton 
-                    icon={<PencilSimple size={24} />} 
-                    colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                    onClick={() => setEditGameWeekViewOpen(true)}
-                  />
-                  {new Date(ongoingGameWeek.deadline) < new Date() && (
-                    <IconButton 
-                      icon={<CheckSquareOffset size={24} />} 
-                      colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                      onClick={() => setShowCorrectGameWeekContent(true)}
-                    />
-                  )}
-                </>
-              )}
-            </Section>
-          </Section>
-          {getOngoingGameWeekContent()}
+          <HeadingsTypography variant='h4'>Nästa omgång</HeadingsTypography>
+          {upcomingGameWeek ? (
+            <>
+              <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {upcomingGameWeek.startDate.toString()}</NormalTypography>
+              <NormalTypography variant='m' color={theme.colors.textLight}>Deadline: {upcomingGameWeek.deadline.toString()}</NormalTypography>
+              <NormalTypography variant='m' color={theme.colors.textLight}>Antal matcher: {upcomingGameWeek.games.fixtures.length}</NormalTypography>
+            </>
+          ) : (
+            <NormalTypography variant='m' color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
+          )}
         </Section>
-      )}
-      <Section 
-        backgroundColor={theme.colors.white} 
-        borderRadius={theme.borderRadius.l}
-        padding={theme.spacing.m}
-        gap='s'
-      >
-        <HeadingsTypography variant='h4'>Nästa omgång</HeadingsTypography>
-        {upcomingGameWeek ? (
-          <>
-            <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {upcomingGameWeek.startDate.toString()}</NormalTypography>
-            <NormalTypography variant='m' color={theme.colors.textLight}>Deadline: {upcomingGameWeek.deadline.toString()}</NormalTypography>
-            <NormalTypography variant='m' color={theme.colors.textLight}>Antal matcher: {upcomingGameWeek.games.fixtures.length}</NormalTypography>
-          </>
-        ) : (
-          <NormalTypography variant='m' color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
-        )}
-      </Section>
-      <Section 
-        backgroundColor={theme.colors.white} 
-        borderRadius={theme.borderRadius.l}
-        padding={theme.spacing.m}
-        gap='s'
-      >
-        <HeadingsTypography variant='h4'>Föregående omgångar</HeadingsTypography>
-        {previousGameWeeks && previousGameWeeks.length > 0 ? (
-          <>
-            {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
-              <Section key={gameWeek.round} gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
-                <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
-                  <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {gameWeek.round}</HeadingsTypography>
-                  <Section flexDirection='row' gap='s' alignItems='center' fitContent>
-                    <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
-                    <RoundPointsContainer>
-                      <EmphasisTypography variant='m' color={theme.colors.gold}>
-                        {gameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)} poäng
-                      </EmphasisTypography>
-                    </RoundPointsContainer>
+        <Section 
+          backgroundColor={theme.colors.white} 
+          borderRadius={theme.borderRadius.l}
+          padding={theme.spacing.m}
+          gap='s'
+        >
+          <HeadingsTypography variant='h4'>Föregående omgångar</HeadingsTypography>
+          {previousGameWeeks && previousGameWeeks.length > 0 ? (
+            <>
+              {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
+                <Section key={gameWeek.round} gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+                  <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
+                    <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {gameWeek.round}</HeadingsTypography>
+                    <Section flexDirection='row' gap='s' alignItems='center' fitContent>
+                      <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
+                      <RoundPointsContainer>
+                        <EmphasisTypography variant='m' color={theme.colors.gold}>
+                          {gameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)} poäng
+                        </EmphasisTypography>
+                      </RoundPointsContainer>
+                    </Section>
+                  </Section>
+                  <Divider color={theme.colors.silver} />
+                  <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
+                    {gameWeek.games.fixtures.map((fixture) => (
+                      <FixtureResultPreview 
+                        fixture={fixture}
+                        predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                        compact={false}
+                      />
+                    ))}
                   </Section>
                 </Section>
-                <Divider color={theme.colors.silver} />
-                <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
-                  {gameWeek.games.fixtures.map((fixture) => (
-                    <FixtureResultPreview 
-                      fixture={fixture}
-                      predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                      compact={false}
-                    />
-                  ))}
-                </Section>
-              </Section>
-            ))}
-          </>
-        ) : (
-          <NormalTypography variant='m' color={theme.colors.textLight}>Inga föregående omgångar</NormalTypography>
-        )}
+              ))}
+            </>
+          ) : (
+            <NormalTypography variant='m' color={theme.colors.textLight}>Inga föregående omgångar</NormalTypography>
+          )}
+        </Section>
       </Section>
-    </Section>
+      <RootToast />
+    </>
   )
 };
 
