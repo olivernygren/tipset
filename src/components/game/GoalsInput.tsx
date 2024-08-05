@@ -12,9 +12,10 @@ interface GoalsInputProps {
   onDecrease: () => void;
   onInputChange: (value: string) => void;
   hasPredicted?: boolean;
+  disabled?: boolean;
 }
 
-const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPredicted }: GoalsInputProps) => {
+const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPredicted, disabled }: GoalsInputProps) => {
   const getIconButtonColors = () => {
     if (hasPredicted) {
       return {
@@ -39,7 +40,7 @@ const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPre
         icon={<PlusCircle size={24} />}
         onClick={onIncrease}
         colors={getIconButtonColors()}
-        disabled={goals === '9'}
+        disabled={goals === '9' || disabled}
       />
       <Input
         value={goals}
@@ -49,12 +50,13 @@ const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPre
         textAlign='center'
         fontSize='30px'
         fontWeight='600'
+        disabled={disabled}
       />
       <IconButton 
         icon={<MinusCircle size={24} />}
         onClick={onDecrease}
         colors={getIconButtonColors()}
-        disabled={goals === '0' || goals === ''}
+        disabled={goals === '0' || goals === '' || disabled}
       />
     </Section>
   )

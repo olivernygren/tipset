@@ -94,6 +94,8 @@ const InputContainer = styled.div`
     flex-direction: row;
     gap: ${theme.spacing.m};
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 `;
 

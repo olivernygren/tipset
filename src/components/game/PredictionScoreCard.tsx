@@ -13,6 +13,21 @@ interface PredictionScoreCardProps {
 }
 
 const PredictionScoreCard = ({ prediction }: PredictionScoreCardProps) => {
+  const numberOfPointsItems = Object.values(prediction.points ?? {}).filter(value => value > 0).length;
+
+  const getTableRow = (label: string, points: number | undefined) => {
+    if (!points || points === 0) return null;
+    return (
+      <>
+        <TableRow>
+          <NormalTypography variant='s' color={theme.colors.white}>{label}</NormalTypography>
+          <EmphasisTypography variant='m' color={theme.colors.gold}>{points} p</EmphasisTypography>
+        </TableRow>
+        <Divider color={theme.colors.primary} />
+      </>
+    )
+  };
+
   return (
     <Card>
       <HeadingsTypography variant='h4' color={theme.colors.gold}>
@@ -40,37 +55,14 @@ const PredictionScoreCard = ({ prediction }: PredictionScoreCardProps) => {
         padding={`${theme.spacing.xxs} ${theme.spacing.xs}`}
         gap='xxs'
       >
-        <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>Korrekt utfall (1X2)</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctOutcome ?? 0} p</EmphasisTypography>
-        </TableRow>
-        <Divider color={theme.colors.primary} />
-        <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>Korrekt resultat</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctResult ?? 0} p</EmphasisTypography>
-        </TableRow>
-        <Divider color={theme.colors.primary} />
-        <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>Korrekt antal mål av hemmalag</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctGoalsByHomeTeam ?? 0} p</EmphasisTypography>
-        </TableRow>
-        <Divider color={theme.colors.primary} />
-        <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>Korrekt antal mål av bortalag</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctGoalsByAwayTeam ?? 0} p</EmphasisTypography>
-        </TableRow>
-        <Divider color={theme.colors.primary} />
-        <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>Korrekt målskillnad</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctGoalDifference ?? 0} p</EmphasisTypography>
-        </TableRow>
+        {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
+        {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
+        {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
+        {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
+        {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
         {prediction.goalScorer && (
           <>
-            <Divider color={theme.colors.primary} />
-            <TableRow>
-              <NormalTypography variant='s' color={theme.colors.white}>Korrekt målskytt ({getGeneralPositionShorthand(prediction.goalScorer.position.general)})</NormalTypography>
-              <EmphasisTypography variant='m' color={theme.colors.gold}>{prediction.points?.correctGoalScorer ?? 0} p</EmphasisTypography>
-            </TableRow>
+            {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
           </>
         )}
       </Section>

@@ -32,17 +32,11 @@ export enum LeagueTabs {
   EDIT = 'EDIT',
 }
 
-const tabs = [
-  LeagueTabs.OVERVIEW,
-  LeagueTabs.MATCHES,
-  LeagueTabs.PARTICIPANTS,
-  LeagueTabs.EDIT,
-];
-
 const PredictionLeaguePage = () => {
   const navigate = useNavigate();
   const { user, hasAdminRights } = useUser();
 
+  const [tabs, setTabs] = useState([LeagueTabs.OVERVIEW, LeagueTabs.MATCHES, LeagueTabs.PARTICIPANTS]);
   const [league, setLeague] = useState<PredictionLeague | undefined>();
   const [initialFetchLoading, setInitialFetchLoading] = useState<boolean>(true);
   const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
@@ -66,6 +60,10 @@ const PredictionLeaguePage = () => {
       const isUserParticipant = league.participants.includes(currentUserId);
       setIsParticipant(isUserParticipant);
       setSortedLeagueStandings(getSortedLeagueStandings(league.standings));
+
+      if (league.creatorId === currentUserId || hasAdminRights) {
+        setTabs([LeagueTabs.OVERVIEW, LeagueTabs.MATCHES, LeagueTabs.PARTICIPANTS, LeagueTabs.EDIT]);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId, initialFetchLoading, league]);

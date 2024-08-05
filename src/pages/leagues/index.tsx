@@ -18,6 +18,7 @@ import Input from '../../components/input/Input';
 import { QueryEnum } from '../../utils/Routes';
 import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
 import { useUser } from '../../context/UserContext';
+import { successNotify } from '../../utils/toast/toastHelpers';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -150,6 +151,7 @@ const PredictionLeaguesPage = () => {
         standings: [...leagueData.standings, newParticipantStandingsObj]
       });
       setShowJoinLeagueModal(false);
+      successNotify(`Du har gått med i ${leagueData.name}`);
       fetchLeagues();
     } catch (e) {
       console.error(e);

@@ -4,7 +4,7 @@ import { Section } from '../section/Section';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
-import { CheckSquareOffset, PencilSimple, PlusCircle, XCircle } from '@phosphor-icons/react';
+import { ArrowCircleLeft, CheckSquareOffset, PencilSimple, PlusCircle, XCircle } from '@phosphor-icons/react';
 import { Divider } from '../Divider';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -25,12 +25,11 @@ import { generateRandomID } from '../../utils/firebaseHelpers';
 import { Player } from '../../utils/Players';
 import IconButton from '../buttons/IconButton';
 import FixturePreview from '../game/FixturePreview';
-import PredictionsModal from './PredictionsModal';
+import CorrectPredictionsModal from './CorrectPredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
 import RootToast from '../toast/RootToast';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
-import { error } from 'console';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -56,6 +55,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [showCorrectGameWeekContent, setShowCorrectGameWeekContent] = useState<boolean>(false)
   const [showPredictionsModalFixtureId, setShowPredictionsModalFixtureId] = useState<string | null>(null);
   const [createGameWeekLoading, setCreateGameWeekLoading] = useState<boolean>(false);
+  const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekDeadline, setNewGameWeekDeadline] = useState<Date>(new Date());
@@ -112,7 +112,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       if (currentGameWeek && user) {
         setPredictionStatuses(currentGameWeek.games.fixtures.map((fixture) => ({
           fixtureId: fixture.id,
-          status: getPredictionStatus(currentGameWeek, user?.documentId ?? '')
+          status: getPredictionStatus(currentGameWeek, user?.documentId ?? '', fixture.id)
         })));
       };
     };
@@ -344,6 +344,41 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     });
     setPredictionStatuses(updatedPredictionStatuses);
   };
+
+  const handleEndGameWeek = async () => {
+    if (!league || !ongoingGameWeek) return;
+
+    setEndGameWeekLoading(true);
+
+    const updatedGameWeek: LeagueGameWeek = {
+      ...ongoingGameWeek,
+      hasEnded: true,
+      hasBeenCorrected: true,
+    }
+
+    try {
+      const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, league.documentId));
+      const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
+      
+      const updatedGameWeeks: Array<LeagueGameWeek> = leagueData.gameWeeks ? leagueData.gameWeeks.map((gameWeek) => {
+        if (gameWeek.round === ongoingGameWeek.round) {
+          return updatedGameWeek;
+        }
+        return gameWeek;
+      }) : [];
+
+      await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), {
+        gameWeeks: updatedGameWeeks,
+      });
+
+      refetchLeague();
+      setShowCorrectGameWeekContent(false);
+    } catch (error) {
+      console.error(error);
+    };
+
+    setEndGameWeekLoading(false);
+  }
 
   const handleSavePrediction = async (fixture: Fixture, homeGoals: string, awayGoals: string, playerToScore?: Player | null) => {
     if (!user || !user.documentId || !ongoingGameWeek) return;
@@ -648,12 +683,22 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           ))}
         </Section>
         {showPredictionsModalFixtureId && (
-          <PredictionsModal
+          <CorrectPredictionsModal
             onClose={() => setShowPredictionsModalFixtureId(null)}
             gameId={showPredictionsModalFixtureId}
             league={league}
             ongoingGameWeek={ongoingGameWeek}
+            refetchLeague={refetchLeague}
           />
+        )}
+        {ongoingGameWeek.games.fixtures.every((f) => Boolean(f.finalResult)) && (
+          <Button
+            color='red'
+            onClick={handleEndGameWeek}
+            loading={endGameWeekLoading}
+          >
+            Avsluta omgång
+          </Button>
         )}
       </>
     )
@@ -702,11 +747,21 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       onClick={() => setEditGameWeekViewOpen(true)}
                     />
                     {new Date(ongoingGameWeek.deadline) < new Date() && (
-                      <IconButton 
-                        icon={<CheckSquareOffset size={24} />} 
-                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                        onClick={() => setShowCorrectGameWeekContent(true)}
-                      />
+                      <>
+                        {showCorrectGameWeekContent ? (
+                          <IconButton 
+                            icon={<ArrowCircleLeft size={24} />} 
+                            colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                            onClick={() => setShowCorrectGameWeekContent(false)}
+                          />
+                        ) : (
+                          <IconButton 
+                            icon={<CheckSquareOffset size={24} />} 
+                            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                            onClick={() => setShowCorrectGameWeekContent(true)}
+                          />
+                        )}
+                      </>
                     )}
                   </>
                 )}

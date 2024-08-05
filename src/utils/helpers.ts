@@ -27,8 +27,8 @@ export const hasInvalidTeamName = (teamName: string): boolean => {
   return false;
 };
 
-export const getPredictionStatus = (currentGameWeek: LeagueGameWeek, userId: string): PredictionStatus => {
-  if (currentGameWeek.games.predictions.some((prediction) => prediction.userId === userId)) {
+export const getPredictionStatus = (currentGameWeek: LeagueGameWeek, userId: string, fixtureId: string): PredictionStatus => {
+  if (currentGameWeek.games.predictions.some((prediction) => prediction.userId === userId && prediction.fixtureId === fixtureId)) {
     return PredictionStatus.PREDICTED;
   }
   return PredictionStatus.NOT_PREDICTED;

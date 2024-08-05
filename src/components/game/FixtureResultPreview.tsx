@@ -15,12 +15,12 @@ import Modal from '../modal/Modal';
 interface FixtureResultPreviewProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
+  // background?: 'white' | 'silver';
+  showBorder?: boolean;
   compact?: boolean;
 }
 
-// Lägg till totalpoäng för omgången på varje omgång i listan "Föregående omgångar" - bredvid omgångsnumret eller deadline datumet
-
-const FixtureResultPreview = ({ fixture, predictions, compact }: FixtureResultPreviewProps) => {
+const FixtureResultPreview = ({ fixture, predictions, compact, showBorder }: FixtureResultPreviewProps) => {
   const { user } = useUser();
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -31,7 +31,7 @@ const FixtureResultPreview = ({ fixture, predictions, compact }: FixtureResultPr
 
   return (
     <>
-      <FixtureContainer>
+      <FixtureContainer showBorder={showBorder}>
         <FullTimeIndicator>
           <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>FT</EmphasisTypography>
         </FullTimeIndicator>
@@ -138,13 +138,15 @@ const Teams = styled.div<{ compact?: boolean }>`
   `}
 `;
 
-const FixtureContainer = styled.div`
+const FixtureContainer = styled.div<{ showBorder?: boolean }>`
   display: grid;
   grid-template-columns: auto auto 1fr;
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.s};
   width: 100%;
   box-sizing: border-box;
+  border: ${({ showBorder }) => showBorder ? `1px solid ${theme.colors.silver}` : 'none'};
+  overflow: hidden;
 `;
 
 const TeamContainer = styled.div<{ compact?: boolean }>`

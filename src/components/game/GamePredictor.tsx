@@ -34,6 +34,8 @@ const GamePredictor = ({
   const [awayGoals, setAwayGoals] = useState<string>(predictionValue?.awayGoals.toString() ?? '');
   const [predictedPlayerToScore, setPredictedPlayerToScore] = useState<Player | undefined>(predictionValue && predictionValue.goalScorer ? predictionValue.goalScorer : undefined);
 
+  const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
+
   const getTeam = (team: Team, isAwayTeam: boolean) => {
     const name = team.name;
     const logoUrl = team.logoUrl ?? team.relativeLogoUrl;
@@ -214,6 +216,7 @@ const GamePredictor = ({
           onDecrease={() => handleDecreaseGoals('home')}
           onInputChange={(value) => handleInputChange('home', value)}
           hasPredicted={hasPredicted}
+          disabled={kickoffTimeHasPassed}
         />
         <NormalTypography variant='l' color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>–</NormalTypography>
         <GoalsInput
@@ -223,6 +226,7 @@ const GamePredictor = ({
           onDecrease={() => handleDecreaseGoals('away')}
           onInputChange={(value) => handleInputChange('away', value)}
           hasPredicted={hasPredicted}
+          disabled={kickoffTimeHasPassed}
         />
         {getTeam(game.awayTeam, true)}
       </GameWrapper>
@@ -238,23 +242,25 @@ const GamePredictor = ({
           optionGroups={getOptionGroups()}
           value={predictedPlayerToScore?.id || ''}
           onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
-          disabled={!game.shouldPredictGoalScorer}
+          disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
         />
       </GoalScorerSection>
       <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-      <SaveButtonSection hasPredicted={hasPredicted}>
-        <Button 
-          variant='primary' 
-          onClick={handleSave} 
-          color={hasPredicted ? "gold" : "primary"}
-          loading={loading}
-          disabledInvisible={homeGoals === '' || awayGoals === '' || loading}
-          textColor={hasPredicted ? theme.colors.textDefault : theme.colors.white}
-          fullWidth 
-        >
-          Spara
-        </Button>
-      </SaveButtonSection>
+      {!kickoffTimeHasPassed && (
+        <SaveButtonSection hasPredicted={hasPredicted}>
+          <Button 
+            variant='primary' 
+            onClick={handleSave} 
+            color={hasPredicted ? "gold" : "primary"}
+            loading={loading}
+            disabledInvisible={homeGoals === '' || awayGoals === '' || loading}
+            textColor={hasPredicted ? theme.colors.textDefault : theme.colors.white}
+            fullWidth 
+          >
+            Spara
+          </Button>
+        </SaveButtonSection>
+      )}
     </Card>
   )
 }

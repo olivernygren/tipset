@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components';
 import { devices, theme } from '../theme';
+import RootToast from './toast/RootToast';
 
 interface PageProps {
   children: React.ReactNode;
@@ -10,11 +11,14 @@ interface PageProps {
 
 const Page = ({ children, user, noPadding }: PageProps) => {
   return (
-    <Root>
-      <Content>
-        {children}
-      </Content>
-    </Root>
+    <>
+      <Root>
+        <Content>
+          {children}
+        </Content>
+      </Root>
+      <RootToast />
+    </>
   )
 }
 

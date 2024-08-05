@@ -13,6 +13,7 @@ import { Divider } from '../Divider';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
+import PredictionsModal from './PredictionsModal';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -27,6 +28,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
+  const [showPredictionsModalForFixture, setShowPredictionsModalForFixture] = useState<string | null>(null);
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -98,6 +100,8 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
                 <FixturePreview
                   fixture={fixture} 
                   hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                  onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
+                  simple
                 />
               ))}
               {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
@@ -206,6 +210,15 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
           </Section>
         </GridSection>
       </OverviewGrid>
+      {showPredictionsModalForFixture && (
+        <PredictionsModal
+          predictions={currentGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showPredictionsModalForFixture) ?? []}
+          onClose={() => setShowPredictionsModalForFixture(null)}
+          fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture)}
+        />
+        // build new modal for displaying predictions without points
+        // should include teams, names of users and predictions with score + goal scorer
+      )}
     </>
   )
 };

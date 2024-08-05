@@ -1,7 +1,7 @@
 import React from 'react'
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { Section } from '../section/Section';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import { AvatarSize } from '../avatar/Avatar';
@@ -14,31 +14,29 @@ interface FixturePreviewProps {
   hidePredictions?: boolean;
   hasBeenCorrected?: boolean;
   onShowPredictionsClick?: () => void;
+  simple?: boolean;
 };
 
-const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick }: FixturePreviewProps) => {
+const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple }: FixturePreviewProps) => {
   const getFormattedKickoffTime = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    return `${day}/${month} ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    return `${day}/${month} | ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
   };
 
   return (
     <Section 
       flexDirection='row' 
-      justifyContent={hidePredictions ? 'flex-start' : 'space-between'} 
+      justifyContent={hidePredictions || simple ? 'flex-start' : 'space-between'} 
       alignItems='center' 
       gap='s' 
       backgroundColor={theme.colors.silverLighter}
       borderRadius={theme.borderRadius.s}
     >
-      <KickoffTime>
-        <NormalTypography variant='m' color={theme.colors.silverDarker}>{getFormattedKickoffTime(fixture.kickOffTime)}</NormalTypography>
-      </KickoffTime>
-      <Teams showPrediction={!hidePredictions}>
+      <Teams showPrediction={!hidePredictions} simple={simple}>
         <TeamContainer>
           {fixture.teamType === TeamType.CLUBS ? (
             <ClubAvatar
@@ -74,27 +72,44 @@ const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPred
         </TeamContainer>
       </Teams>
       {hasBeenCorrected && (
-        <NormalTypography variant='m'>Rättad</NormalTypography>
+        <RightAligned>
+          <NormalTypography variant='m'>Rättad</NormalTypography>
+        </RightAligned>
       )}
       {!hidePredictions && (
-        <TextButton color='primaryDark' onClick={onShowPredictionsClick}>
-          Se vad alla har tippat
-        </TextButton>
+        <RightAligned>
+          <TextButton color='primaryDark' onClick={onShowPredictionsClick}>
+            Se vad alla har tippat
+          </TextButton>
+        </RightAligned>
+      )}
+      {!hasBeenCorrected && hidePredictions && (
+        <KickoffTime>
+          <NormalTypography variant='m' color={theme.colors.silverDarker}>{getFormattedKickoffTime(fixture.kickOffTime)}</NormalTypography>
+        </KickoffTime>
       )}
     </Section>
   )
 };
 
-const Teams = styled.div<{ showPrediction: boolean }>`
-  display: grid;
+const Teams = styled.div<{ showPrediction: boolean, simple?: boolean }>`
+  /* display: grid;
   align-items: center;
   gap: ${theme.spacing.s};
-  grid-template-columns: ${({ showPrediction }) => showPrediction ? 'repeat(3, auto)' : '1fr auto 1fr'};
+  grid-template-columns: ${({ showPrediction, simple }) => showPrediction ? 'repeat(3, auto)' : '1fr auto 1fr'};
   width: ${({ showPrediction }) => showPrediction ? 'fit-content' : '100%'};
 
-  :nth-child(3) {
-    margin-left: auto;
-  }
+  ${({ simple }) => !simple && css`
+    :nth-child(3) {
+      margin-left: auto;
+    }
+  `} */
+
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.s};
+  /* width: ${({ showPrediction }) => showPrediction ? 'fit-content' : '100%'}; */
+  flex: 1;
 `;
 
 const TeamContainer = styled.div`
@@ -109,7 +124,12 @@ const KickoffTime = styled.div`
   align-items: center;
   width: fit-content;
   white-space: nowrap;
-  margin-left: ${theme.spacing.xxs};
+  margin-right: ${theme.spacing.xxs};
+  margin-left: auto;
+`;
+
+const RightAligned = styled.div`
+  margin-left: auto;
 `;
 
 export default FixturePreview;
