@@ -1,7 +1,7 @@
 import React from 'react'
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { Section } from '../section/Section';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import { AvatarSize } from '../avatar/Avatar';
@@ -73,13 +73,13 @@ const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPred
       </Teams>
       {hasBeenCorrected && (
         <RightAligned>
-          <NormalTypography variant='m'>Rättad</NormalTypography>
+          <NormalTypography variant='m' color={theme.colors.silverDarker}>Rättad</NormalTypography>
         </RightAligned>
       )}
-      {!hidePredictions && (
+      {!hidePredictions && !hasBeenCorrected && (
         <RightAligned>
           <TextButton color='primaryDark' onClick={onShowPredictionsClick}>
-            Se vad alla har tippat
+            Se allas tips
           </TextButton>
         </RightAligned>
       )}
@@ -93,22 +93,9 @@ const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPred
 };
 
 const Teams = styled.div<{ showPrediction: boolean, simple?: boolean }>`
-  /* display: grid;
-  align-items: center;
-  gap: ${theme.spacing.s};
-  grid-template-columns: ${({ showPrediction, simple }) => showPrediction ? 'repeat(3, auto)' : '1fr auto 1fr'};
-  width: ${({ showPrediction }) => showPrediction ? 'fit-content' : '100%'};
-
-  ${({ simple }) => !simple && css`
-    :nth-child(3) {
-      margin-left: auto;
-    }
-  `} */
-
   display: flex;
   align-items: center;
   gap: ${theme.spacing.s};
-  /* width: ${({ showPrediction }) => showPrediction ? 'fit-content' : '100%'}; */
   flex: 1;
 `;
 
@@ -117,6 +104,7 @@ const TeamContainer = styled.div`
   align-items: center;
   gap: ${theme.spacing.xxxs};
   width: fit-content;
+  white-space: nowrap;
 `;
 
 const KickoffTime = styled.div`
@@ -130,6 +118,10 @@ const KickoffTime = styled.div`
 
 const RightAligned = styled.div`
   margin-left: auto;
+
+  > span {
+    margin-right: ${theme.spacing.xs};
+  }
 `;
 
 export default FixturePreview;

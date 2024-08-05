@@ -7,9 +7,10 @@ interface ClubAvatarProps {
   size: AvatarSize;
   showBorder?: boolean;
   isDarkMode?: boolean;
+  noPadding?: boolean;
 }
 
-const ClubAvatar = ({ logoUrl, clubName, size, showBorder, isDarkMode }: ClubAvatarProps) => {
+const ClubAvatar = ({ logoUrl, clubName, size, showBorder, isDarkMode, noPadding }: ClubAvatarProps) => {
   return (
     <Avatar 
       src={logoUrl} 
@@ -17,6 +18,7 @@ const ClubAvatar = ({ logoUrl, clubName, size, showBorder, isDarkMode }: ClubAva
       alt={`${clubName} logo`}
       showBorder={showBorder}
       isDarkMode={isDarkMode}
+      noPadding={noPadding}
     />
   )
 };

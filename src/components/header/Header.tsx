@@ -8,6 +8,9 @@ import { RoutesEnum } from '../../utils/Routes';
 import { User, signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useUser } from '../../context/UserContext';
+import IconButton from '../buttons/IconButton';
+import { SignOut, UserCircle } from '@phosphor-icons/react';
+import { Divider } from '../Divider';
 
 interface HeaderProps {
   user: User | null;
@@ -37,7 +40,7 @@ const Header = ({ user }: HeaderProps) => {
         <InvisibleLink href="/">
           <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
         </InvisibleLink>
-        <Section gap="s" alignItems='center' flexDirection='row' fitContent>
+        <Section gap="s" alignItems='center' flexDirection='row' fitContent height='40px'>
           <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
             <EmphasisTypography variant='m' color={theme.colors.primary}>Ligor</EmphasisTypography>
           </StyledNavLink>
@@ -45,7 +48,18 @@ const Header = ({ user }: HeaderProps) => {
             <EmphasisTypography variant='m' color={theme.colors.primary}>Regler</EmphasisTypography>
           </InvisibleLink>
           {isSignedIn && (
-            <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
+            <EmphasisTypography variant='m' color={theme.colors.textLight}>{auth?.currentUser?.email}</EmphasisTypography>
+          )}
+          <Divider vertical />
+          {isSignedIn && (
+            <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
+              <IconButton
+                icon={<UserCircle size={32} color={theme.colors.primary} />}
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                onClick={() => {}}
+                title='Profil'
+              />
+            </InvisibleLink>
           )}
           {hasAdminRights && (
             <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
@@ -53,7 +67,12 @@ const Header = ({ user }: HeaderProps) => {
             </InvisibleLink>
           )}
           {isSignedIn ? (
-            <Button variant='primary' size='m' onClick={handleSignOut}>Logga ut</Button>
+            <IconButton
+              icon={<SignOut size={32} color={theme.colors.primary} />}
+              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+              onClick={handleSignOut}
+              title='Logga ut'
+            />
           ) : (
             <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
               <Button variant='primary' size='m'>Logga in</Button>

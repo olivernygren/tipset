@@ -15,7 +15,7 @@ import AdminLeaguesPage from './pages/admin/leagues';
 import PredictionLeaguesPage from './pages/leagues';
 import { RoutesEnum } from './utils/Routes';
 import { AnimatePresence } from 'framer-motion';
-import PredictionLeaguePage from './pages/admin/leagues/[leagueId]';
+import PredictionLeaguePage from './pages/leagues/[leagueId]';
 import RulesPage from './pages/rules';
 import HowToPlayPage from './pages/how-to-play';
 

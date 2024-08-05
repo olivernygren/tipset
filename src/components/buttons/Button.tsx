@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 import { motion } from 'framer-motion';
@@ -23,6 +23,10 @@ export interface ButtonProps {
 const Button = ({ 
   variant = "primary", onClick, children, disabled, disabledInvisible, fullWidth, color = "primary", textColor = theme.colors.white, size = 'm', icon, loading, endIcon,
 }: ButtonProps) => {
+  // make a state variable for bgColor and bordercolor
+  // add a useEffect that listens to the color and disabled and disabledInvisible prop and sets the bgColor and borderColor
+  // also change manually when hover onmousehover and onmouseleave and onmousedown and onmouseup
+  
   const getBackgroundColor = (hover?: boolean, active?: boolean) => {
     if (variant === 'secondary') {
       return 'transparent';

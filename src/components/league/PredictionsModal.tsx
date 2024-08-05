@@ -24,7 +24,7 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
         {fixture && <FixtureResultPreview fixture={fixture} showBorder />}
         <PredictionsContainer>
           {predictions?.map((prediction) => (
-            <PredictionScoreCard prediction={prediction} />
+            <PredictionScoreCard prediction={prediction} fixture={fixture ?? undefined} />
           ))}
         </PredictionsContainer>
       </>

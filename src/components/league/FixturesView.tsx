@@ -691,7 +691,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           {ongoingGameWeek.games.fixtures.map((fixture) => (
             <FixturePreview 
               fixture={fixture}
-              hasBeenCorrected={ongoingGameWeek.hasBeenCorrected}
+              hasBeenCorrected={ongoingGameWeek.hasBeenCorrected || Boolean(fixture.finalResult)}
               onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
             />
           ))}

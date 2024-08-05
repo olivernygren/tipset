@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { theme } from '../../theme';
 
 export enum AvatarSize {
@@ -18,6 +18,7 @@ interface AvatarProps {
   showBorder?: boolean;
   customBorderColor?: string;
   isDarkMode?: boolean;
+  noPadding?: boolean;
 }
 
 interface StyledAvatarProps {
@@ -26,9 +27,10 @@ interface StyledAvatarProps {
   customBorderColor?: string;
   objectFit: 'cover' | 'contain';
   isDarkMode?: boolean;
+  noPadding?: boolean;
 }
 
-const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode }: AvatarProps) => {
+const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false }: AvatarProps) => {
   return (
     <StyledAvatar
       size={size}
@@ -36,6 +38,7 @@ const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBord
       customBorderColor={customBorderColor}
       objectFit={objectFit}
       isDarkMode={isDarkMode}
+      noPadding={noPadding}
       className='avatar'
     >
       <img src={src} alt={alt ?? 'avatar'} />
@@ -79,6 +82,10 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   overflow: hidden;
   border-radius: 50%;
   background-color: ${({ isDarkMode }) => isDarkMode ? theme.colors.white : 'transparent'};
+
+  ${({ noPadding }) => noPadding && css`
+    padding: 0 !important;
+  `}
 
   & > img {
     width: 100%;

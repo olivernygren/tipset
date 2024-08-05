@@ -6,7 +6,7 @@ import { getUserStandingPositionInLeague } from '../../utils/firebaseHelpers';
 import Button from '../buttons/Button';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
-import { LeagueTabs } from '../../pages/admin/leagues/[leagueId]';
+import { LeagueTabs } from '../../pages/leagues/[leagueId]';
 import { useEffect, useState } from 'react';
 import FixturePreview from '../game/FixturePreview';
 import { Divider } from '../Divider';
@@ -41,10 +41,12 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         setCurrentGameWeek(currentGameWeek);
       }
 
-      const previousGameWeek = league.gameWeeks.find((gameWeek) => {
-        const now = new Date();
-        return new Date(gameWeek.startDate) < now && new Date(gameWeek.deadline) < now && gameWeek.hasBeenCorrected === true;
-      });
+      const previousGameWeek = league.gameWeeks
+        .filter((gameWeek) => {
+          const now = new Date();
+          return new Date(gameWeek.startDate) < now && new Date(gameWeek.deadline) < now && gameWeek.hasBeenCorrected === true;
+        })
+        .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0];
 
       if (previousGameWeek) {
         setPreviousGameWeek(previousGameWeek);
@@ -60,8 +62,8 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
     const day = deadline.getDate();
     const month = deadline.toLocaleString('default', { month: 'long' });
     const year = deadline.getFullYear();
-    const hours = deadline.getHours();
-    const minutes = deadline.getMinutes();
+    const hours = String(deadline.getHours()).padStart(2, '0');
+    const minutes = String(deadline.getMinutes()).padStart(2, '0');
 
     return `${day} ${month} ${year} (${hours}:${minutes})`;
   }
@@ -116,7 +118,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
             </Section>
           ) : (
             <>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Inga omgångar finns</NormalTypography>
+              <NormalTypography variant='m' color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
               {isCreator && (
                 <MarginTopButton>
                   <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
@@ -216,7 +218,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         <PredictionsModal
           predictions={currentGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showPredictionsModalForFixture) ?? []}
           onClose={() => setShowPredictionsModalForFixture(null)}
-          fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture)}
+          fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture)}
         />
         // build new modal for displaying predictions without points
         // should include teams, names of users and predictions with score + goal scorer

@@ -1,20 +1,22 @@
 import React from 'react'
 import styled from 'styled-components';
-import { Prediction } from '../../utils/Fixture';
+import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
 import { Section } from '../section/Section';
 import { getGeneralPositionShorthand } from '../../utils/helpers';
 import { Divider } from '../Divider';
+import { AvatarSize } from '../avatar/Avatar';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
 
 interface PredictionScoreCardProps {
   prediction: Prediction;
+  fixture: Fixture | undefined;
 }
 
-const PredictionScoreCard = ({ prediction }: PredictionScoreCardProps) => {
-  const numberOfPointsItems = Object.values(prediction.points ?? {}).filter(value => value > 0).length;
-
+const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) => {
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
     return (
@@ -23,10 +25,20 @@ const PredictionScoreCard = ({ prediction }: PredictionScoreCardProps) => {
           <NormalTypography variant='s' color={theme.colors.white}>{label}</NormalTypography>
           <EmphasisTypography variant='m' color={theme.colors.gold}>{points} p</EmphasisTypography>
         </TableRow>
-        <Divider color={theme.colors.primary} />
+        <Divider color={theme.colors.primary} className='divider' />
       </>
     )
   };
+
+  const getLogo = (teamType: TeamType, logoUrl: string) => {
+    if (!fixture) return null;
+
+    if (teamType === TeamType.CLUBS) {
+      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} />
+    } else {
+      return <NationAvatar flagUrl={logoUrl} nationName={fixture.homeTeam.name} size={AvatarSize.L} />
+    }
+  }
 
   return (
     <Card>
@@ -38,11 +50,14 @@ const PredictionScoreCard = ({ prediction }: PredictionScoreCardProps) => {
           {prediction.points?.total ?? '?'}
         </HeadingsTypography>
       </PointsContainer>
-      <Section flexDirection='row' alignItems='center' gap='s'>
-        <HeadingsTypography variant='h5' color={theme.colors.white}>{prediction.homeGoals} - {prediction.awayGoals}</HeadingsTypography>
+      <Section gap='s' padding={`${theme.spacing.s} 0`} alignItems='center'>
+        <Section flexDirection='row' alignItems='center' gap='xxxs' fitContent>
+          {fixture && getLogo(fixture.teamType, fixture.homeTeam.logoUrl)}
+          <HeadingsTypography variant='h2' color={theme.colors.white}>{prediction.homeGoals} - {prediction.awayGoals}</HeadingsTypography>
+          {fixture && getLogo(fixture.teamType, fixture.awayTeam.logoUrl)}
+        </Section>
         {prediction.goalScorer && (
           <>
-            <NormalTypography variant='m' color={theme.colors.white}>|</NormalTypography>
             <EmphasisTypography variant='m' color={theme.colors.white}>{prediction.goalScorer?.name} ({getGeneralPositionShorthand(prediction.goalScorer.position.general)})</EmphasisTypography>
           </>
         )}
@@ -79,6 +94,10 @@ const Card = styled.div`
   background-color: ${theme.colors.primary};
   position: relative;
   overflow: hidden;
+
+  .divider:last-of-type {
+    display: none;
+  }
 `;
 
 const PointsContainer = styled.div`

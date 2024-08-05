@@ -1,29 +1,29 @@
 import { useEffect, useState } from 'react'
-import Page from '../../../../components/Page';
+import Page from '../../../components/Page';
 import { useNavigate } from 'react-router-dom';
 import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../../../../config/firebase';
-import { CollectionEnum } from '../../../../utils/Firebase';
-import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../../../utils/League';
-import { withDocumentIdOnObject } from '../../../../utils/helpers';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
+import { auth, db } from '../../../config/firebase';
+import { CollectionEnum } from '../../../utils/Firebase';
+import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../../utils/League';
+import { withDocumentIdOnObject } from '../../../utils/helpers';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
 import { ArrowLeft, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
-import { Section } from '../../../../components/section/Section';
-import { theme } from '../../../../theme';
-import IconButton from '../../../../components/buttons/IconButton';
-import ContextMenu from '../../../../components/menu/ContextMenu';
-import ContextMenuOption from '../../../../components/menu/ContextMenuOption';
-import { RoutesEnum } from '../../../../utils/Routes';
-import { useUser } from '../../../../context/UserContext';
+import { Section } from '../../../components/section/Section';
+import { theme } from '../../../theme';
+import IconButton from '../../../components/buttons/IconButton';
+import ContextMenu from '../../../components/menu/ContextMenu';
+import ContextMenuOption from '../../../components/menu/ContextMenuOption';
+import { RoutesEnum } from '../../../utils/Routes';
+import { useUser } from '../../../context/UserContext';
 import { motion } from 'framer-motion';
-import TextButton from '../../../../components/buttons/TextButton';
-import Button from '../../../../components/buttons/Button';
-import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../../utils/firebaseHelpers';
-import LeagueOverview from '../../../../components/league/LeagueOverview';
-import FixturesView from '../../../../components/league/FixturesView';
-import ParticipantsView from '../../../../components/league/ParticipantsView';
-import EditLeagueView from '../../../../components/league/EditLeagueView';
+import TextButton from '../../../components/buttons/TextButton';
+import Button from '../../../components/buttons/Button';
+import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../utils/firebaseHelpers';
+import LeagueOverview from '../../../components/league/LeagueOverview';
+import FixturesView from '../../../components/league/FixturesView';
+import ParticipantsView from '../../../components/league/ParticipantsView';
+import EditLeagueView from '../../../components/league/EditLeagueView';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -264,7 +264,7 @@ const PredictionLeaguePage = () => {
       </PageHeader>
       {initialFetchLoading ? <p>Laddar...</p> : (
         <PageContent>
-          {isParticipant ? (
+          {isParticipant && (
             <>
               <TabsContainer>
                 {tabs.map((tab) => (
@@ -278,7 +278,8 @@ const PredictionLeaguePage = () => {
               </TabsContainer>
               {getPageContent()}
             </>
-          ) : (
+          )} 
+          {!isParticipant && currentUserId && (
             <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap='m'>
               <HeadingsTypography variant='h5'>Vill du gå med i ligan {league?.name}?</HeadingsTypography>
               <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>

@@ -178,7 +178,7 @@ const PredictionLeaguesPage = () => {
         </Section>
         <BottomRow>
           {league.gameWeeks && league.gameWeeks.length > 0 && (
-            <HeadingsTypography variant='h6' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>Matchdag {league.gameWeeks?.length ?? 0}</HeadingsTypography>
+            <HeadingsTypography variant='h6' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>Omgång {league.gameWeeks?.length ?? 0}</HeadingsTypography>
           )}
           <UsersTag isHovered={isHovered}>
             <Users size={24} color={isHovered ? theme.colors.white : theme.colors.primary} />
@@ -213,7 +213,10 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {fetchLoading && <NormalTypography variant='m'>Laddar ligor...</NormalTypography>}
+        {!fetchLoading && !currentUserId && (
+          <NormalTypography variant='m'>Logga in för att se och gå med i ligor</NormalTypography>
+        )}
+        {fetchLoading && currentUserId && <NormalTypography variant='m'>Laddar ligor...</NormalTypography>}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues].length > 0 && (
           <>
             {creatorLeagues.length > 0 && (

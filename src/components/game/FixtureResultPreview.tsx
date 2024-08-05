@@ -8,14 +8,12 @@ import { theme } from '../../theme';
 import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
 import TextButton from '../buttons/TextButton';
-import PredictionScoreCard from './PredictionScoreCard';
 import { useUser } from '../../context/UserContext';
-import Modal from '../modal/Modal';
+import PredictionsModal from '../league/PredictionsModal';
 
 interface FixtureResultPreviewProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
-  // background?: 'white' | 'silver';
   showBorder?: boolean;
   compact?: boolean;
 }
@@ -89,18 +87,23 @@ const FixtureResultPreview = ({ fixture, predictions, compact, showBorder }: Fix
         </Section>
       </FixtureContainer>
       {modalOpen && (
-        <Modal
-          title='Vad tippade alla?'
+        // <Modal
+        //   title='Vad tippade alla?'
+        //   onClose={() => setModalOpen(false)}
+        //   size='l'
+        //   headerDivider
+        // >
+        //   <PredictionsContainer>
+        //     {predictions?.map((prediction) => (
+        //       <PredictionScoreCard prediction={prediction} fixture={fixture} />
+        //     ))}
+        //   </PredictionsContainer>
+        // </Modal>
+        <PredictionsModal
           onClose={() => setModalOpen(false)}
-          size='l'
-          headerDivider
-        >
-          <PredictionsContainer>
-            {predictions?.map((prediction) => (
-              <PredictionScoreCard prediction={prediction} />
-            ))}
-          </PredictionsContainer>
-        </Modal>
+          predictions={predictions ?? []}
+          fixture={fixture}
+        />
       )}
     </>
   )

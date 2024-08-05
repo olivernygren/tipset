@@ -5,6 +5,7 @@ export enum RoutesEnum {
   LEAGUE = 'leagues/:leagueId',
   RULES = 'rules',
   HOW_TO_PLAY = 'how-to-play',
+  PROFILE = 'profile',
 
   ADMIN = 'admin',
   ADMIN_LEAGUES = 'admin/leagues',

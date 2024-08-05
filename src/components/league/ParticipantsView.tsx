@@ -71,6 +71,7 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
             <TableRow key={participantId}>
               <EmphasisTypography variant='m'>
                 <UserName userId={participantId} />
+                {participantId === league.creatorId && ' (Skapare)'}
               </EmphasisTypography>
               <NormalTypography variant='m'>
                 <UserEmail userId={participantId} />
