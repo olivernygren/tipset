@@ -324,7 +324,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const handleUpdatePredictionScoreline = (fixtureId: string) => {
     const fixture = predictionStatuses.find((fixture) => fixture.fixtureId === fixtureId);
     
-    if (!fixture) return;
+    if (!fixture || league.hasEnded) return;
 
     const updatedPredictionStatuses = predictionStatuses.map((prediction) => {
       if (prediction.fixtureId === fixtureId) {
@@ -393,7 +393,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const handleSavePrediction = async (fixture: Fixture, homeGoals: string, awayGoals: string, playerToScore?: Player | null) => {
     if (!user || !user.documentId || !ongoingGameWeek) return;
 
-    if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0) return;
+    if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0 || league.hasEnded) return;
 
     // if (new Date(ongoingGameWeek.deadline) < new Date()) return;
     if (new Date(fixture.kickOffTime) < new Date()) {
@@ -597,6 +597,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         </Section>
       )}
       <Section flexDirection='row' alignItems='center' gap='xxs'>
+        <Button variant='secondary' size='m' onClick={() => setAddFixtureViewOpen(false)}>
+          Avbryt
+        </Button>
         <Button size='m' onClick={handleAddFixtureToGameWeek} icon={<PlusCircle size={20} color={theme.colors.white} />} disabled={isAddFixtureButtonDisabled}>
           Lägg till match
         </Button>
@@ -721,7 +724,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   return (
     <>
       <Section gap='m'>
-        {isCreator && !showCreateGameWeekSection && (
+        {isCreator && !showCreateGameWeekSection && !league.hasEnded && (
           <Section flexDirection='row' gap='s'>
             <Button 
               color="primary"
@@ -734,7 +737,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           </Section>
         )}
         {showCreateGameWeekSection && getCreateGameWeekContent()}
-        {ongoingGameWeek && (
+        {ongoingGameWeek && !league.hasEnded && (
           <Section 
             backgroundColor={theme.colors.white} 
             borderRadius={theme.borderRadius.l}
@@ -784,23 +787,25 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             {getOngoingGameWeekContent()}
           </Section>
         )}
-        <Section 
-          backgroundColor={theme.colors.white} 
-          borderRadius={theme.borderRadius.l}
-          padding={theme.spacing.m}
-          gap='s'
-        >
-          <HeadingsTypography variant='h4'>Nästa omgång</HeadingsTypography>
-          {upcomingGameWeek ? (
-            <>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {upcomingGameWeek.startDate.toString()}</NormalTypography>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Deadline: {upcomingGameWeek.deadline.toString()}</NormalTypography>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Antal matcher: {upcomingGameWeek.games.fixtures.length}</NormalTypography>
-            </>
-          ) : (
-            <NormalTypography variant='m' color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
-          )}
-        </Section>
+        {!league.hasEnded && (
+          <Section 
+            backgroundColor={theme.colors.white} 
+            borderRadius={theme.borderRadius.l}
+            padding={theme.spacing.m}
+            gap='s'
+          >
+            <HeadingsTypography variant='h4'>Nästa omgång</HeadingsTypography>
+            {upcomingGameWeek ? (
+              <>
+                <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {upcomingGameWeek.startDate.toString()}</NormalTypography>
+                <NormalTypography variant='m' color={theme.colors.textLight}>Deadline: {upcomingGameWeek.deadline.toString()}</NormalTypography>
+                <NormalTypography variant='m' color={theme.colors.textLight}>Antal matcher: {upcomingGameWeek.games.fixtures.length}</NormalTypography>
+              </>
+            ) : (
+              <NormalTypography variant='m' color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
+            )}
+          </Section>
+        )}
         <Section 
           backgroundColor={theme.colors.white} 
           borderRadius={theme.borderRadius.l}

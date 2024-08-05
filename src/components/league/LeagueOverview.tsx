@@ -95,36 +95,45 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
     <>
       <OverviewGrid>
         <GridSection>
-          <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
-          {currentGameWeek ? (
-            <Section gap='xxxs' height='100%'>
-              <FixturesContainer>
-                {currentGameWeek.games.fixtures.map((fixture) => (
-                  <FixturePreview
-                    fixture={fixture} 
-                    hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-                    onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
-                    simple
-                  />
-                ))}
-              </FixturesContainer>
-              {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
-                <MarginTopButton>
-                  <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight='fill' size={24} color={theme.colors.white} />}>
-                    Tippa matcher
-                  </Button>
-                </MarginTopButton>
-              )}
-            </Section>
+          {league.hasEnded ? (
+            <>
+              <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
+              <NormalTypography variant='m' color={theme.colors.textLight}>Ligan har avslutats</NormalTypography>
+            </>
           ) : (
             <>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
-              {isCreator && (
-                <MarginTopButton>
-                  <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
-                    Skapa omgång
-                  </Button>
-                </MarginTopButton>
+              <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
+              {currentGameWeek ? (
+                <Section gap='xxxs' height='100%'>
+                  <FixturesContainer>
+                    {currentGameWeek.games.fixtures.map((fixture) => (
+                      <FixturePreview
+                        fixture={fixture} 
+                        hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                        onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
+                        simple
+                      />
+                    ))}
+                  </FixturesContainer>
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
+                    <MarginTopButton>
+                      <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight='fill' size={24} color={theme.colors.white} />}>
+                        Tippa matcher
+                      </Button>
+                    </MarginTopButton>
+                  )}
+                </Section>
+              ) : (
+                <>
+                  <NormalTypography variant='m' color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
+                  {isCreator && (
+                    <MarginTopButton>
+                      <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
+                        Skapa omgång
+                      </Button>
+                    </MarginTopButton>
+                  )}
+                </>
               )}
             </>
           )}
@@ -190,7 +199,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         <GridSection>
           <Section justifyContent='space-between' alignItems='center' flexDirection='row'>
             <HeadingsTypography variant='h3'>Information</HeadingsTypography>
-            {(isCreator || hasAdminRights) && (
+            {(isCreator || hasAdminRights) && !league.hasEnded && (
               <IconButton 
                 onClick={() => onChangeTab(LeagueTabs.EDIT)} 
                 icon={<PencilSimple size={24} />}

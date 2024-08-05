@@ -27,6 +27,7 @@ const PredictionLeaguesPage = () => {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [participantLeagues, setParticipantLeagues] = useState<Array<PredictionLeague>>([]);
   const [creatorLeagues, setCreatorLeagues] = useState<Array<PredictionLeague>>([]);
+  const [endedLeagues, setEndedLeagues] = useState<Array<PredictionLeague>>([]);
   const [newLeagueName, setNewLeagueName] = useState<string>('');
   const [newLeagueDescription, setNewLeagueDescription] = useState<string>('');
   const [showCreateLeagueModal, setShowCreateLeagueModal] = useState<boolean>(false);
@@ -53,9 +54,11 @@ const PredictionLeaguesPage = () => {
       const data = await getDocs(query(collection(db, CollectionEnum.LEAGUES), where("participants", "array-contains", currentUserId)));
       const currentUserLeagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);      
       
-      const creatorLeagues = currentUserLeagues.filter((league) => league.creatorId === currentUserId);
-      const participantLeagues = currentUserLeagues.filter((league) => league.participants.includes(currentUserId ?? '---') && league.creatorId !== currentUserId);
+      const endedLeagues = currentUserLeagues.filter((league) => league.hasEnded);
+      const creatorLeagues = currentUserLeagues.filter((league) => league.creatorId === currentUserId && !league.hasEnded);
+      const participantLeagues = currentUserLeagues.filter((league) => league.participants.includes(currentUserId ?? '---') && league.creatorId !== currentUserId && !league.hasEnded);
 
+      setEndedLeagues(endedLeagues);
       setParticipantLeagues(participantLeagues);
       setCreatorLeagues(creatorLeagues);
       setFetchLoading(false);
@@ -88,6 +91,7 @@ const PredictionLeaguesPage = () => {
         correctResults: 0,
       }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
+      hasEnded: false
     }
 
     try {
@@ -182,7 +186,11 @@ const PredictionLeaguesPage = () => {
           )}
           <UsersTag isHovered={isHovered}>
             <Users size={24} color={isHovered ? theme.colors.white : theme.colors.primary} />
-            <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>{league.participants.length} deltagare</EmphasisTypography>
+            {league.hasEnded ? (
+              <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>Du kom {league.standings.findIndex((standing) => standing.userId) + 1}a</EmphasisTypography>
+            ) : (
+              <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>{league.participants.length} deltagare</EmphasisTypography>
+            )}
           </UsersTag>
         </BottomRow>
       </LeagueCard>
@@ -217,7 +225,7 @@ const PredictionLeaguesPage = () => {
           <NormalTypography variant='m'>Logga in för att se och gå med i ligor</NormalTypography>
         )}
         {fetchLoading && currentUserId && <NormalTypography variant='m'>Laddar ligor...</NormalTypography>}
-        {!fetchLoading && [...creatorLeagues, ...participantLeagues].length > 0 && (
+        {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
           <>
             {creatorLeagues.length > 0 && (
               <Section gap='s'>
@@ -235,9 +243,17 @@ const PredictionLeaguesPage = () => {
                 </LeaguesContainer>
               </Section>
             )}
+            {endedLeagues.length > 0 && (
+              <Section gap='s'>
+                <HeadingsTypography variant='h3'>Avslutade ligor</HeadingsTypography>
+                <LeaguesContainer>
+                  {endedLeagues.map((league) => getLeagueCard(league))}
+                </LeaguesContainer>
+              </Section>
+            )}
           </>
         )}
-        {!fetchLoading && [...creatorLeagues, ...participantLeagues].length === 0 && (
+        {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
           <>
             <NormalTypography variant='m'>Du är inte med i några ligor ännu.</NormalTypography>
             <Section flexDirection='row' gap='l'>

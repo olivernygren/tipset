@@ -47,8 +47,6 @@ const TestPage = () => {
     fetchLeagues();
   }, []);
 
-  // console.log('leagues', leagues);
-
   const handleCalculatePoints = () => {
     if (homeGoals === '' || awayGoals === '' || resultHomeGoals === '' || resultAwayGoals === '') {
       return;
@@ -186,6 +184,7 @@ const TestPage = () => {
       invitedUsers: [],
       standings: [],
       deadlineToJoin: oneMonthFromNow.toISOString(),
+      hasEnded: false
     }
 
     try {

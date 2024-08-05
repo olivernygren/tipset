@@ -27,6 +27,7 @@ export interface CreatePredictionLeagueInput {
   invitedUsers: Array<string>;
   standings: Array<PredictionLeagueStanding>;
   deadlineToJoin: string;
+  hasEnded: boolean;
 }
 
 export interface PredictionLeagueStanding {

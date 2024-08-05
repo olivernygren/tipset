@@ -57,6 +57,7 @@ const AdminLeaguesPage = () => {
       invitedUsers: [],
       standings: [],
       deadlineToJoin: oneMonthFromNow.toISOString(),
+      hasEnded: false
     }
 
     try {

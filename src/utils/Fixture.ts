@@ -67,6 +67,7 @@ export interface PredictionPoints {
 
 export interface Prediction {
   userId: string;
+  username?: string;
   fixtureId: string;
   homeGoals: number;
   awayGoals: number;
@@ -77,6 +78,7 @@ export interface Prediction {
 
 export interface PredictionInput {
   userId: string;
+  username?: string;
   fixtureId: string;
   homeGoals: number;
   awayGoals: number;
