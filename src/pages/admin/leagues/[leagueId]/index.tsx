@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
-import { PredictionLeague, PredictionLeagueStanding, leagueMaximalParticipants } from '../../../../utils/League';
+import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../../../utils/League';
 import { withDocumentIdOnObject } from '../../../../utils/helpers';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
 import { ArrowLeft, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList } from '@phosphor-icons/react';
@@ -129,7 +129,7 @@ const PredictionLeaguePage = () => {
       return;
     }
 
-    if (leagueData.participants.length >= leagueMaximalParticipants) {
+    if (leagueData.participants.length >= leagueMaximumParticipants) {
       setShowJoinLeagueError('Ligan har redan full kapacitet');
       setJoinLeagueLoading(false);
       return;

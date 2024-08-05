@@ -146,6 +146,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const handleCreateGameWeek = async () => {
     if (!league) return;
 
+    if (league.gameWeeks && league.gameWeeks.length === 100) {
+      setCreateGameWeekError('Max antal omgångar är 100');
+      return;
+    }
+
     setCreateGameWeekError(null);
     setCreateGameWeekLoading(true);
 
@@ -292,6 +297,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const handleAddFixtureToGameWeek = () => {
     if (!newFixtureHomeTeam || !newFixtureAwayTeam) return;
 
+    if (newGameWeekFixtures.length === 13) {
+      errorNotify('Max antal matcher per omgång är 13');
+      return;
+    }
+
     const newFixtureInput: FixtureInput = {
       id: generateRandomID(),
       homeTeam: newFixtureHomeTeam,
@@ -385,7 +395,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0) return;
 
-    if (new Date(ongoingGameWeek.deadline) < new Date()) return;
+    // if (new Date(ongoingGameWeek.deadline) < new Date()) return;
+    if (new Date(fixture.kickOffTime) < new Date()) {
+      errorNotify('Deadline har passerat');
+      return;
+    }
 
     setPredictionLoading(fixture.id);
 

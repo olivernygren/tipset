@@ -96,14 +96,16 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
           <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
           {currentGameWeek ? (
             <Section gap='xxxs' height='100%'>
-              {currentGameWeek.games.fixtures.map((fixture) => (
-                <FixturePreview
-                  fixture={fixture} 
-                  hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-                  onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
-                  simple
-                />
-              ))}
+              <FixturesContainer>
+                {currentGameWeek.games.fixtures.map((fixture) => (
+                  <FixturePreview
+                    fixture={fixture} 
+                    hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                    onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
+                    simple
+                  />
+                ))}
+              </FixturesContainer>
               {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
                 <MarginTopButton>
                   <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight='fill' size={24} color={theme.colors.white} />}>
@@ -305,6 +307,15 @@ const RoundPointsContainer = styled.div`
   background-color: ${theme.colors.primaryDark};
   border-radius: ${theme.borderRadius.s};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+`;
+
+const FixturesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: ${theme.spacing.s};
 `;
 
 export default LeagueOverview;

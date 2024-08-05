@@ -1,6 +1,6 @@
 import { Fixture, Prediction } from "./Fixture";
 
-export const leagueMaximalParticipants = 25;
+export const leagueMaximumParticipants = 20;
 
 export interface PredictionLeague {
   documentId: string;
@@ -14,6 +14,7 @@ export interface PredictionLeague {
   standings: Array<PredictionLeagueStanding>;
   deadlineToJoin: Date;
   gameWeeks?: Array<LeagueGameWeek>;
+  hasEnded?: boolean;
 }
 
 export interface CreatePredictionLeagueInput {

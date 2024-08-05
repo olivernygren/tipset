@@ -226,7 +226,7 @@ export const Teams = {
     },
     {
       name: 'Atletico Madrid',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Atletico_Madrid_Logo_2024.svg',
       stadium: 'Wanda Metropolitano',
     },
     {

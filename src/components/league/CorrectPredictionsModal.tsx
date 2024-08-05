@@ -17,7 +17,7 @@ import Button from '../buttons/Button';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { withDocumentIdOnObject } from '../../utils/helpers';
+import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObject } from '../../utils/helpers';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -133,15 +133,15 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
         options: [{ value: 'Välj spelare', label: 'Välj spelare' }]
       },
       {
-        label: 'Försvarare (8p)',
+        label: `Försvarare (${defenderGoalPoints}p)`,
         options: defenders.map(getOptionItem)
       },
       {
-        label: 'Mittfältare (4p)',
+        label: `Mittfältare (${midfielderGoalPoints}p)`,
         options: midfielders.map(getOptionItem)
       },
       {
-        label: 'Anfallare (3p)',
+        label: `Anfallare (${forwardGoalPoints}p)`,
         options: forwards.map(getOptionItem)
       }
     ]
@@ -163,11 +163,11 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
 
     switch (predictedPlayerToScore.position.general) {
       case GeneralPositionEnum.DF:
-        return 8;
+        return defenderGoalPoints;
       case GeneralPositionEnum.MF:
-        return 4;
+        return midfielderGoalPoints;
       case GeneralPositionEnum.FW:
-        return 2;
+        return forwardGoalPoints;
       default:
         return 0;
     }
@@ -175,13 +175,8 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
 
   const handleCalculatePoints = (prediction: Prediction) => {
     if (!prediction || finalResult.homeGoals === '' || finalResult.awayGoals === '') {
-      console.log('returning');
-      
       return;
     }
-
-    console.log(prediction);
-    console.log(goalScorers);
 
     let totalPoints: number = 0;
     let pointDistribution: PredictionPoints = {

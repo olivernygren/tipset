@@ -1,17 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Page from '../../components/Page'
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography'
 import { Section } from '../../components/section/Section';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
+import { Divider } from '../../components/Divider';
+import Input from '../../components/input/Input';
+import Button from '../../components/buttons/Button';
 
 const RulesPage = () => {
+  const [inputValue, setInputValue] = useState('');
+
   return (
     <Page>
       <Container>
         <HeadingsTypography variant='h1'>Regler</HeadingsTypography>
         <EmphasisTypography variant='l'>Följande regler gäller i tipset</EmphasisTypography>
+        <Divider color={theme.colors.silver} />
         <Section gap='m'>
           <HeadingsTypography variant='h3'>Poäng</HeadingsTypography>
           <NormalTypography variant='m'>För att göra det hela lite extra intressant kan du få poäng på flera olika sätt. Du belönas alltså inte bara för att tippa exakt rätt resultat, eller rätt utfall.</NormalTypography>
@@ -30,13 +36,29 @@ const RulesPage = () => {
           </Section>
           <EmphasisTypography variant='m'>Maxpoäng per match = 10 poäng</EmphasisTypography>
         </Section>
+        <Divider color={theme.colors.silver} />
         <Section gap='s'>
           <HeadingsTypography variant='h3'>Tippa matcher</HeadingsTypography>
           <NormalTypography variant='m'>Du kan tippa matcher fram till avsparkstiden. Efter avspark kan du inte längre ändra ditt tips i matchen. Skulle du glömma av att tippa matchen kommer du inte kunna få några poäng.</NormalTypography>
         </Section>
+        <Divider color={theme.colors.silver} />
         <Section gap='s'>
           <HeadingsTypography variant='h3'>Tabell</HeadingsTypography>
           <NormalTypography variant='m'>I varje liga kan du följa poängställningen i en tabell. Tabellen sorteras efter antal poäng. Skulle två deltagare ha samma antal poäng sorteras tabellen efter antal korrekta resultat som deltageren tippat. Du som tippar flest antal korrekta resultat kan alltså på detta sätt ha en fördel.</NormalTypography>
+        </Section>
+        <Divider color={theme.colors.silver} />
+        <Section gap='s'>
+          <HeadingsTypography variant='h3'>Tycker du reglerna är dåliga?</HeadingsTypography>
+          <NormalTypography variant='m'>Här kan du skicka in din kritik</NormalTypography>
+          <Input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder='Skriv här...'
+            fullWidth
+          />
+          <Button onClick={() => setInputValue('')}>
+            Skicka
+          </Button>
         </Section>
       </Container>
     </Page>

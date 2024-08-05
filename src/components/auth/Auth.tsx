@@ -35,7 +35,7 @@ const Auth = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/home');
+      navigate('/');
     } catch (e) {
       console.error(e);
     }
@@ -67,7 +67,7 @@ const Auth = () => {
         displayName: `${firstname} ${lastname}`,
       });
   
-      navigate('/home');
+      navigate('/');
     } catch (e) {
       console.error(e);
     }
@@ -99,7 +99,7 @@ const Auth = () => {
         displayName: `${firstname} ${lastname}`,
       });
   
-      navigate('/home');
+      navigate('/');
     } catch (e) {
       console.error(e);
     }

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
-import { ArrowRight, Scroll, Trophy } from '@phosphor-icons/react';
+import { ArrowRight, Question, Scroll, Trophy } from '@phosphor-icons/react';
 
 interface HomePageCardProps {
   title: string;
@@ -21,8 +21,10 @@ const HomePageCard = ({ title, description, href }: HomePageCardProps) => {
         return <Trophy size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
       case 'Regler':
         return <Scroll size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
-      default:
-        return <Trophy size={32} color={theme.colors.primary} />;
+      case 'Hur funkar det?':
+        return <Question size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
+        default:
+          return <></>
     }
   }
 

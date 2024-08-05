@@ -15,6 +15,7 @@ import Button from '../buttons/Button';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import GoalsInput from './GoalsInput';
+import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -154,15 +155,15 @@ const GamePredictor = ({
         options: [{ value: 'Välj spelare', label: 'Välj spelare' }]
       },
       {
-        label: 'Försvarare (8p)',
+        label: `Försvarare (${defenderGoalPoints}p)`,
         options: defenders.map(getOptionItem)
       },
       {
-        label: 'Mittfältare (4p)',
+        label: `Mittfältare (${midfielderGoalPoints}p)`,
         options: midfielders.map(getOptionItem)
       },
       {
-        label: 'Anfallare (3p)',
+        label: `Anfallare (${forwardGoalPoints}p)`,
         options: forwards.map(getOptionItem)
       }
     ]

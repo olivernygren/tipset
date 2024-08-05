@@ -3,6 +3,8 @@ export enum RoutesEnum {
   LOGIN = 'login',
   LEAGUES = 'leagues',
   LEAGUE = 'leagues/:leagueId',
+  RULES = 'rules',
+  HOW_TO_PLAY = 'how-to-play',
 
   ADMIN = 'admin',
   ADMIN_LEAGUES = 'admin/leagues',

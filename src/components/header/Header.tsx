@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { theme } from '../../theme';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import { Section } from '../section/Section';
 import Button from '../buttons/Button';
 import { RoutesEnum } from '../../utils/Routes';
 import { User, signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
+import { useUser } from '../../context/UserContext';
 
 interface HeaderProps {
   user: User | null;
 }
 
 const Header = ({ user }: HeaderProps) => {
+  const { hasAdminRights } = useUser();
+
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
   useEffect(() => {
@@ -22,6 +25,7 @@ const Header = ({ user }: HeaderProps) => {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      window.location.reload();
     } catch (e) {
       console.error(e);
     }
@@ -37,13 +41,13 @@ const Header = ({ user }: HeaderProps) => {
           <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
             <EmphasisTypography variant='m' color={theme.colors.primary}>Ligor</EmphasisTypography>
           </StyledNavLink>
+          <InvisibleLink href={`/${RoutesEnum.RULES}`}>
+            <EmphasisTypography variant='m' color={theme.colors.primary}>Regler</EmphasisTypography>
+          </InvisibleLink>
           {isSignedIn && (
             <EmphasisTypography variant='m'>{auth?.currentUser?.email}</EmphasisTypography>
           )}
-          {/* <InvisibleLink href={`/${RoutesEnum.TEST}`}>
-            <Button variant='secondary' size='m'>Test</Button>
-          </InvisibleLink> */}
-          {isSignedIn && (
+          {hasAdminRights && (
             <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
               <Button variant='secondary' size='m'>Admin</Button>
             </InvisibleLink>

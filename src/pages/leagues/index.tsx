@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { auth, db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
-import { CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximalParticipants } from '../../utils/League';
+import { CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../utils/League';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -132,7 +132,7 @@ const PredictionLeaguesPage = () => {
       return;
     }
 
-    if (leagueData.participants.length >= leagueMaximalParticipants) {
+    if (leagueData.participants.length >= leagueMaximumParticipants) {
       setShowJoinLeagueError('Ligan har redan full kapacitet');
       setJoinLeagueLoading(null);
       return;

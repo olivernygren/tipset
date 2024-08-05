@@ -2,6 +2,10 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 
+export const defenderGoalPoints = 5;
+export const midfielderGoalPoints = 3;
+export const forwardGoalPoints = 2;
+
 export const withDocumentIdOnObjectsInArray = <T>(docs: QueryDocumentSnapshot<DocumentData>[]): T[] => {
   return docs.map(doc => ({
     ...(doc.data() as T),

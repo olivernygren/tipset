@@ -15,7 +15,7 @@ import { auth, db } from '../../config/firebase';
 import { PredictionLeague, CreatePredictionLeagueInput } from '../../utils/League';
 import IconButton from '../../components/buttons/IconButton';
 import { Trash } from '@phosphor-icons/react';
-import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
+import { defenderGoalPoints, forwardGoalPoints, generateLeagueInviteCode, midfielderGoalPoints, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
 import { CollectionEnum } from '../../utils/Firebase';
 
 const TestPage = () => {
@@ -141,15 +141,15 @@ const TestPage = () => {
 
     return [
       {
-        label: 'Försvarare (6p)',
+        label: `Försvarare (${defenderGoalPoints}p)`,
         options: defenders.map(getOptionItem)
       },
       {
-        label: 'Mittfältare (3p)',
+        label: `Mittfältare (${midfielderGoalPoints}p)`,
         options: midfielders.map(getOptionItem)
       },
       {
-        label: 'Anfallare (2p)',
+        label: `Anfallare (${forwardGoalPoints}p)`,
         options: forwards.map(getOptionItem)
       }
     ]

@@ -15,8 +15,13 @@ const HomePage = () => {
         />
         <HomePageCard
           title='Regler'
-          description='Läs om reglerna för att förstå hur du kan vinna.'
+          description='Läs om reglerna för poängräkning och för att tippa matcher.'
           href='/rules'
+        />
+        <HomePageCard
+          title='Hur funkar det?'
+          description='Lär dig hur tipset fungerar.'
+          href='/how-to-play'
         />
       </Section>
     </Page>
