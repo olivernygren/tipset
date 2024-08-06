@@ -11,7 +11,7 @@ import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
 import { Section } from '../../components/section/Section';
 import Button from '../../components/buttons/Button';
-import { PlusCircle, UserPlus, Users } from '@phosphor-icons/react';
+import { Medal, MedalMilitary, PlusCircle, UserPlus, Users } from '@phosphor-icons/react';
 import Modal from '../../components/modal/Modal';
 import Page from '../../components/Page';
 import Input from '../../components/input/Input';
@@ -142,6 +142,12 @@ const PredictionLeaguesPage = () => {
       return;
     }
 
+    if (leagueData.hasEnded) {
+      setShowJoinLeagueError('Ligan har redan avslutats');
+      setJoinLeagueLoading(null);
+      return;
+    }
+
     const newParticipantStandingsObj: PredictionLeagueStanding = {
       userId: currentUserId,
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
@@ -176,7 +182,7 @@ const PredictionLeaguesPage = () => {
         onHoverEnd={() => setLeagueCardHovered(undefined)}
         onClick={() => navigate(`/${QueryEnum.LEAGUES}/${league.documentId}`)}
       >
-        <HeadingsTypography variant='h4' color={isHovered ? theme.colors.white : theme.colors.textDefault}>{league.name}</HeadingsTypography>
+        <HeadingsTypography variant='h4' color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{league.name}</HeadingsTypography>
         <Section gap='s'>
           <NormalTypography variant='s' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>{league.description}</NormalTypography>
         </Section>
@@ -185,7 +191,11 @@ const PredictionLeaguesPage = () => {
             <HeadingsTypography variant='h6' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>Omgång {league.gameWeeks?.length ?? 0}</HeadingsTypography>
           )}
           <UsersTag isHovered={isHovered}>
-            <Users size={24} color={isHovered ? theme.colors.white : theme.colors.primary} />
+            {league.hasEnded ? (
+              <Medal size={24} color={isHovered ? theme.colors.white : theme.colors.primary} weight='fill' />
+            ) : (
+              <Users size={24} color={isHovered ? theme.colors.white : theme.colors.primary} />
+            )}
             {league.hasEnded ? (
               <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>Du kom {league.standings.findIndex((standing) => standing.userId) + 1}a</EmphasisTypography>
             ) : (
@@ -405,7 +415,7 @@ const ModalButtons = styled.div`
 const UsersTag = styled.div<{ isHovered: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.xxs};
   background-color: ${({ isHovered }) => isHovered ? theme.colors.primaryDarker : theme.colors.primaryBleach};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   border-radius: ${theme.borderRadius.m};

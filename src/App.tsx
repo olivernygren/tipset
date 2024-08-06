@@ -18,6 +18,7 @@ import { AnimatePresence } from 'framer-motion';
 import PredictionLeaguePage from './pages/leagues/[leagueId]';
 import RulesPage from './pages/rules';
 import HowToPlayPage from './pages/how-to-play';
+import ProfilePage from './pages/profile';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -58,6 +59,10 @@ const App = () => {
     {
       pageComponentElement: <HowToPlayPage />,
       path: `/${RoutesEnum.HOW_TO_PLAY}`,
+    },
+    {
+      pageComponentElement: <ProfilePage />,
+      path: `/${RoutesEnum.PROFILE}`,
     }
   ]
 

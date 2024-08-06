@@ -4,6 +4,7 @@ export interface User {
   firstname: string;
   lastname: string;
   role: RolesEnum;
+  profilePicture?: string;
 }
 
 export interface CreateUserInput {
@@ -11,6 +12,7 @@ export interface CreateUserInput {
   firstname: string;
   lastname: string;
   role: RolesEnum;
+  profilePicture?: string;
 }
 
 export enum RolesEnum {

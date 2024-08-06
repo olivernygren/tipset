@@ -28,7 +28,7 @@ const Header = ({ user }: HeaderProps) => {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      window.location.reload();
+      window.location.href = `/${RoutesEnum.LOGIN}`;
     } catch (e) {
       console.error(e);
     }

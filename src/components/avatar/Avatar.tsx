@@ -10,6 +10,17 @@ export enum AvatarSize {
   XL = 'xlarge',
 }
 
+export enum ProfilePictureEnum {
+  MR_BEAN = 'mr-bean',
+  CARL_GUSTAF = 'carl-gustaf',
+  DONKEY = 'donkey',
+  ZLATAN = 'zlatan',
+  ANIMAL = 'animal',
+  SHREK = 'shrek',
+  ANTONY = 'antony',
+  FELLAINI = 'fellaini',
+}
+
 interface AvatarProps {
   src: string;
   size: AvatarSize;
