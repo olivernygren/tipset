@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import PredictionScoreCard from '../game/PredictionScoreCard';
 import FixtureResultPreview from '../game/FixtureResultPreview';
+import SimpleFixturePredictionCard from '../cards/SimpleFixturePredictionCard';
+import { Section } from '../section/Section';
+import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -13,21 +16,40 @@ interface PredictionsModalProps {
 }
 
 const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalProps) => {
+  const gameHasFinished = fixture && Boolean(fixture.finalResult);
+  const goalScorers = fixture?.finalResult?.goalScorers?.join(', ');
+
   return (
     <Modal
       title='Vad tippade alla?'
       onClose={onClose}
-      size='l'
+      size={gameHasFinished ? 'l' : 'm'}
       headerDivider
     >
-      <>
-        {fixture && <FixtureResultPreview fixture={fixture} showBorder />}
+      <Section gap='m'>
+        {fixture && <FixtureResultPreview fixture={fixture} showBorder isFullTime={gameHasFinished} />}
+        {fixture && gameHasFinished && (
+          <Section gap='xs' flexDirection='row' alignItems='center' justifyContent='space-between'>
+            <HeadingsTypography variant='h6'>Målskyttar</HeadingsTypography>
+            <Section gap='xxs' flexDirection='row' alignItems='center' fitContent>
+              {fixture.finalResult?.goalScorers && (
+                <NormalTypography variant='m'>{goalScorers}</NormalTypography>
+              )}
+            </Section>
+          </Section>
+        )}
         <PredictionsContainer>
           {predictions?.map((prediction) => (
-            <PredictionScoreCard prediction={prediction} fixture={fixture ?? undefined} />
+            <>
+              {gameHasFinished ? (
+                <PredictionScoreCard prediction={prediction} fixture={fixture ?? undefined} />
+              ) : (
+                <SimpleFixturePredictionCard prediction={prediction} fixture={fixture} />
+              )}
+            </>
           ))}
         </PredictionsContainer>
-      </>
+      </Section>
     </Modal>
   )
 };

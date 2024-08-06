@@ -11,10 +11,8 @@ import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import styled from 'styled-components';
 import { Divider } from '../Divider';
-import { Stop } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
-import { errorNotify } from '../../utils/toast/toastHelpers';
-import { set } from 'date-fns';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -44,6 +42,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
 
     try {
       await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
+      successNotify('Ligan uppdaterad');
       refetchLeague();
     } catch (error) {
       errorNotify('Ett fel uppstod')

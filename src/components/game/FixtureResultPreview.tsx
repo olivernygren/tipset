@@ -16,23 +16,42 @@ interface FixtureResultPreviewProps {
   predictions?: Array<Prediction>;
   showBorder?: boolean;
   compact?: boolean;
+  isFullTime?: boolean;
 }
 
-const FixtureResultPreview = ({ fixture, predictions, compact, showBorder }: FixtureResultPreviewProps) => {
+const FixtureResultPreview = ({ fixture, predictions, compact, showBorder, isFullTime = true }: FixtureResultPreviewProps) => {
   const { user } = useUser();
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const handleOpenModal = () => {
     setModalOpen(true);
-  }
+  };
+
+  const getFormattedKickOffTime = (kickOffTime: string) => {
+    const date = new Date(kickOffTime);
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' }).replaceAll('.', '');
+    const hours = `${date.getHours() < 10 ? `0${date.getHours()}` : date.getHours()}`;
+    const minutes = `${date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()}`;
+    return `${day} ${month} ${hours}:${minutes}`;
+  };
+
+  console.log('fixture', fixture);
+  
 
   return (
     <>
       <FixtureContainer showBorder={showBorder}>
-        <FullTimeIndicator>
-          <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>FT</EmphasisTypography>
-        </FullTimeIndicator>
+        {isFullTime ? (
+          <FullTimeIndicator>
+            <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>FT</EmphasisTypography>
+          </FullTimeIndicator>
+        ) : (
+          <FullTimeIndicator>
+            <EmphasisTypography variant='m' color={theme.colors.primaryDarker}>{getFormattedKickOffTime(fixture.kickOffTime)}</EmphasisTypography>
+          </FullTimeIndicator>
+        )}
         <Teams compact={compact}>
           <TeamContainer compact={compact}>
             {fixture.teamType === TeamType.CLUBS ? (
@@ -87,18 +106,6 @@ const FixtureResultPreview = ({ fixture, predictions, compact, showBorder }: Fix
         </Section>
       </FixtureContainer>
       {modalOpen && (
-        // <Modal
-        //   title='Vad tippade alla?'
-        //   onClose={() => setModalOpen(false)}
-        //   size='l'
-        //   headerDivider
-        // >
-        //   <PredictionsContainer>
-        //     {predictions?.map((prediction) => (
-        //       <PredictionScoreCard prediction={prediction} fixture={fixture} />
-        //     ))}
-        //   </PredictionsContainer>
-        // </Modal>
         <PredictionsModal
           onClose={() => setModalOpen(false)}
           predictions={predictions ?? []}

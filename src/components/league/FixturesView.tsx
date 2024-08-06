@@ -4,7 +4,7 @@ import { Section } from '../section/Section';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
-import { ArrowCircleLeft, CheckSquareOffset, PencilSimple, PlusCircle, XCircle } from '@phosphor-icons/react';
+import { CheckSquareOffset, PencilSimple, PlusCircle, XCircle } from '@phosphor-icons/react';
 import { Divider } from '../Divider';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -395,7 +395,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0 || league.hasEnded) return;
 
-    // if (new Date(ongoingGameWeek.deadline) < new Date()) return;
     if (new Date(fixture.kickOffTime) < new Date()) {
       errorNotify('Deadline har passerat');
       return;
@@ -405,6 +404,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     const predictionInput: PredictionInput = {
       userId: user.documentId,
+      username: `${user.firstname} ${user.lastname}`,
       fixtureId: fixture.id,
       homeGoals: parseInt(homeGoals),
       awayGoals: parseInt(awayGoals),
@@ -696,6 +696,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               fixture={fixture}
               hasBeenCorrected={ongoingGameWeek.hasBeenCorrected || Boolean(fixture.finalResult)}
               onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
+              hidePredictions={new Date(fixture.kickOffTime) > new Date()}
             />
           ))}
         </Section>
@@ -767,7 +768,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       <>
                         {showCorrectGameWeekContent ? (
                           <IconButton 
-                            icon={<ArrowCircleLeft size={24} />} 
+                            icon={<XCircle size={24} />} 
                             colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
                             onClick={() => setShowCorrectGameWeekContent(false)}
                           />

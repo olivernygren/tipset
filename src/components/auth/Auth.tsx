@@ -44,6 +44,7 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
+      navigate('/');
     } catch (e) {
       console.error(e);
     }

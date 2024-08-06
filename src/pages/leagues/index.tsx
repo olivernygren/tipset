@@ -11,7 +11,7 @@ import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
 import { Section } from '../../components/section/Section';
 import Button from '../../components/buttons/Button';
-import { Medal, MedalMilitary, PlusCircle, UserPlus, Users } from '@phosphor-icons/react';
+import { Medal, PlusCircle, UserPlus, Users } from '@phosphor-icons/react';
 import Modal from '../../components/modal/Modal';
 import Page from '../../components/Page';
 import Input from '../../components/input/Input';

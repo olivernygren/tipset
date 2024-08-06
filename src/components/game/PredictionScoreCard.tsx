@@ -64,23 +64,27 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
       </Section>
       <Divider color={theme.colors.primaryDark} />
       <HeadingsTypography variant='h6' color={theme.colors.white}>Poängfördelning</HeadingsTypography>
-      <Section
-        backgroundColor={theme.colors.primaryDark}
-        borderRadius={theme.borderRadius.s}
-        padding={`${theme.spacing.xxs} ${theme.spacing.xs}`}
-        gap='xxs'
-      >
-        {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
-        {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
-        {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
-        {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
-        {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
-        {prediction.goalScorer && (
-          <>
-            {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
-          </>
-        )}
-      </Section>
+      {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
+        <Section
+          backgroundColor={theme.colors.primaryDark}
+          borderRadius={theme.borderRadius.s}
+          padding={`${theme.spacing.xxs} ${theme.spacing.xs}`}
+          gap='xxs'
+        >
+          {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
+          {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
+          {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
+          {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
+          {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
+          {prediction.goalScorer && (
+            <>
+              {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
+            </>
+          )}
+        </Section>
+      ) : (
+        <NormalTypography variant='m' color={theme.colors.white}>Inga poäng</NormalTypography>
+      )}
     </Card>
   )
 };

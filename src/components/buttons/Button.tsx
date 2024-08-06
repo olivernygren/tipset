@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
-import { motion } from 'framer-motion';
 import { SpinnerGap } from '@phosphor-icons/react';
 
 export interface ButtonProps {
@@ -23,41 +22,55 @@ export interface ButtonProps {
 const Button = ({ 
   variant = "primary", onClick, children, disabled, disabledInvisible, fullWidth, color = "primary", textColor = theme.colors.white, size = 'm', icon, loading, endIcon,
 }: ButtonProps) => {
-  // make a state variable for bgColor and bordercolor
-  // add a useEffect that listens to the color and disabled and disabledInvisible prop and sets the bgColor and borderColor
-  // also change manually when hover onmousehover and onmouseleave and onmousedown and onmouseup
-  
-  const getBackgroundColor = (hover?: boolean, active?: boolean) => {
-    if (variant === 'secondary') {
-      return 'transparent';
-    }
-    if (hover) {
-      return theme.colors[color] || theme.colors.primaryDark;
-    }
-    if (active) {
-      return theme.colors[color] || theme.colors.primaryDarker;
-    }
-    if (disabled) {
-      return theme.colors.silver;
-    }
-    if (color) {
-      return theme.colors[color];
-    }
-    if (variant === 'primary') {
-      return theme.colors.primary;
-    }
-    return 'transparent';
-  };
+  // const getBackgroundColor = (hover?: boolean, active?: boolean) => {
+  //   if (variant === 'secondary') {
+  //     return 'transparent';
+  //   }
+  //   if (hover) {
+  //     if (color === 'primary') {
+  //       return theme.colors.primaryDark;
+  //     }
+  //     return theme.colors[color];
+  //   }
+  //   if (active) {
+  //     if (color === 'primary') {
+  //       return theme.colors.primaryDarker;
+  //     }
+  //     return theme.colors[color];
+  //   }
+  //   if (disabled) {
+  //     return theme.colors.silver;
+  //   }
+  //   if (color) {
+  //     return theme.colors[color];
+  //   }
+  //   if (variant === 'primary') {
+  //     return theme.colors.primary;
+  //   }
+  //   return 'transparent';
+  // };
 
-  const getBorderColor = () => {
-    if (disabled) {
-      return theme.colors.silver;
-    }
-    if (color) {
-      return theme.colors[color];
-    }
-    return theme.colors.primary;
-  }
+  // const getBorderColor = (hover?: boolean, active?: boolean) => {
+  //   if (hover) {
+  //     if (color === 'primary') {
+  //       return theme.colors.primaryDark;
+  //     }
+  //     return theme.colors[color];
+  //   }
+  //   if (active) {
+  //     if (color === 'primary') {
+  //       return theme.colors.primaryDarker;
+  //     }
+  //     return theme.colors[color];
+  //   }
+  //   if (disabled) {
+  //     return theme.colors.silver;
+  //   }
+  //   if (color) {
+  //     return theme.colors[color];
+  //   }
+  //   return theme.colors.primary;
+  // };
 
   return (
     <StyledButton
@@ -72,20 +85,21 @@ const Button = ({
       fullWidth={fullWidth}
       color={color}
       size={size}
-      initial={{ 
-        scale: 1,
-        backgroundColor: getBackgroundColor(),
-        borderColor: getBorderColor()
-      }}
-      whileHover={{ 
-        scale: disabled ? 1 : 1.03, 
-        backgroundColor: getBackgroundColor(), 
-        borderColor: getBorderColor()
-      }}
-      whileTap={{ 
-        backgroundColor: getBackgroundColor(), 
-        borderColor: getBorderColor()
-      }}
+      // initial={{ 
+      //   scale: 1,
+      //   backgroundColor: getBackgroundColor(false, false),
+      //   borderColor: getBorderColor(false, false)
+      // }}
+      // whileHover={{ 
+      //   scale: disabled ? 1 : 1.02, 
+      //   backgroundColor: getBackgroundColor(true, false), 
+      //   borderColor: getBorderColor(true, false)
+      // }}
+      // whileTap={{ 
+      //   scale: disabled ? 1 : 0.99,
+      //   backgroundColor: getBackgroundColor(false, true), 
+      //   borderColor: getBorderColor(false, true)
+      // }}
     >
       {icon}
       {loading ? (
@@ -100,14 +114,64 @@ const Button = ({
       {endIcon}
     </StyledButton>
   )
-}
+};
 
-const StyledButton = styled(motion.button)<ButtonProps>`
+const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color: keyof typeof theme.colors | undefined, disabled?: boolean) => {
+  if (variant === 'secondary') {
+    return 'transparent';
+  }
+  // if (hover) {
+  //   if (color === 'primary') {
+  //     return theme.colors.primaryDark;
+  //   }
+  //   return theme.colors[color];
+  // }
+  // if (active) {
+  //   if (color === 'primary') {
+  //     return theme.colors.primaryDarker;
+  //   }
+  //   return theme.colors[color];
+  // }
+  if (disabled) {
+    return theme.colors.silver;
+  }
+  if (color) {
+    return theme.colors[color];
+  }
+  if (variant === 'primary') {
+    return theme.colors.primary;
+  }
+  return 'transparent';
+};
+
+const getBorderColor = (color: keyof typeof theme.colors | undefined, disabled?: boolean) => {
+  // if (hover) {
+  //   if (color === 'primary') {
+  //     return theme.colors.primaryDark;
+  //   }
+  //   return theme.colors[color];
+  // }
+  // if (active) {
+  //   if (color === 'primary') {
+  //     return theme.colors.primaryDarker;
+  //   }
+  //   return theme.colors[color];
+  // }
+  if (disabled) {
+    return theme.colors.silver;
+  }
+  if (color) {
+    return theme.colors[color];
+  }
+  return theme.colors.primary;
+};
+
+const StyledButton = styled.button<ButtonProps>`
   width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
   padding: ${({ size }) => size === 's' ? `${theme.spacing.xs} ${theme.spacing.xs}` : size === 'm' ? `${theme.spacing.xs} ${theme.spacing.s}` : `${theme.spacing.s} ${theme.spacing.m}`};
   border-radius: ${theme.borderRadius.m};
-  /* background-color: ${({ color, variant, disabled }) => disabled ? theme.colors.silverLight : variant === 'primary' ? (color || theme.colors.primary) : 'transparent'}; */
-  /* border-color: ${({ color, variant }) => variant === 'primary' ? theme.colors.primary : variant === 'secondary' ? (color || theme.colors.primary) : color}; */
+  background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
+  border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
   border-width: 2px;
   border-style: solid;
   cursor: ${({ disabledInvisible }) => disabledInvisible ? 'not-allowed' : 'pointer'};
@@ -116,6 +180,19 @@ const StyledButton = styled(motion.button)<ButtonProps>`
   align-items: center;
   justify-content: center;
   gap: ${theme.spacing.xxs};
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
+    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
+    transform: ${({ disabled }) => disabled ? 'none' : 'scale(1.02)'};
+  }
+
+  &:active {
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
+    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
+    transform: ${({ disabled }) => disabled ? 'none' : 'scale(0.99)'};
+  }
 
   &:disabled {
     background-color: ${theme.colors.silver} !important; 
