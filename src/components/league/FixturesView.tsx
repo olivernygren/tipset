@@ -798,9 +798,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             <HeadingsTypography variant='h4'>Nästa omgång</HeadingsTypography>
             {upcomingGameWeek ? (
               <>
-                <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {upcomingGameWeek.startDate.toString()}</NormalTypography>
-                <NormalTypography variant='m' color={theme.colors.textLight}>Deadline: {upcomingGameWeek.deadline.toString()}</NormalTypography>
                 <NormalTypography variant='m' color={theme.colors.textLight}>Antal matcher: {upcomingGameWeek.games.fixtures.length}</NormalTypography>
+                <NormalTypography variant='m' color={theme.colors.textLight}>Startdatum: {new Date(upcomingGameWeek.startDate).toLocaleDateString()} {new Date(upcomingGameWeek.startDate).toLocaleTimeString()}</NormalTypography>
               </>
             ) : (
               <NormalTypography variant='m' color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>

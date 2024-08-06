@@ -34,7 +34,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     if (!fixture) return null;
 
     if (teamType === TeamType.CLUBS) {
-      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} />
+      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} showBorder isDarkMode />
     } else {
       return <NationAvatar flagUrl={logoUrl} nationName={fixture.homeTeam.name} size={AvatarSize.L} />
     }
@@ -51,7 +51,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
         </HeadingsTypography>
       </PointsContainer>
       <Section gap='s' padding={`${theme.spacing.s} 0`} alignItems='center'>
-        <Section flexDirection='row' alignItems='center' gap='xxxs' fitContent>
+        <Section flexDirection='row' alignItems='center' gap='s' fitContent>
           {fixture && getLogo(fixture.teamType, fixture.homeTeam.logoUrl)}
           <HeadingsTypography variant='h2' color={theme.colors.white}>{prediction.homeGoals} - {prediction.awayGoals}</HeadingsTypography>
           {fixture && getLogo(fixture.teamType, fixture.awayTeam.logoUrl)}

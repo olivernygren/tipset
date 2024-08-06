@@ -16,6 +16,7 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import GoalsInput from './GoalsInput';
 import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
+import { errorNotify } from '../../utils/toast/toastHelpers';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -81,6 +82,11 @@ const GamePredictor = ({
   // }
 
   const handleIncreaseGoals = (team: 'home' | 'away') => {
+    if (new Date(game.kickOffTime) < new Date()) {
+      errorNotify('Deadline har passerat');
+      return;
+    }
+
     let updatedHomeGoals = homeGoals;
     let updatedAwayGoals = awayGoals;
 
@@ -105,6 +111,11 @@ const GamePredictor = ({
   }
 
   const handleDecreaseGoals = (team: 'home' | 'away') => {
+    if (new Date(game.kickOffTime) < new Date()) {
+      errorNotify('Deadline har passerat');
+      return;
+    }
+    
     let updatedHomeGoals = homeGoals;
     let updatedAwayGoals = awayGoals;
 
