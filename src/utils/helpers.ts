@@ -1,6 +1,7 @@
 import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
+import { ProfilePictureEnum } from '../components/avatar/Avatar';
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;
@@ -70,5 +71,28 @@ export const getGeneralPositionShorthand = (position: string) => {
       return 'MV';
     default:
       return '';
+  }
+};
+
+export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
+  switch (picture) {
+    case ProfilePictureEnum.MR_BEAN:
+      return '/images/mr-bean.png';
+    case ProfilePictureEnum.CARL_GUSTAF:
+      return '/images/carl-gustaf.png';
+    case ProfilePictureEnum.DONKEY:
+      return '/images/donkey.png';
+    case ProfilePictureEnum.ZLATAN:
+      return '/images/zlatan.png';
+    case ProfilePictureEnum.ANIMAL:
+      return '/images/animal.png';
+    case ProfilePictureEnum.SHREK:
+      return '/images/shrek.png';
+    case ProfilePictureEnum.ANTONY:
+      return '/images/antony.png';
+    case ProfilePictureEnum.FELLAINI:
+      return '/images/fellaini.png';
+    default:
+      return '/images/generic.png';
   }
 }

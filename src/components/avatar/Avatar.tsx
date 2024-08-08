@@ -88,8 +88,9 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silverLight}` : 'none'};
+  border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silver}` : 'none'};
   padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
+  margin: ${({ objectFit }) => objectFit === 'cover' ? theme.spacing.xxs : '0'};
   overflow: hidden;
   border-radius: 50%;
   background-color: ${({ isDarkMode }) => isDarkMode ? theme.colors.white : 'transparent'};

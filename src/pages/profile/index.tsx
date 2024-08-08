@@ -9,8 +9,8 @@ import Button from '../../components/buttons/Button';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { withDocumentIdOnObject } from '../../utils/helpers';
-import { errorNotify } from '../../utils/toast/toastHelpers';
+import { getProfilePictureUrl, withDocumentIdOnObject } from '../../utils/helpers';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import styled from 'styled-components';
 import SelectProfilePictureModal from '../../components/profile/SelectProfilePictureModal';
 import { ProfilePictureEnum } from '../../components/avatar/Avatar';
@@ -22,8 +22,11 @@ const ProfilePage = () => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [profilePicture, setProfilePicture] = useState<string | undefined>(getProfilePictureUrl(user?.profilePicture as ProfilePictureEnum));
+  const [selectedNewProfilePicture, setSelectedNewProfilePicture] = useState(user?.profilePicture ? getProfilePictureUrl(user.profilePicture as ProfilePictureEnum) : undefined)
   const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false);
   const [notLoggedIn, setNotLoggedIn] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -31,6 +34,7 @@ const ProfilePage = () => {
       setFirstName(user.firstname);
       setLastName(user.lastname);
       setEmail(user.email);
+      setProfilePicture(getProfilePictureUrl(user.profilePicture as ProfilePictureEnum));
     }
   }, [user]);
 
@@ -46,6 +50,8 @@ const ProfilePage = () => {
       return;
     }
 
+    setSaveLoading(true);
+
     try {
       const userDoc = await getDoc(doc(db, CollectionEnum.USERS, user.documentId));
       const userData = withDocumentIdOnObject(userDoc);
@@ -54,12 +60,26 @@ const ProfilePage = () => {
         ...userData,
         firstname: firstName,
         lastname: lastName,
+        profilePicture: selectedNewProfilePicture,
       });
+      successNotify('Profilen är uppdaterad');
     } catch (error) {
       console.error(error);
       errorNotify('Något gick fel');
     }
 
+    setSaveLoading(false);
+  };
+
+  const handleSelectNewProfilePicture = (image: ProfilePictureEnum) => {
+    setSelectedNewProfilePicture(image);
+  };
+
+  const handleSaveNewProfilePicture = () => {
+    console.log('selectedNewProfilePicture', selectedNewProfilePicture);
+    
+    setProfilePicture(getProfilePictureUrl(selectedNewProfilePicture as ProfilePictureEnum));
+    setProfilePictureModalOpen(false);
   }
 
   return (
@@ -77,7 +97,7 @@ const ProfilePage = () => {
           >
             <HeadingsTypography variant='h4'>Profilbild</HeadingsTypography>
             <Section gap='m' flexDirection='row' alignItems='flex-end'>
-              <CustomAvatarLarge src={'/images/carl-gustaf.png'} alt='image' />
+              <CustomAvatarLarge src={profilePicture} alt='image' />
               <Button
                 variant='secondary'
                 onClick={() => setProfilePictureModalOpen(true)}
@@ -111,6 +131,7 @@ const ProfilePage = () => {
               <Button
                 variant='primary'
                 onClick={handleSave}
+                loading={saveLoading}
               >
                 Spara
               </Button>
@@ -121,9 +142,9 @@ const ProfilePage = () => {
       {profilePictureModalOpen && (
         <SelectProfilePictureModal
           onClose={() => setProfilePictureModalOpen(false)}
-          onSave={() => {}}
-          onSelectImage={() => {}}
-          initialImage={ProfilePictureEnum.CARL_GUSTAF}
+          onSave={handleSaveNewProfilePicture}
+          onSelectImage={(image) => handleSelectNewProfilePicture(image)}
+          initialImage={profilePicture as ProfilePictureEnum}
         />
       )}
     </Page>

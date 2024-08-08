@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { CheckCircle } from '@phosphor-icons/react';
 import Button from '../buttons/Button';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
-import styled from 'styled-components';
 import { theme } from '../../theme';
 import { ProfilePictureEnum } from '../avatar/Avatar';
 import { EmphasisTypography } from '../typography/Typography';
 import TextButton from '../buttons/TextButton';
-import { CheckCircle } from '@phosphor-icons/react';
 
 interface SelectProfilePictureModalProps {
   initialImage?: ProfilePictureEnum;
@@ -16,44 +16,52 @@ interface SelectProfilePictureModalProps {
   onSave: () => void;
 }
 
-const SelectProfilePictureModal = ({ onClose, onSelectImage, onSave, initialImage }: SelectProfilePictureModalProps) => {
+function SelectProfilePictureModal({
+  onClose, onSelectImage, onSave, initialImage,
+}: SelectProfilePictureModalProps) {
   const [selectedImage, setSelectedImage] = useState<ProfilePictureEnum | undefined>(initialImage);
 
-  const getAvatar = (image: ProfilePictureEnum) => {
-    return (
-      <SelectAvatarContainer>
-        <CustomAvatarSmall src={`/images/${image}.png`} alt={image} />
-        {selectedImage === image ? (
-          <Section flexDirection='row' gap='xxxs' alignItems='center' fitContent>
-            <CheckCircle size={24} color={theme.colors.green} weight='fill' />
-            <EmphasisTypography variant='m' color={theme.colors.green}>Vald</EmphasisTypography>
-          </Section>
-        ) : (
-          <TextButton onClick={() => setSelectedImage(image)} noPadding>Välj</TextButton>
-        )}
-      </SelectAvatarContainer>
-    )
-  };
+  const getAvatar = (image: ProfilePictureEnum) => (
+    <SelectAvatarContainer>
+      <CustomAvatarSmall src={`/images/${image}.png`} alt={image} />
+      {selectedImage === image ? (
+        <Section flexDirection="row" gap="xxxs" alignItems="center" fitContent>
+          <CheckCircle size={24} color={theme.colors.green} weight="fill" />
+          <EmphasisTypography variant="m" color={theme.colors.green}>Vald</EmphasisTypography>
+        </Section>
+      ) : (
+        <TextButton
+          onClick={() => {
+            setSelectedImage(image);
+            onSelectImage(image);
+          }}
+          noPadding
+        >
+          Välj
+        </TextButton>
+      )}
+    </SelectAvatarContainer>
+  );
 
   return (
     <Modal
-      size='m'
-      title='Välj profilbild'
+      size="m"
+      title="Välj profilbild"
       onClose={onClose}
     >
       <AvatarGrid>
         {Object.values(ProfilePictureEnum).map((image) => getAvatar(image))}
       </AvatarGrid>
-      <Section flexDirection='row' gap='xs' alignItems='center'>
+      <Section flexDirection="row" gap="xs" alignItems="center">
         <Button
-          variant='secondary'
+          variant="secondary"
           onClick={onClose}
           fullWidth
         >
           Avbryt
         </Button>
         <Button
-          variant='primary'
+          variant="primary"
           onClick={onSave}
           fullWidth
         >
@@ -61,8 +69,8 @@ const SelectProfilePictureModal = ({ onClose, onSelectImage, onSave, initialImag
         </Button>
       </Section>
     </Modal>
-  )
-};
+  );
+}
 
 const CustomAvatarSmall = styled.img`
   width: 124px;

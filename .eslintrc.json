@@ -1,0 +1,23 @@
+{
+  "root": true,
+  "extends": ["airbnb", "airbnb-typescript"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "@next/next/no-document-import-in-page": "off",
+    "react/jsx-props-no-spreading": "off",
+    "linebreak-style": "off",
+    "import/no-extraneous-dependencies": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "max-len": "off",
+    "react/no-array-index-key": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/media-has-caption": "off",
+    "react/require-default-props": "off",
+    "radix": "off",
+    "react/no-param-reassign": "off",
+    "react/function-component-definition": "off"
+  }
+}

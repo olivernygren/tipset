@@ -102,7 +102,7 @@ const App = () => {
   return (
     <AnimatePresence>
       <Root>
-        <Header user={user} />
+        <Header />
         <Router>
           <div className="App">
             <Routes>

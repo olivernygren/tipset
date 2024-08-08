@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
+import { Calculator } from '@phosphor-icons/react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
-import styled from 'styled-components';
 import { theme } from '../../theme';
-import { Calculator } from '@phosphor-icons/react';
 import IconButton from '../buttons/IconButton';
 import { Prediction, FixtureResult, PredictionPoints } from '../../utils/Fixture';
 import Input from '../input/Input';
 import { Divider } from '../Divider';
 import Select from '../input/Select';
-import { Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById } from '../../utils/Players';
+import {
+  Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById,
+} from '../../utils/Players';
 import Button from '../buttons/Button';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObject } from '../../utils/helpers';
+import {
+  defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObject,
+} from '../../utils/helpers';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -27,7 +31,9 @@ interface PredictionsModalProps {
   refetchLeague: () => void;
 }
 
-const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, refetchLeague }: PredictionsModalProps) => {
+function CorrectPredictionsModal({
+  onClose, gameId, league, ongoingGameWeek, refetchLeague,
+}: PredictionsModalProps) {
   const [finalResult, setFinalResult] = useState({ homeGoals: '', awayGoals: '' });
   const [goalScorers, setGoalScorers] = useState<Array<string>>([]);
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
@@ -51,7 +57,7 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
         return {
           ...prediction,
           points: pointsDistributions.find((d) => d.participantId === prediction.userId)?.points,
-        }
+        };
       }
       return prediction;
     });
@@ -65,24 +71,24 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
             return {
               ...fixture,
               finalResult: finalResultInput,
-            }
+            };
           }
           return fixture;
         }),
         predictions: updatedPredictions,
         hasBeenCorrected: ongoingGameWeek.games.fixtures.every((fixture) => fixture.finalResult !== undefined),
         hasEnded: ongoingGameWeek.games.fixtures.every((fixture) => fixture.finalResult !== undefined),
-      }
+      },
     };
 
     const updatedStandings = league.standings.map((standing) => {
       const pointsDistribution = pointsDistributions.find((d) => d.participantId === standing.userId);
       const points = pointsDistribution?.points;
       const predictedCorrectResult = pointsDistribution?.points?.correctResult;
-    
+
       return {
         ...standing,
-        points: points ? standing.points += points.total : standing.points,
+        points: points ? standing.points + points.total : standing.points,
         correctResults: predictedCorrectResult ? standing.correctResults + 1 : standing.correctResults,
       };
     });
@@ -112,15 +118,12 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
       console.log('Error updating league', error);
       setSavingLoading(false);
     }
-
   };
 
-  const getOptionItem = (player: Player) => {
-    return {
-      value: player.id,
-      label: player.name,
-    }
-  };
+  const getOptionItem = (player: Player) => ({
+    value: player.id,
+    label: player.name,
+  });
 
   const getOptionGroups = () => {
     const defenders = getPlayersByGeneralPosition(GeneralPositionEnum.DF);
@@ -130,21 +133,21 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
     return [
       {
         label: 'Välj spelare',
-        options: [{ value: 'Välj spelare', label: 'Välj spelare' }]
+        options: [{ value: 'Välj spelare', label: 'Välj spelare' }],
       },
       {
         label: `Försvarare (${defenderGoalPoints}p)`,
-        options: defenders.map(getOptionItem)
+        options: defenders.map(getOptionItem),
       },
       {
         label: `Mittfältare (${midfielderGoalPoints}p)`,
-        options: midfielders.map(getOptionItem)
+        options: midfielders.map(getOptionItem),
       },
       {
         label: `Anfallare (${forwardGoalPoints}p)`,
-        options: forwards.map(getOptionItem)
-      }
-    ]
+        options: forwards.map(getOptionItem),
+      },
+    ];
   };
 
   const handleAddGoalScorer = (playerId: string) => {
@@ -154,9 +157,9 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
 
     if (!player) return;
     if (goalScorers.includes(player.name)) return;
-    
+
     setGoalScorers([...goalScorers, player.name]);
-  }
+  };
 
   const getPlayerToScorePoints = (predictedPlayerToScore: Player | undefined) => {
     if (!predictedPlayerToScore) return 0;
@@ -171,7 +174,7 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
       default:
         return 0;
     }
-  }
+  };
 
   const handleCalculatePoints = (prediction: Prediction) => {
     if (!prediction || finalResult.homeGoals === '' || finalResult.awayGoals === '') {
@@ -179,7 +182,7 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
     }
 
     let totalPoints: number = 0;
-    let pointDistribution: PredictionPoints = {
+    const pointDistribution: PredictionPoints = {
       correctResult: 0,
       correctOutcome: 0,
       correctGoalScorer: 0,
@@ -187,11 +190,11 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
       correctGoalsByHomeTeam: 0,
       correctGoalsByAwayTeam: 0,
       total: 0,
-    }
+    };
 
     const correctHomeGoals = prediction.homeGoals === parseInt(finalResult.homeGoals);
     const correctAwayGoals = prediction.awayGoals === parseInt(finalResult.awayGoals);
-    
+
     const predictedGoalDifference = prediction.homeGoals - prediction.awayGoals;
     const actualGoalDifference = parseInt(finalResult.homeGoals) - parseInt(finalResult.awayGoals);
     const correctGoalDifference = predictedGoalDifference === actualGoalDifference;
@@ -207,50 +210,42 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
 
     if (homeWinPredicted && wasHomeWin) {
-      console.log('home win, + 1');
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
     }
 
     if (awayWinPredicted && wasAwayWin) {
-      console.log('away win, + 1');
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
     }
 
     if (drawPredicted && wasDraw) {
-      console.log('draw, + 1');
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
     }
-    
+
     if (correctHomeGoals) {
-      console.log('correct home goals, + 1');
       totalPoints += 1;
       pointDistribution.correctGoalsByHomeTeam += 1;
     }
 
     if (correctAwayGoals) {
-      console.log('correct away goals, + 1');
       totalPoints += 1;
       pointDistribution.correctGoalsByAwayTeam += 1;
     }
 
     if (correctHomeGoals && correctAwayGoals) {
-      console.log('correct result, + 1');
       totalPoints += 1;
       pointDistribution.correctResult += 1;
     }
-    
+
     if (correctGoalDifference) {
-      console.log('correct goal difference, + 1');
       totalPoints += 1;
       pointDistribution.correctGoalDifference += 1;
     }
 
     if (correctPlayerPrediction) {
       const playerPoints = getPlayerToScorePoints(prediction.goalScorer);
-      console.log('correct goal scorer, +', playerPoints);
       totalPoints += playerPoints;
       pointDistribution.correctGoalScorer += playerPoints;
     }
@@ -258,137 +253,139 @@ const CorrectPredictionsModal = ({ onClose, gameId, league, ongoingGameWeek, ref
     pointDistribution.total = totalPoints;
 
     setPointsDistributions((oldstate) => {
-      const existingIndex = oldstate.findIndex(item => item.participantId === prediction.userId);
+      const existingIndex = oldstate.findIndex((item) => item.participantId === prediction.userId);
       if (existingIndex !== -1) {
         // If the participantId exists, update the points
         const newState = [...oldstate];
         newState[existingIndex].points = pointDistribution;
         return newState;
-      } else {
-        // If the participantId does not exist, add a new object
-        return [...oldstate, { participantId: prediction.userId, points: pointDistribution }];
       }
+      // If the participantId does not exist, add a new object
+      return [...oldstate, { participantId: prediction.userId, points: pointDistribution }];
     });
   };
 
   const getPointsValue = (participantId: string, prediction?: Prediction) => {
     const hasCalculatedPointsForUser = pointsDistributions.some((d) => d.participantId === participantId);
     const hasSavedPointsForUser = prediction?.points !== undefined;
-    
+
     if (hasCalculatedPointsForUser) return pointsDistributions.find((d) => d.participantId === participantId)?.points.total;
     if (hasSavedPointsForUser) return prediction?.points?.total;
 
     return '-';
-  }
+  };
 
   if (!ongoingGameWeek) return null;
 
   return (
-    <Modal 
-      title="Tippningar för matchen" 
+    <Modal
+      title="Tippningar för matchen"
       onClose={onClose}
-      size='l'
+      size="l"
       headerDivider
     >
-      <Section gap='m'>
-        <HeadingsTypography variant='h5'>Fyll i resultatet i matchen</HeadingsTypography>
+      <Section gap="m">
+        <HeadingsTypography variant="h5">Fyll i resultatet i matchen</HeadingsTypography>
         {ongoingGameWeek.games.fixtures
           .filter((fixture) => fixture.id === gameId)
           .map((fixture) => (
-          <Section key={fixture.id} gap='m'>
-            <FixtureResultWrapper>
-              <ResultInputContainer>
-                <NormalTypography variant='m'>Resultat</NormalTypography>
-                <Input 
-                  type='number'
-                  placeholder={fixture.homeTeam.name}
-                  value={finalResult.homeGoals ?? ''} 
-                  onChange={(e) => setFinalResult({ ...finalResult, homeGoals: e.target.value })} 
-                />
-                <NormalTypography variant='m'>-</NormalTypography>
-                <Input
-                  placeholder={fixture.awayTeam.name}
-                  type='number'
-                  value={finalResult.awayGoals ?? ''} 
-                  onChange={(e) => setFinalResult({ ...finalResult, awayGoals: e.target.value })} 
-                />
-              </ResultInputContainer>
-            </FixtureResultWrapper>
-            {fixture.shouldPredictGoalScorer && (
+            <Section key={fixture.id} gap="m">
+              <FixtureResultWrapper>
+                <ResultInputContainer>
+                  <NormalTypography variant="m">Resultat</NormalTypography>
+                  <Input
+                    type="number"
+                    placeholder={fixture.homeTeam.name}
+                    value={finalResult.homeGoals ?? ''}
+                    onChange={(e) => setFinalResult({ ...finalResult, homeGoals: e.target.value })}
+                  />
+                  <NormalTypography variant="m">-</NormalTypography>
+                  <Input
+                    placeholder={fixture.awayTeam.name}
+                    type="number"
+                    value={finalResult.awayGoals ?? ''}
+                    onChange={(e) => setFinalResult({ ...finalResult, awayGoals: e.target.value })}
+                  />
+                </ResultInputContainer>
+              </FixtureResultWrapper>
+              {fixture.shouldPredictGoalScorer && (
               <>
                 <FixtureResultWrapper>
-                  <NormalTypography variant='m'>Målgörare</NormalTypography>
+                  <NormalTypography variant="m">Målgörare</NormalTypography>
                   <Select
                     options={[]}
                     optionGroups={getOptionGroups()}
                     onChange={(value) => handleAddGoalScorer(value)}
                     value={goalScorers[0]}
-                    />
+                  />
                 </FixtureResultWrapper>
                 {goalScorers.length > 0 && (
-                  <Section gap='xxs'>
+                  <Section gap="xxs">
                     {goalScorers.map((goalScorer) => (
-                      <NormalTypography variant='m'>⚽️ {goalScorer}</NormalTypography>
+                      <NormalTypography variant="m">
+                        ⚽️
+                        {goalScorer}
+                      </NormalTypography>
                     ))}
                   </Section>
                 )}
               </>
-            )}
-          </Section>
-        ))}
+              )}
+            </Section>
+          ))}
         <Divider />
         <TableHeader>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Deltagare</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Utgång</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Resultat</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Målgörare</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Poäng</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Deltagare</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Utgång</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Resultat</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Målgörare</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Poäng</NormalTypography>
         </TableHeader>
         <Table>
           {ongoingGameWeek.games.predictions
             .filter((prediction) => prediction.fixtureId === gameId)
             .map((prediction) => (
               <TableRow key={prediction.userId}>
-                <EmphasisTypography variant='m'>
+                <EmphasisTypography variant="m">
                   <UserName userId={prediction.userId} />
                 </EmphasisTypography>
                 <Outcome>
-                  <NormalTypography variant='m' color={theme.colors.primaryDark}>{hasPredictedResult(prediction) ? prediction.outcome : '?'}</NormalTypography>
+                  <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult(prediction) ? prediction.outcome : '?'}</NormalTypography>
                 </Outcome>
-                <NormalTypography variant='m'>{hasPredictedResult(prediction) ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
+                <NormalTypography variant="m">{hasPredictedResult(prediction) ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
                 {prediction.goalScorer ? (
-                  <NormalTypography variant='m'>{prediction.goalScorer.name}</NormalTypography>
+                  <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
                 ) : (
-                  <NormalTypography variant='m' color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
+                  <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
                 )}
                 <PointsCell>
-                  <NormalTypography variant='m'>{getPointsValue(prediction.userId, prediction)}</NormalTypography>
-                  <IconButton 
+                  <NormalTypography variant="m">{getPointsValue(prediction.userId, prediction)}</NormalTypography>
+                  <IconButton
                     icon={<Calculator size={24} color={theme.colors.primary} />}
                     onClick={() => handleCalculatePoints(prediction)}
-                    colors={{ 
+                    colors={{
                       normal: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primary,
                       hover: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDark,
-                      active: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDarker 
+                      active: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDarker,
                     }}
-                    title='Räkna ut poäng'
+                    title="Räkna ut poäng"
                     disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
                   />
                 </PointsCell>
               </TableRow>
-            ))
-          }
+            ))}
         </Table>
       </Section>
       <Button
         onClick={handleSaveCorrectedPredictions}
         loading={savingLoading}
+        disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
       >
         Spara
       </Button>
     </Modal>
-  )
-};
+  );
+}
 
 const TableHeader = styled.div`
   display: grid;

@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { theme } from '../../theme';
-import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
-import { Section } from '../section/Section';
+import { signOut } from 'firebase/auth';
+import { List, SignOut, UserCircle } from '@phosphor-icons/react';
+import Cookies from 'js-cookie';
+import { devices, theme } from '../../theme';
+import { EmphasisTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
 import { RoutesEnum } from '../../utils/Routes';
-import { User, signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
-import { SignOut, UserCircle } from '@phosphor-icons/react';
 import { Divider } from '../Divider';
+import MobileMenu from './MobileMenu';
 
-interface HeaderProps {
-  user: User | null;
-}
+const Header = () => {
+  const { hasAdminRights, user } = useUser();
 
-const Header = ({ user }: HeaderProps) => {
-  const { hasAdminRights } = useUser();
+  const hasUserCookie = Cookies.get('user');
 
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!hasUserCookie);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsSignedIn(Boolean(user));
-  }, [user])
-  
+  }, [user]);
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -32,57 +32,79 @@ const Header = ({ user }: HeaderProps) => {
     } catch (e) {
       console.error(e);
     }
-  }
-  
+  };
+
   return (
-    <StyledHeader>
-      <Content>
-        <InvisibleLink href="/">
-          <HeadingsTypography variant='h3'>Tipset</HeadingsTypography>
-        </InvisibleLink>
-        <Section gap="s" alignItems='center' flexDirection='row' fitContent height='40px'>
-          <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
-            <EmphasisTypography variant='m' color={theme.colors.primary}>Ligor</EmphasisTypography>
-          </StyledNavLink>
-          <InvisibleLink href={`/${RoutesEnum.RULES}`}>
-            <EmphasisTypography variant='m' color={theme.colors.primary}>Regler</EmphasisTypography>
+    <>
+      <StyledHeader>
+        <Content>
+          <InvisibleLink href="/">
+            <LogoImageContainer>
+              <img src="/images/tipset-logo-text.svg" alt="logo" />
+            </LogoImageContainer>
           </InvisibleLink>
-          {isSignedIn && (
-            <EmphasisTypography variant='m' color={theme.colors.textLight}>{auth?.currentUser?.email}</EmphasisTypography>
-          )}
-          <Divider vertical />
-          {isSignedIn && (
+          <DesktopNav>
+            <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
+              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Ligor</EmphasisTypography>
+            </StyledNavLink>
+            <StyledNavLink href={`/${RoutesEnum.RULES}`}>
+              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Regler</EmphasisTypography>
+            </StyledNavLink>
+            <StyledNavLink href={`/${RoutesEnum.RULES}`}>
+              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Hur funkar det?</EmphasisTypography>
+            </StyledNavLink>
+            {isSignedIn && (
+            <EmphasisTypography variant="m" color={theme.colors.textLight}>{user?.email ?? '?'}</EmphasisTypography>
+            )}
+            <Divider vertical />
+            {isSignedIn && (
             <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
               <IconButton
                 icon={<UserCircle size={32} color={theme.colors.primary} />}
                 colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                 onClick={() => {}}
-                title='Profil'
+                title="Profil"
               />
             </InvisibleLink>
-          )}
-          {hasAdminRights && (
+            )}
+            {hasAdminRights && (
             <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
-              <Button variant='secondary' size='m'>Admin</Button>
+              <Button variant="secondary" size="m">Admin</Button>
             </InvisibleLink>
-          )}
-          {isSignedIn ? (
+            )}
+            {isSignedIn ? (
+              <IconButton
+                icon={<SignOut size={32} color={theme.colors.primary} />}
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                onClick={handleSignOut}
+                title="Logga ut"
+              />
+            ) : (
+              <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
+                <Button variant="primary" size="m">Logga in</Button>
+              </InvisibleLink>
+            )}
+          </DesktopNav>
+          <MobileMenuButton>
             <IconButton
-              icon={<SignOut size={32} color={theme.colors.primary} />}
-              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-              onClick={handleSignOut}
-              title='Logga ut'
+              icon={<List size={32} />}
+              colors={{ normal: theme.colors.textDefault, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
+              onClick={() => setIsMobileMenuOpen(true)}
+              title="Meny"
             />
-          ) : (
-            <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
-              <Button variant='primary' size='m'>Logga in</Button>
-            </InvisibleLink>
-          )}
-        </Section>
-      </Content>
-    </StyledHeader>
-  )
-}
+          </MobileMenuButton>
+        </Content>
+      </StyledHeader>
+      {isMobileMenuOpen && (
+        <MobileMenu
+          onClose={() => setIsMobileMenuOpen(false)}
+          isSignedIn={isSignedIn}
+          onSignOut={handleSignOut}
+        />
+      )}
+    </>
+  );
+};
 
 const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
@@ -94,7 +116,6 @@ const StyledHeader = styled.header`
 `;
 
 const Content = styled.div`
-  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -105,6 +126,14 @@ const Content = styled.div`
 const InvisibleLink = styled.a`
   text-decoration: none;
   color: inherit;
+`;
+
+const LogoImageContainer = styled.div`
+  height: 50px;
+  width: fit-content;
+  > img {
+    height: 100%;
+  }
 `;
 
 const StyledNavLink = styled.a`
@@ -121,4 +150,24 @@ const StyledNavLink = styled.a`
   }
 `;
 
-export default Header;
+const MobileMenuButton = styled.div`
+  width: fit-content;
+
+  @media ${devices.tablet} {
+    display: none;
+  }
+`;
+
+const DesktopNav = styled.div`
+  display: none;
+
+  @media ${devices.tablet} {
+    display: flex;
+    gap: ${theme.spacing.s};
+    align-items: center;
+    width: fit-content;
+    height: 40px;
+  }
+`;
+
+export default React.memo(Header);
