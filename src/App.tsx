@@ -1,12 +1,13 @@
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import styled from 'styled-components';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/home';
 import TestPage from './pages/test';
 import LoginPage from './pages/login';
 import { auth } from './config/firebase';
 import Header from './components/header/Header';
-import styled from 'styled-components';
-import { useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
 import AdminPage from './pages/admin';
 import PrivateRoute from './components/auth/PrivateRoute';
 import AdminLayout from './layouts/AdminLayout';
@@ -14,7 +15,6 @@ import AdminUsersPage from './pages/admin/users';
 import AdminLeaguesPage from './pages/admin/leagues';
 import PredictionLeaguesPage from './pages/leagues';
 import { RoutesEnum } from './utils/Routes';
-import { AnimatePresence } from 'framer-motion';
 import PredictionLeaguePage from './pages/leagues/[leagueId]';
 import RulesPage from './pages/rules';
 import HowToPlayPage from './pages/how-to-play';
@@ -63,8 +63,8 @@ const App = () => {
     {
       pageComponentElement: <ProfilePage />,
       path: `/${RoutesEnum.PROFILE}`,
-    }
-  ]
+    },
+  ];
 
   const adminPages = [
     {
@@ -78,26 +78,25 @@ const App = () => {
     {
       pageComponentElement: <AdminLeaguesPage />,
       path: `/${RoutesEnum.ADMIN_LEAGUES}`,
-    }
+    },
   ];
 
-  const getPage = (pageComponentElement: JSX.Element, path: string) => {
-    return (
-      <Route path={path} element={pageComponentElement} />
-    );
-  }
+  const getPage = (pageComponentElement: JSX.Element, path: string) => (
+    <Route path={path} element={pageComponentElement} />
+  );
 
-  const getAdminPage = (pageComponentElement: JSX.Element, path: string) => {
-    return (
-      <Route path={path} element={
-        <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin={true}>
+  const getAdminPage = (pageComponentElement: JSX.Element, path: string) => (
+    <Route
+      path={path}
+      element={(
+        <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin>
           <AdminLayout>
             {pageComponentElement}
           </AdminLayout>
         </PrivateRoute>
-      } />
-    );
-  }
+      )}
+    />
+  );
 
   return (
     <AnimatePresence>
@@ -114,7 +113,7 @@ const App = () => {
       </Root>
     </AnimatePresence>
   );
-}
+};
 
 const Root = styled.div`
   overflow-x: hidden;

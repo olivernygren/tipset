@@ -112,7 +112,7 @@ const Header = () => {
 const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
   border-bottom: 1px solid ${theme.colors.silverLight};
-  padding: 0 ${theme.spacing.l};
+  padding: 0 ${theme.spacing.xl};
   width: 100vw;
   height: 80px;
   box-sizing: border-box;

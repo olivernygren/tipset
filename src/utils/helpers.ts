@@ -7,23 +7,17 @@ export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;
 export const forwardGoalPoints = 2;
 
-export const withDocumentIdOnObjectsInArray = <T>(docs: QueryDocumentSnapshot<DocumentData>[]): T[] => {
-  return docs.map(doc => ({
-    ...(doc.data() as T),
-    documentId: doc.id,
-  }));
-};
+export const withDocumentIdOnObjectsInArray = <T>(docs: QueryDocumentSnapshot<DocumentData>[]): T[] => docs.map((doc) => ({
+  ...(doc.data() as T),
+  documentId: doc.id,
+}));
 
-export const withDocumentIdOnObject = <T>(docSnap: DocumentSnapshot): T & { documentId: string } => {
-  return {
-    ...(docSnap.data() as T),
-    documentId: docSnap.id,
-  };
-};
+export const withDocumentIdOnObject = <T>(docSnap: DocumentSnapshot): T & { documentId: string } => ({
+  ...(docSnap.data() as T),
+  documentId: docSnap.id,
+});
 
-export const generateLeagueInviteCode = (): string => {
-  return Math.random().toString(20).substring(2, 8).toUpperCase();
-};
+export const generateLeagueInviteCode = (): string => Math.random().toString(20).substring(2, 8).toUpperCase();
 
 export const hasInvalidTeamName = (teamName: string): boolean => {
   if (teamName === 'Välj lag' || teamName === '') {
@@ -42,11 +36,10 @@ export const getPredictionStatus = (currentGameWeek: LeagueGameWeek, userId: str
 export const getPredictionOutcome = (homeGoals: number, awayGoals: number): PredictionOutcomeEnum => {
   if (homeGoals > awayGoals) {
     return PredictionOutcomeEnum.HOME_TEAM_WIN;
-  } else if (homeGoals < awayGoals) {
+  } if (homeGoals < awayGoals) {
     return PredictionOutcomeEnum.AWAY_TEAM_WIN;
-  } else {
-    return PredictionOutcomeEnum.DRAW;
   }
+  return PredictionOutcomeEnum.DRAW;
 };
 
 export const getHomeTeamPredictedGoals = (gameWeek: LeagueGameWeek, fixtureId: string, userId: string): number | undefined => {
@@ -76,7 +69,7 @@ export const getGeneralPositionShorthand = (position: string) => {
 
 export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
   switch (picture) {
-    case ProfilePictureEnum.MR_BEAN:
+    case ProfilePictureEnum.GRANNEN:
       return '/images/mr-bean.png';
     case ProfilePictureEnum.CARL_GUSTAF:
       return '/images/carl-gustaf.png';
@@ -95,4 +88,4 @@ export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
     default:
       return '/images/generic.png';
   }
-}
+};

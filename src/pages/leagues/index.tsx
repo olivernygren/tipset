@@ -302,14 +302,14 @@ const PredictionLeaguesPage = () => {
                   Gå med
                 </Button>
               </Section>
-              <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
+              {/* <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
                 <HeadingsTypography variant="h3">Skapa liga</HeadingsTypography>
                 <Button
                   onClick={() => setShowCreateLeagueModal(true)}
                 >
                   Skapa liga
                 </Button>
-              </Section>
+              </Section> */}
             </Section>
           </>
         )}

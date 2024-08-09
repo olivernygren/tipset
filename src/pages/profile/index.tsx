@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import styled from 'styled-components';
 import Page from '../../components/Page';
 import { Section } from '../../components/section/Section';
 import { HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -6,12 +8,10 @@ import { theme } from '../../theme';
 import Input from '../../components/input/Input';
 import { useUser } from '../../context/UserContext';
 import Button from '../../components/buttons/Button';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { getProfilePictureUrl, withDocumentIdOnObject } from '../../utils/helpers';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
-import styled from 'styled-components';
 import SelectProfilePictureModal from '../../components/profile/SelectProfilePictureModal';
 import { ProfilePictureEnum } from '../../components/avatar/Avatar';
 import { Divider } from '../../components/Divider';
@@ -23,7 +23,7 @@ const ProfilePage = () => {
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [profilePicture, setProfilePicture] = useState<string | undefined>(getProfilePictureUrl(user?.profilePicture as ProfilePictureEnum));
-  const [selectedNewProfilePicture, setSelectedNewProfilePicture] = useState(user?.profilePicture ? getProfilePictureUrl(user.profilePicture as ProfilePictureEnum) : undefined)
+  const [selectedNewProfilePicture, setSelectedNewProfilePicture] = useState(user?.profilePicture ? getProfilePictureUrl(user.profilePicture as ProfilePictureEnum) : undefined);
   const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false);
   const [notLoggedIn, setNotLoggedIn] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -42,7 +42,6 @@ const ProfilePage = () => {
     if (!user) {
       setNotLoggedIn(true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {
@@ -55,7 +54,7 @@ const ProfilePage = () => {
     try {
       const userDoc = await getDoc(doc(db, CollectionEnum.USERS, user.documentId));
       const userData = withDocumentIdOnObject(userDoc);
-  
+
       await updateDoc(doc(db, CollectionEnum.USERS, user.documentId), {
         ...userData,
         firstname: firstName,
@@ -76,60 +75,58 @@ const ProfilePage = () => {
   };
 
   const handleSaveNewProfilePicture = () => {
-    console.log('selectedNewProfilePicture', selectedNewProfilePicture);
-    
     setProfilePicture(getProfilePictureUrl(selectedNewProfilePicture as ProfilePictureEnum));
     setProfilePictureModalOpen(false);
-  }
+  };
 
   return (
     <Page>
-      <Section gap='m'>
-        <HeadingsTypography variant='h1'>Konto</HeadingsTypography>
+      <Section gap="m">
+        <HeadingsTypography variant="h1">Konto</HeadingsTypography>
         {notLoggedIn ? (
-          <NormalTypography variant='m'>Logga in för att se kontoinformation</NormalTypography>
+          <NormalTypography variant="m">Logga in för att se kontoinformation</NormalTypography>
         ) : (
           <Section
-            gap='m'
+            gap="m"
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
             padding={theme.spacing.m}
           >
-            <HeadingsTypography variant='h4'>Profilbild</HeadingsTypography>
-            <Section gap='m' flexDirection='row' alignItems='flex-end'>
-              <CustomAvatarLarge src={profilePicture} alt='image' />
+            <HeadingsTypography variant="h4">Profilbild</HeadingsTypography>
+            <Section gap="m" flexDirection="row" alignItems="flex-end">
+              <CustomAvatarLarge src={profilePicture} alt="image" />
               <Button
-                variant='secondary'
+                variant="secondary"
                 onClick={() => setProfilePictureModalOpen(true)}
               >
                 Byt profilbild
               </Button>
             </Section>
             <Divider />
-            <Section gap='m'>
-              <Section gap='m' alignItems='center' flexDirection='row'>
+            <Section gap="m">
+              <Section gap="m" alignItems="center" flexDirection="row">
                 <Input
-                  label='Förnamn'
+                  label="Förnamn"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   fullWidth
                 />
                 <Input
-                  label='Efternamn'
+                  label="Efternamn"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   fullWidth
                 />
               </Section>
               <Input
-                label='Email'
+                label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 fullWidth
                 disabled
               />
               <Button
-                variant='primary'
+                variant="primary"
                 onClick={handleSave}
                 loading={saveLoading}
               >
@@ -148,7 +145,7 @@ const ProfilePage = () => {
         />
       )}
     </Page>
-  )
+  );
 };
 
 const CustomAvatarLarge = styled.img`

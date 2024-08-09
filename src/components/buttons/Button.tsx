@@ -18,10 +18,11 @@ export interface ButtonProps {
   icon?: React.ReactNode;
   endIcon?: React.ReactNode;
   loading?: boolean;
+  id?: string;
 }
 
 const Button = ({
-  variant = 'primary', onClick, children, disabled, disabledInvisible, fullWidth, color = 'primary', textColor = theme.colors.white, size = 'm', icon, loading, endIcon,
+  variant = 'primary', onClick, children, disabled, disabledInvisible, fullWidth, color = 'primary', textColor = theme.colors.white, size = 'm', icon, loading, endIcon, id,
 }: ButtonProps) => (
   <StyledButton
     variant={variant || 'primary'}
@@ -42,7 +43,7 @@ const Button = ({
         <SpinnerGap size={24} color={variant === 'primary' ? theme.colors.white : theme.colors.primary} />
       </RotationalSpinner>
     ) : (
-      <EmphasisTypography variant="m" color={variant === 'secondary' ? theme.colors.primary : textColor} align="center">
+      <EmphasisTypography id={id} variant="m" color={variant === 'secondary' ? theme.colors.primary : textColor} align="center">
         {children}
       </EmphasisTypography>
     )}
@@ -66,7 +67,7 @@ const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color:
   //   return theme.colors[color];
   // }
   if (disabled) {
-    return theme.colors.silver;
+    return theme.colors.silverLight;
   }
   if (color) {
     return theme.colors[color];
@@ -91,7 +92,7 @@ const getBorderColor = (color: keyof typeof theme.colors | undefined, disabled?:
   //   return theme.colors[color];
   // }
   if (disabled) {
-    return theme.colors.silver;
+    return theme.colors.silverLight;
   }
   if (color) {
     return theme.colors[color];
@@ -133,8 +134,8 @@ const StyledButton = styled.button<ButtonProps>`
   }
 
   &:disabled {
-    background-color: ${theme.colors.silver} !important; 
-    border-color: ${theme.colors.silver} !important; 
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
+    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
     cursor: not-allowed;
   }
 `;

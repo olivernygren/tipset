@@ -1,10 +1,12 @@
-import { motion } from 'framer-motion'
-import React, { useState } from 'react'
+import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import {
+  ArrowRight, Question, Scroll, Trophy,
+} from '@phosphor-icons/react';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
-import { ArrowRight, Question, Scroll, Trophy } from '@phosphor-icons/react';
 
 interface HomePageCardProps {
   title: string;
@@ -18,20 +20,20 @@ const HomePageCard = ({ title, description, href }: HomePageCardProps) => {
   const getIcon = () => {
     switch (title) {
       case 'Ligor':
-        return <Trophy size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
+        return <Trophy size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight="fill" />;
       case 'Regler':
-        return <Scroll size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
+        return <Scroll size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight="fill" />;
       case 'Hur funkar det?':
-        return <Question size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight='fill' />;
-        default:
-          return <></>
+        return <Question size={42} color={isHovered ? theme.colors.gold : theme.colors.textDefault} weight="fill" />;
+      default:
+        return null;
     }
-  }
+  };
 
   return (
     <StyledLink href={href}>
       <Card
-        initial={{ opacity: 0, backgroundColor: theme.colors.white, border: `1px solid ${theme.colors.silver}` }}
+        initial={{ opacity: 0, backgroundColor: theme.colors.white, border: `1px solid ${theme.colors.silverLight}` }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         whileHover={{ scale: 1.01, backgroundColor: theme.colors.primary, border: `2px solid ${theme.colors.gold}` }}
@@ -41,19 +43,19 @@ const HomePageCard = ({ title, description, href }: HomePageCardProps) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <Section gap="m">
-          <Section flexDirection='row' alignItems='center' gap='s'>
-            <HeadingsTypography variant='h2' color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{title}</HeadingsTypography>
+          <Section flexDirection="row" alignItems="center" gap="s">
+            <HeadingsTypography variant="h2" color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{title}</HeadingsTypography>
             {getIcon()}
           </Section>
-          <NormalTypography variant='l' color={isHovered ? theme.colors.white : theme.colors.textDefault}>{description}</NormalTypography>
+          <NormalTypography variant="l" color={isHovered ? theme.colors.white : theme.colors.silverDark}>{description}</NormalTypography>
         </Section>
         <ArrowIconContainer isHovered={isHovered}>
-          <ArrowRight size={40} color={isHovered ? theme.colors.gold : theme.colors.white} weight='bold' />
+          <ArrowRight size={40} color={isHovered ? theme.colors.gold : theme.colors.white} weight="bold" />
         </ArrowIconContainer>
       </Card>
     </StyledLink>
-  )
-}
+  );
+};
 
 const StyledLink = styled.a`
   text-decoration: none;
@@ -79,7 +81,7 @@ const ArrowIconContainer = styled.div<{ isHovered: boolean }>`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: ${({ isHovered }) => isHovered ? theme.colors.primaryDarker : theme.colors.white};
+    background-color: ${({ isHovered }) => (isHovered ? theme.colors.primaryDarker : theme.colors.white)};
     box-sizing: border-box;
     width: 100px;
     height: 100px;

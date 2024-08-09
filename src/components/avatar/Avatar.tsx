@@ -11,7 +11,7 @@ export enum AvatarSize {
 }
 
 export enum ProfilePictureEnum {
-  MR_BEAN = 'mr-bean',
+  GRANNEN = 'grannen',
   CARL_GUSTAF = 'carl-gustaf',
   DONKEY = 'donkey',
   ZLATAN = 'zlatan',
@@ -41,21 +41,21 @@ interface StyledAvatarProps {
   noPadding?: boolean;
 }
 
-const Avatar = ({ src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false }: AvatarProps) => {
-  return (
-    <StyledAvatar
-      size={size}
-      showBorder={showBorder}
-      customBorderColor={customBorderColor}
-      objectFit={objectFit}
-      isDarkMode={isDarkMode}
-      noPadding={noPadding}
-      className='avatar'
-    >
-      <img src={src} alt={alt ?? 'avatar'} />
-    </StyledAvatar>
-  )
-}
+const Avatar = ({
+  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false,
+}: AvatarProps) => (
+  <StyledAvatar
+    size={size}
+    showBorder={showBorder}
+    customBorderColor={customBorderColor}
+    objectFit={objectFit}
+    isDarkMode={isDarkMode}
+    noPadding={noPadding}
+    className="avatar"
+  >
+    <img src={src} alt={alt ?? 'avatar'} />
+  </StyledAvatar>
+);
 
 const getAvatarSize = (size: AvatarSize) => {
   switch (size) {
@@ -72,7 +72,7 @@ const getAvatarSize = (size: AvatarSize) => {
     default:
       return '32px';
   }
-}
+};
 
 // const StyledAvatar = styled.img<AvatarProps>`
 //   border-radius: ${({ shape }) => shape === 'circle' ? '50%' : theme.borderRadius.xs};
@@ -88,12 +88,12 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silver}` : 'none'};
-  padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
-  margin: ${({ objectFit }) => objectFit === 'cover' ? theme.spacing.xxs : '0'};
+  border: ${({ showBorder, customBorderColor }) => (showBorder ? `2px solid ${customBorderColor || theme.colors.silver}` : 'none')};
+  padding: ${({ objectFit }) => (objectFit === 'contain' ? theme.spacing.xxs : '0')};
+  margin: ${({ objectFit }) => (objectFit === 'cover' ? theme.spacing.xxs : '0')};
   overflow: hidden;
   border-radius: 50%;
-  background-color: ${({ isDarkMode }) => isDarkMode ? theme.colors.white : 'transparent'};
+  background-color: ${({ isDarkMode }) => (isDarkMode ? theme.colors.white : 'transparent')};
 
   ${({ noPadding }) => noPadding && css`
     padding: 0 !important;
