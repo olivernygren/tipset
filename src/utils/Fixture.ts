@@ -1,5 +1,5 @@
-import { Player } from "./Players";
-import { Team } from "./Team";
+import { Player } from './Players';
+import { Team } from './Team';
 
 export enum FixtureOutcomeEnum {
   WIN = 'V',

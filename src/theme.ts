@@ -12,16 +12,23 @@ export const theme = {
     textDefault: '#333333',
     textLight: '#7D93A1',
     textLighter: '#A9B8C1',
-    silver: '#cccccc',
-    silverLight: '#f2f2f2',
-    silverLighter: '#f5f5f5',
-    silverDark: '#bfbfbf',
-    silverDarker: '#8c8c8c',
+    // silver: '#cccccc',
+    // silverLight: '#f2f2f2',
+    // silverLighter: '#f5f5f5',
+    // silverDark: '#bfbfbf',
+    // silverDarker: '#8c8c8c',
+    silverDarker: '#586D79',
+    silverDark: '#7D93A1',
+    silver: '#A9B8C1',
+    silverLight: '#D9E3E9',
+    silverLighter: '#F0F4F6',
+    silverBleach: '#F7FAFC',
+    silverFade: '#F7FAFC',
     red: '#E22B2B',
     redDark: '#B81A1A',
     redDarker: '#7D0707',
     gold: '#FFD700',
-    green: '#52C68E'
+    green: '#52C68E',
   },
   spacing: {
     xxxs: '4px',
@@ -43,13 +50,13 @@ export const theme = {
     xl: '16px',
     xxl: '24px',
   },
-}
+};
 
 export const devices = {
-  mobile: `(min-width: 375px)`,
-  mobileL: `(min-width: 425px)`,
-  tablet: `(min-width: 768px)`,
-  laptop: `(min-width: 1024px)`,
-  desktop: `(min-width: 1440px)`,
-  desktopL: `(min-width: 2560px)`,
-}
+  mobile: '(min-width: 375px)',
+  mobileL: '(min-width: 425px)',
+  tablet: '(min-width: 768px)',
+  laptop: '(min-width: 1024px)',
+  desktop: '(min-width: 1440px)',
+  desktopL: '(min-width: 2560px)',
+};

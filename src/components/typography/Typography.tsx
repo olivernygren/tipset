@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { theme } from "../../theme";
+import styled from 'styled-components';
+import { theme } from '../../theme';
 
 interface RegularTypographyProps {
   variant?: 'xs' | 's' | 'm' | 'l';
@@ -29,8 +29,10 @@ const getRegularTypographySize = (variant: RegularTypographyProps['variant']) =>
       return '16px';
     case 'l':
       return '20px';
+    default:
+      return '16px';
   }
-}
+};
 
 const getHeadingsTypographySize = (variant: HeadingsTypographyProps['variant']) => {
   switch (variant) {
@@ -46,8 +48,10 @@ const getHeadingsTypographySize = (variant: HeadingsTypographyProps['variant']) 
       return '18px';
     case 'h6':
       return '16px';
+    default:
+      return '24px';
   }
-}
+};
 
 const RootTypography = styled.span<RootTypographyProps>`
   font-family: "Readex Pro", sans-serif;

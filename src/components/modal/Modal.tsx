@@ -1,10 +1,10 @@
 import React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
+import { X } from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
 import { theme } from '../../theme';
 import { HeadingsTypography } from '../typography/Typography';
 import IconButton from '../buttons/IconButton';
-import { X } from '@phosphor-icons/react';
-import { motion } from 'framer-motion';
 
 interface ModalProps {
   title?: string;
@@ -14,7 +14,9 @@ interface ModalProps {
   headerDivider?: boolean;
 }
 
-const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalProps) => {
+const Modal = ({
+  title, children, onClose, size = 'm', headerDivider,
+}: ModalProps) => {
   const getModalWidth = () => {
     switch (size) {
       case 's':
@@ -34,7 +36,8 @@ const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalPro
         if (e.target === e.currentTarget) {
           onClose();
         }
-      }}>
+      }}
+      >
         <ModalContainer
           width={getModalWidth()}
           initial={{ opacity: 0, scale: 0.92 }}
@@ -43,12 +46,12 @@ const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalPro
           transition={{ duration: 0.2 }}
         >
           <Header headerDivider={headerDivider}>
-            {title && <HeadingsTypography variant='h3'>{title}</HeadingsTypography>}
-            <IconButton 
-              icon={<X size={24} />} 
+            {title && <HeadingsTypography variant="h3">{title}</HeadingsTypography>}
+            <IconButton
+              icon={<X size={24} />}
               colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textLight }}
               onClick={onClose}
-              />
+            />
           </Header>
           <ModalContent headerDivider={headerDivider}>
             {children}
@@ -57,7 +60,7 @@ const Modal = ({ title, children, onClose, size = 'm', headerDivider }: ModalPro
       </Backdrop>
       <GlobalStyle />
     </>
-  )
+  );
 };
 
 const Backdrop = styled.div`
@@ -89,7 +92,7 @@ const ModalContent = styled.div<{ headerDivider?: boolean }>`
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: ${({ headerDivider }) => headerDivider ? theme.spacing.l : 0} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
+  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.l : 0)} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
 `;
 
 const Header = styled.div<{ headerDivider?: boolean }>`
@@ -98,7 +101,7 @@ const Header = styled.div<{ headerDivider?: boolean }>`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  padding: ${theme.spacing.l};
+  padding: ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.s} ${theme.spacing.l};
   
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};

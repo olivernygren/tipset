@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import styled from 'styled-components';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { theme } from '../../theme';
@@ -22,54 +22,67 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     return (
       <>
         <TableRow>
-          <NormalTypography variant='s' color={theme.colors.white}>{label}</NormalTypography>
-          <EmphasisTypography variant='m' color={theme.colors.gold}>{points} p</EmphasisTypography>
+          <NormalTypography variant="s" color={theme.colors.white}>{label}</NormalTypography>
+          <EmphasisTypography variant="m" color={theme.colors.gold}>
+            {points}
+            {' '}
+            p
+          </EmphasisTypography>
         </TableRow>
-        <Divider color={theme.colors.primary} className='divider' />
+        <Divider color={theme.colors.primary} className="divider" />
       </>
-    )
+    );
   };
 
   const getLogo = (teamType: TeamType, logoUrl: string) => {
     if (!fixture) return null;
 
     if (teamType === TeamType.CLUBS) {
-      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} showBorder isDarkMode />
-    } else {
-      return <NationAvatar flagUrl={logoUrl} nationName={fixture.homeTeam.name} size={AvatarSize.L} />
+      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} showBorder isDarkMode />;
     }
-  }
+    return <NationAvatar flagUrl={logoUrl} nationName={fixture.homeTeam.name} size={AvatarSize.L} />;
+  };
 
   return (
     <Card>
-      <HeadingsTypography variant='h4' color={theme.colors.gold}>
+      <HeadingsTypography variant="h4" color={theme.colors.gold}>
         <UserName userId={prediction.userId} />
       </HeadingsTypography>
       <PointsContainer>
-        <HeadingsTypography variant='h1' color={theme.colors.gold}>
+        <HeadingsTypography variant="h1" color={theme.colors.gold}>
           {prediction.points?.total ?? '?'}
         </HeadingsTypography>
       </PointsContainer>
-      <Section gap='s' padding={`${theme.spacing.s} 0`} alignItems='center'>
-        <Section flexDirection='row' alignItems='center' gap='s' fitContent>
+      <Section gap="s" padding={`${theme.spacing.s} 0`} alignItems="center">
+        <Section flexDirection="row" alignItems="center" gap="s" fitContent>
           {fixture && getLogo(fixture.teamType, fixture.homeTeam.logoUrl)}
-          <HeadingsTypography variant='h2' color={theme.colors.white}>{prediction.homeGoals} - {prediction.awayGoals}</HeadingsTypography>
+          <HeadingsTypography variant="h2" color={theme.colors.white}>
+            {prediction.homeGoals}
+            {' '}
+            -
+            {' '}
+            {prediction.awayGoals}
+          </HeadingsTypography>
           {fixture && getLogo(fixture.teamType, fixture.awayTeam.logoUrl)}
         </Section>
         {prediction.goalScorer && (
-          <>
-            <EmphasisTypography variant='m' color={theme.colors.white}>{prediction.goalScorer?.name} ({getGeneralPositionShorthand(prediction.goalScorer.position.general)})</EmphasisTypography>
-          </>
+          <EmphasisTypography variant="m" color={theme.colors.white}>
+            {prediction.goalScorer?.name}
+            {' '}
+            (
+            {getGeneralPositionShorthand(prediction.goalScorer.position.general)}
+            )
+          </EmphasisTypography>
         )}
       </Section>
       <Divider color={theme.colors.primaryDark} />
-      <HeadingsTypography variant='h6' color={theme.colors.white}>Poängfördelning</HeadingsTypography>
+      <HeadingsTypography variant="h6" color={theme.colors.white}>Poängfördelning</HeadingsTypography>
       {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
         <Section
           backgroundColor={theme.colors.primaryDark}
           borderRadius={theme.borderRadius.s}
           padding={`${theme.spacing.xxs} ${theme.spacing.xs}`}
-          gap='xxs'
+          gap="xxs"
         >
           {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
           {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
@@ -83,10 +96,10 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           )}
         </Section>
       ) : (
-        <NormalTypography variant='m' color={theme.colors.white}>Inga poäng</NormalTypography>
+        <NormalTypography variant="m" color={theme.colors.white}>Inga poäng</NormalTypography>
       )}
     </Card>
-  )
+  );
 };
 
 const Card = styled.div`

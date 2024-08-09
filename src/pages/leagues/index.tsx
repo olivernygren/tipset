@@ -1,17 +1,23 @@
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDocs, collection, where, query, addDoc, updateDoc } from 'firebase/firestore';
+import {
+  getDocs, collection, where, query, addDoc, updateDoc,
+} from 'firebase/firestore';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react'
+import styled from 'styled-components';
+import {
+  Medal, PlusCircle, UserPlus, Users,
+} from '@phosphor-icons/react';
 import { auth, db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
-import { CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../utils/League';
-import styled from 'styled-components';
+import {
+  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
+} from '../../utils/League';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
 import { Section } from '../../components/section/Section';
 import Button from '../../components/buttons/Button';
-import { Medal, PlusCircle, UserPlus, Users } from '@phosphor-icons/react';
 import Modal from '../../components/modal/Modal';
 import Page from '../../components/Page';
 import Input from '../../components/input/Input';
@@ -19,6 +25,7 @@ import { QueryEnum } from '../../utils/Routes';
 import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
 import { useUser } from '../../context/UserContext';
 import { successNotify } from '../../utils/toast/toastHelpers';
+import Tag from '../../components/tag/Tag';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -46,21 +53,20 @@ const PredictionLeaguesPage = () => {
     if (currentUserId) {
       fetchLeagues();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId]);
 
-  const fetchLeagues = async () => {    
+  const fetchLeagues = async () => {
     try {
-      const data = await getDocs(query(collection(db, CollectionEnum.LEAGUES), where("participants", "array-contains", currentUserId)));
-      const currentUserLeagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);      
-      
-      const endedLeagues = currentUserLeagues.filter((league) => league.hasEnded);
-      const creatorLeagues = currentUserLeagues.filter((league) => league.creatorId === currentUserId && !league.hasEnded);
-      const participantLeagues = currentUserLeagues.filter((league) => league.participants.includes(currentUserId ?? '---') && league.creatorId !== currentUserId && !league.hasEnded);
+      const data = await getDocs(query(collection(db, CollectionEnum.LEAGUES), where('participants', 'array-contains', currentUserId)));
+      const currentUserLeagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
 
-      setEndedLeagues(endedLeagues);
-      setParticipantLeagues(participantLeagues);
-      setCreatorLeagues(creatorLeagues);
+      const allEndedLeagues = currentUserLeagues.filter((league) => league.hasEnded);
+      const allCreatorLeagues = currentUserLeagues.filter((league) => league.creatorId === currentUserId && !league.hasEnded).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const allParticipantLeagues = currentUserLeagues.filter((league) => league.participants.includes(currentUserId ?? '---') && league.creatorId !== currentUserId && !league.hasEnded);
+
+      setEndedLeagues(allEndedLeagues);
+      setParticipantLeagues(allParticipantLeagues);
+      setCreatorLeagues(allCreatorLeagues);
       setFetchLoading(false);
     } catch (err) {
       console.error(err);
@@ -91,8 +97,8 @@ const PredictionLeaguesPage = () => {
         correctResults: 0,
       }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
-      hasEnded: false
-    }
+      hasEnded: false,
+    };
 
     try {
       await addDoc(leagueCollectionRef, newLeague);
@@ -108,7 +114,7 @@ const PredictionLeaguesPage = () => {
 
   const handleJoinLeague = async () => {
     console.log(currentUserId, user);
-    
+
     if (!currentUserId || !user) return;
 
     setJoinLeagueLoading('modal');
@@ -116,14 +122,14 @@ const PredictionLeaguesPage = () => {
 
     const code = joinLeagueCodeValueInModal.length > 0 ? joinLeagueCodeValueInModal.trim() : joinLeagueCodeValue.trim();
     const leagueDoc = await getLeagueByInvitationCode(code);
-  
+
     if (!leagueDoc) {
       setShowJoinLeagueError('Felaktig inbjudningskod');
       return;
     }
-  
+
     const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
-  
+
     if (leagueData.participants.includes(currentUserId)) {
       setShowJoinLeagueError('Du är redan med i denna liga');
       setJoinLeagueLoading(null);
@@ -153,12 +159,12 @@ const PredictionLeaguesPage = () => {
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
       correctResults: 0,
-    }
-  
+    };
+
     try {
-      await updateDoc(leagueDoc.ref, { 
+      await updateDoc(leagueDoc.ref, {
         participants: [...leagueData.participants, currentUserId],
-        standings: [...leagueData.standings, newParticipantStandingsObj]
+        standings: [...leagueData.standings, newParticipantStandingsObj],
       });
       setShowJoinLeagueModal(false);
       successNotify(`Du har gått med i ${leagueData.name}`);
@@ -174,7 +180,7 @@ const PredictionLeaguesPage = () => {
   const getLeagueCard = (league: PredictionLeague) => {
     const isHovered = leagueCardHovered === league.documentId;
     return (
-      <LeagueCard 
+      <LeagueCard
         key={league.documentId}
         whileHover={{ scale: 1.02, backgroundColor: theme.colors.primary }}
         transition={{ duration: 0.2 }}
@@ -182,47 +188,59 @@ const PredictionLeaguesPage = () => {
         onHoverEnd={() => setLeagueCardHovered(undefined)}
         onClick={() => navigate(`/${QueryEnum.LEAGUES}/${league.documentId}`)}
       >
-        <HeadingsTypography variant='h4' color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{league.name}</HeadingsTypography>
-        <Section gap='s'>
-          <NormalTypography variant='s' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>{league.description}</NormalTypography>
+        <Section gap="s" flexDirection="row" alignItems="flex-start" justifyContent="space-between">
+          <Tag
+            text={league.gameWeeks && league.gameWeeks.length > 0 ? `Omgång ${league.gameWeeks.length ?? 0}` : 'Ej startad'}
+            textAndIconColor={isHovered ? theme.colors.white : theme.colors.textDefault}
+            backgroundColor={isHovered ? theme.colors.primaryLight : theme.colors.silverLighter}
+          />
+          <PointsContainer isHovered={isHovered}>
+            <EmphasisTypography variant="l" color={isHovered ? theme.colors.gold : theme.colors.primary}>{`${league.standings.find((standing) => standing.userId === currentUserId)?.points}p`}</EmphasisTypography>
+          </PointsContainer>
+        </Section>
+        <Section gap="s">
+          <EmphasisTypography variant="l" color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{league.name}</EmphasisTypography>
+          <NormalTypography variant="m" color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>{league.description}</NormalTypography>
         </Section>
         <BottomRow>
-          {league.gameWeeks && league.gameWeeks.length > 0 && (
-            <HeadingsTypography variant='h6' color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>Omgång {league.gameWeeks?.length ?? 0}</HeadingsTypography>
+          {league.hasEnded ? (
+            <Tag
+              text={`Du kom ${league.standings.findIndex((standing) => standing.userId === currentUserId) + 1}a`}
+              textAndIconColor={isHovered ? theme.colors.white : theme.colors.primary}
+              backgroundColor={isHovered ? theme.colors.primaryLight : theme.colors.primaryFade}
+              icon={<Medal size={20} weight="fill" />}
+              fullWidth
+            />
+          ) : (
+            <Tag
+              text={`${league.participants.length} deltagare`}
+              textAndIconColor={isHovered ? theme.colors.white : theme.colors.primary}
+              backgroundColor={isHovered ? theme.colors.primaryLight : theme.colors.primaryFade}
+              icon={<Users size={20} weight="light" />}
+              fullWidth
+            />
           )}
-          <UsersTag isHovered={isHovered}>
-            {league.hasEnded ? (
-              <Medal size={24} color={isHovered ? theme.colors.white : theme.colors.primary} weight='fill' />
-            ) : (
-              <Users size={24} color={isHovered ? theme.colors.white : theme.colors.primary} />
-            )}
-            {league.hasEnded ? (
-              <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>Du kom {league.standings.findIndex((standing) => standing.userId) + 1}a</EmphasisTypography>
-            ) : (
-              <EmphasisTypography variant='m' color={isHovered ? theme.colors.white : theme.colors.primary}>{league.participants.length} deltagare</EmphasisTypography>
-            )}
-          </UsersTag>
         </BottomRow>
       </LeagueCard>
-    )
-  }
-  
+    );
+  };
+
   return (
     <Page>
       <PageHeader>
-        <HeadingsTypography variant='h2'>Ligor</HeadingsTypography>
-        <Section gap='s' flexDirection='row' alignItems='center' fitContent>
-          <Button 
-            variant='primary'
-            size='s'
+        <HeadingsTypography variant="h2">Ligor</HeadingsTypography>
+        <Section gap="s" flexDirection="row" alignItems="center" fitContent>
+          <Button
+            variant="primary"
+            size="m"
             onClick={() => setShowCreateLeagueModal(true)}
-            icon={<PlusCircle size={24} weight='fill' color='white' />}
+            icon={<PlusCircle size={24} weight="fill" color="white" />}
           >
             Skapa liga
           </Button>
-          <Button 
-            variant='secondary'
-            size='s'
+          <Button
+            variant="secondary"
+            size="m"
             onClick={() => setShowJoinLeagueModal(true)}
             icon={<UserPlus size={24} color={theme.colors.primary} />}
           >
@@ -232,30 +250,30 @@ const PredictionLeaguesPage = () => {
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
         {!fetchLoading && !currentUserId && (
-          <NormalTypography variant='m'>Logga in för att se och gå med i ligor</NormalTypography>
+          <NormalTypography variant="m">Logga in för att se och gå med i ligor</NormalTypography>
         )}
-        {fetchLoading && currentUserId && <NormalTypography variant='m'>Laddar ligor...</NormalTypography>}
+        {fetchLoading && currentUserId && <NormalTypography variant="m">Laddar ligor...</NormalTypography>}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
           <>
             {creatorLeagues.length > 0 && (
-              <Section gap='s'>
-                <HeadingsTypography variant='h3'>Dina skapade ligor</HeadingsTypography>
+              <Section gap="s">
+                <HeadingsTypography variant="h3">Dina skapade ligor</HeadingsTypography>
                 <LeaguesContainer>
                   {creatorLeagues.map((league) => getLeagueCard(league))}
                 </LeaguesContainer>
               </Section>
             )}
             {participantLeagues.length > 0 && (
-              <Section gap='s'>
-                <HeadingsTypography variant='h3'>Ligor du deltar i</HeadingsTypography>
+              <Section gap="s">
+                <HeadingsTypography variant="h3">Ligor du deltar i</HeadingsTypography>
                 <LeaguesContainer>
                   {participantLeagues.map((league) => getLeagueCard(league))}
                 </LeaguesContainer>
               </Section>
             )}
             {endedLeagues.length > 0 && (
-              <Section gap='s'>
-                <HeadingsTypography variant='h3'>Avslutade ligor</HeadingsTypography>
+              <Section gap="s">
+                <HeadingsTypography variant="h3">Avslutade ligor</HeadingsTypography>
                 <LeaguesContainer>
                   {endedLeagues.map((league) => getLeagueCard(league))}
                 </LeaguesContainer>
@@ -265,18 +283,18 @@ const PredictionLeaguesPage = () => {
         )}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
           <>
-            <NormalTypography variant='m'>Du är inte med i några ligor ännu.</NormalTypography>
-            <Section flexDirection='row' gap='l'>
+            <NormalTypography variant="m">Du är inte med i några ligor ännu.</NormalTypography>
+            <Section flexDirection="row" gap="l">
               <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
-                <HeadingsTypography variant='h3'>Gå med i liga</HeadingsTypography>
+                <HeadingsTypography variant="h3">Gå med i liga</HeadingsTypography>
                 <Input
-                  label='Ange inbjudningskod'
-                  type='text'
-                  placeholder='t.ex. KNT342G9'
+                  label="Ange inbjudningskod"
+                  type="text"
+                  placeholder="t.ex. KNT342G9"
                   value={joinLeagueCodeValue}
                   onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
                 />
-                <Button 
+                <Button
                   onClick={handleJoinLeague}
                   loading={joinLeagueLoading === 'input'}
                   disabled={joinLeagueCodeValue.length === 0}
@@ -285,8 +303,8 @@ const PredictionLeaguesPage = () => {
                 </Button>
               </Section>
               <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l} gap="m">
-                <HeadingsTypography variant='h3'>Skapa liga</HeadingsTypography>
-                <Button 
+                <HeadingsTypography variant="h3">Skapa liga</HeadingsTypography>
+                <Button
                   onClick={() => setShowCreateLeagueModal(true)}
                 >
                   Skapa liga
@@ -298,33 +316,33 @@ const PredictionLeaguesPage = () => {
       </Section>
       {showCreateLeagueModal && (
         <Modal
-          size='s'
-          title='Skapa liga'
+          size="s"
+          title="Skapa liga"
           onClose={() => setShowCreateLeagueModal(false)}
         >
-          <Section gap='m'>
+          <Section gap="m">
             <Input
-              label='Namn'
-              type='text'
+              label="Namn"
+              type="text"
               value={newLeagueName}
               onChange={(e) => setNewLeagueName(e.currentTarget.value)}
               fullWidth
               maxLength={30}
             />
             <Input
-              label='Beskrivning'
-              type='text'
+              label="Beskrivning"
+              type="text"
               value={newLeagueDescription}
               onChange={(e) => setNewLeagueDescription(e.currentTarget.value)}
               fullWidth
             />
             <ModalButtons>
-              <Button variant='secondary' onClick={() => setShowCreateLeagueModal(false)} fullWidth>
+              <Button variant="secondary" onClick={() => setShowCreateLeagueModal(false)} fullWidth>
                 Avbryt
               </Button>
               <Button
-                variant='primary'
-                onClick={handleCreateLeague} 
+                variant="primary"
+                onClick={handleCreateLeague}
                 disabled={newLeagueName.length === 0}
                 loading={createLeagueLoading}
                 fullWidth
@@ -337,29 +355,29 @@ const PredictionLeaguesPage = () => {
       )}
       {showJoinLeagueModal && (
         <Modal
-          size='s'
-          title='Gå med i liga'
+          size="s"
+          title="Gå med i liga"
           onClose={() => setShowJoinLeagueModal(false)}
         >
-          <Section gap='m'>
+          <Section gap="m">
             <Input
-              label='Inbjudningskod'
-              type='text'
-              placeholder='t.ex. DHU8M2GL'
+              label="Inbjudningskod"
+              type="text"
+              placeholder="t.ex. DHU8M2GL"
               value={joinLeagueCodeValueInModal}
               onChange={(e) => setJoinLeagueCodeValueInModal(e.currentTarget.value)}
               fullWidth
             />
             {showJoinLeagueError.length > 0 && (
-              <NormalTypography variant='s' color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+              <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
             )}
             <ModalButtons>
-              <Button variant='secondary' onClick={() => setShowJoinLeagueModal(false)} fullWidth>
+              <Button variant="secondary" onClick={() => setShowJoinLeagueModal(false)} fullWidth>
                 Avbryt
               </Button>
               <Button
-                variant='primary'
-                onClick={handleJoinLeague} 
+                variant="primary"
+                onClick={handleJoinLeague}
                 disabled={joinLeagueCodeValueInModal.length === 0}
                 loading={joinLeagueLoading === 'modal'}
                 fullWidth
@@ -371,7 +389,7 @@ const PredictionLeaguesPage = () => {
         </Modal>
       )}
     </Page>
-  )
+  );
 };
 
 const PageHeader = styled.div`
@@ -379,7 +397,7 @@ const PageHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing.m};
-  border-bottom: 1px solid ${theme.colors.silver};
+  border-bottom: 1px solid ${theme.colors.silverLight};
   padding-bottom: ${theme.spacing.s};
 `;
 
@@ -394,11 +412,11 @@ const LeaguesContainer = styled.div`
 
 const LeagueCard = styled(motion.div)`
   background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.m};
+  border-radius: ${theme.borderRadius.l};
   padding: ${theme.spacing.m};
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.s};
+  gap: ${theme.spacing.xxs};
   cursor: pointer;
   min-height: 250px;
   box-sizing: border-box;
@@ -412,16 +430,6 @@ const ModalButtons = styled.div`
   box-sizing: border-box;
 `;
 
-const UsersTag = styled.div<{ isHovered: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.xxs};
-  background-color: ${({ isHovered }) => isHovered ? theme.colors.primaryDarker : theme.colors.primaryBleach};
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
-  border-radius: ${theme.borderRadius.m};
-  width: fit-content;
-`;
-
 const BottomRow = styled.div`
   margin-top: auto;
   display: flex;
@@ -429,12 +437,16 @@ const BottomRow = styled.div`
   gap: ${theme.spacing.xs};
 `;
 
+const PointsContainer = styled.div<{ isHovered: boolean }>`
+  width: fit-content;
+  min-width: 40px;
+  height: 40px;
+  padding: ${theme.spacing.xxs};
+  border-radius: 100px;
+  background-color: ${({ isHovered }) => (isHovered ? theme.colors.primaryLight : theme.colors.silverLighter)};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export default PredictionLeaguesPage;
-
-  // if no leagues, show input to enter league invitation code or create league
-
-  // /league/:id page
-  // render league info, participants, matches, predictions
-  // if uid is in participants array, show content - if not, show button to accept invitation
-
-  // when joining league, add uid to participants array and add league id to user "leagues" field?

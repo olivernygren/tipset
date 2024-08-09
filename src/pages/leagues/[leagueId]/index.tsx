@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react'
-import Page from '../../../components/Page';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  deleteDoc, doc, getDoc, updateDoc,
+} from 'firebase/firestore';
+import {
+  ArrowLeft, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
+} from '@phosphor-icons/react';
+import styled, { css } from 'styled-components';
+import { motion } from 'framer-motion';
+import Page from '../../../components/Page';
 import { auth, db } from '../../../config/firebase';
 import { CollectionEnum } from '../../../utils/Firebase';
 import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../../utils/League';
 import { withDocumentIdOnObject } from '../../../utils/helpers';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
-import { ArrowLeft, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList } from '@phosphor-icons/react';
-import styled, { css } from 'styled-components';
 import { Section } from '../../../components/section/Section';
 import { theme } from '../../../theme';
 import IconButton from '../../../components/buttons/IconButton';
@@ -16,14 +21,15 @@ import ContextMenu from '../../../components/menu/ContextMenu';
 import ContextMenuOption from '../../../components/menu/ContextMenuOption';
 import { RoutesEnum } from '../../../utils/Routes';
 import { useUser } from '../../../context/UserContext';
-import { motion } from 'framer-motion';
 import TextButton from '../../../components/buttons/TextButton';
 import Button from '../../../components/buttons/Button';
 import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../utils/firebaseHelpers';
+// eslint-disable-next-line import/no-cycle
 import LeagueOverview from '../../../components/league/LeagueOverview';
 import FixturesView from '../../../components/league/FixturesView';
 import ParticipantsView from '../../../components/league/ParticipantsView';
 import EditLeagueView from '../../../components/league/EditLeagueView';
+import { errorNotify } from '../../../utils/toast/toastHelpers';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -52,9 +58,8 @@ const PredictionLeaguePage = () => {
 
   useEffect(() => {
     fetchLeagueData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
     if (!initialFetchLoading && league && currentUserId) {
       const isUserParticipant = league.participants.includes(currentUserId);
@@ -65,19 +70,18 @@ const PredictionLeaguePage = () => {
         setTabs([LeagueTabs.OVERVIEW, LeagueTabs.MATCHES, LeagueTabs.PARTICIPANTS, LeagueTabs.EDIT]);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId, initialFetchLoading, league]);
-  
+
   const fetchLeagueData = async () => {
     const docRef = doc(db, CollectionEnum.LEAGUES, leagueIdFromUrl);
     const docSnap = await getDoc(docRef);
-  
+
     if (docSnap.exists()) {
       const leagueData = withDocumentIdOnObject<PredictionLeague>(docSnap);
       setLeague(leagueData);
       setInitialFetchLoading(false);
     } else {
-      console.log("No such document!");
+      console.log('No such document!');
     }
   };
 
@@ -85,14 +89,14 @@ const PredictionLeaguePage = () => {
     if (!league) {
       console.log('No league found');
       return;
-    };
+    }
 
     if (league.creatorId !== currentUserId) {
       console.log('You are not the creator of this league');
       return;
     }
-  
-    try {      
+
+    try {
       const leagueDoc = doc(db, CollectionEnum.LEAGUES, league.documentId);
       await deleteDoc(leagueDoc);
       setContextMenuOpen(false);
@@ -109,14 +113,14 @@ const PredictionLeaguePage = () => {
     setShowJoinLeagueError('');
 
     const leagueDoc = await getLeagueByInvitationCode(league?.inviteCode ?? '');
-  
+
     if (!leagueDoc) {
       setShowJoinLeagueError('Felaktig inbjudningskod');
       return;
     }
-  
+
     const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
-  
+
     if (leagueData.participants.includes(currentUserId)) {
       setShowJoinLeagueError('Du är redan med i denna liga');
       setJoinLeagueLoading(false);
@@ -140,16 +144,17 @@ const PredictionLeaguePage = () => {
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
       correctResults: 0,
-    }
-  
+    };
+
     try {
-      await updateDoc(leagueDoc.ref, { 
+      await updateDoc(leagueDoc.ref, {
         participants: [...leagueData.participants, currentUserId],
         standings: [...leagueData.standings, newParticipantStandingsObj],
       });
       fetchLeagueData();
     } catch (e) {
       console.error(e);
+      errorNotify('Ett fel uppstod. Försök igen');
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
     }
 
@@ -176,7 +181,7 @@ const PredictionLeaguePage = () => {
       case LeagueTabs.OVERVIEW:
         return <SquaresFour size={20} color={isActive ? theme.colors.white : theme.colors.textLight} />;
       case LeagueTabs.MATCHES:
-        return <SoccerBall size={20} weight='fill' color={isActive ? theme.colors.white : theme.colors.textLight} />;
+        return <SoccerBall size={20} weight="fill" color={isActive ? theme.colors.white : theme.colors.textLight} />;
       case LeagueTabs.PARTICIPANTS:
         return <UserList size={20} color={isActive ? theme.colors.white : theme.colors.textLight} />;
       case LeagueTabs.EDIT:
@@ -187,7 +192,7 @@ const PredictionLeaguePage = () => {
   };
 
   // also add a invitation link to the league in the information section
-  
+
   const getPageContent = () => {
     if (!league) return null;
 
@@ -204,7 +209,7 @@ const PredictionLeaguePage = () => {
         );
       case LeagueTabs.MATCHES:
         return (
-          <FixturesView 
+          <FixturesView
             league={league}
             isCreator={isCreator}
             refetchLeague={fetchLeagueData}
@@ -237,19 +242,19 @@ const PredictionLeaguePage = () => {
         Alla ligor
       </TextButton>
       <PageHeader>
-        <HeadingsTypography variant='h2'>{league?.name}</HeadingsTypography>
-        <Section gap='s' flexDirection='row' alignItems='center' fitContent>
+        <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
+        <Section gap="s" flexDirection="row" alignItems="center" fitContent>
           {(isCreator || hasAdminRights) && (
             <>
-              <IconButton 
-                icon={<DotsThree size={30} />} 
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }} 
-                backgroundColor={theme.colors.primaryBleach} 
+              <IconButton
+                icon={<DotsThree size={28} />}
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                 onClick={() => setContextMenuOpen(!contextMenuOpen)}
-                shape='square'
+                // shape="circle"
+                showBorder
               />
               {contextMenuOpen && (
-                <ContextMenu positionX='right' positionY='bottom' offsetY={48 + 12} offsetX={0}>
+                <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
                   <ContextMenuOption
                     icon={<Trash size={24} color={theme.colors.red} />}
                     onClick={() => handleDeleteLeague()}
@@ -270,7 +275,7 @@ const PredictionLeaguePage = () => {
                 {tabs.map((tab) => (
                   <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
                     {getTabIcon(tab, activeTab === tab)}
-                    <EmphasisTypography variant='m' color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
+                    <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
                       {getTabText(tab)}
                     </EmphasisTypography>
                   </Tab>
@@ -278,22 +283,24 @@ const PredictionLeaguePage = () => {
               </TabsContainer>
               {getPageContent()}
             </>
-          )} 
+          )}
           {!isParticipant && currentUserId && (
-            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap='m'>
-              <HeadingsTypography variant='h5'>Vill du gå med i ligan {league?.name}?</HeadingsTypography>
+            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m">
+              <HeadingsTypography variant="h5">
+                {`Vill du gå med i ligan ${league?.name}?`}
+              </HeadingsTypography>
               <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>
                 Acceptera inbjudan
               </Button>
               {showJoinLeagueError.length > 0 && (
-                <NormalTypography variant='s' color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+                <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
               )}
             </Section>
           )}
         </PageContent>
       )}
     </Page>
-  )
+  );
 };
 
 const PageHeader = styled.div`

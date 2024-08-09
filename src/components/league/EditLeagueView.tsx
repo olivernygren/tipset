@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { updateDoc, doc } from 'firebase/firestore';
+import styled from 'styled-components';
 import { PredictionLeague } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
@@ -7,10 +9,7 @@ import Input from '../input/Input';
 import CustomDatePicker from '../input/DatePicker';
 import Button from '../buttons/Button';
 import { CollectionEnum } from '../../utils/Firebase';
-import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import styled from 'styled-components';
-import { Divider } from '../Divider';
 import Modal from '../modal/Modal';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 
@@ -28,7 +27,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [showEndLeagueConfirmationModal, setShowEndLeagueConfirmationModal] = useState(false);
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
 
-  if (!isCreator) return <></>;
+  if (!isCreator) return null;
 
   const handleUpdateLeague = async () => {
     setUpdateLoading(true);
@@ -37,7 +36,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       ...league,
       name,
       description,
-      deadlineToJoin: deadlineToJoin.toISOString()
+      deadlineToJoin: deadlineToJoin.toISOString(),
     };
 
     try {
@@ -45,9 +44,9 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       successNotify('Ligan uppdaterad');
       refetchLeague();
     } catch (error) {
-      errorNotify('Ett fel uppstod')
+      errorNotify('Ett fel uppstod');
       console.error(error);
-    };
+    }
 
     setUpdateLoading(false);
   };
@@ -55,17 +54,15 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const handleEndLeague = async () => {
     setEndLeagueLoading(true);
 
-    const updatedGameWeeks = league.gameWeeks?.map((gameWeek) => {
-      return {
-        ...gameWeek,
-        hasEnded: true
-      }
-    });
+    const updatedGameWeeks = league.gameWeeks?.map((gameWeek) => ({
+      ...gameWeek,
+      hasEnded: true,
+    }));
 
     const updatedLeague = {
       ...league,
       gameWeeks: updatedGameWeeks,
-      hasEnded: true
+      hasEnded: true,
     };
 
     try {
@@ -73,59 +70,62 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       refetchLeague();
       setShowEndLeagueConfirmationModal(false);
     } catch (error) {
-      errorNotify('Ett fel uppstod')
+      errorNotify('Ett fel uppstod');
       console.error(error);
-    };
+    }
 
     setEndLeagueLoading(false);
-  }
+  };
 
   return (
     <>
       <Section
         backgroundColor={theme.colors.white}
         padding={theme.spacing.m}
-        gap='m'
+        gap="m"
         borderRadius={theme.borderRadius.m}
       >
-        <HeadingsTypography variant='h4'>Redigera liga</HeadingsTypography>
+        <HeadingsTypography variant="h4">Redigera liga</HeadingsTypography>
         <InputContainer>
           <Input
-            label='Namn'
+            label="Namn"
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
           />
           <Input
-            label='Beskrivning'
+            label="Beskrivning"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
           />
           <CustomDatePicker
-            label='Deadline att gå med'
+            label="Deadline att gå med"
             selectedDate={deadlineToJoin}
             onChange={(date) => setDeadlineToJoin(date!)}
             fullWidth
           />
         </InputContainer>
         <Button
-          variant='primary'
+          variant="primary"
           onClick={handleUpdateLeague}
           loading={updateLoading}
           disabled={name.length === 0}
         >
           Spara
         </Button>
-        <Divider />
-        <HeadingsTypography variant='h4'>Avsluta liga</HeadingsTypography>
-        <NormalTypography variant='m'>Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng.</NormalTypography>
-        <Button
-          color='red'
-          onClick={() => setShowEndLeagueConfirmationModal(true)}
-        >
-          Avsluta liga
-        </Button>
+        <EndLeagueContainer>
+          <Section gap="xxs">
+            <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
+            <NormalTypography variant="m" color={theme.colors.silverDark}>Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng.</NormalTypography>
+          </Section>
+          <Button
+            color="red"
+            onClick={() => setShowEndLeagueConfirmationModal(true)}
+          >
+            Avsluta liga
+          </Button>
+        </EndLeagueContainer>
       </Section>
       {showEndLeagueConfirmationModal && (
         <Modal
@@ -133,18 +133,18 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
           onClose={() => setShowEndLeagueConfirmationModal(false)}
           title="Dags att avsluta ligan?"
         >
-          <NormalTypography variant='m'>Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
-          <Section gap='xs' flexDirection='row' alignItems='center'>
+          <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
+          <Section gap="xs" flexDirection="row" alignItems="center">
             <Button
-              variant='secondary'
+              variant="secondary"
               onClick={() => setShowEndLeagueConfirmationModal(false)}
               fullWidth
             >
               Avbryt
             </Button>
             <Button
-              variant='primary'
-              color='red'
+              variant="primary"
+              color="red"
               onClick={handleEndLeague}
               fullWidth
               loading={endLeagueLoading}
@@ -155,7 +155,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
         </Modal>
       )}
     </>
-  )
+  );
 };
 
 const InputContainer = styled.div`
@@ -170,6 +170,18 @@ const InputContainer = styled.div`
     width: 100%;
     box-sizing: border-box;
   }
+`;
+
+const EndLeagueContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: ${theme.borderRadius.l};
+  border: 1px solid ${theme.colors.silverLight};
+  padding: ${theme.spacing.s};
+  background-color: ${theme.colors.silverBleach};
+  align-items: center;
 `;
 
 export default EditLeagueView;

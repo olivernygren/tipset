@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import {
+  addDoc, collection, deleteDoc, getDocs, doc,
+} from 'firebase/firestore';
+import { Trash } from '@phosphor-icons/react';
 import { Divider } from '../../components/Divider';
 import Page from '../../components/Page';
 import Button from '../../components/buttons/Button';
@@ -9,13 +13,15 @@ import Select from '../../components/input/Select';
 import { Section } from '../../components/section/Section';
 import { HeadingsTypography, NormalTypography, EmphasisTypography } from '../../components/typography/Typography';
 import { theme } from '../../theme';
-import { Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById } from '../../utils/Players';
-import { addDoc, collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
+import {
+  Player, getPlayersByGeneralPosition, GeneralPositionEnum, getPlayerById,
+} from '../../utils/Players';
 import { auth, db } from '../../config/firebase';
 import { PredictionLeague, CreatePredictionLeagueInput } from '../../utils/League';
 import IconButton from '../../components/buttons/IconButton';
-import { Trash } from '@phosphor-icons/react';
-import { defenderGoalPoints, forwardGoalPoints, generateLeagueInviteCode, midfielderGoalPoints, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
+import {
+  defenderGoalPoints, forwardGoalPoints, generateLeagueInviteCode, midfielderGoalPoints, withDocumentIdOnObjectsInArray,
+} from '../../utils/helpers';
 import { CollectionEnum } from '../../utils/Firebase';
 
 const TestPage = () => {
@@ -36,8 +42,8 @@ const TestPage = () => {
   const fetchLeagues = async () => {
     try {
       const data = await getDocs(leagueCollectionRef);
-      const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
-      setLeagues(leagues);
+      const leaguesData = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
+      setLeagues(leaguesData);
     } catch (e) {
       console.error(e);
     }
@@ -53,11 +59,11 @@ const TestPage = () => {
     }
 
     let totalPoints: number = 0;
-    let correctPredictions: Array<{ prediction: string, pointsGained: number }> = [];
+    const correctPredictions: Array<{ prediction: string, pointsGained: number }> = [];
 
     const correctHomeGoals = homeGoals === resultHomeGoals;
     const correctAwayGoals = awayGoals === resultAwayGoals;
-    
+
     const predictedGoalDifference = parseInt(homeGoals) - parseInt(awayGoals);
     const actualGoalDifference = parseInt(resultHomeGoals) - parseInt(resultAwayGoals);
     const correctGoalDifference = predictedGoalDifference === actualGoalDifference;
@@ -86,7 +92,7 @@ const TestPage = () => {
       totalPoints += 1;
       correctPredictions.push({ prediction: 'Oavgjort', pointsGained: 1 });
     }
-    
+
     if (correctHomeGoals) {
       console.log('correct home goals, + 1');
       totalPoints += 1;
@@ -98,7 +104,7 @@ const TestPage = () => {
       totalPoints += 1;
       correctPredictions.push({ prediction: 'Antal mål av bortalaget', pointsGained: 1 });
     }
-    
+
     if (correctGoalDifference) {
       console.log('correct goal difference, + 1');
       totalPoints += 1;
@@ -125,12 +131,10 @@ const TestPage = () => {
     setCorrectPlayerPrediction(false);
   };
 
-  const getOptionItem = (player: Player) => {
-    return {
-      value: player.id,
-      label: player.name,
-    }
-  }
+  const getOptionItem = (player: Player) => ({
+    value: player.id,
+    label: player.name,
+  });
 
   const getOptionGroups = () => {
     const defenders = getPlayersByGeneralPosition(GeneralPositionEnum.DF);
@@ -140,18 +144,18 @@ const TestPage = () => {
     return [
       {
         label: `Försvarare (${defenderGoalPoints}p)`,
-        options: defenders.map(getOptionItem)
+        options: defenders.map(getOptionItem),
       },
       {
         label: `Mittfältare (${midfielderGoalPoints}p)`,
-        options: midfielders.map(getOptionItem)
+        options: midfielders.map(getOptionItem),
       },
       {
         label: `Anfallare (${forwardGoalPoints}p)`,
-        options: forwards.map(getOptionItem)
-      }
-    ]
-  }
+        options: forwards.map(getOptionItem),
+      },
+    ];
+  };
 
   const getPlayerToScorePoints = () => {
     if (!predictedPlayerToScore) return 0;
@@ -166,7 +170,7 @@ const TestPage = () => {
       default:
         return 0;
     }
-  }
+  };
 
   const handleCreateLeague = async () => {
     if (newLeagueName.length === 0) return;
@@ -184,8 +188,8 @@ const TestPage = () => {
       invitedUsers: [],
       standings: [],
       deadlineToJoin: oneMonthFromNow.toISOString(),
-      hasEnded: false
-    }
+      hasEnded: false,
+    };
 
     try {
       await addDoc(leagueCollectionRef, newLeague);
@@ -200,99 +204,99 @@ const TestPage = () => {
     console.log(leagueDoc);
     await deleteDoc(leagueDoc);
     fetchLeagues();
-  }
+  };
 
   return (
-    <Page user={undefined}>
+    <Page>
       <Wrapper>
-        <Section gap='s' backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
-          <HeadingsTypography variant='h3'>Dina ligor</HeadingsTypography>
+        <Section gap="s" backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
+          <HeadingsTypography variant="h3">Dina ligor</HeadingsTypography>
           {leagues.length > 0 && (
-            <Section gap='s'>
+            <Section gap="s">
               {leagues.map((league) => (
-                <Section key={league.documentId} gap='xxxs' flexDirection='row' alignItems='center'>
-                  <NormalTypography variant='m'>{league.name}</NormalTypography>
-                  <IconButton icon={<Trash size={24}/>} colors={{normal: theme.colors.primary}} onClick={() => handleDeleteLeague(league.documentId)} />
+                <Section key={league.documentId} gap="xxxs" flexDirection="row" alignItems="center">
+                  <NormalTypography variant="m">{league.name}</NormalTypography>
+                  <IconButton icon={<Trash size={24} />} colors={{ normal: theme.colors.primary }} onClick={() => handleDeleteLeague(league.documentId)} />
                 </Section>
               ))}
             </Section>
           )}
         </Section>
-        <Section gap='s' backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
-          <HeadingsTypography variant='h3'>Skapa liga</HeadingsTypography>
-          <Input 
-            placeholder='Liganamn'
+        <Section gap="s" backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.l}>
+          <HeadingsTypography variant="h3">Skapa liga</HeadingsTypography>
+          <Input
+            placeholder="Liganamn"
             value={newLeagueName}
             onChange={(e) => setNewLeagueName(e.currentTarget.value)}
           />
-          <Button variant='primary' onClick={handleCreateLeague}>
+          <Button variant="primary" onClick={handleCreateLeague}>
             Skapa liga
           </Button>
         </Section>
-        <Section 
+        <Section
           backgroundColor={theme.colors.white}
           padding={theme.spacing.m}
           borderRadius={theme.borderRadius.l}
-          gap='m'
+          gap="m"
         >
-          <HeadingsTypography variant='h4'>Nästa match</HeadingsTypography>
-          <Select 
+          <HeadingsTypography variant="h4">Nästa match</HeadingsTypography>
+          <Select
             options={[]}
             optionGroups={getOptionGroups()}
             value={predictedPlayerToScore?.id || ''}
             onChange={(value) => setPredictedPlayerToScore(getPlayerById(value))}
           />
           <MatchContainer>
-            <NormalTypography variant='m'>Arsenal</NormalTypography>
+            <NormalTypography variant="m">Arsenal</NormalTypography>
             <Input
               value={homeGoals}
               onChange={(e) => setHomeGoals(e.currentTarget.value)}
-              placeholder='0'
-              maxWidth='50px'
-              textAlign='center'
-              fontSize='30px'
-              fontWeight='600'
+              placeholder="0"
+              maxWidth="50px"
+              textAlign="center"
+              fontSize="30px"
+              fontWeight="600"
             />
             <Input
               value={awayGoals}
               onChange={(e) => setAwayGoals(e.currentTarget.value)}
-              placeholder='0'
-              maxWidth='50px'
-              textAlign='center'
-              fontSize='30px'
-              fontWeight='600'
+              placeholder="0"
+              maxWidth="50px"
+              textAlign="center"
+              fontSize="30px"
+              fontWeight="600"
             />
-            <NormalTypography variant='m'>Tottenham</NormalTypography>
+            <NormalTypography variant="m">Tottenham</NormalTypography>
           </MatchContainer>
           {/* ============================================================================================================ */}
           <Divider />
-          <HeadingsTypography variant='h4'>Verkligt resultat</HeadingsTypography>
+          <HeadingsTypography variant="h4">Verkligt resultat</HeadingsTypography>
           <MatchContainer>
-            <NormalTypography variant='m'>Arsenal</NormalTypography>
+            <NormalTypography variant="m">Arsenal</NormalTypography>
             <Input
               value={resultHomeGoals}
               onChange={(e) => setResultHomeGoals(e.currentTarget.value)}
-              placeholder='0'
-              maxWidth='50px'
-              textAlign='center'
-              fontSize='30px'
-              fontWeight='600'
+              placeholder="0"
+              maxWidth="50px"
+              textAlign="center"
+              fontSize="30px"
+              fontWeight="600"
             />
             <Input
               value={resultAwayGoals}
               onChange={(e) => setResultAwayGoals(e.currentTarget.value)}
-              placeholder='0'
-              maxWidth='50px'
-              textAlign='center'
-              fontSize='30px'
-              fontWeight='600'
+              placeholder="0"
+              maxWidth="50px"
+              textAlign="center"
+              fontSize="30px"
+              fontWeight="600"
             />
-            <NormalTypography variant='m'>Tottenham</NormalTypography>
+            <NormalTypography variant="m">Tottenham</NormalTypography>
           </MatchContainer>
-          <Checkbox 
-            checked={correctPlayerPrediction} 
+          <Checkbox
+            checked={correctPlayerPrediction}
             onChange={(wasChecked) => setCorrectPlayerPrediction(wasChecked)}
-            label='Rätt målskytt'
+            label="Rätt målskytt"
           />
           <Divider />
           <Button
@@ -300,28 +304,31 @@ const TestPage = () => {
           >
             Räkna poäng
           </Button>
-          <EmphasisTypography variant='m'>Totala poäng för matchen: {points}</EmphasisTypography>
+          <EmphasisTypography variant="m">
+            Totala poäng för matchen:
+            {points}
+          </EmphasisTypography>
           {correctPredictionPoints.length > 0 && (
             <Section>
               {correctPredictionPoints.map((correctPrediction) => (
-                <Section gap='xs' flexDirection='row'>
-                  <NormalTypography variant='m'>{correctPrediction.prediction}</NormalTypography>
-                  <EmphasisTypography variant='m'>{correctPrediction.pointsGained}</EmphasisTypography>
+                <Section gap="xs" flexDirection="row">
+                  <NormalTypography variant="m">{correctPrediction.prediction}</NormalTypography>
+                  <EmphasisTypography variant="m">{correctPrediction.pointsGained}</EmphasisTypography>
                 </Section>
               ))}
             </Section>
           )}
           <Button
             onClick={handleResetAll}
-            variant='secondary'
+            variant="secondary"
           >
             Återställ
           </Button>
         </Section>
       </Wrapper>
     </Page>
-  )
-}
+  );
+};
 
 const Wrapper = styled.div`
   display: flex;

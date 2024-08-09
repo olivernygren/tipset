@@ -1,26 +1,22 @@
-import React from 'react'
+import React from 'react';
 import styled from 'styled-components';
 import { devices, theme } from '../theme';
 import RootToast from './toast/RootToast';
 
 interface PageProps {
   children: React.ReactNode;
-  user?: any;
-  noPadding?: boolean;
 }
 
-const Page = ({ children, user, noPadding }: PageProps) => {
-  return (
-    <>
-      <Root>
-        <Content>
-          {children}
-        </Content>
-      </Root>
-      <RootToast />
-    </>
-  )
-}
+const Page = ({ children }: PageProps) => (
+  <>
+    <Root>
+      <Content>
+        {children}
+      </Content>
+    </Root>
+    <RootToast />
+  </>
+);
 
 const Root = styled.div<{ noPadding?: boolean }>`
   padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.m)};
@@ -41,4 +37,4 @@ const Content = styled.div`
   margin: 0 auto;
 `;
 
-export default Page
+export default Page;

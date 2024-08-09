@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
-import { List, SignOut, UserCircle } from '@phosphor-icons/react';
+import {
+  List, SignOut, User,
+} from '@phosphor-icons/react';
 import Cookies from 'js-cookie';
 import { devices, theme } from '../../theme';
-import { EmphasisTypography } from '../typography/Typography';
+import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
 import { RoutesEnum } from '../../utils/Routes';
 import { auth } from '../../config/firebase';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
-import { Divider } from '../Divider';
 import MobileMenu from './MobileMenu';
 
 const Header = () => {
-  const { hasAdminRights, user } = useUser();
+  const { user } = useUser();
 
   const hasUserCookie = Cookies.get('user');
 
@@ -45,46 +46,48 @@ const Header = () => {
           </InvisibleLink>
           <DesktopNav>
             <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
-              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Ligor</EmphasisTypography>
+              <NormalTypography variant="m" color={theme.colors.textDefault}>Ligor</NormalTypography>
+              {window && window.location.href.includes(RoutesEnum.LEAGUES) && <ActiveLinkIndicator />}
             </StyledNavLink>
             <StyledNavLink href={`/${RoutesEnum.RULES}`}>
-              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Regler</EmphasisTypography>
+              <NormalTypography variant="m" color={theme.colors.textDefault}>Regler</NormalTypography>
+              {window && window.location.href.includes(RoutesEnum.RULES) && <ActiveLinkIndicator />}
             </StyledNavLink>
-            <StyledNavLink href={`/${RoutesEnum.RULES}`}>
-              <EmphasisTypography variant="m" color={theme.colors.textDefault}>Hur funkar det?</EmphasisTypography>
+            <StyledNavLink href={`/${RoutesEnum.HOW_TO_PLAY}`}>
+              <NormalTypography variant="m" color={theme.colors.textDefault}>Hur funkar det?</NormalTypography>
+              {window && window.location.href.includes(RoutesEnum.HOW_TO_PLAY) && <ActiveLinkIndicator />}
             </StyledNavLink>
+          </DesktopNav>
+          <RightSideItems>
             {isSignedIn && (
-            <EmphasisTypography variant="m" color={theme.colors.textLight}>{user?.email ?? '?'}</EmphasisTypography>
+              <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography>
+              // <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
             )}
-            <Divider vertical />
             {isSignedIn && (
-            <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
-              <IconButton
-                icon={<UserCircle size={32} color={theme.colors.primary} />}
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                onClick={() => {}}
-                title="Profil"
-              />
-            </InvisibleLink>
-            )}
-            {hasAdminRights && (
-            <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
-              <Button variant="secondary" size="m">Admin</Button>
-            </InvisibleLink>
+              <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
+                <IconButton
+                  icon={<User size={24} weight="light" />}
+                  colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                  onClick={() => {}}
+                  title="Profil"
+                  showBorder
+                />
+              </InvisibleLink>
             )}
             {isSignedIn ? (
               <IconButton
-                icon={<SignOut size={32} color={theme.colors.primary} />}
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                icon={<SignOut size={24} weight="light" />}
+                colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                 onClick={handleSignOut}
                 title="Logga ut"
+                showBorder
               />
             ) : (
               <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
                 <Button variant="primary" size="m">Logga in</Button>
               </InvisibleLink>
             )}
-          </DesktopNav>
+          </RightSideItems>
           <MobileMenuButton>
             <IconButton
               icon={<List size={32} />}
@@ -108,7 +111,7 @@ const Header = () => {
 
 const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
-  border-bottom: 1px solid ${theme.colors.silver};
+  border-bottom: 1px solid ${theme.colors.silverLight};
   padding: 0 ${theme.spacing.l};
   width: 100vw;
   height: 80px;
@@ -117,7 +120,8 @@ const StyledHeader = styled.header`
 
 const Content = styled.div`
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   justify-content: space-between;
   height: 100%;
@@ -138,8 +142,13 @@ const LogoImageContainer = styled.div`
 
 const StyledNavLink = styled.a`
   text-decoration: none;
-  padding: ${theme.spacing.s};
+  padding: 0 ${theme.spacing.s};
   border-radius: ${theme.borderRadius.m};
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+
   > span {
     &:hover {
       color: ${theme.colors.primaryDark};
@@ -165,9 +174,29 @@ const DesktopNav = styled.div`
     display: flex;
     gap: ${theme.spacing.s};
     align-items: center;
-    width: fit-content;
-    height: 40px;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
+`;
+
+const RightSideItems = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: ${theme.spacing.s};
+`;
+
+const ActiveLinkIndicator = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 4px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  background-color: ${theme.colors.primary};
 `;
 
 export default React.memo(Header);
