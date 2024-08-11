@@ -1,5 +1,8 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 export interface Team {
   name: string;
+  shortName?: string;
   logoUrl: string;
   relativeLogoUrl?: string;
   stadium?: string;
@@ -11,22 +14,21 @@ export enum LeagueEnum {
   LA_LIGA = 'La Liga',
   SERIE_A = 'Serie A',
   BUNDESLIGA = 'Bundesliga',
+  BUNDESLIGA_2 = '2. Bundesliga',
   LIGUE_1 = 'Ligue 1',
   EREDIVISIE = 'Eredivisie',
   PRIMEIRA_LIGA = 'Primeira Liga',
   NATIONS = 'Landslag',
 }
 
-export const getTeamByNameAndLeague = (teamName: string, league: string) => {
-  return Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
-}
+export const getTeamByNameAndLeague = (teamName: string, league: string) => Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
 
 export const getTeamByName = (teamName: string): Team | undefined => {
   for (const league in Teams) {
     const team = Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
     if (team) return team;
   }
-}
+};
 
 export const Teams = {
   [LeagueEnum.PREMIER_LEAGUE]: [
@@ -47,11 +49,13 @@ export const Teams = {
     },
     {
       name: 'Manchester City',
+      shortName: 'Man City',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
       stadium: 'Etihad Stadium',
     },
     {
       name: 'Manchester United',
+      shortName: 'Man United',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
       stadium: 'Old Trafford',
     },
@@ -97,6 +101,7 @@ export const Teams = {
     },
     {
       name: 'Crystal Palace',
+      shortName: 'C. Palace',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg',
       stadium: 'Selhurst Park',
     },
@@ -112,6 +117,7 @@ export const Teams = {
     },
     {
       name: 'Nottingham Forest',
+      shortName: 'N. Forest',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg',
       stadium: 'City Ground',
     },
@@ -139,11 +145,13 @@ export const Teams = {
     },
     {
       name: 'Hammarby IF',
+      shortName: 'Hammarby',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Hammarby_IF_logo.svg/1920px-Hammarby_IF_logo.svg.png',
       stadium: 'Tele2 Arena',
     },
     {
       name: 'Malmö FF',
+      shortName: 'Malmö',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Malmo_FF_logo.svg',
       stadium: 'Eleda Stadion',
     },
@@ -159,21 +167,25 @@ export const Teams = {
     },
     {
       name: 'IFK Norrköping',
+      shortName: 'Norrköping',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/IFK_Norrkoping_logo.svg',
       stadium: 'PlatinumCars Arena',
     },
     {
       name: 'BK Häcken',
+      shortName: 'Häcken',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5d/BK_Hacken_logo.svg',
       stadium: 'Bravida Arena',
     },
     {
       name: 'IFK Värnamo',
+      shortName: 'Värnamo',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/IFK_Varnamo_logo.svg',
       stadium: 'Finnvedsvallen',
     },
     {
       name: 'Kalmar FF',
+      shortName: 'Kalmar',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/af/Kalmar_FF_logo.svg',
       stadium: 'Guldfågeln Arena',
     },
@@ -189,6 +201,7 @@ export const Teams = {
     },
     {
       name: 'Västerås SK',
+      shortName: 'Västerås',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Vasteras_SK_logo.svg',
       stadium: 'Hitachi Energy Arena',
     },
@@ -199,19 +212,22 @@ export const Teams = {
     },
     {
       name: 'Halmstad BK',
+      shortName: 'Halmstad',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/66/Halmstad_BK_logo.svg',
       stadium: 'Örjans Vall',
     },
     {
       name: 'IK Sirius',
+      shortName: 'Sirius',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/IK_Sirius_logo.svg',
       stadium: 'Studenternas IP',
     },
     {
       name: 'Brommapojkarna',
+      shortName: 'BP',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/20/IF_Brommapojkarna_logo.svg',
       stadium: 'Grimsta IP',
-    }
+    },
   ],
   [LeagueEnum.LA_LIGA]: [
     {
@@ -221,11 +237,13 @@ export const Teams = {
     },
     {
       name: 'FC Barcelona',
+      shortName: 'Barcelona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg',
       stadium: 'Camp Nou',
     },
     {
       name: 'Atletico Madrid',
+      shortName: 'Atl. Madrid',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Atletico_Madrid_Logo_2024.svg',
       stadium: 'Wanda Metropolitano',
     },
@@ -256,6 +274,7 @@ export const Teams = {
     },
     {
       name: 'Athletic Bilbao',
+      shortName: 'Ath. Bilbao',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg',
       stadium: 'Estadio San Mamés',
     },
@@ -305,43 +324,93 @@ export const Teams = {
       name: 'Bologna',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg',
       stadium: 'Stadio Renato Dall\'Ara',
-    }
+    },
   ],
   [LeagueEnum.BUNDESLIGA]: [
     {
       name: 'Bayern München',
+      shortName: 'FC Bayern',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg',
       stadium: 'Allianz Arena',
     },
     {
       name: 'Borussia Dortmund',
+      shortName: 'Dortmund',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
       stadium: 'Signal Iduna Park',
     },
     {
       name: 'RB Leipzig',
+      shortName: 'Leipzig',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg',
       stadium: 'Red Bull Arena',
     },
     {
       name: 'Bayer Leverkusen',
+      shortName: 'Leverkusen',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg',
       stadium: 'BayArena',
     },
     {
       name: 'Eintracht Frankfurt',
+      shortName: 'Frankfurt',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
       stadium: 'Deutsche Bank Park',
     },
     {
       name: 'VfB Stuttgart',
+      shortName: 'Stuttgart',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/VfB_Stuttgart_1893_Logo.svg',
       stadium: 'Mercedes-Benz Arena',
+    },
+  ],
+  [LeagueEnum.BUNDESLIGA_2]: [
+    {
+      name: 'Hamburger SV',
+      shortName: 'Hamburg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Hamburger_SV_logo.svg',
+      stadium: 'Volksparkstadion',
+    },
+    {
+      name: 'Schalke 04',
+      shortName: 'Schalke',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/FC_Schalke_04_Logo.svg',
+      stadium: 'Veltins-Arena',
+    },
+    {
+      name: '1. FC Köln',
+      shortName: 'Köln',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/01/1._FC_Koeln_Logo_2014%E2%80%93.svg',
+      stadium: 'RheinEnergieStadion',
+    },
+    {
+      name: 'Düsseldorf',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Fortuna_D%C3%BCsseldorf.png',
+      stadium: 'Merkur Spiel-Arena',
+    },
+    {
+      name: 'Hertha Berlin',
+      shortName: 'Hertha BSC',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Hertha_BSC_Logo_2012.svg',
+      stadium: 'Olympiastadion',
+    },
+    {
+      name: 'Hannover 96',
+      shortName: 'Hannover',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Hannover_96_Logo.svg',
+      stadium: 'Niedersachsenstadion',
+    },
+    {
+      name: '1. FC Nürnberg',
+      shortName: 'Nürnberg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/1._FC_N%C3%BCrnberg_logo.svg',
+      stadium: 'Max-Morlock-Stadion',
     },
   ],
   [LeagueEnum.LIGUE_1]: [
     {
       name: 'Paris Saint-Germain',
+      shortName: 'PSG',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
       stadium: 'Parc des Princes',
     },
@@ -467,6 +536,6 @@ export const Teams = {
     {
       name: 'Norge',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
-    }
-  ]
+    },
+  ],
 };

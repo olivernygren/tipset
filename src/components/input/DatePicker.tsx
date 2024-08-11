@@ -1,11 +1,12 @@
-import DatePicker, { registerLocale } from "react-datepicker";
+import React from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { sv } from 'date-fns/locale';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
+import styled from 'styled-components';
+import { Calendar } from '@phosphor-icons/react';
 import { Section } from '../section/Section';
 import { EmphasisTypography } from '../typography/Typography';
 import { theme } from '../../theme';
-import styled from 'styled-components';
-import { Calendar } from '@phosphor-icons/react';
 
 interface CustomDatePickerProps {
   selectedDate: Date;
@@ -17,32 +18,34 @@ interface CustomDatePickerProps {
   fullWidth?: boolean;
 }
 
-const CustomDatePicker = ({ selectedDate, onChange, includeTime = true, label, inline, disabled, fullWidth }: CustomDatePickerProps) => {
+const CustomDatePicker = ({
+  selectedDate, onChange, includeTime = true, label, inline, disabled, fullWidth,
+}: CustomDatePickerProps) => {
   registerLocale('sv', sv);
 
   return (
-    <Section gap='xxs'>
+    <Section gap="xxs">
       {label && (
-        <EmphasisTypography variant='s'>{label}</EmphasisTypography>
+        <EmphasisTypography variant="s">{label}</EmphasisTypography>
       )}
       <DatePickerWrapper fullWidth={fullWidth}>
-        <DatePicker 
+        <DatePicker
           selected={selectedDate}
           onSelect={(date) => onChange(date)}
           onChange={(date) => onChange(date)}
           showTimeSelect={includeTime}
           dateFormat={includeTime ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd'}
-          locale={'sv'}
+          locale="sv"
           calendarStartDay={1}
           timeIntervals={5}
-          timeCaption='Tid'
-          timeFormat='HH:mm'
+          timeCaption="Tid"
+          timeFormat="HH:mm"
           inline={inline}
           disabled={disabled}
           disabledKeyboardNavigation
           minDate={new Date()}
         />
-        <Calendar size={24} color={theme.colors.textLight} />
+        <Calendar size={24} color={theme.colors.silverDark} />
       </DatePickerWrapper>
     </Section>
   );
@@ -52,18 +55,18 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
   border: 1px solid #ccc;
   border-radius: ${theme.borderRadius.s};
   padding-right: ${theme.spacing.xs};
   box-sizing: border-box;
 
   .react-datepicker-wrapper {
-    width: ${({ fullWidth }) => fullWidth ? '100%' : 'auto'};
+    width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   }
 
   .react-datepicker__input-container {
-    width: ${({ fullWidth }) => fullWidth ? '100%' : 'auto'};
+    width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
 
     > input {
       padding: ${theme.spacing.xxs} ${theme.spacing.xs};
@@ -76,7 +79,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
       box-sizing: border-box;
       color: ${theme.colors.textDefault};
       height: 48px;
-      width: ${({ fullWidth }) => fullWidth ? '100%' : 'auto'};
+      width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
     }
   }
 

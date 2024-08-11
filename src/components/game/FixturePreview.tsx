@@ -1,13 +1,14 @@
-import React from 'react'
+import React from 'react';
+import styled from 'styled-components';
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { Section } from '../section/Section';
-import styled from 'styled-components';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { NormalTypography } from '../typography/Typography';
 import TextButton from '../buttons/TextButton';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface FixturePreviewProps {
   fixture: Fixture;
@@ -15,105 +16,146 @@ interface FixturePreviewProps {
   hasBeenCorrected?: boolean;
   onShowPredictionsClick?: () => void;
   simple?: boolean;
-};
+}
 
-const FixturePreview = ({ fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple }: FixturePreviewProps) => {
-  const getFormattedKickoffTime = (kickoffTime: string) => {
+const FixturePreview = ({
+  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple,
+}: FixturePreviewProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  // const getFormattedKickoffTime = (kickoffTime: string) => {
+  //   const date = new Date(kickoffTime);
+  //   const day = date.getDate();
+  //   const month = date.getMonth() + 1;
+  //   const hours = date.getHours();
+  //   const minutes = date.getMinutes();
+  //   return `${day}/${month} | ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+  // };
+
+  const getKickoffDate = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
     const day = date.getDate();
-    const month = date.getMonth() + 1;
+    const month = date.toLocaleDateString('sv-SE', { month: 'short' }).replaceAll('.', '');
+    return `${day} ${month}`;
+  };
+
+  const getKickoffTime = (kickoffTime: string) => {
+    const date = new Date(kickoffTime);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    return `${day}/${month} | ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   };
 
   return (
-    <Section 
-      flexDirection='row' 
-      justifyContent={hidePredictions || simple ? 'flex-start' : 'space-between'} 
-      alignItems='center' 
-      gap='s' 
+    <Section
+      flexDirection="row"
+      justifyContent={hidePredictions || simple ? 'flex-start' : 'space-between'}
+      alignItems="center"
+      gap="s"
       backgroundColor={theme.colors.silverLighter}
       borderRadius={theme.borderRadius.s}
     >
-      <Teams showPrediction={!hidePredictions} simple={simple}>
+      <Teams showPrediction={!hidePredictions}>
         <TeamContainer>
           {fixture.teamType === TeamType.CLUBS ? (
             <ClubAvatar
               logoUrl={fixture.homeTeam.logoUrl}
               clubName={fixture.homeTeam.name}
-              size={AvatarSize.S}
+              size={isMobile ? AvatarSize.XS : AvatarSize.S}
             />
           ) : (
             <NationAvatar
               flagUrl={fixture.homeTeam.logoUrl}
               nationName={fixture.homeTeam.name}
-              size={AvatarSize.S}
+              size={isMobile ? AvatarSize.XS : AvatarSize.S}
             />
           )}
-          <NormalTypography variant='m'>{fixture.homeTeam.name}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.name}</NormalTypography>
         </TeamContainer>
-        <NormalTypography variant='s' color={theme.colors.textLight}>vs</NormalTypography>
-        <TeamContainer>
-          <NormalTypography variant='m'>{fixture.awayTeam.name}</NormalTypography>
+        {!isMobile && (
+          <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
+        )}
+        <TeamContainer reverse={isMobile}>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.name}</NormalTypography>
           {fixture.teamType === TeamType.CLUBS ? (
             <ClubAvatar
               logoUrl={fixture.awayTeam.logoUrl}
               clubName={fixture.awayTeam.name}
-              size={AvatarSize.S}
+              size={isMobile ? AvatarSize.XS : AvatarSize.S}
             />
           ) : (
             <NationAvatar
               flagUrl={fixture.awayTeam.logoUrl}
               nationName={fixture.awayTeam.name}
-              size={AvatarSize.S}
+              size={isMobile ? AvatarSize.XS : AvatarSize.S}
             />
           )}
         </TeamContainer>
       </Teams>
       {hasBeenCorrected && (
         <RightAligned>
-          <NormalTypography variant='m' color={theme.colors.silverDarker}>Rättad</NormalTypography>
+          <NormalTypography variant="m" color={theme.colors.silverDarker}>Rättad</NormalTypography>
         </RightAligned>
       )}
       {!hidePredictions && !hasBeenCorrected && (
         <RightAligned>
-          <TextButton color='primaryDark' onClick={onShowPredictionsClick}>
+          <TextButton color="primaryDark" onClick={onShowPredictionsClick}>
             Se allas tips
           </TextButton>
         </RightAligned>
       )}
       {!hasBeenCorrected && hidePredictions && (
         <KickoffTime>
-          <NormalTypography variant='m' color={theme.colors.silverDarker}>{getFormattedKickoffTime(fixture.kickOffTime)}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primary}>{getKickoffDate(fixture.kickOffTime)}</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.silverDark}>{getKickoffTime(fixture.kickOffTime)}</NormalTypography>
         </KickoffTime>
       )}
     </Section>
-  )
+  );
 };
 
-const Teams = styled.div<{ showPrediction: boolean, simple?: boolean }>`
+const Teams = styled.div<{ showPrediction: boolean }>`
   display: flex;
-  align-items: center;
-  gap: ${theme.spacing.s};
+  flex-direction: column;
+  padding: ${theme.spacing.xxxs};
   flex: 1;
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: ${theme.spacing.s};
+    min-height: 48px;
+  }
 `;
 
-const TeamContainer = styled.div`
+const TeamContainer = styled.div<{ reverse?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xxxs};
   width: fit-content;
   white-space: nowrap;
+  flex-direction: ${({ reverse }) => (reverse ? 'row-reverse' : 'row')};
+  
+  @media ${devices.tablet} {
+    gap: 0;
+  }
 `;
 
 const KickoffTime = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100%;
   width: fit-content;
-  white-space: nowrap;
-  margin-right: ${theme.spacing.xxs};
-  margin-left: auto;
+  padding: 0 ${theme.spacing.xxs};
+  gap: ${theme.spacing.xxxs};
+  border-left: 1px solid ${theme.colors.silverLight};
+
+  @media ${devices.tablet} {
+    gap: 0;
+  }
 `;
 
 const RightAligned = styled.div`

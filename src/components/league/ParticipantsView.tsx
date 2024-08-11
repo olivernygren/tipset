@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { XCircle } from '@phosphor-icons/react';
+import { Crown, XCircle } from '@phosphor-icons/react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Section } from '../section/Section';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { PredictionLeague } from '../../utils/League';
 import UserName, { UserEmail } from '../typography/UserName';
@@ -13,6 +13,7 @@ import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface ParticipantsViewProps {
   league: PredictionLeague;
@@ -22,6 +23,7 @@ interface ParticipantsViewProps {
 
 const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsViewProps) => {
   const { user, hasAdminRights } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState<string | null>(null);
@@ -61,24 +63,32 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
       >
         <HeadingsTypography variant="h4">Deltagare</HeadingsTypography>
         <TableHeader>
-          <EmphasisTypography variant="s" color={theme.colors.silverDarker}>Namn</EmphasisTypography>
-          <EmphasisTypography variant="s" color={theme.colors.silverDarker}>Email</EmphasisTypography>
-          <EmphasisTypography variant="s" color={theme.colors.silverDarker}>ID</EmphasisTypography>
+          <EmphasisTypography variant="s" color={theme.colors.silverDark}>Namn</EmphasisTypography>
+          <EmphasisTypography variant="s" color={theme.colors.silverDark}>Email</EmphasisTypography>
+          {!isMobile && (
+            <EmphasisTypography variant="s" color={theme.colors.silverDark}>ID</EmphasisTypography>
+          )}
           <EmptyCell />
         </TableHeader>
         <Section gap="xxs">
           {league.participants.map((participantId) => (
             <TableRow key={participantId}>
-              <EmphasisTypography variant="m">
-                <UserName userId={participantId} />
-                {participantId === league.creatorId && ' (Skapare)'}
-              </EmphasisTypography>
+              <Section alignItems="center" flexDirection="row" gap="xxs" fitContent>
+                {league.creatorId === participantId && (
+                  <Crown weight="fill" size={24} color={theme.colors.gold} />
+                )}
+                <NoWrapTypography variant="m">
+                  <UserName userId={participantId} />
+                </NoWrapTypography>
+              </Section>
               <NormalTypography variant="m">
                 <UserEmail userId={participantId} />
               </NormalTypography>
-              <NormalTypography variant="s" color={theme.colors.silverDarker}>
-                {participantId}
-              </NormalTypography>
+              {!isMobile && (
+                <NormalTypography variant="s" color={theme.colors.silverDarker}>
+                  {participantId}
+                </NormalTypography>
+              )}
               {(isCreator || hasAdminRights) && user?.documentId !== participantId ? (
                 <IconButton
                   icon={<XCircle weight="fill" size={24} />}
@@ -100,6 +110,7 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
           size="s"
           title="Ta bort deltagare"
           onClose={() => setConfirmModalOpen(false)}
+          mobileBottomSheet
         >
           <NormalTypography variant="m">
             Är du säker på att du vill ta bort
@@ -124,18 +135,22 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
 
 const TableHeader = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing.s};
   border-bottom: 1px solid ${theme.colors.silverLight};
-  padding: ${theme.spacing.xxs} ${theme.spacing.xxs} 0 ${theme.spacing.xxs};
+  padding: ${theme.spacing.xxs};
   width: 100%;
   box-sizing: border-box;
+  
+  @media ${devices.tablet} {
+    grid-template-columns: 1fr 1fr 1fr auto;
+  }
 `;
 
 const TableRow = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing.s};
   padding: ${theme.spacing.xxxs} ${theme.spacing.xs};
   background-color: ${theme.colors.silverBleach};
@@ -143,11 +158,26 @@ const TableRow = styled.div`
   border-radius: ${theme.borderRadius.s};
   width: 100%;
   box-sizing: border-box;
+  min-height: 36px;
+
+  @media ${devices.tablet} {
+    grid-template-columns: 1fr 1fr 1fr auto;
+  }
 `;
 
 const EmptyCell = styled.div`
-  width: 32px;
-  height: 32px;
+  display: none;
+
+  @media ${devices.tablet} {
+    width: 32px;
+    height: 32px;
+  }
+`;
+
+const NoWrapTypography = styled(EmphasisTypography)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export default ParticipantsView;

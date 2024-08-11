@@ -19,9 +19,11 @@ import TextButton from '../buttons/TextButton';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import SelectProfilePictureModal from '../profile/SelectProfilePictureModal';
 import { errorNotify } from '../../utils/toast/toastHelpers';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -291,7 +293,7 @@ const Auth = () => {
             </Section>
           )}
           <Divider color={theme.colors.silverLight} />
-          <Section flexDirection="row" alignItems="center" justifyContent="center">
+          <Section flexDirection={isMobile ? 'column' : 'row'} alignItems="center" justifyContent="center">
             <NormalTypography variant="m" color={theme.colors.silverDark}>Har du redan skapat ett konto?</NormalTypography>
             <TextButton onClick={() => {
               setShowRegisterView(!showRegisterView);
@@ -361,7 +363,7 @@ const Auth = () => {
           Logga in
         </Button>
         <Divider color={theme.colors.silverLight} />
-        <Section flexDirection="row" alignItems="center" justifyContent="center">
+        <Section flexDirection={isMobile ? 'column' : 'row'} alignItems="center" justifyContent="center">
           <NormalTypography variant="m" color={theme.colors.silverDark}>Har du inget konto?</NormalTypography>
           <TextButton
             onClick={() => setShowRegisterView(!showRegisterView)}
@@ -398,15 +400,16 @@ const Container = styled.div`
 
 const Card = styled.div`
   background-color: white;
-  padding: ${theme.spacing.xl};
-  border-radius: ${theme.borderRadius.xl};
+  padding: ${theme.spacing.l};
   width: 400px;
   margin: auto 0;
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
-
+  
   #google-sign-in {
+    border-radius: ${theme.borderRadius.xl};
+    padding: ${theme.spacing.xl};
     color: ${theme.colors.textDefault} !important;
   }
 `;

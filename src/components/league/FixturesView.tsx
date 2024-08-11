@@ -24,7 +24,6 @@ import {
 import Input from '../input/Input';
 import Select, { OptionItem } from '../input/Select';
 import CustomDatePicker from '../input/DatePicker';
-import TextButton from '../buttons/TextButton';
 import Checkbox from '../input/Checkbox';
 import GamePredictor from '../game/GamePredictor';
 import { generateRandomID } from '../../utils/firebaseHelpers';
@@ -37,7 +36,7 @@ import EditGameWeekView from './EditGameWeekView';
 import RootToast from '../toast/RootToast';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../tag/Tag';
-// import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -54,7 +53,7 @@ enum GameWeekPredictionStatus {
 
 const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) => {
   const { user, hasAdminRights } = useUser();
-  // const isMobile = useResizeListener(DeviceSizes.MOBILE);
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [ongoingGameWeek, setOngoingGameWeek] = useState<LeagueGameWeek>();
   const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek>();
@@ -477,6 +476,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
             predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
             loading={predictionLoading === fixture.id}
+            anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
           />
         ))}
       </FixturesGrid>
@@ -504,7 +504,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <EmphasisTypography variant="m" color={teamType === TeamType.NATIONS ? theme.colors.primary : theme.colors.silver}>Landslag</EmphasisTypography>
         </TeamTypeSelectorButton>
       </Section>
-      <Section flexDirection="row" gap="l" alignItems="center">
+      <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
         <Section gap="xxs">
           <EmphasisTypography variant="s">Hemmalag</EmphasisTypography>
           <Select
@@ -515,9 +515,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             fullWidth
           />
         </Section>
-        <VersusTypography>
-          <NormalTypography variant="m">vs</NormalTypography>
-        </VersusTypography>
+        {!isMobile && (
+          <VersusTypography>
+            <NormalTypography variant="m">vs</NormalTypography>
+          </VersusTypography>
+        )}
         <Section gap="xxs">
           <EmphasisTypography variant="s">Bortalag</EmphasisTypography>
           <Select
@@ -529,7 +531,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           />
         </Section>
       </Section>
-      <Section gap="l" flexDirection="row" alignItems="center">
+      <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
         <Input
           label="Arena"
           value={newFixtureStadium}
@@ -563,25 +565,36 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <Select
             options={[
               { value: 'Välj lag', label: 'Välj lag' },
-              { value: newFixtureHomeTeam.name, label: newFixtureHomeTeam.name },
-              { value: newFixtureAwayTeam.name, label: newFixtureAwayTeam.name },
-              { value: 'Båda lagen', label: 'Båda lagen' },
+              { value: 'Arsenal', label: 'Arsenal' },
+              // { value: newFixtureHomeTeam.name, label: newFixtureHomeTeam.name },
+              // { value: newFixtureAwayTeam.name, label: newFixtureAwayTeam.name },
+              // { value: 'Båda lagen', label: 'Båda lagen' },
             ]}
             value={newFixtureGoalScorerTeam ? newFixtureGoalScorerTeam[0] : 'Välj lag'}
             onChange={(value) => handleSetGoalScrorerTeam(value)}
+            fullWidth={isMobile}
           />
         </Section>
       )}
-      <Section flexDirection="row" alignItems="center" gap="xxs">
-        <Button variant="secondary" size="m" onClick={() => setAddFixtureViewOpen(false)}>
-          Avbryt
-        </Button>
-        <Button size="m" onClick={handleAddFixtureToGameWeek} icon={<PlusCircle size={20} color={theme.colors.white} />} disabled={isAddFixtureButtonDisabled}>
-          Lägg till match
-        </Button>
-        <TextButton color="red" onClick={handleResetNewFixture}>
-          Nollställ matchinfo
-        </TextButton>
+      <Section gap="m">
+        {/* {isMobile && (
+          <TextButton color="red" onClick={handleResetNewFixture} noPadding>
+            Nollställ
+          </TextButton>
+        )} */}
+        <Section flexDirection="row" alignItems="center" gap="xxs">
+          <Button variant="secondary" size="m" onClick={() => setAddFixtureViewOpen(false)}>
+            Avbryt
+          </Button>
+          <Button size="m" onClick={handleAddFixtureToGameWeek} icon={<PlusCircle size={20} color={theme.colors.white} />} disabled={isAddFixtureButtonDisabled} fullWidth={isMobile}>
+            Lägg till match
+          </Button>
+          {/* {!isMobile && (
+            <TextButton color="red" onClick={handleResetNewFixture}>
+              Nollställ matchinfo
+            </TextButton>
+          )} */}
+        </Section>
       </Section>
     </AddFixtureContainer>
   );
@@ -607,6 +620,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           label="Startdatum (kan tippas fr.o.m.)"
           selectedDate={newGameWeekStartDate}
           onChange={(date) => setNewGameWeekStartDate(date!)}
+          fullWidth={isMobile}
         />
       </Section>
       <Divider />
@@ -624,7 +638,12 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </Section>
           ))
         )}
-        {addFixtureViewOpen ? getAddNewFixtureContent() : (
+        {addFixtureViewOpen ? (
+          <>
+            {newGameWeekFixtures.length > 0 && <Divider />}
+            {getAddNewFixtureContent()}
+          </>
+        ) : (
           <CreateFixtureCard onClick={() => setAddFixtureViewOpen(true)}>
             <PlusCircle size={32} color={theme.colors.textDefault} />
             <NormalTypography variant="l">Lägg till match</NormalTypography>
@@ -643,7 +662,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             <Button variant="secondary" onClick={() => setShowCreateGameWeekSection(false)}>
               Avbryt
             </Button>
-            <Button variant="primary" onClick={handleCreateGameWeek} disabled={addFixtureViewOpen || createGameWeekLoading} loading={createGameWeekLoading}>
+            <Button variant="primary" onClick={handleCreateGameWeek} disabled={addFixtureViewOpen || createGameWeekLoading} loading={createGameWeekLoading} fullWidth={isMobile}>
               Skapa omgång
             </Button>
           </Section>
@@ -693,12 +712,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     <>
       <Section gap="m">
         {isCreator && !showCreateGameWeekSection && !league.hasEnded && (
-          <Section flexDirection="row" gap="s">
+          <Section flexDirection="row" gap="s" padding={isMobile ? `0 ${theme.spacing.s}` : '0'}>
             <Button
               color="primary"
               size="m"
               icon={<PlusCircle size={20} color={theme.colors.white} />}
               onClick={isCreator || hasAdminRights ? () => setShowCreateGameWeekSection(!showCreateGameWeekSection) : () => {}}
+              disabled={ongoingGameWeek !== undefined}
             >
               Skapa ny omgång
             </Button>
@@ -709,14 +729,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <Section
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
-            padding={theme.spacing.m}
+            padding={isMobile ? theme.spacing.s : theme.spacing.m}
             gap="s"
             expandMobile
           >
             <OngoingGameWeekHeader>
               <HeadingsTypography variant="h4">Pågående omgång</HeadingsTypography>
-              <Section flexDirection="row" alignItems="center" gap="s" justifyContent="space-between">
-                <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+              <Section flexDirection="row" alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile}>
+                <Section>
+                  <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+                </Section>
                 <Tag
                   text={`Omgång ${ongoingGameWeek.round}`}
                   textAndIconColor={theme.colors.primaryDark}
@@ -756,7 +778,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <Section
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
-            padding={theme.spacing.m}
+            padding={isMobile ? theme.spacing.s : theme.spacing.m}
             gap="s"
             expandMobile
           >
@@ -782,7 +804,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <Section
           backgroundColor={theme.colors.white}
           borderRadius={theme.borderRadius.l}
-          padding={theme.spacing.m}
+          padding={isMobile ? theme.spacing.s : theme.spacing.m}
           gap="s"
           expandMobile
         >
@@ -891,11 +913,15 @@ const VersusTypography = styled.div`
 
 const FixturesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  grid-template-columns: 1fr;
   grid-template-rows: auto;
   gap: ${theme.spacing.m};
   width: 100%;
   box-sizing: border-box;
+
+  @media ${devices.tablet} {
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  }
 `;
 
 const RoundPointsContainer = styled.div`

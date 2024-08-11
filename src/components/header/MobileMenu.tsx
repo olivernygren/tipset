@@ -17,16 +17,20 @@ interface MobileMenuProps {
 const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
   const links = [
     {
+      label: 'Startsida',
+      href: '/',
+    },
+    {
       label: 'Ligor',
-      href: '/leagues',
+      href: `/${RoutesEnum.LEAGUES}`,
     },
     {
       label: 'Regler',
-      href: '/rules',
+      href: `/${RoutesEnum.RULES}`,
     },
     {
       label: 'Hur funkar det?',
-      href: '/how-it-works',
+      href: `/${RoutesEnum.HOW_TO_PLAY}`,
     },
   ];
 
@@ -53,15 +57,17 @@ const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
       </Links>
       <BottomLinks>
         {isSignedIn ? (
-          <IconButton
-            icon={<SignOut size={32} color={theme.colors.primary} />}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+          <Button
+            variant="secondary"
+            endIcon={<SignOut size={24} color={theme.colors.primary} />}
             onClick={onSignOut}
-            title="Logga ut"
-          />
+            fullWidth
+          >
+            Logga ut
+          </Button>
         ) : (
           <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
-            <Button variant="primary" size="m">Logga in</Button>
+            <Button variant="primary" size="m" fullWidth>Logga in</Button>
           </InvisibleLink>
         )}
       </BottomLinks>
@@ -74,7 +80,7 @@ const StyledMobileMenu = styled(motion.div)`
   inset: 0;
   background-color: ${theme.colors.white};
   z-index: 1000;
-  padding: 0 ${theme.spacing.s};
+  padding: 0 ${theme.spacing.s} ${theme.spacing.l} ${theme.spacing.s};
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
@@ -119,6 +125,8 @@ const BottomLinks = styled.div`
 const InvisibleLink = styled.a`
   text-decoration: none;
   color: inherit;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default MobileMenu;

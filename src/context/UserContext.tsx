@@ -1,11 +1,15 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, {
+  createContext, useState, useEffect, useContext,
+  useMemo,
+} from 'react';
 import { getDoc, doc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import Cookies from 'js-cookie';
 import { auth, db } from '../config/firebase';
 import { User } from '../utils/Auth';
-import { onAuthStateChanged } from 'firebase/auth';
 import { CollectionEnum } from '../utils/Firebase';
 import { withDocumentIdOnObject } from '../utils/helpers';
-import Cookies from 'js-cookie';
+
 interface UserContextProps {
   user: User | null;
   hasAdminRights: boolean;
@@ -26,12 +30,14 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
   });
   const [loading, setLoading] = useState<boolean>(true);
 
+  const contextValue = useMemo(() => ({ user, hasAdminRights }), [user, hasAdminRights]);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDocRef = doc(db, CollectionEnum.USERS, user.uid);
         const userDocSnap = await getDoc(userDocRef);
-  
+
         if (userDocSnap.exists()) {
           const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
           setUser(userWithDocId);
@@ -40,7 +46,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
             setHasAdminRights(true);
           }
         } else {
-          console.log("No such user!");
+          console.log('No such user!');
         }
       } else {
         setUser(null);
@@ -49,7 +55,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
       }
       setLoading(false);
     });
-  
+
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
@@ -59,7 +65,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
   }
 
   return (
-    <UserContext.Provider value={{ user, hasAdminRights }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );

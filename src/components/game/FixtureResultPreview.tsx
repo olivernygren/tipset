@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { Eye } from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import TextButton from '../buttons/TextButton';
 import { useUser } from '../../context/UserContext';
 // eslint-disable-next-line import/no-cycle
 import PredictionsModal from '../league/PredictionsModal';
+import IconButton from '../buttons/IconButton';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface FixtureResultPreviewProps {
   fixture: Fixture;
@@ -20,10 +23,11 @@ interface FixtureResultPreviewProps {
   isFullTime?: boolean;
 }
 
-function FixtureResultPreview({
+const FixtureResultPreview = ({
   fixture, predictions, compact, showBorder, isFullTime = true,
-}: FixtureResultPreviewProps) {
+}: FixtureResultPreviewProps) => {
   const { user } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -45,11 +49,11 @@ function FixtureResultPreview({
       <FixtureContainer showBorder={showBorder}>
         {isFullTime ? (
           <FullTimeIndicator>
-            <EmphasisTypography variant="m" color={theme.colors.primaryDarker}>FT</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>FT</EmphasisTypography>
           </FullTimeIndicator>
         ) : (
           <FullTimeIndicator>
-            <EmphasisTypography variant="m" color={theme.colors.primaryDarker}>{getFormattedKickOffTime(fixture.kickOffTime)}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{getFormattedKickOffTime(fixture.kickOffTime)}</EmphasisTypography>
           </FullTimeIndicator>
         )}
         <Teams compact={compact}>
@@ -67,11 +71,11 @@ function FixtureResultPreview({
                 size={compact ? AvatarSize.XS : AvatarSize.S}
               />
             )}
-            <EmphasisTypography variant="m">{fixture.homeTeam.name}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.shortName || fixture.homeTeam.name}</EmphasisTypography>
           </TeamContainer>
           <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
           <TeamContainer compact={compact}>
-            <EmphasisTypography variant="m">{fixture.awayTeam.name}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.shortName || fixture.awayTeam.name}</EmphasisTypography>
             {fixture.teamType === TeamType.CLUBS ? (
               <ClubAvatar
                 logoUrl={fixture.awayTeam.logoUrl}
@@ -89,29 +93,39 @@ function FixtureResultPreview({
         </Teams>
         <Section flexDirection="row" alignItems="center" justifyContent="flex-end">
           <ResultContainer>
-            <NormalTypography variant="m" color={theme.colors.primaryDark}>
+            <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDark}>
               {fixture.finalResult?.homeTeamGoals ?? '?'}
               {' '}
               -
               {' '}
               {fixture.finalResult?.awayTeamGoals ?? '?'}
-            </NormalTypography>
+            </NoWrapTypography>
           </ResultContainer>
           {predictions && (
             <PointsContainer>
-              <NormalTypography variant="m" color={theme.colors.gold}>
+              <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.gold}>
                 {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '?'}
                 {' '}
                 p
-              </NormalTypography>
+              </NoWrapTypography>
             </PointsContainer>
           )}
           {predictions && predictions.length > 0 && (
-            <TextButton
-              onClick={handleOpenModal}
-            >
-              Se allas tips
-            </TextButton>
+            isMobile ? (
+              <MobileButtonContainer>
+                <IconButton
+                  icon={<Eye size={24} />}
+                  onClick={handleOpenModal}
+                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                />
+              </MobileButtonContainer>
+            ) : (
+              <TextButton
+                onClick={handleOpenModal}
+              >
+                Se allas tips
+              </TextButton>
+            )
           )}
         </Section>
       </FixtureContainer>
@@ -124,7 +138,7 @@ function FixtureResultPreview({
       )}
     </>
   );
-}
+};
 
 const FullTimeIndicator = styled.div`
   min-height: 44px;
@@ -146,7 +160,7 @@ const Teams = styled.div<{ compact?: boolean }>`
   height: 100%;
   align-items: ${({ compact }) => (compact ? 'flex-start' : 'center')};
   flex-direction: ${({ compact }) => (compact ? 'column' : 'row')};
-  margin-left: ${theme.spacing.xs};
+  margin-left: ${theme.spacing.xxs};
   justify-content: ${({ compact }) => (compact ? 'center' : 'flex-start')};
   
   ${({ compact }) => compact && css`
@@ -156,6 +170,10 @@ const Teams = styled.div<{ compact?: boolean }>`
       display: none;
     }
   `}
+
+  @media ${devices.tablet} {
+    margin-left: ${theme.spacing.xs};
+  }
 `;
 
 const FixtureContainer = styled.div<{ showBorder?: boolean }>`
@@ -199,6 +217,16 @@ const PointsContainer = styled.div`
   background-color: ${theme.colors.primaryDark};
   width: fit-content;
   height: 100%;
+`;
+
+const NoWrapTypography = styled(NormalTypography)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const MobileButtonContainer = styled.div`
+  padding: 0 ${theme.spacing.xxxs};
 `;
 
 export default FixtureResultPreview;

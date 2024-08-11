@@ -12,6 +12,7 @@ import { CollectionEnum } from '../../utils/Firebase';
 import { db } from '../../config/firebase';
 import Modal from '../modal/Modal';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -20,6 +21,8 @@ interface EditLeagueViewProps {
 }
 
 const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const [name, setName] = useState<string>(league.name);
   const [description, setDescription] = useState<string>(league.description);
   const [deadlineToJoin, setDeadlineToJoin] = useState(new Date(league.deadlineToJoin));
@@ -69,6 +72,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
       refetchLeague();
       setShowEndLeagueConfirmationModal(false);
+      successNotify('Ligan avslutad');
     } catch (error) {
       errorNotify('Ett fel uppstod');
       console.error(error);
@@ -112,28 +116,33 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
             onClick={handleUpdateLeague}
             loading={updateLoading}
             disabled={name.length === 0}
+            fullWidth={isMobile}
           >
             Spara
           </Button>
         </Section>
-        <EndLeagueContainer>
-          <Section gap="xxs">
-            <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
-            <NormalTypography variant="m" color={theme.colors.silverDark}>Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng.</NormalTypography>
-          </Section>
-          <Button
-            color="red"
-            onClick={() => setShowEndLeagueConfirmationModal(true)}
-          >
-            Avsluta liga
-          </Button>
-        </EndLeagueContainer>
+        {!league.hasEnded && (
+          <EndLeagueContainer>
+            <Section gap={isMobile ? 's' : 'xxs'}>
+              <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.silverDark}>Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng.</NormalTypography>
+            </Section>
+            <Button
+              color="red"
+              onClick={() => setShowEndLeagueConfirmationModal(true)}
+              fullWidth={isMobile}
+            >
+              Avsluta liga
+            </Button>
+          </EndLeagueContainer>
+        )}
       </Section>
       {showEndLeagueConfirmationModal && (
         <Modal
           size="s"
           onClose={() => setShowEndLeagueConfirmationModal(false)}
-          title="Dags att avsluta ligan?"
+          title="Avsluta ligan"
+          mobileBottomSheet
         >
           <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
           <Section gap="xs" flexDirection="row" alignItems="center">
@@ -164,19 +173,20 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.s};
+  width: 100%;
 
   @media ${devices.tablet} {
     flex-direction: row;
     gap: ${theme.spacing.m};
     align-items: center;
-    width: 100%;
     box-sizing: border-box;
   }
 `;
 
 const EndLeagueContainer = styled.div`
   display: flex;
-  gap: ${theme.spacing.s};
+  flex-direction: column;
+  gap: ${theme.spacing.m};
   width: 100%;
   box-sizing: border-box;
   border-radius: ${theme.borderRadius.l};
@@ -184,6 +194,11 @@ const EndLeagueContainer = styled.div`
   padding: ${theme.spacing.s};
   background-color: ${theme.colors.silverBleach};
   align-items: center;
+
+  @media ${devices.tablet} {
+    flex-direction: row;
+    gap: ${theme.spacing.s};
+  }
 `;
 
 export default EditLeagueView;

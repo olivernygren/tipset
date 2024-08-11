@@ -137,7 +137,7 @@ const LeagueOverview = ({
                       />
                     ))}
                   </FixturesContainer>
-                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && (
                     <MarginTopButton>
                       <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight="fill" size={24} color={theme.colors.white} />}>
                         Tippa matcher
@@ -165,9 +165,8 @@ const LeagueOverview = ({
             <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
             {league.standings && league.standings.length > 0 && (
               <>
-                <EmphasisTypography variant="l" color={theme.colors.textLight}>
-                  Din placering:
-                  {getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}
+                <EmphasisTypography variant="m" color={theme.colors.textLight}>
+                  {`Din placering: ${getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}`}
                 </EmphasisTypography>
                 {/* Show separate user placing somewhere if they are outside the top 5 */}
                 {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
@@ -258,8 +257,6 @@ const LeagueOverview = ({
           onClose={() => setShowPredictionsModalForFixture(null)}
           fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture)}
         />
-        // build new modal for displaying predictions without points
-        // should include teams, names of users and predictions with score + goal scorer
       )}
     </>
   );
@@ -269,11 +266,12 @@ const OverviewGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
-  gap: ${theme.spacing.s};
-
-  @media ${devices.tablet} {
+  gap: ${theme.spacing.m};
+  
+  @media ${devices.laptop} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(2, auto);
+    gap: ${theme.spacing.s};
   }
 `;
 
@@ -282,14 +280,15 @@ const GridSection = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.s};
   background-color: ${theme.colors.white};
-  padding: ${theme.spacing.m};
+  padding: ${theme.spacing.s};
   border-radius: 0;
   max-height: 500px;
   overflow-y: auto;
   min-height: 240px;
-
+  
   @media ${devices.tablet} {
-    border-radius: ${theme.borderRadius.m};
+    border-radius: ${theme.borderRadius.l};
+    padding: ${theme.spacing.m};
   }
 `;
 
@@ -309,7 +308,7 @@ const LeagueStandings = styled.div`
 
 const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 4fr 1fr 1fr;
   gap: ${theme.spacing.xxs};
   align-items: center;
   padding: ${theme.spacing.xxs};
@@ -317,16 +316,24 @@ const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   background-color: ${theme.colors.silverLighter};
   box-sizing: border-box;
   border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')};
+
+  @media ${devices.tablet} {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
 `;
 
 const LeagueStandingsHeader = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 4fr 1fr 1fr;
   gap: ${theme.spacing.xxs};
   align-items: center;
   padding: 0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.xs};
   background-color: ${theme.colors.white};
+
+  @media ${devices.tablet} {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
 `;
 
 const RightAlignedGridItem = styled.div`

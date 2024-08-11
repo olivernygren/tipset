@@ -10,17 +10,17 @@ interface ClubAvatarProps {
   noPadding?: boolean;
 }
 
-const ClubAvatar = ({ logoUrl, clubName, size, showBorder, isDarkMode, noPadding }: ClubAvatarProps) => {
-  return (
-    <Avatar 
-      src={logoUrl} 
-      size={size} 
-      alt={`${clubName} logo`}
-      showBorder={showBorder}
-      isDarkMode={isDarkMode}
-      noPadding={noPadding}
-    />
-  )
-};
+const ClubAvatar = ({
+  logoUrl, clubName, size, showBorder, isDarkMode, noPadding,
+}: ClubAvatarProps) => (
+  <Avatar
+    src={logoUrl}
+    size={size}
+    alt={`${clubName} logo`}
+    showBorder={showBorder}
+    isDarkMode={isDarkMode}
+    noPadding={noPadding}
+  />
+);
 
 export default ClubAvatar;

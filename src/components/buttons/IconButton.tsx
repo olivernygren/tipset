@@ -17,6 +17,7 @@ interface ButtonProps {
   shape?: 'circle' | 'square';
   title?: string;
   showBorder?: boolean;
+  borderColor?: string;
 }
 
 interface StyledButtonProps {
@@ -30,10 +31,11 @@ interface StyledButtonProps {
   };
   shape?: 'circle' | 'square';
   showBorder?: boolean;
+  borderColor?: string;
 }
 
 const IconButton = ({
-  icon, backgroundColor, onClick, disabled, colors, shape = 'circle', title, showBorder,
+  icon, backgroundColor, onClick, disabled, colors, shape = 'circle', title, showBorder, borderColor,
 }: ButtonProps) => (
   <StyledButton
     onClick={onClick}
@@ -43,6 +45,7 @@ const IconButton = ({
     shape={shape}
     title={title}
     showBorder={showBorder}
+    borderColor={borderColor}
     whileHover={{
       scale: 1.05,
       backgroundColor: backgroundColor || 'rgba(0, 0, 0, 0)',
@@ -59,13 +62,13 @@ const StyledButton = styled(motion.button)<StyledButtonProps>`
   border: none;
   background-color: ${({ backgroundColor }) => backgroundColor || 'transparent'};
   cursor: pointer;
-  padding: ${({ showBorder }) => (showBorder ? theme.spacing.xxs : theme.spacing.xxxs)};
+  padding: ${({ showBorder, backgroundColor }) => (showBorder || backgroundColor ? theme.spacing.xxs : theme.spacing.xxxs)};
   border-radius: ${({ shape }) => (shape === 'circle' ? '50%' : theme.borderRadius.s)};
   height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: ${({ showBorder }) => (showBorder ? `1px solid ${theme.colors.silverLight}` : 'none')};
+  border: ${({ showBorder, borderColor }) => (showBorder ? `1px solid ${borderColor || theme.colors.silverLight}` : 'none')};
 
   svg {
     fill: ${({ colors }) => colors.normal};

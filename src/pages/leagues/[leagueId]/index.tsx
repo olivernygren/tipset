@@ -5,6 +5,7 @@ import {
 } from 'firebase/firestore';
 import {
   ArrowLeft, CaretDown, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
+  X,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -252,11 +253,11 @@ const PredictionLeaguePage = () => {
           {(isCreator || hasAdminRights) && (
             <>
               <IconButton
-                icon={<DotsThree size={28} />}
+                icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
                 colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                 onClick={() => setContextMenuOpen(!contextMenuOpen)}
-                // shape="circle"
                 showBorder
+                backgroundColor={theme.colors.white}
               />
               {contextMenuOpen && (
                 <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
@@ -272,7 +273,7 @@ const PredictionLeaguePage = () => {
           )}
         </Section>
       </PageHeader>
-      {initialFetchLoading ? <p>Laddar...</p> : (
+      {initialFetchLoading ? null : (
         <PageContent>
           {isParticipant && (
             <>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import Avatar, { AvatarSize } from './Avatar';
 
 interface NationAvatarProps {
@@ -8,17 +8,17 @@ interface NationAvatarProps {
   isDarkMode?: boolean;
 }
 
-const NationAvatar = ({ nationName, flagUrl, size, isDarkMode }: NationAvatarProps) => {
-  return (
-    <Avatar 
-      src={flagUrl} 
-      size={size} 
-      alt={`${nationName} logo`}
-      showBorder
-      objectFit='cover'
-      isDarkMode={isDarkMode}
-    />
-  )
-}
+const NationAvatar = ({
+  nationName, flagUrl, size, isDarkMode,
+}: NationAvatarProps) => (
+  <Avatar
+    src={flagUrl}
+    size={size}
+    alt={`${nationName} logo`}
+    showBorder
+    objectFit="cover"
+    isDarkMode={isDarkMode}
+  />
+);
 
 export default NationAvatar;

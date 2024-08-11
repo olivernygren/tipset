@@ -14,7 +14,7 @@ import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentI
 import {
   CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
 } from '../../utils/League';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
 import { Section } from '../../components/section/Section';
 import Button from '../../components/buttons/Button';
@@ -26,10 +26,13 @@ import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
 import { useUser } from '../../context/UserContext';
 import { successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../../components/tag/Tag';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import IconButton from '../../components/buttons/IconButton';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [fetchLoading, setFetchLoading] = useState(true);
   const [participantLeagues, setParticipantLeagues] = useState<Array<PredictionLeague>>([]);
@@ -229,23 +232,51 @@ const PredictionLeaguesPage = () => {
     <Page>
       <PageHeader>
         <HeadingsTypography variant="h2">Ligor</HeadingsTypography>
-        <Section gap="s" flexDirection="row" alignItems="center" fitContent>
-          <Button
-            variant="primary"
-            size="m"
-            onClick={() => setShowCreateLeagueModal(true)}
-            icon={<PlusCircle size={24} weight="fill" color="white" />}
-          >
-            Skapa liga
-          </Button>
-          <Button
-            variant="secondary"
-            size="m"
-            onClick={() => setShowJoinLeagueModal(true)}
-            icon={<UserPlus size={24} color={theme.colors.primary} />}
-          >
-            Gå med i liga
-          </Button>
+        <Section gap={isMobile ? 'xs' : 's'} flexDirection="row" alignItems="center" fitContent>
+          {isMobile ? (
+            <>
+              <IconButton
+                icon={<PlusCircle size={28} />}
+                onClick={() => setShowCreateLeagueModal(true)}
+                backgroundColor={theme.colors.primary}
+                colors={{
+                  normal: theme.colors.white,
+                  disabled: theme.colors.silver,
+                }}
+              />
+              <IconButton
+                icon={<UserPlus size={28} />}
+                onClick={() => setShowJoinLeagueModal(true)}
+                colors={{
+                  normal: theme.colors.primary,
+                  hover: theme.colors.primaryDark,
+                  active: theme.colors.primaryDarker,
+                  disabled: theme.colors.silver,
+                }}
+                showBorder
+                borderColor={theme.colors.primary}
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                variant="primary"
+                size="m"
+                onClick={() => setShowCreateLeagueModal(true)}
+                icon={<PlusCircle size={24} weight="fill" color="white" />}
+              >
+                Skapa liga
+              </Button>
+              <Button
+                variant="secondary"
+                size="m"
+                onClick={() => setShowJoinLeagueModal(true)}
+                icon={<UserPlus size={24} color={theme.colors.primary} />}
+              >
+                Gå med i liga
+              </Button>
+            </>
+          )}
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
@@ -319,6 +350,7 @@ const PredictionLeaguesPage = () => {
           size="s"
           title="Skapa liga"
           onClose={() => setShowCreateLeagueModal(false)}
+          mobileBottomSheet
         >
           <Section gap="m">
             <Input
@@ -358,6 +390,7 @@ const PredictionLeaguesPage = () => {
           size="s"
           title="Gå med i liga"
           onClose={() => setShowJoinLeagueModal(false)}
+          mobileBottomSheet
         >
           <Section gap="m">
             <Input
@@ -413,13 +446,17 @@ const LeaguesContainer = styled.div`
 const LeagueCard = styled(motion.div)`
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.l};
-  padding: ${theme.spacing.m};
+  padding: ${theme.spacing.s};
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xxs};
   cursor: pointer;
   min-height: 250px;
   box-sizing: border-box;
+
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.m};
+  }
 `;
 
 const ModalButtons = styled.div`

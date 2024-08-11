@@ -2,9 +2,10 @@ import React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { X } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { HeadingsTypography } from '../typography/Typography';
 import IconButton from '../buttons/IconButton';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface ModalProps {
   title?: string;
@@ -12,12 +13,19 @@ interface ModalProps {
   onClose: () => void;
   size?: 's' | 'm' | 'l';
   headerDivider?: boolean;
+  mobileBottomSheet?: boolean;
 }
 
 const Modal = ({
-  title, children, onClose, size = 'm', headerDivider,
+  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet,
 }: ModalProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const getModalWidth = () => {
+    if (mobileBottomSheet && isMobile) {
+      return '100%';
+    }
+
     switch (size) {
       case 's':
         return '480px';
@@ -32,18 +40,21 @@ const Modal = ({
 
   return (
     <>
-      <Backdrop onMouseDown={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
+      <Backdrop
+        mobileBottomSheet={mobileBottomSheet}
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
       >
         <ModalContainer
           width={getModalWidth()}
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.92 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, scale: 0.92, y: isMobile && mobileBottomSheet ? '100%' : '00%' }}
+          animate={{ opacity: 1, scale: 1, y: isMobile && mobileBottomSheet ? '0%' : '0%' }}
+          exit={{ opacity: 0, scale: 0.92, y: isMobile && mobileBottomSheet ? '100%' : '0%' }}
+          transition={{ duration: 0.2, type: 'tween' }}
+          mobileBottomSheet={mobileBottomSheet}
         >
           <Header headerDivider={headerDivider}>
             {title && <HeadingsTypography variant="h3">{title}</HeadingsTypography>}
@@ -63,17 +74,21 @@ const Modal = ({
   );
 };
 
-const Backdrop = styled.div`
+const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   display: flex;
-  align-items: center;
+  align-items: ${({ mobileBottomSheet }) => (mobileBottomSheet ? 'flex-end' : 'center')};
   justify-content: center;
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
+
+  @media ${devices.tablet} {
+    align-items: center;
+  }
 `;
 
-const ModalContainer = styled(motion.div)<{ width: string }>`
+const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: boolean }>`
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -81,7 +96,11 @@ const ModalContainer = styled(motion.div)<{ width: string }>`
   max-height: 85vh;
   height: fit-content;
   width: ${({ width }) => width};
-  border-radius: ${theme.borderRadius.l};
+  border-radius: ${({ mobileBottomSheet }) => (mobileBottomSheet ? `${theme.borderRadius.m} ${theme.borderRadius.m} 0 0` : theme.borderRadius.l)};
+
+  @media ${devices.tablet} {
+    border-radius: ${theme.borderRadius.l};
+  }
 `;
 
 const ModalContent = styled.div<{ headerDivider?: boolean }>`

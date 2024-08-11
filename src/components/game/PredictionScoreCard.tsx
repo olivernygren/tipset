@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
 import { Section } from '../section/Section';
@@ -10,6 +10,7 @@ import { Divider } from '../Divider';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface PredictionScoreCardProps {
   prediction: Prediction;
@@ -17,6 +18,8 @@ interface PredictionScoreCardProps {
 }
 
 const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
     return (
@@ -45,11 +48,11 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
 
   return (
     <Card>
-      <HeadingsTypography variant="h4" color={theme.colors.gold}>
+      <HeadingsTypography variant={isMobile ? 'h5' : 'h4'} color={theme.colors.gold}>
         <UserName userId={prediction.userId} />
       </HeadingsTypography>
       <PointsContainer>
-        <HeadingsTypography variant="h1" color={theme.colors.gold}>
+        <HeadingsTypography variant={isMobile ? 'h2' : 'h1'} color={theme.colors.gold}>
           {prediction.points?.total ?? '?'}
         </HeadingsTypography>
       </PointsContainer>
@@ -96,7 +99,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           )}
         </Section>
       ) : (
-        <NormalTypography variant="m" color={theme.colors.white}>Inga poäng</NormalTypography>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.white}>Inga poäng</NormalTypography>
       )}
     </Card>
   );
@@ -118,8 +121,8 @@ const Card = styled.div`
 `;
 
 const PointsContainer = styled.div`
-  height: 80px;
-  width: 80px;
+  height: 70px;
+  width: 70px;
   border-radius: 50%;
   background-color: ${theme.colors.primaryDark};
   position: absolute;
@@ -128,6 +131,11 @@ const PointsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  @media ${devices.tablet} {
+    height: 80px;
+    width: 80px;
+  }
 `;
 
 const TableRow = styled.div`

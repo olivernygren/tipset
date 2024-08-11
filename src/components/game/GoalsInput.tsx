@@ -4,9 +4,9 @@ import { theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
 import Input from '../input/Input';
 import { Section } from '../section/Section';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface GoalsInputProps {
-  team: 'home' | 'away';
   goals: string;
   onIncrease: () => void;
   onDecrease: () => void;
@@ -15,28 +15,31 @@ interface GoalsInputProps {
   disabled?: boolean;
 }
 
-const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPredicted, disabled }: GoalsInputProps) => {
+const GoalsInput = ({
+  goals, onIncrease, onDecrease, onInputChange, hasPredicted, disabled,
+}: GoalsInputProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const getIconButtonColors = () => {
     if (hasPredicted) {
       return {
         normal: theme.colors.gold,
         hover: theme.colors.gold,
         active: theme.colors.gold,
-        disabled: theme.colors.primaryLighter
-      }
-    } else {
-      return {
-        normal: theme.colors.primary,
-        hover: theme.colors.primaryDark,
-        active: theme.colors.primaryDarker,
-        disabled: theme.colors.silver
-      }
+        disabled: theme.colors.primaryLighter,
+      };
     }
+    return {
+      normal: theme.colors.primary,
+      hover: theme.colors.primaryDark,
+      active: theme.colors.primaryDarker,
+      disabled: theme.colors.silver,
+    };
   };
 
   return (
-    <Section alignItems='center' fitContent gap="xxxs">
-      <IconButton 
+    <Section alignItems="center" fitContent gap="xxxs">
+      <IconButton
         icon={<PlusCircle size={24} />}
         onClick={onIncrease}
         colors={getIconButtonColors()}
@@ -45,21 +48,21 @@ const GoalsInput = ({ team, goals, onIncrease, onDecrease, onInputChange, hasPre
       <Input
         value={goals}
         onChange={(e) => onInputChange(e.currentTarget.value)}
-        placeholder='0'
-        maxWidth='50px'
-        textAlign='center'
-        fontSize='30px'
-        fontWeight='600'
+        placeholder="0"
+        maxWidth={isMobile ? '40px' : '50px'}
+        textAlign="center"
+        fontSize={isMobile ? '22px' : '30px'}
+        fontWeight="600"
         disabled={disabled}
       />
-      <IconButton 
+      <IconButton
         icon={<MinusCircle size={24} />}
         onClick={onDecrease}
         colors={getIconButtonColors()}
         disabled={goals === '0' || goals === '' || disabled}
       />
     </Section>
-  )
+  );
 };
 
-export default GoalsInput
+export default GoalsInput;
