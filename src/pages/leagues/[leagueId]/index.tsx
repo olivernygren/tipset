@@ -15,7 +15,7 @@ import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants }
 import { withDocumentIdOnObject } from '../../../utils/helpers';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
 import { Section } from '../../../components/section/Section';
-import { theme } from '../../../theme';
+import { devices, theme } from '../../../theme';
 import IconButton from '../../../components/buttons/IconButton';
 import ContextMenu from '../../../components/menu/ContextMenu';
 import ContextMenuOption from '../../../components/menu/ContextMenuOption';
@@ -237,10 +237,12 @@ const PredictionLeaguePage = () => {
   };
 
   return (
-    <Page>
-      <TextButton onClick={() => navigate(`/${RoutesEnum.LEAGUES}`)} icon={<ArrowLeft size={20} color={theme.colors.primary} />} noPadding>
-        Alla ligor
-      </TextButton>
+    <Page fullWidthMobile>
+      <BackButtonContainer>
+        <TextButton onClick={() => navigate(`/${RoutesEnum.LEAGUES}`)} icon={<ArrowLeft size={20} color={theme.colors.primary} />} noPadding>
+          Alla ligor
+        </TextButton>
+      </BackButtonContainer>
       <PageHeader>
         <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
         <Section gap="s" flexDirection="row" alignItems="center" fitContent>
@@ -285,7 +287,7 @@ const PredictionLeaguePage = () => {
             </>
           )}
           {!isParticipant && currentUserId && (
-            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m">
+            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m" expandMobile>
               <HeadingsTypography variant="h5">
                 {`Vill du gå med i ligan ${league?.name}?`}
               </HeadingsTypography>
@@ -308,7 +310,21 @@ const PageHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing.m};
-  padding: ${theme.spacing.s} 0;
+  padding: ${theme.spacing.s};
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.m} 0;
+  }
+`;
+
+const BackButtonContainer = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 0 0 ${theme.spacing.s};
+
+  @media ${devices.tablet} {
+    padding: 0;
+  }
 `;
 
 const PageContent = styled.div`

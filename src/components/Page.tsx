@@ -5,11 +5,12 @@ import RootToast from './toast/RootToast';
 
 interface PageProps {
   children: React.ReactNode;
+  fullWidthMobile?: boolean;
 }
 
-const Page = ({ children }: PageProps) => (
+const Page = ({ children, fullWidthMobile }: PageProps) => (
   <>
-    <Root>
+    <Root fullWidthMobile={fullWidthMobile}>
       <Content>
         {children}
       </Content>
@@ -18,8 +19,8 @@ const Page = ({ children }: PageProps) => (
   </>
 );
 
-const Root = styled.div<{ noPadding?: boolean }>`
-  padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.m)};
+const Root = styled.div<{ fullWidthMobile?: boolean }>`
+  padding: ${({ fullWidthMobile }) => (fullWidthMobile ? `${theme.spacing.m} 0` : theme.spacing.m)};
   min-height: calc(100vh - 80px);
   min-width: 100vw;
   overflow-x: hidden;
@@ -28,7 +29,7 @@ const Root = styled.div<{ noPadding?: boolean }>`
   box-sizing: border-box;
   
   @media ${devices.tablet} {
-    padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.l)};
+    padding: ${theme.spacing.l};
   }
 `;
 

@@ -74,7 +74,7 @@ const StyledMobileMenu = styled(motion.div)`
   inset: 0;
   background-color: ${theme.colors.white};
   z-index: 1000;
-  padding: ${theme.spacing.m};
+  padding: 0 ${theme.spacing.s};
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
@@ -87,7 +87,7 @@ const MenuHeader = styled.div`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  height: fit-content;
+  height: 80px;
 `;
 
 const Links = styled.div`

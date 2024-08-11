@@ -70,7 +70,7 @@ export const getGeneralPositionShorthand = (position: string) => {
 export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
   switch (picture) {
     case ProfilePictureEnum.GRANNEN:
-      return '/images/mr-bean.png';
+      return '/images/grannen.png';
     case ProfilePictureEnum.CARL_GUSTAF:
       return '/images/carl-gustaf.png';
     case ProfilePictureEnum.DONKEY:

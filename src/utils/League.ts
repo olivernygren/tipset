@@ -1,4 +1,4 @@
-import { Fixture, Prediction } from "./Fixture";
+import { Fixture, Prediction } from './Fixture';
 
 export const leagueMaximumParticipants = 20;
 
@@ -45,7 +45,6 @@ export interface LeagueGameWeekFixtures {
 export interface LeagueGameWeek {
   leagueId: string;
   round: number;
-  deadline: Date;
   startDate: Date;
   games: LeagueGameWeekFixtures;
   hasBeenCorrected?: boolean;
@@ -54,7 +53,6 @@ export interface LeagueGameWeek {
 export interface LeagueGameWeekInput {
   leagueId: string;
   round: number;
-  deadline: string;
   startDate: string;
   games: LeagueGameWeekFixtures;
   hasBeenCorrected?: boolean;

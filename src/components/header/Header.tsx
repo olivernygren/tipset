@@ -13,9 +13,11 @@ import { auth } from '../../config/firebase';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
 import MobileMenu from './MobileMenu';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 const Header = () => {
   const { user } = useUser();
+  const isTablet = useResizeListener(DeviceSizes.TABLET);
 
   const hasUserCookie = Cookies.get('user');
 
@@ -44,58 +46,63 @@ const Header = () => {
               <img src="/images/tipset-logo-text.svg" alt="logo" />
             </LogoImageContainer>
           </InvisibleLink>
-          <DesktopNav>
-            <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
-              <NormalTypography variant="m" color={theme.colors.textDefault}>Ligor</NormalTypography>
-              {window && window.location.href.includes(RoutesEnum.LEAGUES) && <ActiveLinkIndicator />}
-            </StyledNavLink>
-            <StyledNavLink href={`/${RoutesEnum.RULES}`}>
-              <NormalTypography variant="m" color={theme.colors.textDefault}>Regler</NormalTypography>
-              {window && window.location.href.includes(RoutesEnum.RULES) && <ActiveLinkIndicator />}
-            </StyledNavLink>
-            <StyledNavLink href={`/${RoutesEnum.HOW_TO_PLAY}`}>
-              <NormalTypography variant="m" color={theme.colors.textDefault}>Hur funkar det?</NormalTypography>
-              {window && window.location.href.includes(RoutesEnum.HOW_TO_PLAY) && <ActiveLinkIndicator />}
-            </StyledNavLink>
-          </DesktopNav>
-          <RightSideItems>
-            {isSignedIn && (
-              <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography>
-              // <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
-            )}
-            {isSignedIn && (
-              <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
-                <IconButton
-                  icon={<User size={24} weight="light" />}
-                  colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                  onClick={() => {}}
-                  title="Profil"
-                  showBorder
-                />
-              </InvisibleLink>
-            )}
-            {isSignedIn ? (
+          {isTablet ? (
+            <MobileMenuButton>
               <IconButton
-                icon={<SignOut size={24} weight="light" />}
-                colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                onClick={handleSignOut}
-                title="Logga ut"
-                showBorder
+                icon={<List size={32} />}
+                colors={{ normal: theme.colors.textDefault, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
+                onClick={() => setIsMobileMenuOpen(true)}
+                title="Meny"
               />
-            ) : (
-              <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
-                <Button variant="primary" size="m">Logga in</Button>
-              </InvisibleLink>
-            )}
-          </RightSideItems>
-          <MobileMenuButton>
-            <IconButton
-              icon={<List size={32} />}
-              colors={{ normal: theme.colors.textDefault, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
-              onClick={() => setIsMobileMenuOpen(true)}
-              title="Meny"
-            />
-          </MobileMenuButton>
+            </MobileMenuButton>
+          ) : (
+            <>
+              <DesktopNavCenter>
+                <StyledNavLink href={`/${RoutesEnum.LEAGUES}`}>
+                  <NormalTypography variant="m" color={theme.colors.textDefault}>Ligor</NormalTypography>
+                  {window && window.location.href.includes(RoutesEnum.LEAGUES) && <ActiveLinkIndicator />}
+                </StyledNavLink>
+                <StyledNavLink href={`/${RoutesEnum.RULES}`}>
+                  <NormalTypography variant="m" color={theme.colors.textDefault}>Regler</NormalTypography>
+                  {window && window.location.href.includes(RoutesEnum.RULES) && <ActiveLinkIndicator />}
+                </StyledNavLink>
+                <StyledNavLink href={`/${RoutesEnum.HOW_TO_PLAY}`}>
+                  <NormalTypography variant="m" color={theme.colors.textDefault}>Hur funkar det?</NormalTypography>
+                  {window && window.location.href.includes(RoutesEnum.HOW_TO_PLAY) && <ActiveLinkIndicator />}
+                </StyledNavLink>
+              </DesktopNavCenter>
+              <RightSideItems>
+                {isSignedIn && (
+                <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography>
+                // <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
+                )}
+                {isSignedIn && (
+                <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
+                  <IconButton
+                    icon={<User size={24} weight="light" />}
+                    colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                    onClick={() => {}}
+                    title="Profil"
+                    showBorder
+                  />
+                </InvisibleLink>
+                )}
+                {isSignedIn ? (
+                  <IconButton
+                    icon={<SignOut size={24} weight="light" />}
+                    colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                    onClick={handleSignOut}
+                    title="Logga ut"
+                    showBorder
+                  />
+                ) : (
+                  <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
+                    <Button variant="primary" size="m">Logga in</Button>
+                  </InvisibleLink>
+                )}
+              </RightSideItems>
+            </>
+          )}
         </Content>
       </StyledHeader>
       {isMobileMenuOpen && (
@@ -112,19 +119,27 @@ const Header = () => {
 const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
   border-bottom: 1px solid ${theme.colors.silverLight};
-  padding: 0 ${theme.spacing.xl};
+  padding: 0 ${theme.spacing.m};
   width: 100vw;
   height: 80px;
   box-sizing: border-box;
+
+  @media ${devices.laptop} {
+    padding: 0 ${theme.spacing.xl};
+  }
 `;
 
 const Content = styled.div`
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   justify-content: space-between;
   height: 100%;
+
+  @media ${devices.laptop} {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 `;
 
 const InvisibleLink = styled.a`
@@ -161,23 +176,16 @@ const StyledNavLink = styled.a`
 
 const MobileMenuButton = styled.div`
   width: fit-content;
-
-  @media ${devices.tablet} {
-    display: none;
-  }
+  margin-left: auto;
 `;
 
-const DesktopNav = styled.div`
-  display: none;
-
-  @media ${devices.tablet} {
-    display: flex;
-    gap: ${theme.spacing.s};
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
+const DesktopNavCenter = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 `;
 
 const RightSideItems = styled.div`

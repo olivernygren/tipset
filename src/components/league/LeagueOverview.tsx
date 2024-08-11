@@ -1,19 +1,21 @@
-import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import styled from 'styled-components';
 import { ArrowCircleRight, PencilSimple, PlusCircle } from '@phosphor-icons/react';
+import React, { useEffect, useState } from 'react';
+import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import { theme, devices } from '../../theme';
 import { getUserStandingPositionInLeague } from '../../utils/firebaseHelpers';
 import Button from '../buttons/Button';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
+// eslint-disable-next-line import/no-cycle
 import { LeagueTabs } from '../../pages/leagues/[leagueId]';
-import { useEffect, useState } from 'react';
 import FixturePreview from '../game/FixturePreview';
 import { Divider } from '../Divider';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
 import PredictionsModal from './PredictionsModal';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -23,8 +25,11 @@ interface LeagueOverviewProps {
   onChangeTab: (tab: LeagueTabs) => void;
 }
 
-const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab }: LeagueOverviewProps) => {
+const LeagueOverview = ({
+  league, isCreator, currentUserId, sortedLeagueStandings, onChangeTab,
+}: LeagueOverviewProps) => {
   const { user, hasAdminRights } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
@@ -34,7 +39,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
       const currentGameWeek = league.gameWeeks.find((gameWeek) => {
         const now = new Date();
-        return new Date(gameWeek.startDate) < now && (new Date(gameWeek.deadline) > now || gameWeek.hasBeenCorrected === false);
+        return new Date(gameWeek.startDate) < now && !gameWeek.hasBeenCorrected && !gameWeek.hasEnded;
       });
 
       if (currentGameWeek) {
@@ -44,7 +49,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
       const previousGameWeek = league.gameWeeks
         .filter((gameWeek) => {
           const now = new Date();
-          return new Date(gameWeek.startDate) < now && new Date(gameWeek.deadline) < now && gameWeek.hasBeenCorrected === true;
+          return new Date(gameWeek.startDate) < now && gameWeek.hasBeenCorrected === true && gameWeek.hasEnded === true;
         })
         .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0];
 
@@ -52,7 +57,6 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         setPreviousGameWeek(previousGameWeek);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getFormattedDeadline = () => {
@@ -66,29 +70,47 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
     const minutes = String(deadline.getMinutes()).padStart(2, '0');
 
     return `${day} ${month} ${year} (${hours}:${minutes})`;
-  }
+  };
 
   const getUserLeagueStandingsItem = (position: number, place?: PredictionLeagueStanding) => {
     if (!place) return null;
     const isLoggedInUser = place.userId === currentUserId;
 
+    let positionEmoji;
+    switch (position) {
+      case 1:
+        positionEmoji = '🥇';
+        break;
+      case 2:
+        positionEmoji = '🥈';
+        break;
+      case 3:
+        positionEmoji = '🥉';
+        break;
+      default:
+        positionEmoji = `${position} -`;
+        break;
+    }
+
     return (
       <UserLeaguePosition isLoggedInUser={isLoggedInUser}>
-        <EmphasisTypography variant='m' color={theme.colors.textDefault}>
-          {position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position} -`} {place.username} {place.userId === currentUserId ? '(Du)' : null}
+        <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+          {`${positionEmoji} ${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
         </EmphasisTypography>
         <RightAlignedGridItem>
-          <NormalTypography variant='m' color={theme.colors.textDefault}>
+          <NormalTypography variant="m" color={theme.colors.textDefault}>
             {place.correctResults}
           </NormalTypography>
         </RightAlignedGridItem>
         <RightAlignedGridItem>
-          <NormalTypography variant='m' color={theme.colors.textDefault}>
-            {place.points} p
+          <NormalTypography variant="m" color={theme.colors.textDefault}>
+            {place.points}
+            {' '}
+            p
           </NormalTypography>
         </RightAlignedGridItem>
       </UserLeaguePosition>
-    )
+    );
   };
 
   return (
@@ -97,27 +119,27 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         <GridSection>
           {league.hasEnded ? (
             <>
-              <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
-              <NormalTypography variant='m' color={theme.colors.textLight}>Ligan har avslutats</NormalTypography>
+              <HeadingsTypography variant="h3">Kommande matcher</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.textLight}>Ligan har avslutats</NormalTypography>
             </>
           ) : (
             <>
-              <HeadingsTypography variant='h3'>Kommande matcher</HeadingsTypography>
+              <HeadingsTypography variant="h3">Kommande matcher</HeadingsTypography>
               {currentGameWeek ? (
-                <Section gap='xxxs' height='100%'>
+                <Section gap="xxxs" height="100%">
                   <FixturesContainer>
                     {currentGameWeek.games.fixtures.map((fixture) => (
                       <FixturePreview
-                        fixture={fixture} 
+                        fixture={fixture}
                         hidePredictions={new Date(fixture.kickOffTime) > new Date()}
                         onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
                         simple
                       />
                     ))}
                   </FixturesContainer>
-                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.deadline && new Date(currentGameWeek.deadline) > new Date() && (
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
                     <MarginTopButton>
-                      <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight='fill' size={24} color={theme.colors.white} />}>
+                      <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight="fill" size={24} color={theme.colors.white} />}>
                         Tippa matcher
                       </Button>
                     </MarginTopButton>
@@ -125,7 +147,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
                 </Section>
               ) : (
                 <>
-                  <NormalTypography variant='m' color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
+                  <NormalTypography variant="m" color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
                   {isCreator && (
                     <MarginTopButton>
                       <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} icon={<PlusCircle size={24} color={theme.colors.white} />}>
@@ -140,10 +162,13 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         </GridSection>
         <GridSection>
           <TableSectionHeader>
-            <HeadingsTypography variant='h3'>Tabell</HeadingsTypography>
+            <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
             {league.standings && league.standings.length > 0 && (
               <>
-                <EmphasisTypography variant='l' color={theme.colors.textLight}>Din placering: {getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}</EmphasisTypography>
+                <EmphasisTypography variant="l" color={theme.colors.textLight}>
+                  Din placering:
+                  {getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}
+                </EmphasisTypography>
                 {/* Show separate user placing somewhere if they are outside the top 5 */}
                 {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
               </>
@@ -152,39 +177,43 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
           {league.standings && league.standings.length > 0 ? (
             <LeagueStandings>
               <LeagueStandingsHeader>
-                <EmphasisTypography variant='s' color={theme.colors.textLight}>Namn</EmphasisTypography>
+                <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
                 <RightAlignedGridItem>
-                  <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Korrekta resultat</EmphasisTypography>
+                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'KR' : 'Korrekta resultat'}</EmphasisTypography>
                 </RightAlignedGridItem>
                 <RightAlignedGridItem>
-                  <EmphasisTypography variant='s' color={theme.colors.textLight} align='right'>Poäng</EmphasisTypography>
+                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
                 </RightAlignedGridItem>
               </LeagueStandingsHeader>
               {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
             </LeagueStandings>
           ) : (
-            <NormalTypography variant='m' color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
+            <NormalTypography variant="m" color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
           )}
         </GridSection>
         <GridSection>
-          <HeadingsTypography variant='h3'>Förra omgången</HeadingsTypography>
+          <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
           {previousGameWeek ? (
-            <Section gap='s' backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
-              <Section justifyContent='space-between' alignItems='center' flexDirection='row' padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
-                <HeadingsTypography variant='h6' color={theme.colors.primaryDark}>Omgång {previousGameWeek.round}</HeadingsTypography>
-                <Section flexDirection='row' gap='s' alignItems='center' fitContent>
-                  <NormalTypography variant='m' color={theme.colors.textLight}>{new Date(previousGameWeek.deadline).toLocaleDateString()}</NormalTypography>
+            <Section gap="s" backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+              <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
+                <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
+                  Omgång
+                  {previousGameWeek.round}
+                </HeadingsTypography>
+                <Section flexDirection="row" gap="s" alignItems="center" fitContent>
                   <RoundPointsContainer>
-                    <EmphasisTypography variant='m' color={theme.colors.gold}>
-                      {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)} poäng
+                    <EmphasisTypography variant="m" color={theme.colors.gold}>
+                      {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
+                      {' '}
+                      poäng
                     </EmphasisTypography>
                   </RoundPointsContainer>
                 </Section>
               </Section>
               <Divider color={theme.colors.silver} />
-              <Section gap='xxs' padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
+              <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
                 {previousGameWeek.games.fixtures.map((fixture) => (
-                  <FixtureResultPreview 
+                  <FixtureResultPreview
                     fixture={fixture}
                     predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
                     compact
@@ -193,33 +222,33 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
               </Section>
             </Section>
           ) : (
-            <NormalTypography variant='m' color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
+            <NormalTypography variant="m" color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
           )}
         </GridSection>
         <GridSection>
-          <Section justifyContent='space-between' alignItems='center' flexDirection='row'>
-            <HeadingsTypography variant='h3'>Information</HeadingsTypography>
+          <Section justifyContent="space-between" alignItems="center" flexDirection="row">
+            <HeadingsTypography variant="h3">Information</HeadingsTypography>
             {(isCreator || hasAdminRights) && !league.hasEnded && (
-              <IconButton 
-                onClick={() => onChangeTab(LeagueTabs.EDIT)} 
+              <IconButton
+                onClick={() => onChangeTab(LeagueTabs.EDIT)}
                 icon={<PencilSimple size={24} />}
                 colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
               />
             )}
           </Section>
           {league.description && (
-            <Section gap='xxxs'>
-              <EmphasisTypography variant='s' color={theme.colors.textLight}>Beskrivning</EmphasisTypography>
-              <NormalTypography variant='m'>{league.description}</NormalTypography>
+            <Section gap="xxxs">
+              <EmphasisTypography variant="s" color={theme.colors.textLight}>Beskrivning</EmphasisTypography>
+              <NormalTypography variant="m">{league.description}</NormalTypography>
             </Section>
           )}
-          <Section gap='xxxs'>
-            <EmphasisTypography variant='s' color={theme.colors.textLight}>Inbjudningskod</EmphasisTypography>
-            <NormalTypography variant='m'>{league.inviteCode}</NormalTypography>
+          <Section gap="xxxs">
+            <EmphasisTypography variant="s" color={theme.colors.textLight}>Inbjudningskod</EmphasisTypography>
+            <NormalTypography variant="m">{league.inviteCode}</NormalTypography>
           </Section>
-          <Section gap='xxxs'>
-            <EmphasisTypography variant='s' color={theme.colors.textLight}>Deadline för att gå med</EmphasisTypography>
-            <NormalTypography variant='m'>{getFormattedDeadline()}</NormalTypography>
+          <Section gap="xxxs">
+            <EmphasisTypography variant="s" color={theme.colors.textLight}>Deadline för att gå med</EmphasisTypography>
+            <NormalTypography variant="m">{getFormattedDeadline()}</NormalTypography>
           </Section>
         </GridSection>
       </OverviewGrid>
@@ -233,7 +262,7 @@ const LeagueOverview = ({ league, isCreator, currentUserId, sortedLeagueStanding
         // should include teams, names of users and predictions with score + goal scorer
       )}
     </>
-  )
+  );
 };
 
 const OverviewGrid = styled.div`
@@ -254,10 +283,14 @@ const GridSection = styled.div`
   gap: ${theme.spacing.s};
   background-color: ${theme.colors.white};
   padding: ${theme.spacing.m};
-  border-radius: ${theme.borderRadius.m};
+  border-radius: 0;
   max-height: 500px;
   overflow-y: auto;
   min-height: 240px;
+
+  @media ${devices.tablet} {
+    border-radius: ${theme.borderRadius.m};
+  }
 `;
 
 const MarginTopButton = styled.div`
@@ -274,7 +307,7 @@ const LeagueStandings = styled.div`
   box-sizing: border-box;
 `;
 
-const UserLeaguePosition = styled.div<{isLoggedInUser: boolean}>`
+const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: ${theme.spacing.xxs};
@@ -283,7 +316,7 @@ const UserLeaguePosition = styled.div<{isLoggedInUser: boolean}>`
   border-radius: ${theme.borderRadius.xs};
   background-color: ${theme.colors.silverLighter};
   box-sizing: border-box;
-  border: ${({ isLoggedInUser }) => isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none'};
+  border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')};
 `;
 
 const LeagueStandingsHeader = styled.div`

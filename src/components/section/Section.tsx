@@ -1,5 +1,6 @@
-import styled from "styled-components";
-import { theme } from "../../theme";
+/* eslint-disable import/prefer-default-export */
+import styled from 'styled-components';
+import { devices, theme } from '../../theme';
 
 interface SectionProps {
   flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
@@ -11,6 +12,7 @@ interface SectionProps {
   borderRadius?: string;
   fitContent?: boolean;
   height?: string;
+  expandMobile?: boolean;
 }
 
 export const Section = styled.section<SectionProps>`
@@ -21,9 +23,13 @@ export const Section = styled.section<SectionProps>`
   gap: ${({ gap }) => gap && theme.spacing[gap]};
   padding: ${({ padding }) => padding || 0};
   background-color: ${({ backgroundColor }) => backgroundColor || 'transparent'};
-  border-radius: ${({ borderRadius }) => borderRadius || 0};
+  border-radius: ${({ borderRadius, expandMobile }) => (expandMobile || !borderRadius ? 0 : borderRadius)};
   box-sizing: border-box;
-  width: ${({ fitContent }) => fitContent ? 'fit-content' : '100%'};
+  width: ${({ fitContent }) => (fitContent ? 'fit-content' : '100%')};
   position: relative;
   height: ${({ height }) => height || 'auto'};
+
+  @media ${devices.tablet} {
+    border-radius: ${({ borderRadius }) => borderRadius || 0};
+  }
 `;

@@ -36,7 +36,7 @@ const Tag = ({
       textAndIconColor={textAndIconColor}
     >
       {icon}
-      <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size}>
+      <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
         {text}
       </NormalTypography>
     </StyledTag>
@@ -53,6 +53,10 @@ const StyledTag = styled.div<{ size: string, fullWidth?: boolean, backgroundColo
   width: fit-content;
   box-sizing: border-box;
   background-color: ${({ backgroundColor }) => backgroundColor};
+
+  ${NormalTypography} {
+    white-space: nowrap;
+  }
 
   svg {
     path {

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-  CheckSquareOffset, PencilSimple, PlusCircle, XCircle,
+  CheckSquareOffset, PlusCircle, XCircle,
 } from '@phosphor-icons/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { LeagueGameWeek, LeagueGameWeekInput, PredictionLeague } from '../../utils/League';
 import { Section } from '../section/Section';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
 import { Divider } from '../Divider';
@@ -36,6 +36,8 @@ import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
 import RootToast from '../toast/RootToast';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
+import Tag from '../tag/Tag';
+// import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -52,6 +54,7 @@ enum GameWeekPredictionStatus {
 
 const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) => {
   const { user, hasAdminRights } = useUser();
+  // const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [ongoingGameWeek, setOngoingGameWeek] = useState<LeagueGameWeek>();
   const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek>();
@@ -64,7 +67,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
-  const [newGameWeekDeadline, setNewGameWeekDeadline] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
 
   const [addFixtureViewOpen, setAddFixtureViewOpen] = useState<boolean>(false);
@@ -97,7 +99,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
       const currentGameWeek = league.gameWeeks.find((gameWeek) => {
         const now = new Date();
-        return new Date(gameWeek.startDate) < now && (new Date(gameWeek.deadline) > now || gameWeek.hasBeenCorrected === false);
+        return new Date(gameWeek.startDate) < now && gameWeek.hasBeenCorrected === false;
       });
 
       const nextGameWeek = league.gameWeeks.find((gameWeek) => {
@@ -105,10 +107,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         return new Date(gameWeek.startDate) > now;
       });
 
-      const allPreviousGameWeeks = league.gameWeeks.filter((gameWeek) => {
-        const now = new Date();
-        return new Date(gameWeek.deadline) < now && gameWeek.hasBeenCorrected;
-      });
+      const allPreviousGameWeeks = league.gameWeeks.filter((gameWeek) => gameWeek.hasBeenCorrected && gameWeek.hasEnded);
 
       setOngoingGameWeek(currentGameWeek);
       setUpcomingGameWeek(nextGameWeek);
@@ -156,8 +155,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setCreateGameWeekError(null);
     setCreateGameWeekLoading(true);
 
-    const today = new Date();
-
     if (!isCreator && !hasAdminRights) {
       setCreateGameWeekError('Du har inte rättigheter att skapa en ny omgång');
       setCreateGameWeekLoading(false);
@@ -166,18 +163,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     if (upcomingGameWeek) {
       setCreateGameWeekError('Det finns redan en kommande omgång');
-      setCreateGameWeekLoading(false);
-      return;
-    }
-
-    if (ongoingGameWeek && newGameWeekStartDate > new Date(ongoingGameWeek.deadline)) {
-      setCreateGameWeekError('Ny omgång kan inte starta innan pågående omgångs deadline');
-      setCreateGameWeekLoading(false);
-      return;
-    }
-
-    if (newGameWeekDeadline < today) {
-      setCreateGameWeekError('Ogiltig deadline');
       setCreateGameWeekLoading(false);
       return;
     }
@@ -192,7 +177,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       leagueId: league.documentId,
       round: (league && league.gameWeeks !== undefined) ? league.gameWeeks.length + 1 : 1,
       startDate: newGameWeekStartDate.toISOString(),
-      deadline: newGameWeekDeadline.toISOString(),
       games: {
         fixtures: newGameWeekFixtures,
         predictions: [],
@@ -260,13 +244,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
   const handleUpdateKickoffTime = (date: Date) => {
     setNewFixtureKickoffDateTime(date);
-
-    const currentFixtureKickoffTimes = newGameWeekFixtures.map((fixture) => new Date(fixture.kickOffTime).getTime());
-    const earliestKickoffTime = Math.min(...currentFixtureKickoffTimes);
-
-    if (date.getTime() < earliestKickoffTime) {
-      setNewGameWeekDeadline(date);
-    }
   };
 
   const handleResetNewFixture = () => {
@@ -573,11 +550,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           fullWidth
         />
       </Section>
-      <Checkbox
-        label="Ska målskytt i matchen tippas?"
-        checked={newFixtureShouldPredictGoalScorer}
-        onChange={() => setNewFixtureShouldPredictGoalScorer(!newFixtureShouldPredictGoalScorer)}
-      />
+      {(newFixtureHomeTeam?.name === 'Arsenal' || newFixtureAwayTeam?.name === 'Arsenal') && (
+        <Checkbox
+          label="Ska målskytt i matchen tippas?"
+          checked={newFixtureShouldPredictGoalScorer}
+          onChange={() => setNewFixtureShouldPredictGoalScorer(!newFixtureShouldPredictGoalScorer)}
+        />
+      )}
       {newFixtureShouldPredictGoalScorer && newFixtureHomeTeam && newFixtureAwayTeam && (
         <Section gap="xxs">
           <EmphasisTypography variant="s">Vilket lag ska målskytten tillhöra?</EmphasisTypography>
@@ -616,31 +595,18 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     >
       <Section flexDirection="row" justifyContent="space-between" alignItems="center">
         <HeadingsTypography variant="h4">Skapa ny omgång</HeadingsTypography>
-        <Section
-          backgroundColor={theme.colors.primaryFade}
-          padding={theme.spacing.xxs}
-          borderRadius={theme.borderRadius.s}
-          fitContent
-        >
-          <EmphasisTypography variant="m" color={theme.colors.primaryDark}>
-            Omgång
-            {getNewGameWeekRoundNumber()}
-          </EmphasisTypography>
-        </Section>
+        <Tag
+          text={`Omgång ${getNewGameWeekRoundNumber()}`}
+          textAndIconColor={theme.colors.primaryDark}
+          backgroundColor={theme.colors.primaryBleach}
+          size="l"
+        />
       </Section>
-      <Divider />
       <Section flexDirection="row" alignItems="center" gap="l">
         <CustomDatePicker
           label="Startdatum (kan tippas fr.o.m.)"
           selectedDate={newGameWeekStartDate}
           onChange={(date) => setNewGameWeekStartDate(date!)}
-          fullWidth
-        />
-        <CustomDatePicker
-          label="Deadline att tippa"
-          selectedDate={newGameWeekDeadline}
-          onChange={(date) => setNewGameWeekDeadline(date!)}
-          fullWidth
         />
       </Section>
       <Divider />
@@ -648,22 +614,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <HeadingsTypography variant="h5">Matcher</HeadingsTypography>
         {newGameWeekFixtures.length > 0 && (
           newGameWeekFixtures.map((fixture, index) => (
-            <Section flexDirection="row" gap="s" key={index} alignItems="center">
-              <NormalTypography variant="m">
-                {fixture.homeTeam.name}
-                {' '}
-                -
-                {' '}
-                {fixture.awayTeam.name}
-              </NormalTypography>
-              <Button
-                color="red"
-                size="s"
-                icon={<XCircle size={16} color={theme.colors.white} />}
-                onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((_, i) => i !== index))}
-              >
-                Ta bort
-              </Button>
+            <Section flexDirection="row" gap="xxs" alignItems="center">
+              <FixturePreview fixture={fixture} key={index} hidePredictions />
+              <IconButton
+                icon={<XCircle size={24} weight="fill" />}
+                colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
+              />
             </Section>
           ))
         )}
@@ -674,20 +631,24 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           </CreateFixtureCard>
         )}
       </Section>
-      <Divider />
-      {createGameWeekError && (
-        <NormalTypography variant="m" color={theme.colors.red}>
-          {createGameWeekError}
-        </NormalTypography>
+      {!addFixtureViewOpen && (
+        <>
+          <Divider />
+          {createGameWeekError && (
+            <NormalTypography variant="m" color={theme.colors.red}>
+              {createGameWeekError}
+            </NormalTypography>
+          )}
+          <Section flexDirection="row" gap="xs">
+            <Button variant="secondary" onClick={() => setShowCreateGameWeekSection(false)}>
+              Avbryt
+            </Button>
+            <Button variant="primary" onClick={handleCreateGameWeek} disabled={addFixtureViewOpen || createGameWeekLoading} loading={createGameWeekLoading}>
+              Skapa omgång
+            </Button>
+          </Section>
+        </>
       )}
-      <Section flexDirection="row" gap="xs">
-        <Button variant="secondary" onClick={() => setShowCreateGameWeekSection(false)}>
-          Avbryt
-        </Button>
-        <Button variant="primary" onClick={handleCreateGameWeek} disabled={addFixtureViewOpen || createGameWeekLoading} loading={createGameWeekLoading}>
-          Skapa omgång
-        </Button>
-      </Section>
     </CreateGameWeekSection>
   );
 
@@ -750,30 +711,26 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             borderRadius={theme.borderRadius.l}
             padding={theme.spacing.m}
             gap="s"
+            expandMobile
           >
-            <Section flexDirection="row" justifyContent="space-between" alignItems="center">
+            <OngoingGameWeekHeader>
               <HeadingsTypography variant="h4">Pågående omgång</HeadingsTypography>
-              <Section flexDirection="row" alignItems="center" gap="s" fitContent>
+              <Section flexDirection="row" alignItems="center" gap="s" justifyContent="space-between">
                 <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
-                <Section
-                  backgroundColor={theme.colors.primaryFade}
-                  padding={theme.spacing.xxs}
-                  borderRadius={theme.borderRadius.s}
-                  fitContent
-                >
-                  <EmphasisTypography variant="m" color={theme.colors.primaryDark}>
-                    Omgång
-                    {ongoingGameWeek.round}
-                  </EmphasisTypography>
-                </Section>
+                <Tag
+                  text={`Omgång ${ongoingGameWeek.round}`}
+                  textAndIconColor={theme.colors.primaryDark}
+                  backgroundColor={theme.colors.primaryBleach}
+                  size="l"
+                />
                 {(isCreator || hasAdminRights) && (
                   <>
-                    <IconButton
+                    {/* <IconButton
                       icon={<PencilSimple size={24} />}
                       colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                       onClick={() => setEditGameWeekViewOpen(true)}
-                    />
-                    {new Date(ongoingGameWeek.deadline) < new Date() && (
+                    /> */}
+                    {ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
                       showCorrectGameWeekContent ? (
                         <IconButton
                           icon={<XCircle size={24} />}
@@ -791,7 +748,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                   </>
                 )}
               </Section>
-            </Section>
+            </OngoingGameWeekHeader>
             {getOngoingGameWeekContent()}
           </Section>
         )}
@@ -801,6 +758,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             borderRadius={theme.borderRadius.l}
             padding={theme.spacing.m}
             gap="s"
+            expandMobile
           >
             <HeadingsTypography variant="h4">Nästa omgång</HeadingsTypography>
             {upcomingGameWeek ? (
@@ -826,6 +784,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           borderRadius={theme.borderRadius.l}
           padding={theme.spacing.m}
           gap="s"
+          expandMobile
         >
           <HeadingsTypography variant="h4">Föregående omgångar</HeadingsTypography>
           {previousGameWeeks && previousGameWeeks.length > 0 ? (
@@ -838,7 +797,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       {gameWeek.round}
                     </HeadingsTypography>
                     <Section flexDirection="row" gap="s" alignItems="center" fitContent>
-                      <NormalTypography variant="m" color={theme.colors.textLight}>{new Date(gameWeek.deadline).toLocaleDateString()}</NormalTypography>
                       <RoundPointsContainer>
                         <EmphasisTypography variant="m" color={theme.colors.gold}>
                           {gameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
@@ -947,6 +905,19 @@ const RoundPointsContainer = styled.div`
   background-color: ${theme.colors.primaryDark};
   border-radius: ${theme.borderRadius.s};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+`;
+
+const OngoingGameWeekHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xs};
+  width: 100%;
+
+  @media ${devices.tablet} {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 `;
 
 export default FixturesView;

@@ -192,7 +192,7 @@ const PredictionLeaguesPage = () => {
           <Tag
             text={league.gameWeeks && league.gameWeeks.length > 0 ? `Omgång ${league.gameWeeks.length ?? 0}` : 'Ej startad'}
             textAndIconColor={isHovered ? theme.colors.white : theme.colors.textDefault}
-            backgroundColor={isHovered ? theme.colors.primaryLight : theme.colors.silverLighter}
+            backgroundColor={isHovered ? theme.colors.primaryDark : theme.colors.silverLighter}
           />
           <PointsContainer isHovered={isHovered}>
             <EmphasisTypography variant="l" color={isHovered ? theme.colors.gold : theme.colors.primary}>{`${league.standings.find((standing) => standing.userId === currentUserId)?.points}p`}</EmphasisTypography>
@@ -200,7 +200,7 @@ const PredictionLeaguesPage = () => {
         </Section>
         <Section gap="s">
           <EmphasisTypography variant="l" color={isHovered ? theme.colors.gold : theme.colors.textDefault}>{league.name}</EmphasisTypography>
-          <NormalTypography variant="m" color={isHovered ? theme.colors.textLighter : theme.colors.textLight}>{league.description}</NormalTypography>
+          <NormalTypography variant="m" color={isHovered ? theme.colors.primaryBleach : theme.colors.textLighter}>{league.description}</NormalTypography>
         </Section>
         <BottomRow>
           {league.hasEnded ? (
@@ -443,7 +443,7 @@ const PointsContainer = styled.div<{ isHovered: boolean }>`
   height: 40px;
   padding: ${theme.spacing.xxs};
   border-radius: 100px;
-  background-color: ${({ isHovered }) => (isHovered ? theme.colors.primaryLight : theme.colors.silverLighter)};
+  background-color: ${({ isHovered }) => (isHovered ? theme.colors.primaryDark : theme.colors.silverLighter)};
   display: flex;
   align-items: center;
   justify-content: center;

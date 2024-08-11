@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { theme } from '../../theme';
 import { CaretDown } from '@phosphor-icons/react';
+import { theme } from '../../theme';
 
 export interface OptionItem {
   value: string;
@@ -19,7 +19,6 @@ interface SelectProps {
   optionGroups?: Array<OptionGroup>;
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
   disabled?: boolean;
   fullWidth?: boolean;
   compact?: boolean;
@@ -31,37 +30,37 @@ interface StyledSelectProps {
   compact?: boolean;
 }
 
-const Select = ({ options, optionGroups, value, onChange, placeholder, disabled, fullWidth, compact }: SelectProps) => {
-  return (
-    <SelectWrapper
+const Select = ({
+  options, optionGroups, value, onChange, disabled, fullWidth, compact,
+}: SelectProps) => (
+  <SelectWrapper
+    disabled={disabled}
+    fullWidth={fullWidth}
+    compact={compact}
+  >
+    <StyledSelect
+      defaultValue="Välj"
+      value={value}
       disabled={disabled}
-      fullWidth={fullWidth}
-      compact={compact}
+      onChange={(e) => onChange(e.currentTarget.value)}
     >
-      <StyledSelect
-        defaultValue={'Välj'}
-        value={value}
-        disabled={disabled}
-        onChange={(e) => onChange(e.currentTarget.value)}
-      >
-        {optionGroups ? optionGroups.map((optionGroup) => (
-          <optgroup key={optionGroup.label} label={optionGroup.label}>
-            {optionGroup.options.map((option) => (
-              <StyledOption key={option.value} value={option.value}>{option.label}</StyledOption>
-            ))}
-          </optgroup>
-        )) : (
-          <>
-            {options.map((option) => (
-              <StyledOption key={option.value} value={option.value}>{option.label}</StyledOption>
-            ))}
-          </>
-        )}
-      </StyledSelect>
-      <CaretDown size={16} weight='bold' color={disabled ? theme.colors.silverDark : theme.colors.textDefault} />
-    </SelectWrapper>
-  )
-};
+      {optionGroups ? optionGroups.map((optionGroup) => (
+        <optgroup key={optionGroup.label} label={optionGroup.label}>
+          {optionGroup.options.map((option) => (
+            <StyledOption key={option.value} value={option.value}>{option.label}</StyledOption>
+          ))}
+        </optgroup>
+      )) : (
+        <>
+          {options.map((option) => (
+            <StyledOption key={option.value} value={option.value}>{option.label}</StyledOption>
+          ))}
+        </>
+      )}
+    </StyledSelect>
+    <CaretDown size={16} weight="bold" color={disabled ? theme.colors.silverDark : theme.colors.textDefault} />
+  </SelectWrapper>
+);
 
 const SelectWrapper = styled.div<StyledSelectProps>`
   display: inline-flex;
@@ -69,14 +68,14 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   justify-content: flex-end;
   align-items: center;
   min-width: 200px;
-  min-height: ${({ compact }) => compact ? '36px' : '44px'};
-  width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
+  min-height: ${({ compact }) => (compact ? '36px' : '44px')};
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
   padding-right: ${theme.spacing.xxs};
   position: relative;
   background-color: ${theme.colors.white};
 
   border-radius: ${theme.borderRadius.s};
-  border: 1px solid ${({ disabled }) => disabled ? theme.colors.silverLight : theme.colors.silver};
+  border: 1px solid ${({ disabled }) => (disabled ? theme.colors.silverLight : theme.colors.silver)};
   box-sizing: border-box;
 
   &:focus-within {

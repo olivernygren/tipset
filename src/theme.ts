@@ -1,12 +1,12 @@
 export const theme = {
   colors: {
-    primary: '#0070f3',
-    primaryLight: '#3291ff',
-    primaryLighter: '#7abaff',
-    primaryBleach: '#CCE0F6',
-    primaryFade: '#f0f7ff',
-    primaryDark: '#0766d8',
-    primaryDarker: '#0544a6',
+    primary: '#09BC8A',
+    primaryLight: '#2FD2A4',
+    primaryLighter: '#64E2C0',
+    primaryBleach: '#C4F7E7',
+    primaryFade: '#E6FBF4',
+    primaryDark: '#08846E',
+    primaryDarker: '#07966E',
     white: '#ffffff',
     black: '#000000',
     textDefault: '#333333',
@@ -27,7 +27,7 @@ export const theme = {
     red: '#E22B2B',
     redDark: '#B81A1A',
     redDarker: '#7D0707',
-    gold: '#FFD700',
+    gold: '#FFCF56',
     green: '#52C68E',
   },
   spacing: {

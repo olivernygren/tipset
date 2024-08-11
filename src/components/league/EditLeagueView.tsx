@@ -86,34 +86,36 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
         borderRadius={theme.borderRadius.m}
       >
         <HeadingsTypography variant="h4">Redigera liga</HeadingsTypography>
-        <InputContainer>
-          <Input
-            label="Namn"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-          />
-          <Input
-            label="Beskrivning"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-          />
-          <CustomDatePicker
-            label="Deadline att gå med"
-            selectedDate={deadlineToJoin}
-            onChange={(date) => setDeadlineToJoin(date!)}
-            fullWidth
-          />
-        </InputContainer>
-        <Button
-          variant="primary"
-          onClick={handleUpdateLeague}
-          loading={updateLoading}
-          disabled={name.length === 0}
-        >
-          Spara
-        </Button>
+        <Section gap="s">
+          <InputContainer>
+            <Input
+              label="Namn"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+            />
+            <Input
+              label="Beskrivning"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
+            />
+            <CustomDatePicker
+              label="Deadline att gå med"
+              selectedDate={deadlineToJoin}
+              onChange={(date) => setDeadlineToJoin(date!)}
+              fullWidth
+            />
+          </InputContainer>
+          <Button
+            variant="primary"
+            onClick={handleUpdateLeague}
+            loading={updateLoading}
+            disabled={name.length === 0}
+          >
+            Spara
+          </Button>
+        </Section>
         <EndLeagueContainer>
           <Section gap="xxs">
             <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
