@@ -4,7 +4,7 @@ import {
   deleteDoc, doc, getDoc, updateDoc,
 } from 'firebase/firestore';
 import {
-  ArrowLeft, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
+  ArrowLeft, CaretDown, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -30,6 +30,7 @@ import FixturesView from '../../../components/league/FixturesView';
 import ParticipantsView from '../../../components/league/ParticipantsView';
 import EditLeagueView from '../../../components/league/EditLeagueView';
 import { errorNotify } from '../../../utils/toast/toastHelpers';
+import useResizeListener, { DeviceSizes } from '../../../utils/hooks/useResizeListener';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -41,6 +42,7 @@ export enum LeagueTabs {
 const PredictionLeaguePage = () => {
   const navigate = useNavigate();
   const { user, hasAdminRights } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [tabs, setTabs] = useState([LeagueTabs.OVERVIEW, LeagueTabs.MATCHES, LeagueTabs.PARTICIPANTS]);
   const [league, setLeague] = useState<PredictionLeague | undefined>();
@@ -51,6 +53,7 @@ const PredictionLeaguePage = () => {
   const [joinLeagueLoading, setJoinLeagueLoading] = useState<boolean>(false);
   const [showJoinLeagueError, setShowJoinLeagueError] = useState<string>('');
   const [sortedLeagueStandings, setSortedLeagueStandings] = useState<Array<PredictionLeagueStanding>>([]);
+  const [mobileTabsMenuOpen, setMobileTabsMenuOpen] = useState<boolean>(false);
 
   const leagueIdFromUrl = window.location.pathname.split('/')[2];
   const currentUserId = auth.currentUser?.uid ?? '';
@@ -273,16 +276,55 @@ const PredictionLeaguePage = () => {
         <PageContent>
           {isParticipant && (
             <>
-              <TabsContainer>
-                {tabs.map((tab) => (
-                  <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
-                    {getTabIcon(tab, activeTab === tab)}
-                    <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
-                      {getTabText(tab)}
-                    </EmphasisTypography>
-                  </Tab>
-                ))}
-              </TabsContainer>
+              {isMobile ? (
+                <MobileTabs>
+                  <MobileTabsButton onClick={() => setMobileTabsMenuOpen(!mobileTabsMenuOpen)}>
+                    <Section flexDirection="row" alignItems="center" gap="xxs">
+                      {getTabIcon(activeTab, true)}
+                      <EmphasisTypography variant="m" color={theme.colors.primary}>
+                        {getTabText(activeTab)}
+                      </EmphasisTypography>
+                    </Section>
+                    <MobileMenuIcon isOpen={mobileTabsMenuOpen}>
+                      <CaretDown size={16} color={theme.colors.primary} weight="bold" />
+                    </MobileMenuIcon>
+                  </MobileTabsButton>
+                  {mobileTabsMenuOpen && (
+                    <MobileTabsOptionsMenu
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {tabs.map((tab) => (
+                        <MobileMenuOption
+                          isActive={activeTab === tab}
+                          onClick={() => {
+                            setActiveTab(tab);
+                            setMobileTabsMenuOpen(false);
+                          }}
+                        >
+                          <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
+                            {getTabText(tab)}
+                          </EmphasisTypography>
+                          {getTabIcon(tab, activeTab === tab)}
+                        </MobileMenuOption>
+                      ))}
+                    </MobileTabsOptionsMenu>
+                  )}
+                </MobileTabs>
+              ) : (
+                <TabsContainer>
+                  {tabs.map((tab) => (
+                    <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
+                      {getTabIcon(tab, activeTab === tab)}
+                      <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
+                        {getTabText(tab)}
+                      </EmphasisTypography>
+                    </Tab>
+                  ))}
+                </TabsContainer>
+              )}
               {getPageContent()}
             </>
           )}
@@ -369,6 +411,63 @@ const Tab = styled(motion.div)<{ active?: boolean }>`
       }
     }
   `}
+`;
+
+const MobileTabsButton = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  border-radius: ${theme.borderRadius.m};
+  background-color: ${theme.colors.white};
+  padding: 0 ${theme.spacing.s};
+
+  svg {
+    fill: ${theme.colors.primary};
+  }
+`;
+
+const MobileMenuIcon = styled.div<{ isOpen: boolean }>`
+  transition: transform 0.2s;
+  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+`;
+
+const MobileTabs = styled.div`
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 ${theme.spacing.s};
+
+  @media ${devices.tablet} {
+    padding: 0;
+  }
+`;
+
+const MobileTabsOptionsMenu = styled(motion.div)`
+  position: absolute;
+  top: calc(48px + 8px);
+  right: ${theme.spacing.s};
+  left: ${theme.spacing.s};
+  padding: ${theme.spacing.xxxs};
+  background-color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.m};
+  border: 1px solid ${theme.colors.silverLight};
+  height: fit-content;
+  z-index: 10;
+`;
+
+const MobileMenuOption = styled.div<{ isActive?: boolean }>`
+  padding: 0 ${theme.spacing.xs};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: ${theme.borderRadius.s};
+  gap: ${theme.spacing.xs};
+  height: 40px;
+  background-color: ${({ isActive }) => (isActive ? theme.colors.primary : theme.colors.white)};
 `;
 
 export default PredictionLeaguePage;
