@@ -128,6 +128,7 @@ export const Teams = {
     },
     {
       name: 'Bournemouth',
+      shortName: 'B‘mouth',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg',
       stadium: 'Vitality Stadium',
     },

@@ -49,7 +49,11 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   return (
     <Card>
       <HeadingsTypography variant={isMobile ? 'h5' : 'h4'} color={theme.colors.gold}>
-        <UserName userId={prediction.userId} />
+        {prediction.username ? (
+          prediction.username
+        ) : (
+          <UserName userId={prediction.userId} />
+        )}
       </HeadingsTypography>
       <PointsContainer>
         <HeadingsTypography variant={isMobile ? 'h2' : 'h1'} color={theme.colors.gold}>

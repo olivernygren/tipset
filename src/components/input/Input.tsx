@@ -31,41 +31,46 @@ interface StyledInputProps {
   compact?: boolean;
 }
 
-const Input = ({ value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, minDate }: InputProps) => {
-  return (
-    <Section gap='xxxs'>
-      {label && (
-        <LabelContainer>
-          <EmphasisTypography variant='s'>{label}</EmphasisTypography>
-        </LabelContainer>
-      )}
-      <StyledInput
-        name={name}
-        type={type || 'text'}
-        value={value}
-        onChange={onChange}
-        maxLength={maxLength}
-        maxWidth={maxWidth}
-        placeholder={placeholder}
-        disabled={disabled}
-        fullWidth={fullWidth}
-        textAlign={textAlign}
-        fontSize={fontSize}
-        fontWeight={fontWeight}
-        compact={compact}
-        min={minDate}
-      />
-      {maxLength && (
-        <NormalTypography variant='s' color={theme.colors.textLight}>
-          {value.length} / {maxLength} tecken
-        </NormalTypography>
-      )}
-    </Section>
-  )
-}
+const Input = ({
+  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, minDate,
+}: InputProps) => (
+  <Section gap="xxxs">
+    {label && (
+    <LabelContainer>
+      <EmphasisTypography variant="s">{label}</EmphasisTypography>
+    </LabelContainer>
+    )}
+    <StyledInput
+      name={name}
+      type={type || 'text'}
+      value={value}
+      onChange={onChange}
+      maxLength={maxLength}
+      maxWidth={maxWidth}
+      placeholder={placeholder}
+      disabled={disabled}
+      fullWidth={fullWidth}
+      textAlign={textAlign}
+      fontSize={fontSize}
+      fontWeight={fontWeight}
+      compact={compact}
+      min={minDate}
+    />
+    {maxLength && (
+      <NormalTypography variant="s" color={theme.colors.textLight}>
+        {value.length}
+        {' '}
+        /
+        {maxLength}
+        {' '}
+        tecken
+      </NormalTypography>
+    )}
+  </Section>
+);
 
 const StyledInput = styled.input<StyledInputProps>`
-  width: ${({ fullWidth }) => fullWidth ? '100%' : 'auto'};
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   text-align: ${({ textAlign }) => textAlign || 'left'};
@@ -79,7 +84,7 @@ const StyledInput = styled.input<StyledInputProps>`
   transition: border-color 0.1s;
   box-sizing: border-box;
   color: ${theme.colors.textDefault};
-  height: ${({ compact }) => compact ? '40px' : '48px'};
+  height: ${({ compact }) => (compact ? '40px' : '48px')};
 
   &:focus {
     border-color: ${theme.colors.primary};

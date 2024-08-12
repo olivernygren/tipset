@@ -93,12 +93,13 @@ const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: b
   display: flex;
   flex-direction: column;
   background-color: ${theme.colors.white};
-  max-height: 85vh;
+  max-height: 90vh;
   height: fit-content;
   width: ${({ width }) => width};
   border-radius: ${({ mobileBottomSheet }) => (mobileBottomSheet ? `${theme.borderRadius.m} ${theme.borderRadius.m} 0 0` : theme.borderRadius.l)};
-
+  
   @media ${devices.tablet} {
+    max-height: 85vh;
     border-radius: ${theme.borderRadius.l};
   }
 `;
@@ -111,7 +112,11 @@ const ModalContent = styled.div<{ headerDivider?: boolean }>`
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.l : 0)} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
+  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.m : 0)} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
+
+  @media ${devices.tablet} {
+    padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.l : 0)} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
+  }
 `;
 
 const Header = styled.div<{ headerDivider?: boolean }>`
@@ -120,12 +125,16 @@ const Header = styled.div<{ headerDivider?: boolean }>`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  padding: ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.s} ${theme.spacing.l};
+  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
   
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};
     padding-bottom: ${theme.spacing.s};
   `}
+
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.s} ${theme.spacing.l};
+  }
 `;
 
 const GlobalStyle = createGlobalStyle`

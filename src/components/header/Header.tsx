@@ -43,7 +43,7 @@ const Header = () => {
         <Content>
           <InvisibleLink href="/">
             <LogoImageContainer>
-              <img src="/images/tipset-logo-text.svg" alt="logo" />
+              <img src="/images/logo.svg" alt="logo" />
             </LogoImageContainer>
           </InvisibleLink>
           {isTablet ? (

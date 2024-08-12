@@ -7,6 +7,8 @@ import IconButton from '../buttons/IconButton';
 import { EmphasisTypography } from '../typography/Typography';
 import Button from '../buttons/Button';
 import { RoutesEnum } from '../../utils/Routes';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
+import { useUser } from '../../context/UserContext';
 
 interface MobileMenuProps {
   onClose: () => void;
@@ -15,6 +17,8 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
+  const { user } = useUser();
+
   const links = [
     {
       label: 'Startsida',
@@ -57,14 +61,30 @@ const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
       </Links>
       <BottomLinks>
         {isSignedIn ? (
-          <Button
-            variant="secondary"
-            endIcon={<SignOut size={24} color={theme.colors.primary} />}
-            onClick={onSignOut}
-            fullWidth
-          >
-            Logga ut
-          </Button>
+          <>
+            <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
+              <ProfileLink>
+                {user && user.profilePicture && (
+                  <Avatar
+                    src={`/images/${user.profilePicture}.png`}
+                    size={AvatarSize.M}
+                    objectFit="cover"
+                    showBorder
+                    alt="avatar"
+                  />
+                )}
+                <EmphasisTypography variant="l">{user?.firstname && user?.lastname ? `${user.firstname} ${user.lastname}` : 'Min profil'}</EmphasisTypography>
+              </ProfileLink>
+            </InvisibleLink>
+            <Button
+              variant="secondary"
+              endIcon={<SignOut size={24} color={theme.colors.primary} />}
+              onClick={onSignOut}
+              fullWidth
+            >
+              Logga ut
+            </Button>
+          </>
         ) : (
           <InvisibleLink href={`/${RoutesEnum.LOGIN}`}>
             <Button variant="primary" size="m" fullWidth>Logga in</Button>
@@ -115,7 +135,7 @@ const PlainLink = styled.a`
 
 const BottomLinks = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: ${theme.spacing.m};
   align-items: center;
   justify-content: center;
@@ -125,6 +145,15 @@ const BottomLinks = styled.div`
 const InvisibleLink = styled.a`
   text-decoration: none;
   color: inherit;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const ProfileLink = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${theme.spacing.xxs};
   width: 100%;
   box-sizing: border-box;
 `;

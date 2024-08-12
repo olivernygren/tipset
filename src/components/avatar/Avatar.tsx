@@ -85,23 +85,27 @@ const getAvatarPadding = (objectFit: 'cover' | 'contain', size: AvatarSize) => {
   }
 };
 
-// const StyledAvatar = styled.img<AvatarProps>`
-//   border-radius: ${({ shape }) => shape === 'circle' ? '50%' : theme.borderRadius.xs};
-//   width: ${({ size }) => getAvatarSize(size)};
-//   height: ${({ size }) => getAvatarSize(size)};
-//   object-fit: ${({ objectFit }) => objectFit};
-//   object-position: center;
-//   border: ${({ showBorder, customBorderColor }) => showBorder ? `2px solid ${customBorderColor || theme.colors.silverLight}` : 'none'};
-//   padding: ${({ objectFit }) => objectFit === 'contain' ? theme.spacing.xxs : '0'};
-// `;
+const getAvatarMargin = (objectFit: 'cover' | 'contain', size: AvatarSize) => {
+  switch (objectFit) {
+    case 'cover':
+      if (size === AvatarSize.XS) {
+        return theme.spacing.xxxs;
+      }
+      return theme.spacing.xxs;
+    case 'contain':
+      return 0;
+    default:
+      return 0;
+  }
+};
 
 const StyledAvatar = styled.div<StyledAvatarProps>`
   display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  border: ${({ showBorder, customBorderColor }) => (showBorder ? `2px solid ${customBorderColor || theme.colors.silver}` : 'none')};
+  border: ${({ showBorder, customBorderColor, size }) => (showBorder ? `${size === AvatarSize.XS ? '1px' : '2px'} solid ${customBorderColor || theme.colors.silver}` : 'none')};
   padding: ${({ objectFit, size }) => getAvatarPadding(objectFit, size)};
-  margin: ${({ objectFit }) => (objectFit === 'cover' ? theme.spacing.xxs : '0')};
+  margin: ${({ objectFit, size }) => getAvatarMargin(objectFit, size)};
   overflow: hidden;
   border-radius: 50%;
   background-color: ${({ isDarkMode }) => (isDarkMode ? theme.colors.white : 'transparent')};

@@ -434,6 +434,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setPredictionLoading(null);
   };
 
+  const getNextGameWeekStartDate = () => {
+    if (!upcomingGameWeek) return '';
+    const startDate = new Date(upcomingGameWeek.startDate);
+    const day = startDate.getDate();
+    const month = startDate.toLocaleString('default', { month: 'short' }).replaceAll('.', '');
+    const hours = `${startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}`;
+    const minutes = `${startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}`;
+    return `${day} ${month} ${hours}:${minutes}`;
+  };
+
   const getGameWeekPredictionStatusText = () => {
     switch (gameWeekPredictionStatus) {
       case GameWeekPredictionStatus.ALL_PREDICTED:
@@ -683,6 +693,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               hasBeenCorrected={ongoingGameWeek.hasBeenCorrected || Boolean(fixture.finalResult)}
               onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
               hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+              isCorrectionMode
             />
           ))}
         </Section>
@@ -725,7 +736,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           </Section>
         )}
         {showCreateGameWeekSection && getCreateGameWeekContent()}
-        {ongoingGameWeek && !league.hasEnded && (
+        {!league.hasEnded && (
           <Section
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
@@ -735,43 +746,49 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           >
             <OngoingGameWeekHeader>
               <HeadingsTypography variant="h4">Pågående omgång</HeadingsTypography>
-              <Section flexDirection="row" alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile}>
-                <Section>
-                  <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+              {ongoingGameWeek && (
+                <Section flexDirection="row" alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile}>
+                  <Section>
+                    <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+                  </Section>
+                  <Tag
+                    text={`Omgång ${ongoingGameWeek.round}`}
+                    textAndIconColor={theme.colors.primaryDark}
+                    backgroundColor={theme.colors.primaryBleach}
+                    size="l"
+                  />
+                  {(isCreator || hasAdminRights) && (
+                    <>
+                      {/* <IconButton
+                        icon={<PencilSimple size={24} />}
+                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                        onClick={() => setEditGameWeekViewOpen(true)}
+                      /> */}
+                      {ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
+                        showCorrectGameWeekContent ? (
+                          <IconButton
+                            icon={<XCircle size={24} />}
+                            colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                            onClick={() => setShowCorrectGameWeekContent(false)}
+                          />
+                        ) : (
+                          <IconButton
+                            icon={<CheckSquareOffset size={24} />}
+                            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                            onClick={() => setShowCorrectGameWeekContent(true)}
+                          />
+                        )
+                      )}
+                    </>
+                  )}
                 </Section>
-                <Tag
-                  text={`Omgång ${ongoingGameWeek.round}`}
-                  textAndIconColor={theme.colors.primaryDark}
-                  backgroundColor={theme.colors.primaryBleach}
-                  size="l"
-                />
-                {(isCreator || hasAdminRights) && (
-                  <>
-                    {/* <IconButton
-                      icon={<PencilSimple size={24} />}
-                      colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                      onClick={() => setEditGameWeekViewOpen(true)}
-                    /> */}
-                    {ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
-                      showCorrectGameWeekContent ? (
-                        <IconButton
-                          icon={<XCircle size={24} />}
-                          colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                          onClick={() => setShowCorrectGameWeekContent(false)}
-                        />
-                      ) : (
-                        <IconButton
-                          icon={<CheckSquareOffset size={24} />}
-                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                          onClick={() => setShowCorrectGameWeekContent(true)}
-                        />
-                      )
-                    )}
-                  </>
-                )}
-              </Section>
+              )}
             </OngoingGameWeekHeader>
-            {getOngoingGameWeekContent()}
+            {ongoingGameWeek ? (
+              getOngoingGameWeekContent()
+            ) : (
+              <NormalTypography variant="m" color={theme.colors.textLight}>Ingen pågående omgång</NormalTypography>
+            )}
           </Section>
         )}
         {!league.hasEnded && (
@@ -784,18 +801,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           >
             <HeadingsTypography variant="h4">Nästa omgång</HeadingsTypography>
             {upcomingGameWeek ? (
-              <>
-                <NormalTypography variant="m" color={theme.colors.textLight}>
-                  Antal matcher:
-                  {upcomingGameWeek.games.fixtures.length}
-                </NormalTypography>
-                <NormalTypography variant="m" color={theme.colors.textLight}>
-                  Startdatum:
-                  {new Date(upcomingGameWeek.startDate).toLocaleDateString()}
-                  {' '}
-                  {new Date(upcomingGameWeek.startDate).toLocaleTimeString()}
-                </NormalTypography>
-              </>
+              <NormalTypography variant="m" color={theme.colors.primary}>
+                {`Du kan tippa nästa omgång fr.o.m. ${getNextGameWeekStartDate()}`}
+              </NormalTypography>
             ) : (
               <NormalTypography variant="m" color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
             )}
@@ -815,8 +823,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                 <Section key={gameWeek.round} gap="s" backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
                   <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                     <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
-                      Omgång
-                      {gameWeek.round}
+                      {`Omgång ${gameWeek.round}`}
                     </HeadingsTypography>
                     <Section flexDirection="row" gap="s" alignItems="center" fitContent>
                       <RoundPointsContainer>
@@ -834,7 +841,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       <FixtureResultPreview
                         fixture={fixture}
                         predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                        compact={false}
+                        compact={isMobile}
                       />
                     ))}
                   </Section>

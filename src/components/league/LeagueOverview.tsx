@@ -196,8 +196,7 @@ const LeagueOverview = ({
             <Section gap="s" backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
               <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                 <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
-                  Omgång
-                  {previousGameWeek.round}
+                  {`Omgång ${previousGameWeek.round}`}
                 </HeadingsTypography>
                 <Section flexDirection="row" gap="s" alignItems="center" fitContent>
                   <RoundPointsContainer>

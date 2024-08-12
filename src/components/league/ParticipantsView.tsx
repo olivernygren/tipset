@@ -64,9 +64,11 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
         <HeadingsTypography variant="h4">Deltagare</HeadingsTypography>
         <TableHeader>
           <EmphasisTypography variant="s" color={theme.colors.silverDark}>Namn</EmphasisTypography>
-          <EmphasisTypography variant="s" color={theme.colors.silverDark}>Email</EmphasisTypography>
           {!isMobile && (
-            <EmphasisTypography variant="s" color={theme.colors.silverDark}>ID</EmphasisTypography>
+            <>
+              <EmphasisTypography variant="s" color={theme.colors.silverDark}>Email</EmphasisTypography>
+              <EmphasisTypography variant="s" color={theme.colors.silverDark}>ID</EmphasisTypography>
+            </>
           )}
           <EmptyCell />
         </TableHeader>
@@ -74,20 +76,22 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
           {league.participants.map((participantId) => (
             <TableRow key={participantId}>
               <Section alignItems="center" flexDirection="row" gap="xxs" fitContent>
-                {league.creatorId === participantId && (
-                  <Crown weight="fill" size={24} color={theme.colors.gold} />
-                )}
                 <NoWrapTypography variant="m">
                   <UserName userId={participantId} />
                 </NoWrapTypography>
+                {league.creatorId === participantId && (
+                  <Crown weight="fill" size={24} color={theme.colors.gold} />
+                )}
               </Section>
-              <NormalTypography variant="m">
-                <UserEmail userId={participantId} />
-              </NormalTypography>
               {!isMobile && (
-                <NormalTypography variant="s" color={theme.colors.silverDarker}>
-                  {participantId}
-                </NormalTypography>
+                <>
+                  <NoWrapTypographyNormal variant="m">
+                    <UserEmail userId={participantId} />
+                  </NoWrapTypographyNormal>
+                  <NoWrapTypographyNormal variant="s" color={theme.colors.silverDarker}>
+                    {participantId}
+                  </NoWrapTypographyNormal>
+                </>
               )}
               {(isCreator || hasAdminRights) && user?.documentId !== participantId ? (
                 <IconButton
@@ -135,7 +139,7 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
 
 const TableHeader = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   gap: ${theme.spacing.s};
   border-bottom: 1px solid ${theme.colors.silverLight};
   padding: ${theme.spacing.xxs};
@@ -150,7 +154,7 @@ const TableHeader = styled.div`
 const TableRow = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   gap: ${theme.spacing.s};
   padding: ${theme.spacing.xxxs} ${theme.spacing.xs};
   background-color: ${theme.colors.silverBleach};
@@ -166,15 +170,17 @@ const TableRow = styled.div`
 `;
 
 const EmptyCell = styled.div`
-  display: none;
-
-  @media ${devices.tablet} {
-    width: 32px;
-    height: 32px;
-  }
+  width: 32px;
+  height: 32px;
 `;
 
 const NoWrapTypography = styled(EmphasisTypography)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const NoWrapTypographyNormal = styled(EmphasisTypography)`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

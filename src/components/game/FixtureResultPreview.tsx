@@ -35,13 +35,18 @@ const FixtureResultPreview = ({
     setModalOpen(true);
   };
 
-  const getFormattedKickOffTime = (kickOffTime: string) => {
+  const getFormattedKickOffDate = (kickOffTime: string) => {
     const date = new Date(kickOffTime);
     const day = date.getDate();
     const month = date.toLocaleString('default', { month: 'short' }).replaceAll('.', '');
+    return `${day} ${month}`;
+  };
+
+  const getFormattedKickOffTime = (kickOffTime: string) => {
+    const date = new Date(kickOffTime);
     const hours = `${date.getHours() < 10 ? `0${date.getHours()}` : date.getHours()}`;
     const minutes = `${date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()}`;
-    return `${day} ${month} ${hours}:${minutes}`;
+    return `${hours}:${minutes}`;
   };
 
   return (
@@ -52,9 +57,10 @@ const FixtureResultPreview = ({
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>FT</EmphasisTypography>
           </FullTimeIndicator>
         ) : (
-          <FullTimeIndicator>
-            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{getFormattedKickOffTime(fixture.kickOffTime)}</EmphasisTypography>
-          </FullTimeIndicator>
+          <KickOffTime>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{`${getFormattedKickOffDate(fixture.kickOffTime)}`}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{`${getFormattedKickOffTime(fixture.kickOffTime)}`}</EmphasisTypography>
+          </KickOffTime>
         )}
         <Teams compact={compact}>
           <TeamContainer compact={compact}>
@@ -153,6 +159,26 @@ const FullTimeIndicator = styled.div`
   padding: 0 ${theme.spacing.xs};
 `;
 
+const KickOffTime = styled.div`
+  min-height: 44px;
+  height: 100%;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: ${theme.borderRadius.s} 0 0 ${theme.borderRadius.s};
+  border-right: 1px solid ${theme.colors.primaryLighter};
+  background-color: ${theme.colors.primaryBleach};
+  padding: 0 ${theme.spacing.xs};
+  
+  @media ${devices.tablet} {
+    padding: 0 ${theme.spacing.xxs};
+    flex-direction: row;
+    gap: ${theme.spacing.xxxs};
+  }
+`;
+
 const Teams = styled.div<{ compact?: boolean }>`
   display: flex;
   gap: ${({ compact }) => (compact ? 0 : theme.spacing.xs)};
@@ -160,7 +186,7 @@ const Teams = styled.div<{ compact?: boolean }>`
   height: 100%;
   align-items: ${({ compact }) => (compact ? 'flex-start' : 'center')};
   flex-direction: ${({ compact }) => (compact ? 'column' : 'row')};
-  margin-left: ${theme.spacing.xxs};
+  margin-left: ${({ compact }) => (compact ? theme.spacing.xxs : 0)};
   justify-content: ${({ compact }) => (compact ? 'center' : 'flex-start')};
   
   ${({ compact }) => compact && css`
@@ -172,7 +198,7 @@ const Teams = styled.div<{ compact?: boolean }>`
   `}
 
   @media ${devices.tablet} {
-    margin-left: ${theme.spacing.xs};
+    margin-left: ${({ compact }) => (compact ? theme.spacing.xs : 0)};
   }
 `;
 

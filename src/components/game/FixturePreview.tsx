@@ -16,10 +16,11 @@ interface FixturePreviewProps {
   hasBeenCorrected?: boolean;
   onShowPredictionsClick?: () => void;
   simple?: boolean;
+  isCorrectionMode?: boolean;
 }
 
 const FixturePreview = ({
-  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple,
+  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode,
 }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -94,13 +95,19 @@ const FixturePreview = ({
       </Teams>
       {hasBeenCorrected && (
         <RightAligned>
-          <NormalTypography variant="m" color={theme.colors.silverDarker}>Rättad</NormalTypography>
+          {isCorrectionMode ? (
+            <TextButton color="primaryDark" onClick={onShowPredictionsClick}>
+              {isCorrectionMode ? 'Rätta' : 'Se allas tips'}
+            </TextButton>
+          ) : (
+            <NormalTypography variant="m" color={theme.colors.silverDarker}>Rättad</NormalTypography>
+          )}
         </RightAligned>
       )}
       {!hidePredictions && !hasBeenCorrected && (
         <RightAligned>
           <TextButton color="primaryDark" onClick={onShowPredictionsClick}>
-            Se allas tips
+            {isCorrectionMode ? 'Rätta' : 'Se allas tips'}
           </TextButton>
         </RightAligned>
       )}

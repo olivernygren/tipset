@@ -7,9 +7,11 @@ import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
-import { Prediction, FixtureResult, PredictionPoints } from '../../utils/Fixture';
+import {
+  Prediction, FixtureResult, PredictionPoints, TeamType,
+} from '../../utils/Fixture';
 import Input from '../input/Input';
 import { Divider } from '../Divider';
 import Select from '../input/Select';
@@ -22,6 +24,11 @@ import { CollectionEnum } from '../../utils/Firebase';
 import {
   defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObject,
 } from '../../utils/helpers';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import MobilePredictionCard from '../cards/MobilePredictionCard';
+import { AvatarSize } from '../avatar/Avatar';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -34,6 +41,8 @@ interface PredictionsModalProps {
 function CorrectPredictionsModal({
   onClose, gameId, league, ongoingGameWeek, refetchLeague,
 }: PredictionsModalProps) {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const [finalResult, setFinalResult] = useState({ homeGoals: '', awayGoals: '' });
   const [goalScorers, setGoalScorers] = useState<Array<string>>([]);
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
@@ -283,6 +292,7 @@ function CorrectPredictionsModal({
       onClose={onClose}
       size="l"
       headerDivider
+      mobileBottomSheet
     >
       <Section gap="m">
         <HeadingsTypography variant="h5">Fyll i resultatet i matchen</HeadingsTypography>
@@ -292,20 +302,49 @@ function CorrectPredictionsModal({
             <Section key={fixture.id} gap="m">
               <FixtureResultWrapper>
                 <ResultInputContainer>
-                  <NormalTypography variant="m">Resultat</NormalTypography>
+                  {fixture.teamType === TeamType.CLUBS ? (
+                    <ClubAvatar
+                      logoUrl={fixture.homeTeam.logoUrl}
+                      clubName={fixture.homeTeam.name}
+                      size={AvatarSize.L}
+                    />
+                  ) : (
+                    <NationAvatar
+                      flagUrl={fixture.homeTeam.logoUrl}
+                      nationName={fixture.homeTeam.name}
+                      size={AvatarSize.L}
+                    />
+                  )}
                   <Input
+                    placeholder="0"
+                    textAlign="center"
                     type="number"
-                    placeholder={fixture.homeTeam.name}
                     value={finalResult.homeGoals ?? ''}
                     onChange={(e) => setFinalResult({ ...finalResult, homeGoals: e.target.value })}
+                    fullWidth
                   />
                   <NormalTypography variant="m">-</NormalTypography>
                   <Input
-                    placeholder={fixture.awayTeam.name}
+                    placeholder="0"
                     type="number"
+                    textAlign="center"
                     value={finalResult.awayGoals ?? ''}
                     onChange={(e) => setFinalResult({ ...finalResult, awayGoals: e.target.value })}
+                    fullWidth
                   />
+                  {fixture.teamType === TeamType.CLUBS ? (
+                    <ClubAvatar
+                      logoUrl={fixture.awayTeam.logoUrl}
+                      clubName={fixture.awayTeam.name}
+                      size={AvatarSize.L}
+                    />
+                  ) : (
+                    <NationAvatar
+                      flagUrl={fixture.awayTeam.logoUrl}
+                      nationName={fixture.awayTeam.name}
+                      size={AvatarSize.L}
+                    />
+                  )}
                 </ResultInputContainer>
               </FixtureResultWrapper>
               {fixture.shouldPredictGoalScorer && (
@@ -317,14 +356,14 @@ function CorrectPredictionsModal({
                     optionGroups={getOptionGroups()}
                     onChange={(value) => handleAddGoalScorer(value)}
                     value={goalScorers[0]}
+                    fullWidth={isMobile}
                   />
                 </FixtureResultWrapper>
                 {goalScorers.length > 0 && (
                   <Section gap="xxs">
                     {goalScorers.map((goalScorer) => (
                       <NormalTypography variant="m">
-                        ⚽️
-                        {goalScorer}
+                        {`⚽️ ${goalScorer}`}
                       </NormalTypography>
                     ))}
                   </Section>
@@ -334,55 +373,75 @@ function CorrectPredictionsModal({
             </Section>
           ))}
         <Divider />
-        <TableHeader>
-          <NormalTypography variant="s" color={theme.colors.textLight}>Deltagare</NormalTypography>
-          <NormalTypography variant="s" color={theme.colors.textLight}>Utgång</NormalTypography>
-          <NormalTypography variant="s" color={theme.colors.textLight}>Resultat</NormalTypography>
-          <NormalTypography variant="s" color={theme.colors.textLight}>Målgörare</NormalTypography>
-          <NormalTypography variant="s" color={theme.colors.textLight}>Poäng</NormalTypography>
-        </TableHeader>
-        <Table>
-          {ongoingGameWeek.games.predictions
+        {isMobile ? (
+          ongoingGameWeek.games.predictions
             .filter((prediction) => prediction.fixtureId === gameId)
             .map((prediction) => (
-              <TableRow key={prediction.userId}>
-                <EmphasisTypography variant="m">
-                  <UserName userId={prediction.userId} />
-                </EmphasisTypography>
-                <Outcome>
-                  <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult(prediction) ? prediction.outcome : '?'}</NormalTypography>
-                </Outcome>
-                <NormalTypography variant="m">{hasPredictedResult(prediction) ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
-                {prediction.goalScorer ? (
-                  <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
-                ) : (
-                  <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
-                )}
-                <PointsCell>
-                  <NormalTypography variant="m">{getPointsValue(prediction.userId, prediction)}</NormalTypography>
-                  <IconButton
-                    icon={<Calculator size={24} color={theme.colors.primary} />}
-                    onClick={() => handleCalculatePoints(prediction)}
-                    colors={{
-                      normal: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primary,
-                      hover: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDark,
-                      active: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDarker,
-                    }}
-                    title="Räkna ut poäng"
-                    disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
-                  />
-                </PointsCell>
-              </TableRow>
-            ))}
-        </Table>
+              <MobilePredictionCard
+                key={prediction.userId}
+                prediction={prediction}
+                finalResult={finalResult}
+                onCalculatePoints={handleCalculatePoints}
+                points={getPointsValue(prediction.userId, prediction)}
+                hasPredictedResult={hasPredictedResult(prediction)}
+              />
+            ))
+        ) : (
+          <>
+            <TableHeader>
+              <NormalTypography variant="s" color={theme.colors.textLight}>Deltagare</NormalTypography>
+              <NormalTypography variant="s" color={theme.colors.textLight}>Utgång</NormalTypography>
+              <NormalTypography variant="s" color={theme.colors.textLight}>Resultat</NormalTypography>
+              <NormalTypography variant="s" color={theme.colors.textLight}>Målgörare</NormalTypography>
+              <NormalTypography variant="s" color={theme.colors.textLight}>Poäng</NormalTypography>
+            </TableHeader>
+            <Table>
+              {ongoingGameWeek.games.predictions
+                .filter((prediction) => prediction.fixtureId === gameId)
+                .map((prediction) => (
+                  <TableRow key={prediction.userId}>
+                    <EmphasisTypography variant="m">
+                      <UserName userId={prediction.userId} />
+                    </EmphasisTypography>
+                    <Outcome>
+                      <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult(prediction) ? prediction.outcome : '?'}</NormalTypography>
+                    </Outcome>
+                    <NormalTypography variant="m">{hasPredictedResult(prediction) ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
+                    {prediction.goalScorer ? (
+                      <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
+                    ) : (
+                      <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
+                    )}
+                    <PointsCell>
+                      <NormalTypography variant="m">{getPointsValue(prediction.userId, prediction)}</NormalTypography>
+                      <IconButton
+                        icon={<Calculator size={24} color={theme.colors.primary} />}
+                        onClick={() => handleCalculatePoints(prediction)}
+                        colors={{
+                          normal: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primary,
+                          hover: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDark,
+                          active: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDarker,
+                        }}
+                        title="Räkna ut poäng"
+                        disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
+                      />
+                    </PointsCell>
+                  </TableRow>
+                ))}
+            </Table>
+          </>
+        )}
       </Section>
-      <Button
-        onClick={handleSaveCorrectedPredictions}
-        loading={savingLoading}
-        disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
-      >
-        Spara
-      </Button>
+      <Section alignItems="flex-end">
+        <Button
+          onClick={handleSaveCorrectedPredictions}
+          loading={savingLoading}
+          disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
+          fullWidth={isMobile}
+        >
+          Spara
+        </Button>
+      </Section>
     </Modal>
   );
 }
@@ -433,13 +492,20 @@ const FixtureResultWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xs};
+  width: 100%;
+  box-sizing: border-box;
+
+  @media ${devices.tablet} {
+    width: auto;
+  }
 `;
 
 const ResultInputContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 50px auto 50px auto;
   align-items: center;
-  gap: ${theme.spacing.xxs};
-  /* width: 100px; */
+  gap: ${theme.spacing.xs};
+  justify-content: center;
 `;
 
 export default CorrectPredictionsModal;
