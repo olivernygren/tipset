@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-  CheckSquareOffset, PlusCircle, XCircle,
+  ListChecks,
+  PlusCircle, XCircle,
 } from '@phosphor-icons/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styled from 'styled-components';
@@ -772,11 +773,19 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             onClick={() => setShowCorrectGameWeekContent(false)}
                           />
                         ) : (
-                          <IconButton
-                            icon={<CheckSquareOffset size={24} />}
-                            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                          // <IconButton
+                          //   icon={<CheckSquareOffset size={24} />}
+                          //   colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                          //   onClick={() => setShowCorrectGameWeekContent(true)}
+                          // />
+                          <Button
+                            variant="primary"
+                            size="s"
                             onClick={() => setShowCorrectGameWeekContent(true)}
-                          />
+                            icon={<ListChecks size={20} color={theme.colors.white} />}
+                          >
+                            Rätta
+                          </Button>
                         )
                       )}
                     </>

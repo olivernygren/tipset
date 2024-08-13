@@ -7,6 +7,10 @@ interface UserNameProps {
   userId: string;
 }
 
+interface UserProfilePictureProps extends UserNameProps {
+  size?: AvatarSize;
+}
+
 const UserName = ({ userId }: UserNameProps) => {
   const [name, setName] = useState('');
 
@@ -38,7 +42,7 @@ export const UserEmail = ({ userId }: UserNameProps) => {
   return <>{email || 'Loading...'}</>;
 };
 
-export const UserProfilePicture = ({ userId }: UserNameProps) => {
+export const UserProfilePicture = ({ userId, size }: UserProfilePictureProps) => {
   const [profilePicture, setProfilePicture] = useState('');
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export const UserProfilePicture = ({ userId }: UserNameProps) => {
   return (
     <Avatar
       src={profilePicture && profilePicture.length > 0 ? `/images/${profilePicture}.png` : '/images/generic.png'}
-      size={AvatarSize.M}
+      size={size ?? AvatarSize.M}
       objectFit="cover"
       showBorder
     />

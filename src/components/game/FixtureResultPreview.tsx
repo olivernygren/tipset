@@ -59,7 +59,7 @@ const FixtureResultPreview = ({
         ) : (
           <KickOffTime>
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{`${getFormattedKickOffDate(fixture.kickOffTime)}`}</EmphasisTypography>
-            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{`${getFormattedKickOffTime(fixture.kickOffTime)}`}</EmphasisTypography>
+            <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDarker}>{`${getFormattedKickOffTime(fixture.kickOffTime)}`}</NormalTypography>
           </KickOffTime>
         )}
         <Teams compact={compact}>

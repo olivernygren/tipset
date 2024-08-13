@@ -96,7 +96,7 @@ const FixturePreview = ({
       {hasBeenCorrected && (
         <RightAligned>
           {isCorrectionMode ? (
-            <TextButton color="primaryDark" onClick={onShowPredictionsClick}>
+            <TextButton color="primary" onClick={onShowPredictionsClick}>
               {isCorrectionMode ? 'Rätta' : 'Se allas tips'}
             </TextButton>
           ) : (
@@ -106,7 +106,7 @@ const FixturePreview = ({
       )}
       {!hidePredictions && !hasBeenCorrected && (
         <RightAligned>
-          <TextButton color="primaryDark" onClick={onShowPredictionsClick}>
+          <TextButton color="primary" onClick={onShowPredictionsClick}>
             {isCorrectionMode ? 'Rätta' : 'Se allas tips'}
           </TextButton>
         </RightAligned>

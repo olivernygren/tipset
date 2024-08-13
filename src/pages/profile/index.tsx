@@ -84,7 +84,7 @@ const ProfilePage = () => {
   return (
     <Page>
       <Section gap="m">
-        <HeadingsTypography variant={isMobile ? 'h2' : 'h1'}>Kontoinställningar</HeadingsTypography>
+        <HeadingsTypography variant="h2">Kontoinställningar</HeadingsTypography>
         {notLoggedIn ? (
           <NormalTypography variant="m">Logga in för att se kontoinformation</NormalTypography>
         ) : (

@@ -33,6 +33,7 @@ const LeagueOverview = ({
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
+  const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [showPredictionsModalForFixture, setShowPredictionsModalForFixture] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,6 +57,16 @@ const LeagueOverview = ({
       if (previousGameWeek) {
         setPreviousGameWeek(previousGameWeek);
       }
+
+      const upcomingGameWeek = league.gameWeeks
+        .find((gameWeek) => {
+          const now = new Date();
+          return new Date(gameWeek.startDate) > now;
+        });
+
+      if (upcomingGameWeek) {
+        setUpcomingGameWeek(upcomingGameWeek);
+      }
     }
   }, []);
 
@@ -70,6 +81,16 @@ const LeagueOverview = ({
     const minutes = String(deadline.getMinutes()).padStart(2, '0');
 
     return `${day} ${month} ${year} (${hours}:${minutes})`;
+  };
+
+  const getNextGameWeekStartDate = () => {
+    if (!upcomingGameWeek) return '';
+    const startDate = new Date(upcomingGameWeek.startDate);
+    const day = startDate.getDate();
+    const month = startDate.toLocaleString('default', { month: 'short' }).replaceAll('.', '');
+    const hours = `${startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}`;
+    const minutes = `${startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}`;
+    return `${day} ${month} ${hours}:${minutes}`;
   };
 
   const getUserLeagueStandingsItem = (position: number, place?: PredictionLeagueStanding) => {
@@ -124,8 +145,10 @@ const LeagueOverview = ({
             </>
           ) : (
             <>
-              <HeadingsTypography variant="h3">Kommande matcher</HeadingsTypography>
-              {currentGameWeek ? (
+              <HeadingsTypography variant="h3">
+                {currentGameWeek && !currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) ? 'Aktuella matcher' : 'Kommande matcher'}
+              </HeadingsTypography>
+              {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
                   <FixturesContainer>
                     {currentGameWeek.games.fixtures.map((fixture) => (
@@ -145,7 +168,11 @@ const LeagueOverview = ({
                     </MarginTopButton>
                   )}
                 </Section>
-              ) : (
+              )}
+              {!currentGameWeek && upcomingGameWeek && (
+                <NormalTypography variant="m" color={theme.colors.textLight}>{`Nästa omgång kan tippas fr.o.m ${getNextGameWeekStartDate()}`}</NormalTypography>
+              )}
+              {!currentGameWeek && !upcomingGameWeek && (
                 <>
                   <NormalTypography variant="m" color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
                   {isCreator && (
