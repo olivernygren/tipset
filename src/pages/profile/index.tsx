@@ -15,9 +15,11 @@ import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import SelectProfilePictureModal from '../../components/profile/SelectProfilePictureModal';
 import { ProfilePictureEnum } from '../../components/avatar/Avatar';
 import { Divider } from '../../components/Divider';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 const ProfilePage = () => {
   const { user } = useUser();
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
@@ -93,7 +95,7 @@ const ProfilePage = () => {
             padding={theme.spacing.m}
           >
             <HeadingsTypography variant="h4">Profilbild</HeadingsTypography>
-            <Section gap="m" flexDirection="row" alignItems="flex-end">
+            <Section gap="m" flexDirection={isMobile ? 'column' : 'row'} alignItems={isMobile ? 'center' : 'flex-end'}>
               <CustomAvatarLarge src={profilePicture} alt="image" />
               <Button
                 variant="secondary"
@@ -104,7 +106,7 @@ const ProfilePage = () => {
             </Section>
             <Divider />
             <Section gap="m">
-              <Section gap="m" alignItems="center" flexDirection="row">
+              <Section gap="m" alignItems="center" flexDirection={isMobile ? 'column' : 'row'}>
                 <Input
                   label="Förnamn"
                   value={firstName}
@@ -129,6 +131,7 @@ const ProfilePage = () => {
                 variant="primary"
                 onClick={handleSave}
                 loading={saveLoading}
+                fullWidth={isMobile}
               >
                 Spara
               </Button>
@@ -141,7 +144,7 @@ const ProfilePage = () => {
           onClose={() => setProfilePictureModalOpen(false)}
           onSave={handleSaveNewProfilePicture}
           onSelectImage={(image) => handleSelectNewProfilePicture(image)}
-          initialImage={profilePicture as ProfilePictureEnum}
+          initialImage={profilePicture?.split('/images/')[1].split('.png')[0] as ProfilePictureEnum}
         />
       )}
     </Page>

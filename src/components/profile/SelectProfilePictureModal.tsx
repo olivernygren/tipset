@@ -4,7 +4,7 @@ import { CheckCircle } from '@phosphor-icons/react';
 import Button from '../buttons/Button';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { ProfilePictureEnum } from '../avatar/Avatar';
 import { EmphasisTypography } from '../typography/Typography';
 import TextButton from '../buttons/TextButton';
@@ -16,9 +16,9 @@ interface SelectProfilePictureModalProps {
   onSave: () => void;
 }
 
-function SelectProfilePictureModal({
+const SelectProfilePictureModal = ({
   onClose, onSelectImage, onSave, initialImage,
-}: SelectProfilePictureModalProps) {
+}: SelectProfilePictureModalProps) => {
   const [selectedImage, setSelectedImage] = useState<ProfilePictureEnum | undefined>(initialImage);
 
   const getAvatar = (image: ProfilePictureEnum) => (
@@ -48,6 +48,7 @@ function SelectProfilePictureModal({
       size="m"
       title="Välj profilbild"
       onClose={onClose}
+      mobileBottomSheet
     >
       <AvatarGrid>
         {Object.values(ProfilePictureEnum).map((image) => getAvatar(image))}
@@ -65,27 +66,38 @@ function SelectProfilePictureModal({
           onClick={onSave}
           fullWidth
         >
-          Spara
+          Välj
         </Button>
       </Section>
     </Modal>
   );
-}
+};
 
 const CustomAvatarSmall = styled.img`
-  width: 124px;
-  height: 124px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
   object-position: center;
   border: 2px solid ${theme.colors.silver};
+
+  @media ${devices.tablet} {
+    width: 124px;
+    height: 124px;
+  }
 `;
 
 const AvatarGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(80px, 124px));
+  grid-template-rows: auto;
   gap: ${theme.spacing.m};
   margin-bottom: ${theme.spacing.m};
+  margin: 0 auto;
+  
+  @media ${devices.tablet} {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const SelectAvatarContainer = styled.div`

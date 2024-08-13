@@ -70,11 +70,10 @@ const PredictionLeaguesPage = () => {
       setEndedLeagues(allEndedLeagues);
       setParticipantLeagues(allParticipantLeagues);
       setCreatorLeagues(allCreatorLeagues);
-      setFetchLoading(false);
     } catch (err) {
       console.error(err);
-      setFetchLoading(false);
     }
+    setFetchLoading(false);
   };
 
   const handleCreateLeague = async () => {
