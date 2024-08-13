@@ -20,10 +20,10 @@ const SidebarLink = ({ label, href, icon }: SidebarLinkProps) => {
     <InvisibleLink href={href}>
       <StyledSidebarLink active={isActive}>
         {icon}
-        <EmphasisTypography variant='m' color={isActive ? theme.colors.white : theme.colors.textDefault}>{label}</EmphasisTypography>
+        <EmphasisTypography variant="m" color={isActive ? theme.colors.white : theme.colors.textDefault}>{label}</EmphasisTypography>
       </StyledSidebarLink>
     </InvisibleLink>
-  )
+  );
 };
 
 const StyledSidebarLink = styled.div<StyledSidebarLinkProps>`
@@ -33,7 +33,7 @@ const StyledSidebarLink = styled.div<StyledSidebarLinkProps>`
   padding: 0 ${theme.spacing.m};
   height: 48px;
   border-radius: ${theme.borderRadius.s};
-  background-color: ${({ active }) => active ? theme.colors.primaryLight : theme.colors.silverLight};
+  background-color: ${({ active }) => (active ? theme.colors.primaryLight : theme.colors.silverLight)};
   width: 100%;
   box-sizing: border-box;
 `;
