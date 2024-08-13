@@ -22,21 +22,24 @@ interface SelectProps {
   disabled?: boolean;
   fullWidth?: boolean;
   compact?: boolean;
+  maxWidth?: string;
 }
 
 interface StyledSelectProps {
   fullWidth?: boolean;
   disabled?: boolean;
   compact?: boolean;
+  maxWidth?: string;
 }
 
 const Select = ({
-  options, optionGroups, value, onChange, disabled, fullWidth, compact,
+  options, optionGroups, value, onChange, disabled, fullWidth, compact, maxWidth,
 }: SelectProps) => (
   <SelectWrapper
     disabled={disabled}
     fullWidth={fullWidth}
     compact={compact}
+    maxWidth={maxWidth}
   >
     <StyledSelect
       defaultValue="Välj"
@@ -67,7 +70,8 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   gap: ${theme.spacing.xxs};
   justify-content: flex-end;
   align-items: center;
-  min-width: 200px;
+  min-width: ${({ maxWidth }) => (maxWidth && maxWidth <= '200px' ? maxWidth : '200px')};
+  max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   min-height: ${({ compact }) => (compact ? '36px' : '44px')};
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
   padding-right: ${theme.spacing.xxs};

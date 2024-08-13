@@ -63,8 +63,9 @@ const MobilePredictionCard = ({
           size="m"
           variant="secondary"
           onClick={() => onCalculatePoints(prediction)}
-          icon={<Calculator size={24} color={theme.colors.primary} />}
+          icon={<Calculator size={24} color={finalResult.homeGoals === '' || finalResult.awayGoals === '' ? theme.colors.silverLight : theme.colors.primary} />}
           fullWidth
+          disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
         >
           Beräkna poäng
         </Button>

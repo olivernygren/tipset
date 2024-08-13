@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Calculator } from '@phosphor-icons/react';
+import { Calculator, XCircle } from '@phosphor-icons/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Modal from '../modal/Modal';
@@ -362,9 +362,17 @@ function CorrectPredictionsModal({
                 {goalScorers.length > 0 && (
                   <Section gap="xxs">
                     {goalScorers.map((goalScorer) => (
-                      <NormalTypography variant="m">
-                        {`⚽️ ${goalScorer}`}
-                      </NormalTypography>
+                      <GoalScorerContainer>
+                        <NormalTypography variant="m">
+                          {`⚽️ ${goalScorer}`}
+                        </NormalTypography>
+                        <IconButton
+                          icon={<XCircle size={24} weight="fill" />}
+                          onClick={() => setGoalScorers(goalScorers.filter((scorer) => scorer !== goalScorer))}
+                          title="Ta bort målgörare"
+                          colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                        />
+                      </GoalScorerContainer>
                     ))}
                   </Section>
                 )}
@@ -506,6 +514,14 @@ const ResultInputContainer = styled.div`
   align-items: center;
   gap: ${theme.spacing.xs};
   justify-content: center;
+`;
+
+const GoalScorerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default CorrectPredictionsModal;

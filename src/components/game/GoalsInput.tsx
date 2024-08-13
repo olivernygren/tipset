@@ -49,11 +49,12 @@ const GoalsInput = ({
         value={goals}
         onChange={(e) => onInputChange(e.currentTarget.value)}
         placeholder="0"
-        maxWidth={isMobile ? '40px' : '50px'}
+        maxWidth={isMobile ? '44px' : '50px'}
         textAlign="center"
-        fontSize={isMobile ? '22px' : '30px'}
+        fontSize={isMobile ? '26px' : '30px'}
         fontWeight="600"
         disabled={disabled}
+        customPadding={theme.spacing.xxxs}
       />
       <IconButton
         icon={<MinusCircle size={24} />}

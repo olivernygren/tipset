@@ -40,9 +40,9 @@ const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
 
   return (
     <StyledMobileMenu
-      initial={{ left: '100%', opacity: 0 }}
-      animate={{ left: 0, opacity: 1 }}
-      exit={{ left: '100%', opacity: 0 }}
+      initial={{ x: '100%', opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: '100%', opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
       <MenuHeader>
@@ -97,9 +97,13 @@ const MobileMenu = ({ onClose, isSignedIn, onSignOut }: MobileMenuProps) => {
 
 const StyledMobileMenu = styled(motion.div)`
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   background-color: ${theme.colors.white};
   z-index: 1000;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   padding: 0 ${theme.spacing.s} ${theme.spacing.l} ${theme.spacing.s};
   display: flex;
   flex-direction: column;

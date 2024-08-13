@@ -242,6 +242,7 @@ const PredictionLeaguesPage = () => {
                   normal: theme.colors.white,
                   disabled: theme.colors.silver,
                 }}
+                disabled={!currentUserId}
               />
               <IconButton
                 icon={<UserPlus size={28} />}
@@ -254,6 +255,7 @@ const PredictionLeaguesPage = () => {
                 }}
                 showBorder
                 borderColor={theme.colors.primary}
+                disabled={!currentUserId}
               />
             </>
           ) : (

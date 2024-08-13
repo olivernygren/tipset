@@ -19,7 +19,7 @@ interface InputProps {
   fontWeight?: string;
   compact?: boolean;
   label?: string;
-  minDate?: string;
+  customPadding?: string;
 }
 
 interface StyledInputProps {
@@ -29,16 +29,17 @@ interface StyledInputProps {
   fontSize?: string;
   fontWeight?: string;
   compact?: boolean;
+  customPadding?: string;
 }
 
 const Input = ({
-  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, minDate,
+  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding,
 }: InputProps) => (
   <Section gap="xxxs">
     {label && (
-    <LabelContainer>
-      <EmphasisTypography variant="s">{label}</EmphasisTypography>
-    </LabelContainer>
+      <LabelContainer>
+        <EmphasisTypography variant="s">{label}</EmphasisTypography>
+      </LabelContainer>
     )}
     <StyledInput
       name={name}
@@ -54,7 +55,7 @@ const Input = ({
       fontSize={fontSize}
       fontWeight={fontWeight}
       compact={compact}
-      min={minDate}
+      customPadding={customPadding}
     />
     {maxLength && (
       <NormalTypography variant="s" color={theme.colors.textLight}>
@@ -72,7 +73,7 @@ const Input = ({
 const StyledInput = styled.input<StyledInputProps>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  padding: ${({ customPadding }) => customPadding || `${theme.spacing.xxs} ${theme.spacing.xs}`};
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 'normal'};
@@ -95,9 +96,10 @@ const StyledInput = styled.input<StyledInputProps>`
   }
 
   &:disabled {
-    background-color: ${theme.colors.silverLighter};
-    color: ${theme.colors.textLight};
+    background-color: ${theme.colors.silverLighter} !important;
+    color: ${theme.colors.silverDark} !important;
     cursor: not-allowed;
+    opacity: 1 !important;
   }
 `;
 

@@ -64,40 +64,46 @@ const FixtureResultPreview = ({
         )}
         <Teams compact={compact}>
           <TeamContainer compact={compact}>
-            {fixture.teamType === TeamType.CLUBS ? (
-              <ClubAvatar
-                logoUrl={fixture.homeTeam.logoUrl}
-                clubName={fixture.homeTeam.name}
-                size={compact ? AvatarSize.XS : AvatarSize.S}
-              />
-            ) : (
-              <NationAvatar
-                flagUrl={fixture.homeTeam.logoUrl}
-                nationName={fixture.homeTeam.name}
-                size={compact ? AvatarSize.XS : AvatarSize.S}
-              />
+            {!compact && (
+              fixture.teamType === TeamType.CLUBS ? (
+                <ClubAvatar
+                  logoUrl={fixture.homeTeam.logoUrl}
+                  clubName={fixture.homeTeam.name}
+                  size={compact ? AvatarSize.XS : AvatarSize.S}
+                />
+              ) : (
+                <NationAvatar
+                  flagUrl={fixture.homeTeam.logoUrl}
+                  nationName={fixture.homeTeam.name}
+                  size={compact ? AvatarSize.XS : AvatarSize.S}
+                />
+              )
             )}
             <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.shortName || fixture.homeTeam.name}</EmphasisTypography>
           </TeamContainer>
-          <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
+          {!isMobile && !compact && (
+            <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
+          )}
           <TeamContainer compact={compact}>
             <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.shortName || fixture.awayTeam.name}</EmphasisTypography>
-            {fixture.teamType === TeamType.CLUBS ? (
-              <ClubAvatar
-                logoUrl={fixture.awayTeam.logoUrl}
-                clubName={fixture.awayTeam.name}
-                size={AvatarSize.S}
-              />
-            ) : (
-              <NationAvatar
-                flagUrl={fixture.awayTeam.logoUrl}
-                nationName={fixture.awayTeam.name}
-                size={AvatarSize.S}
-              />
+            {!compact && (
+              fixture.teamType === TeamType.CLUBS ? (
+                <ClubAvatar
+                  logoUrl={fixture.awayTeam.logoUrl}
+                  clubName={fixture.awayTeam.name}
+                  size={compact ? AvatarSize.XS : AvatarSize.S}
+                />
+              ) : (
+                <NationAvatar
+                  flagUrl={fixture.awayTeam.logoUrl}
+                  nationName={fixture.awayTeam.name}
+                  size={compact ? AvatarSize.XS : AvatarSize.S}
+                />
+              )
             )}
           </TeamContainer>
         </Teams>
-        <Section flexDirection="row" alignItems="center" justifyContent="flex-end">
+        <Section flexDirection="row" alignItems="center" justifyContent="flex-end" fitContent>
           <ResultContainer>
             <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.primaryDark}>
               {fixture.finalResult?.homeTeamGoals ?? '?'}
@@ -147,7 +153,7 @@ const FixtureResultPreview = ({
 };
 
 const FullTimeIndicator = styled.div`
-  min-height: 44px;
+  min-height: 50px;
   height: 100%;
   width: fit-content;
   display: flex;
@@ -160,7 +166,7 @@ const FullTimeIndicator = styled.div`
 `;
 
 const KickOffTime = styled.div`
-  min-height: 44px;
+  min-height: 50px;
   height: 100%;
   width: fit-content;
   display: flex;
@@ -182,19 +188,15 @@ const KickOffTime = styled.div`
 const Teams = styled.div<{ compact?: boolean }>`
   display: flex;
   gap: ${({ compact }) => (compact ? 0 : theme.spacing.xs)};
-  min-height: ${({ compact }) => (compact ? '50px' : '44px')};
-  height: 100%;
+  min-height: 50px;
   align-items: ${({ compact }) => (compact ? 'flex-start' : 'center')};
   flex-direction: ${({ compact }) => (compact ? 'column' : 'row')};
   margin-left: ${({ compact }) => (compact ? theme.spacing.xxs : 0)};
   justify-content: ${({ compact }) => (compact ? 'center' : 'flex-start')};
+  flex: 1;
   
   ${({ compact }) => compact && css`
     width: fit-content;
-
-    > :nth-child(2) {
-      display: none;
-    }
   `}
 
   @media ${devices.tablet} {
@@ -203,8 +205,9 @@ const Teams = styled.div<{ compact?: boolean }>`
 `;
 
 const FixtureContainer = styled.div<{ showBorder?: boolean }>`
-  display: grid;
-  grid-template-columns: auto auto 1fr;
+  display: flex;
+  height: fit-content;
+  /* grid-template-columns: auto auto 1fr; */
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.s};
   width: 100%;
@@ -217,12 +220,6 @@ const TeamContainer = styled.div<{ compact?: boolean }>`
   display: flex;
   gap: ${theme.spacing.xxxs};
   align-items: ${({ compact }) => (compact ? 'flex-start' : 'center')};
-
-  ${({ compact }) => compact && css`
-    > .avatar {
-      display: none;
-    }
-  `}
 `;
 
 const ResultContainer = styled.div`

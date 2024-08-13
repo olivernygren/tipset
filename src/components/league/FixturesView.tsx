@@ -748,23 +748,24 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             <OngoingGameWeekHeader>
               <HeadingsTypography variant="h4">Pågående omgång</HeadingsTypography>
               {ongoingGameWeek && (
-                <Section flexDirection="row" alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile}>
+                <Section flexDirection={isMobile ? 'column' : 'row'} alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile} padding={isMobile ? `${theme.spacing.xxxs} 0 0 0` : '0'}>
                   <Section>
                     <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
                   </Section>
-                  <Tag
-                    text={`Omgång ${ongoingGameWeek.round}`}
-                    textAndIconColor={theme.colors.primaryDark}
-                    backgroundColor={theme.colors.primaryBleach}
-                    size="l"
-                  />
-                  {(isCreator || hasAdminRights) && (
+                  <Section flexDirection="row" alignItems="center" gap={isMobile ? 'xxs' : 'xs'} justifyContent="space-between">
+                    <Tag
+                      text={`Omgång ${ongoingGameWeek.round}`}
+                      textAndIconColor={theme.colors.primaryDark}
+                      backgroundColor={theme.colors.primaryBleach}
+                      size="l"
+                    />
+                    {(isCreator || hasAdminRights) && (
                     <>
                       {/* <IconButton
                         icon={<PencilSimple size={24} />}
                         colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                         onClick={() => setEditGameWeekViewOpen(true)}
-                      /> */}
+                        /> */}
                       {ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
                         showCorrectGameWeekContent ? (
                           <IconButton
@@ -773,11 +774,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             onClick={() => setShowCorrectGameWeekContent(false)}
                           />
                         ) : (
-                          // <IconButton
-                          //   icon={<CheckSquareOffset size={24} />}
-                          //   colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                          //   onClick={() => setShowCorrectGameWeekContent(true)}
-                          // />
                           <Button
                             variant="primary"
                             size="s"
@@ -789,7 +785,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                         )
                       )}
                     </>
-                  )}
+                    )}
+                  </Section>
                 </Section>
               )}
             </OngoingGameWeekHeader>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { signOut } from 'firebase/auth';
 import {
   Gear, List, SignOut,
@@ -42,6 +42,7 @@ const Header = () => {
   return (
     <>
       <StyledHeader>
+        {isMobileMenuOpen && <GlobalStyle />}
         <Content>
           <InvisibleLink href="/">
             <LogoImageContainer>
@@ -122,6 +123,12 @@ const Header = () => {
     </>
   );
 };
+
+const GlobalStyle = createGlobalStyle`
+  body.no-scroll {
+    overflow: hidden;
+  }
+`;
 
 const StyledHeader = styled.header`
   background-color: ${theme.colors.white};
