@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { theme } from '../../theme';
-import { EmphasisTypography } from '../typography/Typography';
 import { motion } from 'framer-motion';
 import { SpinnerGap } from '@phosphor-icons/react';
+import { theme } from '../../theme';
+import { EmphasisTypography } from '../typography/Typography';
 import { ButtonProps } from './Button';
 
 interface TextButtonProps extends ButtonProps {
@@ -11,47 +11,64 @@ interface TextButtonProps extends ButtonProps {
   title?: string;
 }
 
-const TextButton = ({ variant = 'primary', onClick, children, disabled, fullWidth, color = "primary", size = 'm', icon, loading, noPadding, title, endIcon }: TextButtonProps) => {
-  return (
-    <StyledButton
-      title={title}
-      variant={variant || 'primary'}
-      onClick={() => {
-        if (onClick) {
-          onClick();
-        }
-      }}
-      disabled={disabled || loading}
-      fullWidth={fullWidth}
-      color={color}
-      size={size}
-      noPadding={noPadding}
-      whileHover={{ 
-        scale: 1.02,
-      }}
-    >
-      {icon}
-      {loading ? (
-        <RotationalSpinner>
-          <SpinnerGap size={24} color={theme.colors[color] || theme.colors.primary} />
-        </RotationalSpinner>
-      ) : (
-        <EmphasisTypography variant='m' color={theme.colors[color] || theme.colors.primary} align='center'>
-          {children}
-        </EmphasisTypography>
-      )}
-      {endIcon}
-    </StyledButton>
-  )
-}
+const TextButton = ({
+  variant = 'primary', onClick, children, disabled, fullWidth, color = 'primary', size = 'm', icon, loading, noPadding, title, endIcon,
+}: TextButtonProps) => (
+  <StyledButton
+    title={title}
+    variant={variant || 'primary'}
+    onClick={() => {
+      if (onClick) {
+        onClick();
+      }
+    }}
+    disabled={disabled || loading}
+    fullWidth={fullWidth}
+    color={color}
+    size={size}
+    noPadding={noPadding}
+    whileHover={{
+      scale: 1.02,
+    }}
+  >
+    {icon}
+    {loading ? (
+      <RotationalSpinner>
+        <SpinnerGap size={24} color={theme.colors[color] || theme.colors.primary} />
+      </RotationalSpinner>
+    ) : (
+      <EmphasisTypography variant="m" color={theme.colors[color] || theme.colors.primary} align="center">
+        {children}
+      </EmphasisTypography>
+    )}
+    {endIcon}
+  </StyledButton>
+);
+
+const getPadding = (size: 's' | 'm' | 'l' | undefined, noPadding?: boolean) => {
+  if (noPadding) {
+    return '0';
+  }
+
+  if (size === 's') {
+    return `${theme.spacing.xs} ${theme.spacing.xs}`;
+  }
+
+  if (size === 'm') {
+    return `${theme.spacing.xs} ${theme.spacing.s}`;
+  }
+
+  return `${theme.spacing.s} ${theme.spacing.m}`;
+};
 
 const StyledButton = styled(motion.button)<TextButtonProps>`
-  width: ${({ fullWidth }) => fullWidth ? '100%' : 'fit-content'};
-  padding: ${({ size, noPadding }) => noPadding ? '0' : size === 's' ? `${theme.spacing.xs} ${theme.spacing.xs}` : size === 'm' ? `${theme.spacing.xs} ${theme.spacing.s}` : `${theme.spacing.s} ${theme.spacing.m}`};  border-radius: ${theme.borderRadius.m};
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
+  padding: ${({ size, noPadding }) => getPadding(size, noPadding)};
+  border-radius: ${theme.borderRadius.m};
   background-color: transparent !important;
-  border-color: ${({ color, variant }) => variant === 'secondary' ? (color || theme.colors.primary) : 'unset'};
-  border-width: ${({ variant }) => variant === 'secondary' ? '2px' : 0};
-  border-style: ${({ variant }) => variant === 'secondary' ? 'solid' : 'none'};
+  border-color: ${({ color, variant }) => (variant === 'secondary' ? (color || theme.colors.primary) : 'unset')};
+  border-width: ${({ variant }) => (variant === 'secondary' ? '2px' : 0)};
+  border-style: ${({ variant }) => (variant === 'secondary' ? 'solid' : 'none')};
   cursor: pointer;
   box-sizing: border-box;
   display: flex;

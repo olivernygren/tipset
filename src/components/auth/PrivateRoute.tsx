@@ -1,3 +1,4 @@
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 interface PrivateRouteProps {
@@ -7,7 +8,9 @@ interface PrivateRouteProps {
   isLoading: boolean;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, isAdmin, children, isLoading }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  isAuthenticated, isAdmin, children, isLoading,
+}) => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -16,6 +19,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, isAdmin, c
     return <Navigate to="/login" />;
   }
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

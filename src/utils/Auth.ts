@@ -17,5 +17,5 @@ export interface CreateUserInput {
 
 export enum RolesEnum {
   ADMIN = 'ADMIN',
-  USER = 'USER'
+  USER = 'USER',
 }

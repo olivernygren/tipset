@@ -8,21 +8,21 @@ interface CheckboxProps {
   label?: string;
 }
 
-const Checkbox = ({ checked, onChange, disabled, label }: CheckboxProps) => {
-  return (
-    <CheckboxLabel>
-      <CheckboxInput 
-        type="checkbox"
-        checked={checked} 
-        onChange={() => onChange(!checked)}
-        disabled={disabled}
-      />
-      {label && (
-        <CheckboxText>{label}</CheckboxText>
-      )}
-    </CheckboxLabel>
-  );
-};
+const Checkbox = ({
+  checked, onChange, disabled, label,
+}: CheckboxProps) => (
+  <CheckboxLabel>
+    <CheckboxInput
+      type="checkbox"
+      checked={checked}
+      onChange={() => onChange(!checked)}
+      disabled={disabled}
+    />
+    {label && (
+    <CheckboxText>{label}</CheckboxText>
+    )}
+  </CheckboxLabel>
+);
 
 const CheckboxInput = styled.input`
   /* appearance: none; */

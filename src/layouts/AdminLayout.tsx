@@ -1,22 +1,20 @@
-import React from 'react'
-import AdminSidebar from '../components/sidebar/AdminSidebar';
+import React from 'react';
 import styled from 'styled-components';
+import AdminSidebar from '../components/sidebar/AdminSidebar';
 import { theme } from '../theme';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const AdminLayout = ({ children }: AdminLayoutProps) => {
-  return (
-    <AdminPageLayout>
-      <AdminSidebar />
-      <PageContent>
-        {children}
-      </PageContent>
-    </AdminPageLayout>
-  )
-};
+const AdminLayout = ({ children }: AdminLayoutProps) => (
+  <AdminPageLayout>
+    <AdminSidebar />
+    <PageContent>
+      {children}
+    </PageContent>
+  </AdminPageLayout>
+);
 
 const AdminPageLayout = styled.div`
   min-height: 100vh;

@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
-import { motion } from 'framer-motion';
 
 interface ContextMenuOptionProps {
   icon?: React.ReactNode;
@@ -11,7 +11,9 @@ interface ContextMenuOptionProps {
   color?: string;
 }
 
-const ContextMenuOption = ({ icon, label, onClick, color = theme.colors.primary }: ContextMenuOptionProps) => {
+const ContextMenuOption = ({
+  icon, label, onClick, color = theme.colors.primary,
+}: ContextMenuOptionProps) => {
   const [optionHovered, setOptionHovered] = useState<boolean>(false);
 
   return (
@@ -24,8 +26,8 @@ const ContextMenuOption = ({ icon, label, onClick, color = theme.colors.primary 
         <EmphasisTypography onClick={onClick} color={color}>{label}</EmphasisTypography>
       </Content>
     </StyledContextMenuOption>
-  )
-}
+  );
+};
 
 const StyledContextMenuOption = styled(motion.div)`
   width: 100%;
@@ -47,7 +49,7 @@ const Content = styled.div<{ isHovered: boolean }>`
   gap: ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
-  transform: ${({ isHovered }) => isHovered ? 'scale(1.03)' : 'scale(1)'};
+  transform: ${({ isHovered }) => (isHovered ? 'scale(1.03)' : 'scale(1)')};
   transition: transform 0.2s;
 `;
 

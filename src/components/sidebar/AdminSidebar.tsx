@@ -1,5 +1,6 @@
-import React from 'react'
-import Sidebar from './Sidebar'
+/* eslint-disable react/jsx-no-useless-fragment */
+import React from 'react';
+import Sidebar from './Sidebar';
 import { NavLink } from '../../utils/Nav';
 
 const AdminSidebar = () => {
@@ -10,10 +11,10 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <Sidebar 
+    <Sidebar
       links={links}
     />
-  )
-}
+  );
+};
 
-export default AdminSidebar
+export default AdminSidebar;

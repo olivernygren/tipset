@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
-import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import {
+  addDoc, collection, deleteDoc, doc, getDocs,
+} from 'firebase/firestore';
+import styled from 'styled-components';
+import { Trash } from '@phosphor-icons/react';
 import { auth, db } from '../../../config/firebase';
 import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
 import { Section } from '../../../components/section/Section';
 import { theme } from '../../../theme';
 import { HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
-import styled from 'styled-components';
 import IconButton from '../../../components/buttons/IconButton';
-import { Trash } from '@phosphor-icons/react';
 import { PredictionLeague, CreatePredictionLeagueInput } from '../../../utils/League';
 import { CollectionEnum } from '../../../utils/Firebase';
 import Button from '../../../components/buttons/Button';
@@ -23,7 +25,7 @@ const AdminLeaguesPage = () => {
 
   useEffect(() => {
     fetchLeagues();
-  }, [])
+  }, []);
 
   const fetchLeagues = async () => {
     try {
@@ -33,13 +35,13 @@ const AdminLeaguesPage = () => {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const handleDeleteLeague = async (documentId: string) => {
     const leagueDoc = doc(db, 'leagues', documentId);
     await deleteDoc(leagueDoc);
-    fetchLeagues(); 
-  }
+    fetchLeagues();
+  };
 
   const handleCreateLeague = async () => {
     if (leagueName.length === 0) return;
@@ -57,8 +59,8 @@ const AdminLeaguesPage = () => {
       invitedUsers: [],
       standings: [],
       deadlineToJoin: oneMonthFromNow.toISOString(),
-      hasEnded: false
-    }
+      hasEnded: false,
+    };
 
     try {
       await addDoc(leagueCollectionRef, newLeague);
@@ -70,58 +72,58 @@ const AdminLeaguesPage = () => {
   };
 
   return (
-    <Section padding={theme.spacing.l} gap='l'>
-      <HeadingsTypography variant='h2'>Ligor</HeadingsTypography>
+    <Section padding={theme.spacing.l} gap="l">
+      <HeadingsTypography variant="h2">Ligor</HeadingsTypography>
       <Table>
         <TableHeader>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Namn</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Inbjudningskod</NormalTypography>
-          <NormalTypography variant='s' color={theme.colors.textLight}>Antal spelare</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Namn</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Inbjudningskod</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.textLight}>Antal spelare</NormalTypography>
         </TableHeader>
         {leagues.length > 0 ? leagues.map((league) => (
           <TableRow key={league.documentId}>
-            <NormalTypography variant='m'>{league.name}</NormalTypography>
-            <NormalTypography variant='m'>{league.inviteCode}</NormalTypography>
-            <NormalTypography variant='m'>{league.participants?.length}</NormalTypography>
-            <IconButton 
-              icon={<Trash size={20} weight='fill' />}
+            <NormalTypography variant="m">{league.name}</NormalTypography>
+            <NormalTypography variant="m">{league.inviteCode}</NormalTypography>
+            <NormalTypography variant="m">{league.participants?.length}</NormalTypography>
+            <IconButton
+              icon={<Trash size={20} weight="fill" />}
               colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
               onClick={() => handleDeleteLeague(league.documentId)}
             />
           </TableRow>
         )) : (
           <TableRow>
-            <NormalTypography variant='m'>Inga ligor hittades</NormalTypography>
+            <NormalTypography variant="m">Inga ligor hittades</NormalTypography>
           </TableRow>
         )}
       </Table>
-      <Button 
-        variant={showCreateLeagueForm ? 'secondary' : 'primary'} 
-        size='m'
+      <Button
+        variant={showCreateLeagueForm ? 'secondary' : 'primary'}
+        size="m"
         onClick={() => setShowCreateLeagueForm(!showCreateLeagueForm)}
       >
         {showCreateLeagueForm ? 'Stäng' : 'Skapa liga'}
       </Button>
       {showCreateLeagueForm && (
-        <Section gap='s'>
-          <HeadingsTypography variant='h5'>Skapa liga</HeadingsTypography>
+        <Section gap="s">
+          <HeadingsTypography variant="h5">Skapa liga</HeadingsTypography>
           <Input
-            type='text'
-            placeholder='Namn'
+            type="text"
+            placeholder="Namn"
             value={leagueName}
             onChange={(e) => setLeagueName(e.currentTarget.value)}
           />
           <Input
-            type='text'
-            placeholder='Beskrivning'
+            type="text"
+            placeholder="Beskrivning"
             value={leagueDescription}
             onChange={(e) => setLeagueDescription(e.currentTarget.value)}
           />
-          <Button variant='primary' size='m' onClick={handleCreateLeague}>Skapa</Button>
+          <Button variant="primary" size="m" onClick={handleCreateLeague}>Skapa</Button>
         </Section>
       )}
     </Section>
-  )
+  );
 };
 
 const Table = styled.div`

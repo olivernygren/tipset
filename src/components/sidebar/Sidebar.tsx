@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavLink } from '../../utils/Nav';
 import styled from 'styled-components';
+import { NavLink } from '../../utils/Nav';
 import SidebarLink from './SidebarLink';
 import { theme } from '../../theme';
 
@@ -8,17 +8,15 @@ interface SidebarProps {
   links: Array<NavLink>
 }
 
-const Sidebar = ({ links }: SidebarProps) => {
-  return (
-    <StyledSidebar>
-      <LinksContainer>
-        {links.map((link, index) => (
-          <SidebarLink key={index} href={link.href} label={link.label} icon={link.icon} />
-        ))}
-      </LinksContainer>
-    </StyledSidebar>
-  )
-};
+const Sidebar = ({ links }: SidebarProps) => (
+  <StyledSidebar>
+    <LinksContainer>
+      {links.map((link, index) => (
+        <SidebarLink key={index} href={link.href} label={link.label} icon={link.icon} />
+      ))}
+    </LinksContainer>
+  </StyledSidebar>
+);
 
 const StyledSidebar = styled.div`
   height: 100vh;

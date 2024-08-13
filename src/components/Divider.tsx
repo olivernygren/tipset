@@ -1,20 +1,21 @@
-import styled, { css } from "styled-components";
-import { theme } from "../theme";
+import styled, { css } from 'styled-components';
+import { theme } from '../theme';
 
 interface DividerProps {
   color?: string;
   vertical?: boolean;
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const Divider = styled.div<DividerProps>`
-  ${({ vertical }) => vertical ? css`
+  ${({ vertical }) => (vertical ? css`
     width: 1px;
     height: 100%;
     min-height: 8px;
   ` : css`
     width: 100%;
     height: 1px;
-  `}
+  `)}
   background-color: ${({ color }) => color || theme.colors.silverLight};
   box-sizing: border-box;
 `;

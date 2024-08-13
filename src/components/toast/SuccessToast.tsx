@@ -1,7 +1,8 @@
+import React from 'react';
 import styled from 'styled-components';
+import { CheckCircle } from '@phosphor-icons/react';
 import { NormalTypography } from '../typography/Typography';
 import { theme } from '../../theme';
-import { CheckCircle } from '@phosphor-icons/react';
 
 export interface SuccessToastProps {
   toastText: string | React.ReactElement
@@ -10,7 +11,7 @@ export interface SuccessToastProps {
 const SuccessToast = ({ toastText }: SuccessToastProps) => (
   <ToastWrapper className="success-toast">
     <ToastContent>
-      <CheckCircle size={24} color={theme.colors.green} weight='fill' />
+      <CheckCircle size={24} color={theme.colors.green} weight="fill" />
       <ToastText variant="s">{toastText}</ToastText>
     </ToastContent>
   </ToastWrapper>
