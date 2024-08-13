@@ -23,33 +23,46 @@ export interface ButtonProps {
 
 const Button = ({
   variant = 'primary', onClick, children, disabled, disabledInvisible, fullWidth, color = 'primary', textColor = theme.colors.white, size = 'm', icon, loading, endIcon, id,
-}: ButtonProps) => (
-  <StyledButton
-    variant={variant || 'primary'}
-    onClick={() => {
-      if (onClick && !disabled && !disabledInvisible) {
-        onClick();
+}: ButtonProps) => {
+  const getButtonTextColor = () => {
+    if (variant === 'secondary') {
+      if (disabled) {
+        return theme.colors.silverLight;
       }
-    }}
-    disabled={disabled}
-    disabledInvisible={disabledInvisible || loading}
-    fullWidth={fullWidth}
-    color={color}
-    size={size}
-  >
-    {icon}
-    {loading ? (
-      <RotationalSpinner>
-        <SpinnerGap size={24} color={variant === 'primary' ? theme.colors.white : theme.colors.primary} />
-      </RotationalSpinner>
-    ) : (
-      <EmphasisTypography id={id} variant="m" color={variant === 'secondary' ? theme.colors.primary : textColor} align="center">
-        {children}
-      </EmphasisTypography>
-    )}
-    {endIcon}
-  </StyledButton>
-);
+      return theme.colors.primary;
+    }
+    return textColor;
+  };
+
+  return (
+    <StyledButton
+      variant={variant || 'primary'}
+      onClick={() => {
+        if (onClick && !disabled && !disabledInvisible) {
+          onClick();
+        }
+      }}
+      disabled={disabled}
+      disabledInvisible={disabledInvisible || loading}
+      fullWidth={fullWidth}
+      color={color}
+      size={size}
+    >
+      {icon}
+      {loading ? (
+        <RotationalSpinner>
+          <SpinnerGap size={24} color={variant === 'primary' ? theme.colors.white : theme.colors.primary} />
+        </RotationalSpinner>
+      ) : (
+        <EmphasisTypography id={id} variant="m" color={getButtonTextColor()} align="center">
+          {children}
+        </EmphasisTypography>
+      )}
+      {endIcon}
+    </StyledButton>
+  );
+};
+
 const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color: keyof typeof theme.colors | undefined, disabled?: boolean) => {
   if (variant === 'secondary') {
     return 'transparent';

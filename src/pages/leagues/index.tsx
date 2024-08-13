@@ -264,6 +264,7 @@ const PredictionLeaguesPage = () => {
                 size="m"
                 onClick={() => setShowCreateLeagueModal(true)}
                 icon={<PlusCircle size={24} weight="fill" color="white" />}
+                disabled={!currentUserId}
               >
                 Skapa liga
               </Button>
@@ -271,7 +272,8 @@ const PredictionLeaguesPage = () => {
                 variant="secondary"
                 size="m"
                 onClick={() => setShowJoinLeagueModal(true)}
-                icon={<UserPlus size={24} color={theme.colors.primary} />}
+                icon={<UserPlus size={24} color={!currentUserId ? theme.colors.silverLight : theme.colors.primary} />}
+                disabled={!currentUserId}
               >
                 Gå med i liga
               </Button>
@@ -280,8 +282,8 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {!fetchLoading && !currentUserId && (
-          <NormalTypography variant="m">Logga in för att se och gå med i ligor</NormalTypography>
+        {!currentUserId && (
+          <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
         )}
         {fetchLoading && currentUserId && <NormalTypography variant="m">Laddar ligor...</NormalTypography>}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
