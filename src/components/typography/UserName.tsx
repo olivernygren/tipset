@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import React, { useState, useEffect } from 'react';
 import { getUserDataById, getUserNameById } from '../../utils/firebaseHelpers';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 
 interface UserNameProps {
   userId: string;
@@ -34,6 +36,29 @@ export const UserEmail = ({ userId }: UserNameProps) => {
   }, [userId]);
 
   return <>{email || 'Loading...'}</>;
-}
+};
+
+export const UserProfilePicture = ({ userId }: UserNameProps) => {
+  const [profilePicture, setProfilePicture] = useState('');
+
+  useEffect(() => {
+    const fetchUserProfilePicture = async () => {
+      const user = await getUserDataById(userId);
+      const userProfilePicture = user?.profilePicture || '';
+      setProfilePicture(userProfilePicture);
+    };
+
+    fetchUserProfilePicture();
+  }, [userId]);
+
+  return (
+    <Avatar
+      src={profilePicture && profilePicture.length > 0 ? `/images/${profilePicture}.png` : '/images/generic.png'}
+      size={AvatarSize.M}
+      objectFit="cover"
+      showBorder
+    />
+  );
+};
 
 export default UserName;

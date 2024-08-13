@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import {
-  List, SignOut, User,
+  Gear, List, SignOut,
 } from '@phosphor-icons/react';
 import Cookies from 'js-cookie';
 import { devices, theme } from '../../theme';
@@ -14,6 +14,8 @@ import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
 import MobileMenu from './MobileMenu';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import { Divider } from '../Divider';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 
 const Header = () => {
   const { user } = useUser();
@@ -52,7 +54,6 @@ const Header = () => {
                 icon={<List size={32} />}
                 colors={{ normal: theme.colors.textDefault, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
                 onClick={() => setIsMobileMenuOpen(true)}
-                title="Meny"
               />
             </MobileMenuButton>
           ) : (
@@ -73,13 +74,19 @@ const Header = () => {
               </DesktopNavCenter>
               <RightSideItems>
                 {isSignedIn && (
-                <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography>
-                // <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
+                  <LoggedInUser>
+                    {user?.profilePicture && <Avatar src={`/images/${user?.profilePicture}.png`} alt="avatar" size={AvatarSize.M} showBorder objectFit="cover" />}
+                    {/* <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography> */}
+                    <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
+                  </LoggedInUser>
+                )}
+                {isSignedIn && (
+                  <Divider vertical />
                 )}
                 {isSignedIn && (
                 <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
                   <IconButton
-                    icon={<User size={24} weight="light" />}
+                    icon={<Gear size={24} weight="light" />}
                     colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                     onClick={() => {}}
                     title="Profil"
@@ -193,6 +200,7 @@ const RightSideItems = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: ${theme.spacing.s};
+  height: 44px;
 `;
 
 const ActiveLinkIndicator = styled.div`
@@ -205,6 +213,13 @@ const ActiveLinkIndicator = styled.div`
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
   background-color: ${theme.colors.primary};
+`;
+
+const LoggedInUser = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxxs};
+  height: 100%;
 `;
 
 export default React.memo(Header);
