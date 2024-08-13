@@ -270,8 +270,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const handleAddFixtureToGameWeek = () => {
     if (!newFixtureHomeTeam || !newFixtureAwayTeam) return;
 
-    if (newGameWeekFixtures.length === 13) {
-      errorNotify('Max antal matcher per omgång är 13');
+    if (newGameWeekFixtures.length === 24) {
+      errorNotify('Max antal matcher per omgång är 24');
       return;
     }
 

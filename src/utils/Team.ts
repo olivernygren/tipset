@@ -279,6 +279,67 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg',
       stadium: 'Estadio San Mamés',
     },
+    {
+      name: 'Girona FC',
+      shortName: 'Girona',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/Girona_FC_Logo.svg',
+      stadium: 'Estadi Montilivi',
+    },
+    {
+      name: 'RCD Espanyol',
+      shortName: 'Espanyol',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/RCD_Espanyol_crest.svg',
+      stadium: 'Stage Front Stadium',
+    },
+    {
+      name: 'Real Valladolid',
+      shortName: 'Valladolid',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6e/Real_Valladolid_Logo.svg',
+      stadium: 'Estadio José Zorrilla',
+    },
+    {
+      name: 'Getafe',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg',
+      stadium: 'Coliseum Alfonso Pérez',
+    },
+    {
+      name: 'Celta Vigo',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg',
+      stadium: 'Estadio de Balaídos',
+    },
+    {
+      name: 'Deportivo Alavés',
+      shortName: 'Alavés',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f8/Deportivo_Alaves_logo_%282020%29.svg',
+      stadium: 'Estadio de Mendizorroza',
+    },
+    {
+      name: 'Las Palmas',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/20/UD_Las_Palmas_logo.svg',
+      stadium: 'Estadio de Gran Canaria',
+    },
+    {
+      name: 'Osasuna',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/38/CA_Osasuna_2024_crest.svg',
+      stadium: 'Estadio El Sadar',
+    },
+    {
+      name: 'Leganés',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b8/Club_Deportivo_Legan%C3%A9s_logo.svg',
+      stadium: 'Estadio Municipal de Butarque',
+    },
+    {
+      name: 'Rayo Vallecano',
+      shortName: 'Rayo',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Rayo_Vallecano_logo.svg',
+      stadium: 'Estadio de Vallecas',
+    },
+    {
+      name: 'RCD Mallorca',
+      shortName: 'Mallorca',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e0/Rcd_mallorca.svg',
+      stadium: 'Estadio Mallorca Son Moix',
+    },
   ],
   [LeagueEnum.SERIE_A]: [
     {
@@ -326,6 +387,63 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg',
       stadium: 'Stadio Renato Dall\'Ara',
     },
+    {
+      name: 'Genoa',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2c/Genoa_CFC_crest.svg',
+      stadium: 'Stadio Luigi Ferraris',
+    },
+    {
+      name: 'Udinese',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Udinese_Calcio_logo.svg',
+      stadium: 'Dacia Arena',
+    },
+    {
+      name: 'Parma',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg',
+      stadium: 'Stadio Ennio Tardini',
+    },
+    {
+      name: 'Torino',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/Torino_FC_Logo.svg',
+      stadium: 'Stadio Olimpico Grande Torino',
+    },
+    {
+      name: 'Empoli',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/ed/Empoli_FC_logo.svg',
+      stadium: 'Stadio Carlo Castellani',
+    },
+    {
+      name: 'Monza',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/AC_Monza_logo_%282021%29.svg',
+      stadium: 'Stadio Brianteo',
+    },
+    {
+      name: 'Hellas Verona',
+      shortName: 'H. Verona',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/Hellas_Verona_FC_logo_%282020%29.svg',
+      stadium: 'Stadio Marcantonio Bentegodi',
+    },
+    {
+      name: 'Cagliari',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/61/Cagliari_Calcio_1920.svg',
+      stadium: 'Unipol Domus',
+    },
+    {
+      name: 'Venezia',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Venezia_FC_-_logo_%28Italy%2C_2022-%29.svg',
+      stadium: 'Stadio Pierluigi Penzo',
+    },
+    {
+      name: 'Lecce',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/US-Lecce-2023.svg',
+      stadium: 'Stadio Via del Mare',
+    },
+    {
+      name: 'Como 1917',
+      shortName: 'Como',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
+      stadium: 'Stadio Giuseppe Sinigaglia',
+    },
   ],
   [LeagueEnum.BUNDESLIGA]: [
     {
@@ -363,6 +481,73 @@ export const Teams = {
       shortName: 'Stuttgart',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/VfB_Stuttgart_1893_Logo.svg',
       stadium: 'Mercedes-Benz Arena',
+    },
+    {
+      name: 'Mönchengladbach',
+      shortName: 'Gladbach',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Borussia_M%C3%B6nchengladbach_logo.svg',
+      stadium: 'Borussia-Park',
+    },
+    {
+      name: 'VfL Bochum',
+      shortName: 'Bochum',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/VfL_Bochum_logo.svg',
+      stadium: 'Vonovia Ruhrstadion',
+    },
+    {
+      name: 'Hoffenheim',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Logo_TSG_Hoffenheim.svg',
+      stadium: 'PreZero Arena',
+    },
+    {
+      name: 'Holstein Kiel',
+      shortName: 'Kiel',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Holstein_Kiel_Logo.svg',
+      stadium: 'Holstein-Stadion',
+    },
+    {
+      name: 'Mainz 05',
+      shortName: 'Mainz',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_Mainz_05.svg',
+      stadium: 'Opel Arena',
+    },
+    {
+      name: 'Union Berlin',
+      shortName: 'U. Berlin',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/44/1._FC_Union_Berlin_Logo.svg',
+      stadium: 'Stadion An der Alten Försterei',
+    },
+    {
+      name: 'Freiburg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6d/SC_Freiburg_logo.svg',
+      stadium: 'Schwarzwald-Stadion',
+    },
+    {
+      name: 'Augsburg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c5/FC_Augsburg_logo.svg',
+      stadium: 'WWK Arena',
+    },
+    {
+      name: 'Werder Bremen',
+      shortName: 'W. Bremen',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/be/SV-Werder-Bremen-Logo.svg',
+      stadium: 'Weserstadion',
+    },
+    {
+      name: 'VfL Wolfsburg',
+      shortName: 'Wolfsburg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/VfL_Wolfsburg_Logo.svg',
+      stadium: 'Volkswagen Arena',
+    },
+    {
+      name: 'St. Pauli',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8f/FC_St._Pauli_logo_%282018%29.svg',
+      stadium: 'Millerntor-Stadion',
+    },
+    {
+      name: 'Heidenheim',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/1._FC_Heidenheim_1846.svg',
+      stadium: 'Voith-Arena',
     },
   ],
   [LeagueEnum.BUNDESLIGA_2]: [
