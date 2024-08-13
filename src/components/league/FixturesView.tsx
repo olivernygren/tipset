@@ -741,7 +741,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <Section
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
-            padding={isMobile ? theme.spacing.s : theme.spacing.m}
+            padding={isMobile ? `${theme.spacing.m} ${theme.spacing.s}` : theme.spacing.m}
             gap="s"
             expandMobile
           >
@@ -801,7 +801,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <Section
             backgroundColor={theme.colors.white}
             borderRadius={theme.borderRadius.l}
-            padding={isMobile ? theme.spacing.s : theme.spacing.m}
+            padding={isMobile ? `${theme.spacing.m} ${theme.spacing.s}` : theme.spacing.m}
             gap="s"
             expandMobile
           >
@@ -818,15 +818,15 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <Section
           backgroundColor={theme.colors.white}
           borderRadius={theme.borderRadius.l}
-          padding={isMobile ? theme.spacing.s : theme.spacing.m}
+          padding={isMobile ? `${theme.spacing.m} ${theme.spacing.s}` : theme.spacing.m}
           gap="s"
           expandMobile
         >
-          <HeadingsTypography variant="h4">Föregående omgångar</HeadingsTypography>
+          <HeadingsTypography variant="h4">Tidigare omgångar</HeadingsTypography>
           {previousGameWeeks && previousGameWeeks.length > 0 ? (
             <>
               {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
-                <Section key={gameWeek.round} gap="s" backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+                <PreviousRoundCard key={gameWeek.round}>
                   <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                     <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
                       {`Omgång ${gameWeek.round}`}
@@ -841,7 +841,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       </RoundPointsContainer>
                     </Section>
                   </Section>
-                  <Divider color={theme.colors.silver} />
+                  <Divider color={theme.colors.silverLight} />
                   <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
                     {gameWeek.games.fixtures.map((fixture) => (
                       <FixtureResultPreview
@@ -851,11 +851,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       />
                     ))}
                   </Section>
-                </Section>
+                </PreviousRoundCard>
               ))}
             </>
           ) : (
-            <NormalTypography variant="m" color={theme.colors.textLight}>Inga föregående omgångar</NormalTypography>
+            <NormalTypography variant="m" color={theme.colors.textLight}>Inga tidigare omgångar</NormalTypography>
           )}
         </Section>
       </Section>
@@ -957,6 +957,17 @@ const OngoingGameWeekHeader = styled.div`
     justify-content: space-between;
     align-items: center;
   }
+`;
+
+const PreviousRoundCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.s};
+  background-color: ${theme.colors.silverLighter};
+  border-radius: ${theme.borderRadius.m};
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
 `;
 
 export default FixturesView;

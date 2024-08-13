@@ -56,16 +56,18 @@ const HomePageCard = ({ title, description, href }: HomePageCardProps) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Section gap="m">
-          <Section flexDirection="row" alignItems="center" gap="s">
+        <Section gap={isMobile ? 'xs' : 'm'}>
+          <Section flexDirection="row" alignItems="center" gap={isMobile ? 'xs' : 's'}>
             <HeadingsTypography variant={isMobile ? 'h3' : 'h2'} color={isHovered && !isMobile ? theme.colors.gold : theme.colors.textDefault}>{title}</HeadingsTypography>
             {getIcon()}
           </Section>
           <NormalTypography variant={isMobile ? 'm' : 'l'} color={isHovered && !isMobile ? theme.colors.white : theme.colors.silverDark}>{description}</NormalTypography>
         </Section>
-        <ArrowIconContainer isHovered={isHovered && !isMobile}>
-          <ArrowRight size={40} color={isHovered && !isMobile ? theme.colors.gold : theme.colors.white} weight="bold" />
-        </ArrowIconContainer>
+        {!isMobile && (
+          <ArrowIconContainer isHovered={isHovered}>
+            <ArrowRight size={40} color={isHovered ? theme.colors.gold : theme.colors.white} weight="bold" />
+          </ArrowIconContainer>
+        )}
       </Card>
     </StyledLink>
   );
@@ -80,12 +82,16 @@ const StyledLink = styled.a`
 const Card = styled(motion.div)`
   width: 100%;
   box-sizing: border-box;
-  padding: ${theme.spacing.m};
+  padding: 20px;
   border-radius: ${theme.borderRadius.l};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.m};
+  }
 `;
 
 const ArrowIconContainer = styled.div<{ isHovered: boolean }>`

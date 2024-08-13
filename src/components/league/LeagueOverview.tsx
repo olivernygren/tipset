@@ -97,27 +97,16 @@ const LeagueOverview = ({
     if (!place) return null;
     const isLoggedInUser = place.userId === currentUserId;
 
-    let positionEmoji;
-    switch (position) {
-      case 1:
-        positionEmoji = '🥇';
-        break;
-      case 2:
-        positionEmoji = '🥈';
-        break;
-      case 3:
-        positionEmoji = '🥉';
-        break;
-      default:
-        positionEmoji = `${position} -`;
-        break;
-    }
-
     return (
       <UserLeaguePosition isLoggedInUser={isLoggedInUser}>
-        <EmphasisTypography variant="m" color={theme.colors.textDefault}>
-          {`${positionEmoji} ${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
-        </EmphasisTypography>
+        <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
+          <NormalTypography variant="m" color={theme.colors.primaryDark}>
+            {position}
+          </NormalTypography>
+          <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+            {`${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
+          </EmphasisTypography>
+        </Section>
         <RightAlignedGridItem>
           <NormalTypography variant="m" color={theme.colors.textDefault}>
             {place.correctResults}
@@ -126,8 +115,6 @@ const LeagueOverview = ({
         <RightAlignedGridItem>
           <NormalTypography variant="m" color={theme.colors.textDefault}>
             {place.points}
-            {' '}
-            p
           </NormalTypography>
         </RightAlignedGridItem>
       </UserLeaguePosition>
@@ -220,7 +207,7 @@ const LeagueOverview = ({
         <GridSection>
           <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
           {previousGameWeek ? (
-            <Section gap="s" backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.m}>
+            <PreviousRoundCard>
               <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
                 <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
                   {`Omgång ${previousGameWeek.round}`}
@@ -235,7 +222,7 @@ const LeagueOverview = ({
                   </RoundPointsContainer>
                 </Section>
               </Section>
-              <Divider color={theme.colors.silver} />
+              <Divider color={theme.colors.silverLight} />
               <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
                 {previousGameWeek.games.fixtures.map((fixture) => (
                   <FixtureResultPreview
@@ -245,7 +232,7 @@ const LeagueOverview = ({
                   />
                 ))}
               </Section>
-            </Section>
+            </PreviousRoundCard>
           ) : (
             <NormalTypography variant="m" color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
           )}
@@ -338,7 +325,7 @@ const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   gap: ${theme.spacing.xxs};
   align-items: center;
   padding: ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.xs};
+  border-radius: ${theme.borderRadius.s};
   background-color: ${theme.colors.silverLighter};
   box-sizing: border-box;
   border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')};
@@ -393,6 +380,17 @@ const FixturesContainer = styled.div`
   width: 100%;
   box-sizing: border-box;
   margin-bottom: ${theme.spacing.s};
+`;
+
+const PreviousRoundCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.s};
+  background-color: ${theme.colors.silverLighter};
+  border-radius: ${theme.borderRadius.m};
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
 `;
 
 export default LeagueOverview;
