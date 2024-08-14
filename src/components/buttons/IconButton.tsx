@@ -89,9 +89,26 @@ const StyledButton = styled(motion.button)<StyledButtonProps>`
   &:disabled {
     cursor: not-allowed;
 
-    svg {
-      fill: ${({ colors }) => colors.disabled};
+    ${({ backgroundColor, colors, showBorder }) => {
+    if (backgroundColor) {
+      return `
+        background-color: ${colors.disabled || theme.colors.silverLight};
+      `;
     }
+
+    if (showBorder) {
+      return `
+        border: 1px solid ${colors.disabled || theme.colors.silver};
+        svg {
+          fill: ${colors.disabled};
+        }
+      `;
+    }
+
+    return `
+      background-color: transparent;
+    `;
+  }}
   }
 `;
 

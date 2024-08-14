@@ -32,6 +32,8 @@ import ParticipantsView from '../../../components/league/ParticipantsView';
 import EditLeagueView from '../../../components/league/EditLeagueView';
 import { errorNotify } from '../../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../../utils/hooks/useResizeListener';
+import CustomSkeleton, { ParagraphSkeleton } from '../../../components/skeleton/CustomSkeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -240,6 +242,42 @@ const PredictionLeaguePage = () => {
     }
   };
 
+  const getSkeletonHeader = () => (
+    <>
+      <ParagraphSkeleton height={40} width={195} />
+      <CustomSkeleton circle width={46} height={46} />
+    </>
+  );
+
+  const getSkeletonLoader = () => (
+    <Section gap="m">
+      {isMobile ? (
+        <Section padding={`0 ${theme.spacing.s}`}>
+          <CustomSkeleton width="calc(100vw - 32px)" height={48} borderRadius={theme.borderRadius.m} />
+        </Section>
+      ) : (
+        <CustomSkeleton width={1200} height={60} borderRadius={theme.borderRadius.m} />
+      )}
+      {isMobile ? (
+        <Section gap="m">
+          <CustomSkeleton width="100vw" height={288} />
+          <CustomSkeleton width="100vw" height={288} />
+        </Section>
+      ) : (
+        <Section gap="s">
+          <Section gap="s" flexDirection="row">
+            <CustomSkeleton width={592} height={376} borderRadius={theme.borderRadius.l} />
+            <CustomSkeleton width={592} height={376} borderRadius={theme.borderRadius.l} />
+          </Section>
+          <Section gap="s" flexDirection="row">
+            <CustomSkeleton width={592} height={376} borderRadius={theme.borderRadius.l} />
+            <CustomSkeleton width={592} height={376} borderRadius={theme.borderRadius.l} />
+          </Section>
+        </Section>
+      )}
+    </Section>
+  );
+
   return (
     <Page fullWidthMobile>
       <BackButtonContainer>
@@ -248,99 +286,103 @@ const PredictionLeaguePage = () => {
         </TextButton>
       </BackButtonContainer>
       <PageHeader>
-        <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
-        <Section gap="s" flexDirection="row" alignItems="center" fitContent>
-          {(isCreator || hasAdminRights) && (
-            <>
-              <IconButton
-                icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                onClick={() => setContextMenuOpen(!contextMenuOpen)}
-                showBorder
-                backgroundColor={theme.colors.white}
-              />
-              {contextMenuOpen && (
-                <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
-                  <ContextMenuOption
-                    icon={<Trash size={24} color={theme.colors.red} />}
-                    onClick={() => handleDeleteLeague()}
-                    label="Radera liga"
-                    color={theme.colors.red}
-                  />
-                </ContextMenu>
-              )}
-            </>
-          )}
-        </Section>
-      </PageHeader>
-      {initialFetchLoading ? null : (
-        <PageContent>
-          {isParticipant && (
-            <>
-              {isMobile ? (
-                <MobileTabs>
-                  <MobileTabsButton onClick={() => setMobileTabsMenuOpen(!mobileTabsMenuOpen)}>
-                    <Section flexDirection="row" alignItems="center" gap="xxs">
-                      {getTabIcon(activeTab, true)}
-                      <EmphasisTypography variant="m" color={theme.colors.primary}>
-                        {getTabText(activeTab)}
-                      </EmphasisTypography>
-                    </Section>
-                    <MobileMenuIcon isOpen={mobileTabsMenuOpen}>
-                      <CaretDown size={16} color={theme.colors.primary} weight="bold" />
-                    </MobileMenuIcon>
-                  </MobileTabsButton>
-                  {mobileTabsMenuOpen && (
-                    <MobileTabsOptionsMenu
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {tabs.map((tab) => (
-                        <MobileMenuOption
-                          isActive={activeTab === tab}
-                          onClick={() => {
-                            setActiveTab(tab);
-                            setMobileTabsMenuOpen(false);
-                          }}
-                        >
-                          <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
-                            {getTabText(tab)}
-                          </EmphasisTypography>
-                          {getTabIcon(tab, activeTab === tab)}
-                        </MobileMenuOption>
-                      ))}
-                    </MobileTabsOptionsMenu>
-                  )}
-                </MobileTabs>
-              ) : (
-                <TabsContainer>
-                  {tabs.map((tab) => (
-                    <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
-                      {getTabIcon(tab, activeTab === tab)}
-                      <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
-                        {getTabText(tab)}
-                      </EmphasisTypography>
-                    </Tab>
-                  ))}
-                </TabsContainer>
-              )}
-              {getPageContent()}
-            </>
-          )}
-          {!isParticipant && currentUserId && (
-            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m" expandMobile>
-              <HeadingsTypography variant="h5">
-                {`Vill du gå med i ligan ${league?.name}?`}
-              </HeadingsTypography>
-              <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>
-                Acceptera inbjudan
-              </Button>
-              {showJoinLeagueError.length > 0 && (
-                <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+        {initialFetchLoading ? getSkeletonHeader() : (
+          <>
+            <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
+            <Section gap="s" flexDirection="row" alignItems="center" fitContent>
+              {(isCreator || hasAdminRights) && (
+              <>
+                <IconButton
+                  icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
+                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                  onClick={() => setContextMenuOpen(!contextMenuOpen)}
+                  showBorder
+                  backgroundColor={theme.colors.white}
+                />
+                {contextMenuOpen && (
+                  <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
+                    <ContextMenuOption
+                      icon={<Trash size={24} color={theme.colors.red} />}
+                      onClick={() => handleDeleteLeague()}
+                      label="Radera liga"
+                      color={theme.colors.red}
+                    />
+                  </ContextMenu>
+                )}
+              </>
               )}
             </Section>
+          </>
+        )}
+      </PageHeader>
+      {initialFetchLoading ? getSkeletonLoader() : (
+        <PageContent>
+          {isParticipant && (
+          <>
+            {isMobile ? (
+              <MobileTabs>
+                <MobileTabsButton onClick={() => setMobileTabsMenuOpen(!mobileTabsMenuOpen)}>
+                  <Section flexDirection="row" alignItems="center" gap="xxs">
+                    {getTabIcon(activeTab, true)}
+                    <EmphasisTypography variant="m" color={theme.colors.primary}>
+                      {getTabText(activeTab)}
+                    </EmphasisTypography>
+                  </Section>
+                  <MobileMenuIcon isOpen={mobileTabsMenuOpen}>
+                    <CaretDown size={16} color={theme.colors.primary} weight="bold" />
+                  </MobileMenuIcon>
+                </MobileTabsButton>
+                {mobileTabsMenuOpen && (
+                <MobileTabsOptionsMenu
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {tabs.map((tab) => (
+                    <MobileMenuOption
+                      isActive={activeTab === tab}
+                      onClick={() => {
+                        setActiveTab(tab);
+                        setMobileTabsMenuOpen(false);
+                      }}
+                    >
+                      <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
+                        {getTabText(tab)}
+                      </EmphasisTypography>
+                      {getTabIcon(tab, activeTab === tab)}
+                    </MobileMenuOption>
+                  ))}
+                </MobileTabsOptionsMenu>
+                )}
+              </MobileTabs>
+            ) : (
+              <TabsContainer>
+                {tabs.map((tab) => (
+                  <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
+                    {getTabIcon(tab, activeTab === tab)}
+                    <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
+                      {getTabText(tab)}
+                    </EmphasisTypography>
+                  </Tab>
+                ))}
+              </TabsContainer>
+            )}
+            {getPageContent()}
+          </>
+          )}
+          {!isParticipant && currentUserId && (
+          <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m" expandMobile>
+            <HeadingsTypography variant="h5">
+              {`Vill du gå med i ligan ${league?.name}?`}
+            </HeadingsTypography>
+            <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>
+              Acceptera inbjudan
+            </Button>
+            {showJoinLeagueError.length > 0 && (
+            <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+            )}
+          </Section>
           )}
         </PageContent>
       )}
@@ -354,6 +396,8 @@ const PageHeader = styled.div`
   align-items: center;
   gap: ${theme.spacing.m};
   padding: ${theme.spacing.s};
+  width: 100%;
+  box-sizing: border-box;
   
   @media ${devices.tablet} {
     padding: ${theme.spacing.m} 0;

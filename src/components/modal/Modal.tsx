@@ -21,6 +21,8 @@ const Modal = ({
 }: ModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
+  const useMobileAnimation = isMobile && mobileBottomSheet;
+
   const getModalWidth = () => {
     if (mobileBottomSheet && isMobile) {
       return '100%';
@@ -50,9 +52,9 @@ const Modal = ({
       >
         <ModalContainer
           width={getModalWidth()}
-          initial={{ opacity: 0, scale: 0.92, y: isMobile && mobileBottomSheet ? '100%' : '00%' }}
-          animate={{ opacity: 1, scale: 1, y: isMobile && mobileBottomSheet ? '0%' : '0%' }}
-          exit={{ opacity: 0, scale: 0.92, y: isMobile && mobileBottomSheet ? '100%' : '0%' }}
+          initial={{ opacity: 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '100%' : '0%' }}
+          animate={{ opacity: 1, scale: 1, y: '0%' }}
+          exit={{ opacity: 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '100%' : '0%' }}
           transition={{ duration: 0.2, type: 'tween' }}
           mobileBottomSheet={mobileBottomSheet}
         >
@@ -60,7 +62,7 @@ const Modal = ({
             {title && <HeadingsTypography variant="h3">{title}</HeadingsTypography>}
             <IconButton
               icon={<X size={24} />}
-              colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textLight }}
+              colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textDefault }}
               onClick={onClose}
             />
           </Header>
@@ -96,7 +98,7 @@ const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: b
   max-height: 90vh;
   height: fit-content;
   width: ${({ width }) => width};
-  border-radius: ${({ mobileBottomSheet }) => (mobileBottomSheet ? `${theme.borderRadius.m} ${theme.borderRadius.m} 0 0` : theme.borderRadius.l)};
+  border-radius: ${({ mobileBottomSheet }) => (mobileBottomSheet ? `${theme.borderRadius.l} ${theme.borderRadius.l} 0 0` : theme.borderRadius.l)};
   
   @media ${devices.tablet} {
     max-height: 85vh;
@@ -112,7 +114,7 @@ const ModalContent = styled.div<{ headerDivider?: boolean }>`
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.m : 0)} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
+  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.m : 0)} ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m};
 
   @media ${devices.tablet} {
     padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.l : 0)} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
@@ -125,7 +127,7 @@ const Header = styled.div<{ headerDivider?: boolean }>`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
+  padding: ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
   
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};

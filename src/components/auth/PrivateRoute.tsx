@@ -12,7 +12,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   isAuthenticated, isAdmin, children, isLoading,
 }) => {
   if (isLoading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (!isAuthenticated || !isAdmin) {

@@ -28,6 +28,8 @@ import { successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../../components/tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import IconButton from '../../components/buttons/IconButton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import CustomSkeleton, { ParagraphSkeleton } from '../../components/skeleton/CustomSkeleton';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -227,6 +229,24 @@ const PredictionLeaguesPage = () => {
     );
   };
 
+  const getSkeletonLoader = () => (
+    <Section gap="m">
+      <Section gap="s">
+        <ParagraphSkeleton height={30} width={225} />
+        <Section flexDirection="row" gap="m">
+          <CustomSkeleton width={isMobile ? 'calc(100vw - 48px)' : 366} height={250} borderRadius={theme.borderRadius.l} />
+          {!isMobile && <CustomSkeleton width={366} height={250} borderRadius={theme.borderRadius.l} />}
+        </Section>
+      </Section>
+      <Section gap="s">
+        <ParagraphSkeleton height={30} width={180} />
+        <Section flexDirection="row" gap="m">
+          <CustomSkeleton width={isMobile ? 'calc(100vw - 48px)' : 366} height={250} borderRadius={theme.borderRadius.l} />
+        </Section>
+      </Section>
+    </Section>
+  );
+
   return (
     <Page>
       <PageHeader>
@@ -240,7 +260,7 @@ const PredictionLeaguesPage = () => {
                 backgroundColor={theme.colors.primary}
                 colors={{
                   normal: theme.colors.white,
-                  disabled: theme.colors.silver,
+                  disabled: theme.colors.silverLight,
                 }}
                 disabled={!currentUserId}
               />
@@ -251,7 +271,7 @@ const PredictionLeaguesPage = () => {
                   normal: theme.colors.primary,
                   hover: theme.colors.primaryDark,
                   active: theme.colors.primaryDarker,
-                  disabled: theme.colors.silver,
+                  disabled: theme.colors.silverLight,
                 }}
                 showBorder
                 borderColor={theme.colors.primary}
@@ -286,7 +306,7 @@ const PredictionLeaguesPage = () => {
         {!currentUserId && (
           <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
         )}
-        {fetchLoading && currentUserId && <NormalTypography variant="m">Laddar ligor...</NormalTypography>}
+        {fetchLoading && currentUserId && getSkeletonLoader()}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
           <>
             {creatorLeagues.length > 0 && (
@@ -327,11 +347,13 @@ const PredictionLeaguesPage = () => {
                   placeholder="t.ex. KNT342G9"
                   value={joinLeagueCodeValue}
                   onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
+                  fullWidth={isMobile}
                 />
                 <Button
                   onClick={handleJoinLeague}
                   loading={joinLeagueLoading === 'input'}
                   disabled={joinLeagueCodeValue.length === 0}
+                  fullWidth={isMobile}
                 >
                   Gå med
                 </Button>

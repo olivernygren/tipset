@@ -103,9 +103,9 @@ const LeagueOverview = ({
           <NormalTypography variant="m" color={theme.colors.primaryDark}>
             {position}
           </NormalTypography>
-          <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+          <NormalTypography variant="m" color={theme.colors.textDefault}>
             {`${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
-          </EmphasisTypography>
+          </NormalTypography>
         </Section>
         <RightAlignedGridItem>
           <NormalTypography variant="m" color={theme.colors.textDefault}>
@@ -293,7 +293,7 @@ const GridSection = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.s};
   background-color: ${theme.colors.white};
-  padding: ${theme.spacing.s};
+  padding: ${theme.spacing.m} ${theme.spacing.s};
   border-radius: 0;
   max-height: 500px;
   overflow-y: auto;
@@ -326,9 +326,9 @@ const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   align-items: center;
   padding: ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.s};
-  background-color: ${theme.colors.silverLighter};
+  background-color: ${({ isLoggedInUser }) => (isLoggedInUser ? theme.colors.primaryFade : theme.colors.silverLighter)};
   box-sizing: border-box;
-  border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')};
+  /* border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')}; */
 
   @media ${devices.tablet} {
     grid-template-columns: 2fr 1fr 1fr;

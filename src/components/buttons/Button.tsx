@@ -143,7 +143,7 @@ const StyledButton = styled.button<ButtonProps>`
   &:active {
     background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
     border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-    transform: ${({ disabled }) => (disabled ? 'none' : 'scale(0.99)')};
+    transform: ${({ disabled }) => (disabled ? 'none' : 'scale(0.98)')};
   }
 
   &:disabled {
