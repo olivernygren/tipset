@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   CheckCircle, Circle, Funnel, XCircle,
@@ -41,8 +41,6 @@ const GoalScorerModal = ({
   const [searchValue, setSearchValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
-
-  const iconButtonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
@@ -98,7 +96,7 @@ const GoalScorerModal = ({
           {player.name}
         </NormalTypography>
       </PlayerInfo>
-      <IconButtonContainer ref={iconButtonRef}>
+      <IconButtonContainer onClick={(e) => e.stopPropagation()}>
         <IconButton
           icon={selectedGoalScorer && selectedGoalScorer.id === player.id ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
           colors={

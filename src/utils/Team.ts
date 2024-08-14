@@ -1,4 +1,7 @@
 /* eslint-disable guard-for-in */
+
+import { CountryEnum } from './Players';
+
 /* eslint-disable no-restricted-syntax */
 export interface Team {
   name: string;
@@ -6,6 +9,7 @@ export interface Team {
   logoUrl: string;
   relativeLogoUrl?: string;
   stadium?: string;
+  country?: string;
 }
 
 export enum LeagueEnum {
@@ -30,112 +34,205 @@ export const getTeamByName = (teamName: string): Team | undefined => {
   }
 };
 
+export const getTeamsByCountry = (country: string): Team[] => {
+  const teams: Team[] = [];
+  for (const league in Teams) {
+    Teams[league as LeagueEnum].forEach((team: Team) => {
+      if (team.country === country) teams.push(team);
+    });
+  }
+  return teams;
+};
+
+export const getTeamsObjectByCountry = (): { [key: string]: Team[] } => {
+  const teamsByCountry: { [key: string]: Team[] } = {};
+
+  for (const league in Teams) {
+    Teams[league as LeagueEnum].forEach((team: Team) => {
+      const { country } = team;
+      if (!country) return;
+      if (!teamsByCountry[country]) {
+        teamsByCountry[country] = [] as Team[];
+      }
+      teamsByCountry[country].push(team);
+    });
+  }
+
+  // Sort teams alphabetically within each country's array
+  Object.keys(teamsByCountry).forEach((country) => {
+    teamsByCountry[country].sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  return teamsByCountry;
+};
+
+export const getAllTeams = (): Team[] => {
+  const teams: Team[] = [];
+  for (const league in Teams) {
+    Teams[league as LeagueEnum].forEach((team: Team) => {
+      teams.push(team);
+    });
+  }
+  return teams;
+};
+
+export const getAllNations = (): Team[] => {
+  const nations: Team[] = [];
+  for (const league in Teams) {
+    if (league === LeagueEnum.NATIONS) {
+      Teams[league as LeagueEnum].forEach((team: Team) => {
+        nations.push(team);
+      });
+    }
+  }
+  return nations;
+};
+
+export const getAllNationsObject = (): { [key: string]: Team[] } => {
+  const nations: { [key: string]: Team[] } = { Landslag: [] };
+
+  for (const league in Teams) {
+    if (league === LeagueEnum.NATIONS) {
+      Teams[league as LeagueEnum].forEach((team: Team) => {
+        nations.Landslag.push(team);
+      });
+    }
+  }
+
+  return nations;
+};
+
+export const getFlagUrlByCountryName = (countryName: string): string => {
+  const country = Teams[LeagueEnum.NATIONS].find((team: Team) => team.name === countryName);
+  return country?.logoUrl || '';
+};
+
 export const Teams = {
   [LeagueEnum.PREMIER_LEAGUE]: [
     {
       name: 'Arsenal',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',
       stadium: 'Emirates Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Chelsea',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg',
       stadium: 'Stamford Bridge',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Liverpool',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',
       stadium: 'Anfield',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Manchester City',
       shortName: 'Man City',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
       stadium: 'Etihad Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Manchester United',
       shortName: 'Man United',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
       stadium: 'Old Trafford',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Tottenham',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',
       stadium: 'Tottenham Hotspur Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Everton',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg',
       stadium: 'Goodison Park',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Leicester',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',
       stadium: 'King Power Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'West Ham',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg',
       stadium: 'London Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Aston Villa',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Aston_Villa_FC_new_crest.svg/1280px-Aston_Villa_FC_new_crest.svg.png',
       stadium: 'Villa Park',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Wolves',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg',
       stadium: 'Molineux Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Southampton',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c9/FC_Southampton.svg',
       stadium: 'St. Mary\'s Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Newcastle',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg',
       stadium: 'St. James\' Park',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Crystal Palace',
       shortName: 'C. Palace',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg',
       stadium: 'Selhurst Park',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Brighton',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg',
       stadium: 'AMEX Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Ipswich',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',
       stadium: 'Portman Road',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Nottingham Forest',
       shortName: 'N. Forest',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg',
       stadium: 'City Ground',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Brentford',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg',
       stadium: 'Brentford Community Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Bournemouth',
       shortName: 'B‘mouth',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg',
       stadium: 'Vitality Stadium',
+      country: CountryEnum.ENGLAND,
     },
     {
       name: 'Fulham',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg',
       stadium: 'Craven Cottage',
+      country: CountryEnum.ENGLAND,
     },
   ],
   [LeagueEnum.ALLSVENSKAN]: [
@@ -143,91 +240,107 @@ export const Teams = {
       name: 'Djurgården',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Djurgardens_IF_logo.svg',
       stadium: 'Tele2 Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Hammarby IF',
       shortName: 'Hammarby',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Hammarby_IF_logo.svg/1920px-Hammarby_IF_logo.svg.png',
       stadium: 'Tele2 Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Malmö FF',
       shortName: 'Malmö',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Malmo_FF_logo.svg',
       stadium: 'Eleda Stadion',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'IFK Göteborg',
       logoUrl: 'https://ifkgoteborg.se/wp-content/uploads/2017/09/IFK-logo.png',
       stadium: 'Gamla Ullevi',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'AIK',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5f/AIK_logo.svg/1920px-AIK_logo.svg.png',
       stadium: 'Strawberry Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'IFK Norrköping',
       shortName: 'Norrköping',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/IFK_Norrkoping_logo.svg',
       stadium: 'PlatinumCars Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'BK Häcken',
       shortName: 'Häcken',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5d/BK_Hacken_logo.svg',
       stadium: 'Bravida Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'IFK Värnamo',
       shortName: 'Värnamo',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/IFK_Varnamo_logo.svg',
       stadium: 'Finnvedsvallen',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Kalmar FF',
       shortName: 'Kalmar',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/af/Kalmar_FF_logo.svg',
       stadium: 'Guldfågeln Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Elfsborg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/37/IF_Elfsborg_logo.svg',
       stadium: 'Borås Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'GAIS',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a3/GAIS_logo.svg',
       stadium: 'Gamla Ullevi',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Västerås SK',
       shortName: 'Västerås',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Vasteras_SK_logo.svg',
       stadium: 'Hitachi Energy Arena',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Mjällby',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a5/Mjallby_AIF_logo.svg',
       stadium: 'Strandvallen',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Halmstad BK',
       shortName: 'Halmstad',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/66/Halmstad_BK_logo.svg',
       stadium: 'Örjans Vall',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'IK Sirius',
       shortName: 'Sirius',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/IK_Sirius_logo.svg',
       stadium: 'Studenternas IP',
+      country: CountryEnum.SWEDEN,
     },
     {
       name: 'Brommapojkarna',
       shortName: 'BP',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/20/IF_Brommapojkarna_logo.svg',
       stadium: 'Grimsta IP',
+      country: CountryEnum.SWEDEN,
     },
   ],
   [LeagueEnum.LA_LIGA]: [
@@ -235,110 +348,130 @@ export const Teams = {
       name: 'Real Madrid',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
       stadium: 'Santiago Bernabéu',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'FC Barcelona',
       shortName: 'Barcelona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg',
       stadium: 'Camp Nou',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Atletico Madrid',
       shortName: 'Atl. Madrid',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Atletico_Madrid_Logo_2024.svg',
       stadium: 'Wanda Metropolitano',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Sevilla',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg',
       stadium: 'Ramón Sánchez Pizjuán',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Valencia',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg',
       stadium: 'Mestalla',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Real Sociedad',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg',
       stadium: 'Estadio Anoeta',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Villarreal',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Villarreal_CF_logo-en.svg',
       stadium: 'Estadio de la Cerámica',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Real Betis',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg',
       stadium: 'Estadio Benito Villamarín',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Athletic Bilbao',
       shortName: 'Ath. Bilbao',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg',
       stadium: 'Estadio San Mamés',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Girona FC',
       shortName: 'Girona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/Girona_FC_Logo.svg',
       stadium: 'Estadi Montilivi',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'RCD Espanyol',
       shortName: 'Espanyol',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/RCD_Espanyol_crest.svg',
       stadium: 'Stage Front Stadium',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Real Valladolid',
       shortName: 'Valladolid',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6e/Real_Valladolid_Logo.svg',
       stadium: 'Estadio José Zorrilla',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Getafe',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg',
       stadium: 'Coliseum Alfonso Pérez',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Celta Vigo',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg',
       stadium: 'Estadio de Balaídos',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Deportivo Alavés',
       shortName: 'Alavés',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f8/Deportivo_Alaves_logo_%282020%29.svg',
       stadium: 'Estadio de Mendizorroza',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Las Palmas',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/20/UD_Las_Palmas_logo.svg',
       stadium: 'Estadio de Gran Canaria',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Osasuna',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/38/CA_Osasuna_2024_crest.svg',
       stadium: 'Estadio El Sadar',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Leganés',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b8/Club_Deportivo_Legan%C3%A9s_logo.svg',
       stadium: 'Estadio Municipal de Butarque',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'Rayo Vallecano',
       shortName: 'Rayo',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Rayo_Vallecano_logo.svg',
       stadium: 'Estadio de Vallecas',
+      country: CountryEnum.SPAIN,
     },
     {
       name: 'RCD Mallorca',
       shortName: 'Mallorca',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e0/Rcd_mallorca.svg',
       stadium: 'Estadio Mallorca Son Moix',
+      country: CountryEnum.SPAIN,
     },
   ],
   [LeagueEnum.SERIE_A]: [
@@ -346,103 +479,123 @@ export const Teams = {
       name: 'Juventus',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Juventus_FC_-_pictogram_black_%28Italy%2C_2017%29.svg',
       stadium: 'Allianz Stadium',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Inter',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
       stadium: 'Giuseppe Meazza',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'AC Milan',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg',
       stadium: 'San Siro',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'AS Roma',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg',
       stadium: 'Stadio Olimpico',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Napoli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SSC_Napoli_2007.svg',
       stadium: 'Stadio Diego Armando Maradona',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Lazio',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/S.S._Lazio_badge.svg',
       stadium: 'Stadio Olimpico',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Fiorentina',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg',
       stadium: 'Stadio Artemio Franchi',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Atalanta',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/66/AtalantaBC.svg',
       stadium: 'Gewiss Stadium',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Bologna',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg',
       stadium: 'Stadio Renato Dall\'Ara',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Genoa',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2c/Genoa_CFC_crest.svg',
       stadium: 'Stadio Luigi Ferraris',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Udinese',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Udinese_Calcio_logo.svg',
       stadium: 'Dacia Arena',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Parma',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg',
       stadium: 'Stadio Ennio Tardini',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Torino',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/Torino_FC_Logo.svg',
       stadium: 'Stadio Olimpico Grande Torino',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Empoli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/ed/Empoli_FC_logo.svg',
       stadium: 'Stadio Carlo Castellani',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Monza',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/AC_Monza_logo_%282021%29.svg',
       stadium: 'Stadio Brianteo',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Hellas Verona',
       shortName: 'H. Verona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/Hellas_Verona_FC_logo_%282020%29.svg',
       stadium: 'Stadio Marcantonio Bentegodi',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Cagliari',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/61/Cagliari_Calcio_1920.svg',
       stadium: 'Unipol Domus',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Venezia',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Venezia_FC_-_logo_%28Italy%2C_2022-%29.svg',
       stadium: 'Stadio Pierluigi Penzo',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Lecce',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/US-Lecce-2023.svg',
       stadium: 'Stadio Via del Mare',
+      country: CountryEnum.ITALY,
     },
     {
       name: 'Como 1917',
       shortName: 'Como',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
       stadium: 'Stadio Giuseppe Sinigaglia',
+      country: CountryEnum.ITALY,
     },
   ],
   [LeagueEnum.BUNDESLIGA]: [
@@ -451,103 +604,121 @@ export const Teams = {
       shortName: 'FC Bayern',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg',
       stadium: 'Allianz Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Borussia Dortmund',
       shortName: 'Dortmund',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
       stadium: 'Signal Iduna Park',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'RB Leipzig',
       shortName: 'Leipzig',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg',
       stadium: 'Red Bull Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Bayer Leverkusen',
       shortName: 'Leverkusen',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg',
       stadium: 'BayArena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Eintracht Frankfurt',
       shortName: 'Frankfurt',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
       stadium: 'Deutsche Bank Park',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'VfB Stuttgart',
       shortName: 'Stuttgart',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/VfB_Stuttgart_1893_Logo.svg',
       stadium: 'Mercedes-Benz Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Mönchengladbach',
       shortName: 'Gladbach',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Borussia_M%C3%B6nchengladbach_logo.svg',
       stadium: 'Borussia-Park',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'VfL Bochum',
       shortName: 'Bochum',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/VfL_Bochum_logo.svg',
       stadium: 'Vonovia Ruhrstadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Hoffenheim',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Logo_TSG_Hoffenheim.svg',
       stadium: 'PreZero Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Holstein Kiel',
       shortName: 'Kiel',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Holstein_Kiel_Logo.svg',
       stadium: 'Holstein-Stadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Mainz 05',
       shortName: 'Mainz',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_Mainz_05.svg',
       stadium: 'Opel Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Union Berlin',
       shortName: 'U. Berlin',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/44/1._FC_Union_Berlin_Logo.svg',
       stadium: 'Stadion An der Alten Försterei',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Freiburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6d/SC_Freiburg_logo.svg',
       stadium: 'Schwarzwald-Stadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Augsburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c5/FC_Augsburg_logo.svg',
       stadium: 'WWK Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Werder Bremen',
       shortName: 'W. Bremen',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/be/SV-Werder-Bremen-Logo.svg',
       stadium: 'Weserstadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'VfL Wolfsburg',
       shortName: 'Wolfsburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/VfL_Wolfsburg_Logo.svg',
       stadium: 'Volkswagen Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'St. Pauli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8f/FC_St._Pauli_logo_%282018%29.svg',
       stadium: 'Millerntor-Stadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Heidenheim',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/1._FC_Heidenheim_1846.svg',
       stadium: 'Voith-Arena',
+      country: CountryEnum.GERMANY,
     },
   ],
   [LeagueEnum.BUNDESLIGA_2]: [
@@ -556,41 +727,48 @@ export const Teams = {
       shortName: 'Hamburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Hamburger_SV_logo.svg',
       stadium: 'Volksparkstadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Schalke 04',
       shortName: 'Schalke',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/FC_Schalke_04_Logo.svg',
       stadium: 'Veltins-Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: '1. FC Köln',
       shortName: 'Köln',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/01/1._FC_Koeln_Logo_2014%E2%80%93.svg',
       stadium: 'RheinEnergieStadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Düsseldorf',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Fortuna_D%C3%BCsseldorf.png',
       stadium: 'Merkur Spiel-Arena',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Hertha Berlin',
       shortName: 'Hertha BSC',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Hertha_BSC_Logo_2012.svg',
       stadium: 'Olympiastadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: 'Hannover 96',
       shortName: 'Hannover',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Hannover_96_Logo.svg',
       stadium: 'Niedersachsenstadion',
+      country: CountryEnum.GERMANY,
     },
     {
       name: '1. FC Nürnberg',
       shortName: 'Nürnberg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/1._FC_N%C3%BCrnberg_logo.svg',
       stadium: 'Max-Morlock-Stadion',
+      country: CountryEnum.GERMANY,
     },
   ],
   [LeagueEnum.LIGUE_1]: [
@@ -599,21 +777,25 @@ export const Teams = {
       shortName: 'PSG',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
       stadium: 'Parc des Princes',
+      country: CountryEnum.FRANCE,
     },
     {
       name: 'Lyon',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/1c/Olympique_Lyonnais_logo.svg',
       stadium: 'Groupama Stadium',
+      country: CountryEnum.FRANCE,
     },
     {
       name: 'Marseille',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg',
       stadium: 'Stade Vélodrome',
+      country: CountryEnum.FRANCE,
     },
     {
       name: 'AS Monaco',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
       stadium: 'Stade Louis II',
+      country: CountryEnum.FRANCE,
     },
   ],
   [LeagueEnum.EREDIVISIE]: [
@@ -621,16 +803,19 @@ export const Teams = {
       name: 'Ajax',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg',
       stadium: 'Johan Cruyff Arena',
+      country: CountryEnum.NETHERLANDS,
     },
     {
       name: 'PSV',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
       stadium: 'Philips Stadion',
+      country: CountryEnum.NETHERLANDS,
     },
     {
       name: 'Feyenoord',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Feyenoord_logo_since_2009.svg',
       stadium: 'De Kuip',
+      country: CountryEnum.NETHERLANDS,
     },
   ],
   [LeagueEnum.PRIMEIRA_LIGA]: [
@@ -638,16 +823,19 @@ export const Teams = {
       name: 'Porto',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg',
       stadium: 'Estádio do Dragão',
+      country: CountryEnum.PORTUGAL,
     },
     {
       name: 'Benfica',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg',
       stadium: 'Estádio da Luz',
+      country: CountryEnum.PORTUGAL,
     },
     {
       name: 'Sporting CP',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg',
       stadium: 'Estádio José Alvalade',
+      country: CountryEnum.PORTUGAL,
     },
   ],
   [LeagueEnum.NATIONS]: [

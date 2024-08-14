@@ -39,7 +39,7 @@ const SelectImitation = ({
       onClick={onClick}
     >
       {placeholder && !value && (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.textDefault}>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.silverDarker}>
           {placeholder}
         </NormalTypography>
       )}
@@ -66,6 +66,7 @@ const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   min-height: ${({ compact }) => (compact ? '36px' : '44px')};
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
 `;
 
 export default SelectImitation;

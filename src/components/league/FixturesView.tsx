@@ -15,7 +15,7 @@ import { Divider } from '../Divider';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { useUser } from '../../context/UserContext';
-import { Team, Teams, getTeamByName } from '../../utils/Team';
+import { Team } from '../../utils/Team';
 import {
   Fixture, FixtureInput, PredictionInput, PredictionStatus, TeamType,
 } from '../../utils/Fixture';
@@ -23,7 +23,7 @@ import {
   getPredictionOutcome, getPredictionStatus, hasInvalidTeamName, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import Input from '../input/Input';
-import Select, { OptionItem } from '../input/Select';
+import Select from '../input/Select';
 import CustomDatePicker from '../input/DatePicker';
 import Checkbox from '../input/Checkbox';
 import GamePredictor from '../game/GamePredictor';
@@ -38,6 +38,8 @@ import RootToast from '../toast/RootToast';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import SelectImitation from '../input/SelectImitation';
+import SelectTeamModal from '../game/SelectTeamModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -65,6 +67,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [showPredictionsModalFixtureId, setShowPredictionsModalFixtureId] = useState<string | null>(null);
   const [createGameWeekLoading, setCreateGameWeekLoading] = useState<boolean>(false);
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
+  const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -209,27 +212,27 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     return league.gameWeeks.length + 1;
   };
 
-  const getOptionItem = (team: Team): OptionItem => ({
-    value: team.name,
-    label: team.name,
-    additionalOptions: team,
-  });
+  // const getOptionItem = (team: Team): OptionItem => ({
+  //   value: team.name,
+  //   label: team.name,
+  //   additionalOptions: team,
+  // });
 
-  const getOptionGroups = () => {
-    const filteredEntries = Object.entries(Teams).filter(([league]) => (teamType === TeamType.CLUBS ? league !== 'Landslag' : league === 'Landslag'));
+  // const getOptionGroups = () => {
+  //   const filteredEntries = Object.entries(Teams).filter(([league]) => (teamType === TeamType.CLUBS ? league !== 'Landslag' : league === 'Landslag'));
 
-    const placeholderObj = {
-      label: '-',
-      options: [{ value: 'Välj lag', label: 'Välj lag' }],
-    };
+  //   const placeholderObj = {
+  //     label: '-',
+  //     options: [{ value: 'Välj lag', label: 'Välj lag' }],
+  //   };
 
-    const teams = filteredEntries.map(([league, teams]) => ({
-      label: league,
-      options: teams.sort((a, b) => a.name.localeCompare(b.name)).map(getOptionItem),
-    }));
+  //   const teams = filteredEntries.map(([league, teams]) => ({
+  //     label: league,
+  //     options: teams.sort((a, b) => a.name.localeCompare(b.name)).map(getOptionItem),
+  //   }));
 
-    return [placeholderObj, ...teams];
-  };
+  //   return [placeholderObj, ...teams];
+  // };
 
   const handleSelectTeam = (team: Team | undefined, isHomeTeam: boolean) => {
     if (!team) return;
@@ -504,13 +507,19 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <Section flexDirection="row" gap="xs">
         <TeamTypeSelectorButton
           isSelected={teamType === TeamType.CLUBS}
-          onClick={() => setTeamType(TeamType.CLUBS)}
+          onClick={() => {
+            setTeamType(TeamType.CLUBS);
+            handleResetNewFixture();
+          }}
         >
           <EmphasisTypography variant="m" color={teamType === TeamType.CLUBS ? theme.colors.primary : theme.colors.silver}>Klubblag</EmphasisTypography>
         </TeamTypeSelectorButton>
         <TeamTypeSelectorButton
           isSelected={teamType === TeamType.NATIONS}
-          onClick={() => setTeamType(TeamType.NATIONS)}
+          onClick={() => {
+            setTeamType(TeamType.NATIONS);
+            handleResetNewFixture();
+          }}
         >
           <EmphasisTypography variant="m" color={teamType === TeamType.NATIONS ? theme.colors.primary : theme.colors.silver}>Landslag</EmphasisTypography>
         </TeamTypeSelectorButton>
@@ -518,11 +527,17 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
         <Section gap="xxs">
           <EmphasisTypography variant="s">Hemmalag</EmphasisTypography>
-          <Select
+          {/* <Select
             options={[]}
             optionGroups={getOptionGroups()}
             value={newFixtureHomeTeam?.name ?? 'Välj lag'}
             onChange={(value) => handleSelectTeam(getTeamByName(value), true)}
+            fullWidth
+          /> */}
+          <SelectImitation
+            value={newFixtureHomeTeam?.name ?? ''}
+            placeholder="Välj lag"
+            onClick={() => setSelectTeamModalOpen('home')}
             fullWidth
           />
         </Section>
@@ -533,11 +548,17 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         )}
         <Section gap="xxs">
           <EmphasisTypography variant="s">Bortalag</EmphasisTypography>
-          <Select
+          {/* <Select
             options={[]}
             optionGroups={getOptionGroups()}
             value={newFixtureAwayTeam?.name ?? 'Välj lag'}
             onChange={(value) => handleSelectTeam(getTeamByName(value), false)}
+            fullWidth
+          /> */}
+          <SelectImitation
+            value={newFixtureAwayTeam?.name ?? ''}
+            placeholder="Välj lag"
+            onClick={() => setSelectTeamModalOpen('away')}
             fullWidth
           />
         </Section>
@@ -860,6 +881,15 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         </Section>
       </Section>
       <RootToast />
+      {selectTeamModalOpen && (
+        <SelectTeamModal
+          onClose={() => setSelectTeamModalOpen(null)}
+          onSave={(team) => handleSelectTeam(team, selectTeamModalOpen === 'home')}
+          teamType={teamType}
+          isHomeTeam={selectTeamModalOpen === 'home'}
+          value={selectTeamModalOpen === 'home' ? newFixtureHomeTeam : newFixtureAwayTeam}
+        />
+      )}
     </>
   );
 };

@@ -124,6 +124,7 @@ const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: b
   @media ${devices.tablet} {
     max-height: 85vh;
     border-radius: ${theme.borderRadius.l};
+    height: auto;
   }
 `;
 
