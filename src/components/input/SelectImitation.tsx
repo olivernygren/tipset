@@ -44,7 +44,7 @@ const SelectImitation = ({
         </NormalTypography>
       )}
       {value && (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.primary}>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.textDefault}>
           {value}
         </NormalTypography>
       )}

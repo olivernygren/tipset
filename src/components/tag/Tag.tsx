@@ -10,41 +10,51 @@ interface TagProps {
   icon?: React.ReactNode;
   size?: 's' | 'm' | 'l';
   fullWidth?: boolean;
+  onClick?: () => void;
+}
+
+interface StyledTagProps {
+  textAndIconColor?: string;
+  backgroundColor?: string;
+  size?: 's' | 'm' | 'l';
+  fullWidth?: boolean;
+  onClick?: () => void;
 }
 
 const Tag = ({
-  text, textAndIconColor, backgroundColor, icon, size = 'm', fullWidth,
-}: TagProps) => {
-  const getTagSize = () => {
-    switch (size) {
-      case 's':
-        return '24px';
-      case 'm':
-        return '32px';
-      case 'l':
-        return '40px';
-      default:
-        return '32px';
-    }
-  };
+  text, textAndIconColor, backgroundColor, icon, size = 'm', fullWidth, onClick,
+}: TagProps) => (
+  <StyledTag
+    size={size}
+    fullWidth={fullWidth}
+    backgroundColor={backgroundColor || theme.colors.primary}
+    textAndIconColor={textAndIconColor}
+    onClick={onClick || undefined}
+  >
+    {icon}
+    <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
+      {text}
+    </NormalTypography>
+  </StyledTag>
+);
 
-  return (
-    <StyledTag
-      size={getTagSize()}
-      fullWidth={fullWidth}
-      backgroundColor={backgroundColor || theme.colors.primary}
-      textAndIconColor={textAndIconColor}
-    >
-      {icon}
-      <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
-        {text}
-      </NormalTypography>
-    </StyledTag>
-  );
+const getTagSize = (size?: 's' | 'm' | 'l') => {
+  if (!size) return;
+
+  switch (size) {
+    case 's':
+      return '24px';
+    case 'm':
+      return '32px';
+    case 'l':
+      return '40px';
+    default:
+      return '32px';
+  }
 };
 
-const StyledTag = styled.div<{ size: string, fullWidth?: boolean, backgroundColor: string, textAndIconColor?: string }>`
-  height: ${({ size }) => size};
+const StyledTag = styled.div<StyledTagProps>`
+  height: ${({ size }) => getTagSize(size)};
   display: flex;
   align-items: center;
   gap: 6px;
@@ -53,6 +63,7 @@ const StyledTag = styled.div<{ size: string, fullWidth?: boolean, backgroundColo
   width: fit-content;
   box-sizing: border-box;
   background-color: ${({ backgroundColor }) => backgroundColor};
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
 
   ${NormalTypography} {
     white-space: nowrap;

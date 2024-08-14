@@ -210,7 +210,10 @@ const PredictionLeaguePage = () => {
             isCreator={isCreator}
             currentUserId={currentUserId}
             sortedLeagueStandings={sortedLeagueStandings}
-            onChangeTab={(tab: LeagueTabs) => setActiveTab(tab)}
+            onChangeTab={(tab: LeagueTabs) => {
+              setActiveTab(tab);
+              window.scrollTo({ top: 0 });
+            }}
           />
         );
       case LeagueTabs.MATCHES:

@@ -14,11 +14,12 @@ interface ModalProps {
   size?: 's' | 'm' | 'l';
   headerDivider?: boolean;
   mobileBottomSheet?: boolean;
+  mobileFullScreen?: boolean;
   noPadding?: boolean;
 }
 
 const Modal = ({
-  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet, noPadding,
+  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet, noPadding, mobileFullScreen,
 }: ModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -53,11 +54,12 @@ const Modal = ({
       >
         <ModalContainer
           width={getModalWidth()}
-          initial={{ opacity: 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '100%' : '0%' }}
+          initial={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
           animate={{ opacity: 1, scale: 1, y: '0%' }}
-          exit={{ opacity: 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '100%' : '0%' }}
-          transition={{ duration: 0.2, type: 'tween' }}
+          exit={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
+          transition={{ duration: 0.25 }}
           mobileBottomSheet={mobileBottomSheet}
+          mobileFullScreen={mobileFullScreen}
         >
           <Header headerDivider={headerDivider}>
             {title && <HeadingsTypography variant="h3">{title}</HeadingsTypography>}
@@ -88,6 +90,12 @@ const getModalPadding = (noPadding?: boolean, headerDivider?: boolean, isMobile?
   return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m}`;
 };
 
+const getBorderRadius = (mobileBottomSheet?: boolean, mobileFullScreen?: boolean) => {
+  if (mobileFullScreen) return 0;
+
+  return mobileBottomSheet ? `${theme.borderRadius.l} ${theme.borderRadius.l} 0 0` : theme.borderRadius.l;
+};
+
 const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   display: flex;
   align-items: ${({ mobileBottomSheet }) => (mobileBottomSheet ? 'flex-end' : 'center')};
@@ -102,15 +110,16 @@ const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   }
 `;
 
-const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: boolean }>`
+const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: boolean, mobileFullScreen?: boolean }>`
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   background-color: ${theme.colors.white};
-  max-height: 90vh;
+  max-height: ${({ mobileFullScreen }) => (mobileFullScreen ? '100vh' : '90vh')};
   height: fit-content;
   width: ${({ width }) => width};
-  border-radius: ${({ mobileBottomSheet }) => (mobileBottomSheet ? `${theme.borderRadius.l} ${theme.borderRadius.l} 0 0` : theme.borderRadius.l)};
+  border-radius: ${({ mobileBottomSheet, mobileFullScreen }) => getBorderRadius(mobileBottomSheet, mobileFullScreen)};
+  ${({ mobileFullScreen }) => mobileFullScreen && 'height: 100vh;'}
   
   @media ${devices.tablet} {
     max-height: 85vh;

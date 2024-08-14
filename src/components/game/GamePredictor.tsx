@@ -251,19 +251,12 @@ const GamePredictor = ({
               </Section>
             )}
             {game.shouldPredictGoalScorer && (
-            // <Select
-            //   options={[]}
-            //   optionGroups={getOptionGroups()}
-            //   value={predictedPlayerToScore?.id || ''}
-            //   onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
-            //   disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
-            // />
-            <SelectImitation
-              value={predictedPlayerToScore?.name || ''}
-              onClick={() => setIsSelectGoalScorerModalOpen(true)}
-              disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
-              placeholder="Välj målskytt"
-            />
+              <SelectImitation
+                value={predictedPlayerToScore?.name || ''}
+                onClick={() => setIsSelectGoalScorerModalOpen(true)}
+                disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+                placeholder="Välj målskytt"
+              />
             )}
           </GoalScorerSection>
           {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
@@ -290,6 +283,7 @@ const GamePredictor = ({
           players={ArsenalPlayers}
           onSave={(player) => handleUpdatePlayerPrediction(player)}
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
+          initialSelectedPlayer={predictedPlayerToScore}
         />
       )}
     </>
