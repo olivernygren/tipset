@@ -750,7 +750,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               {ongoingGameWeek && (
                 <Section flexDirection={isMobile ? 'column' : 'row'} alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile} padding={isMobile ? `${theme.spacing.xxxs} 0 0 0` : '0'}>
                   <Section>
-                    <NormalTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NormalTypography>
+                    <NoWrapTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NoWrapTypography>
                   </Section>
                   <Section flexDirection="row" alignItems="center" gap={isMobile ? 'xxs' : 'xs'} justifyContent="space-between">
                     <Tag
@@ -968,6 +968,10 @@ const PreviousRoundCard = styled.div`
   width: 100%;
   box-sizing: border-box;
   box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
+`;
+
+const NoWrapTypography = styled(NormalTypography)`
+  white-space: nowrap;
 `;
 
 export default FixturesView;

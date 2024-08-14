@@ -1,6 +1,6 @@
 import React from 'react';
-import { FixtureOutcomeEnum } from '../../utils/Fixture';
 import styled from 'styled-components';
+import { FixtureOutcomeEnum } from '../../utils/Fixture';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 
@@ -8,26 +8,24 @@ interface FormIconProps {
   outcome: FixtureOutcomeEnum;
 }
 
-const FormIcon = ({ outcome }: FormIconProps) => {
-  return (
-    <StyledFormIcon outcome={outcome}>
-      <EmphasisTypography variant='s' color={theme.colors.white}>{outcome}</EmphasisTypography>
-    </StyledFormIcon>
-  )
-};
+const FormIcon = ({ outcome }: FormIconProps) => (
+  <StyledFormIcon outcome={outcome}>
+    <EmphasisTypography variant="s" color={theme.colors.white}>{outcome}</EmphasisTypography>
+  </StyledFormIcon>
+);
 
 const getBackgroundColor = (outcome: FixtureOutcomeEnum) => {
   switch (outcome) {
     case FixtureOutcomeEnum.WIN:
-      return '#56BD47';
+      return theme.colors.primary;
     case FixtureOutcomeEnum.DRAW:
-      return '#EEC803';
+      return theme.colors.gold;
     case FixtureOutcomeEnum.LOSS:
-      return '#DC1414';
+      return theme.colors.red;
     default:
       return theme.colors.silver;
   }
-}
+};
 
 const StyledFormIcon = styled.div<FormIconProps>`
   height: 20px;

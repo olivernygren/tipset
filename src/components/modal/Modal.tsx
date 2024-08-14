@@ -14,10 +14,11 @@ interface ModalProps {
   size?: 's' | 'm' | 'l';
   headerDivider?: boolean;
   mobileBottomSheet?: boolean;
+  noPadding?: boolean;
 }
 
 const Modal = ({
-  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet,
+  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet, noPadding,
 }: ModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -66,7 +67,10 @@ const Modal = ({
               onClick={onClose}
             />
           </Header>
-          <ModalContent headerDivider={headerDivider}>
+          <ModalContent
+            headerDivider={headerDivider}
+            noPadding={noPadding}
+          >
             {children}
           </ModalContent>
         </ModalContainer>
@@ -74,6 +78,14 @@ const Modal = ({
       <GlobalStyle />
     </>
   );
+};
+
+const getModalPadding = (noPadding?: boolean, headerDivider?: boolean, isMobile?: boolean) => {
+  if (noPadding) return '0';
+
+  if (isMobile) return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l}`;
+
+  return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m}`;
 };
 
 const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
@@ -106,18 +118,19 @@ const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: b
   }
 `;
 
-const ModalContent = styled.div<{ headerDivider?: boolean }>`
+const ModalContent = styled.div<{ headerDivider?: boolean, noPadding?: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.m};
+  gap: ${({ noPadding }) => (noPadding ? 0 : theme.spacing.m)};
   width: 100%;
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.m : 0)} ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m};
+  padding: ${({ headerDivider, noPadding }) => getModalPadding(noPadding, headerDivider, true)};
+  position: relative;
 
   @media ${devices.tablet} {
-    padding: ${({ headerDivider }) => (headerDivider ? theme.spacing.l : 0)} ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l};
+    padding: ${({ headerDivider, noPadding }) => getModalPadding(noPadding, headerDivider, false)};
   }
 `;
 

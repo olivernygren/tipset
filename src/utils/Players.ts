@@ -92,6 +92,7 @@ export interface Player {
   number: number;
   age: number;
   country: CountryEnum;
+  picture?: string;
 }
 
 export const getPlayersByGeneralPosition = (generalPosition: GeneralPositionEnum): Array<Player> => ArsenalPlayers.filter((player) => player.position.general === generalPosition);
@@ -140,7 +141,7 @@ export enum ArsenalPlayersEnum {
 
 export enum IFKGoteborgPlayersEnum {
   PONTUS_DAHLBERG = 'Pontus Dahlberg',
-  JACOB_KARLSTROM = 'Jacob Karlstrøm',
+  JACOB_KARLSTROM = 'Jacob Karlström',
   ELIS_BISHESARI = 'Elis Bishesari',
   ANDERS_KRISTIANSEN = 'Anders Kristiansen',
   EMIL_SALOMONSSON = 'Emil Salomonsson',
@@ -178,6 +179,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 22,
     age: 28,
     country: CountryEnum.SPAIN,
+    picture: '/images/players/david-raya.png',
   },
   {
     id: 'e8fg8wgr4hrw9frtw9hd',
@@ -189,18 +191,19 @@ export const ArsenalPlayers: Array<Player> = [
     number: 1,
     age: 26,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/aaron-ramsdale.png',
   },
-  {
-    id: 'uewbfouwr48of938hf93',
-    name: ArsenalPlayersEnum.KARL_HEIN,
-    position: {
-      exact: ExactPositionEnum.GK,
-      general: GeneralPositionEnum.GK,
-    },
-    number: 31,
-    age: 22,
-    country: CountryEnum.ESTONIA,
-  },
+  // {
+  //   id: 'uewbfouwr48of938hf93',
+  //   name: ArsenalPlayersEnum.KARL_HEIN,
+  //   position: {
+  //     exact: ExactPositionEnum.GK,
+  //     general: GeneralPositionEnum.GK,
+  //   },
+  //   number: 31,
+  //   age: 22,
+  //   country: CountryEnum.ESTONIA,
+  // },
   {
     id: 'defb8rgb9fbf0fhwh34r',
     name: ArsenalPlayersEnum.BEN_WHITE,
@@ -211,6 +214,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 4,
     age: 26,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/ben-white.png',
   },
   {
     id: 'jdb38fg9fhwwh9wfhw0fe',
@@ -222,6 +226,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 18,
     age: 25,
     country: CountryEnum.JAPAN,
+    picture: '/images/players/takehiro-tomiyasu.png',
   }, {
     id: 'fhwefh9hrrh94ofof',
     name: ArsenalPlayersEnum.JURRIEN_TIMBER,
@@ -232,6 +237,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 12,
     age: 22,
     country: CountryEnum.NETHERLANDS,
+    picture: '/images/players/jurrien-timber.png',
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
@@ -243,6 +249,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 2,
     age: 23,
     country: CountryEnum.FRANCE,
+    picture: '/images/players/william-saliba.png',
   },
   {
     id: 'moehg9n0h01rh0fhfdk',
@@ -254,6 +261,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 6,
     age: 26,
     country: CountryEnum.BRAZIL,
+    picture: '/images/players/gabriel-magalhaes.png',
   },
   {
     id: 'h7fhghgw08hn3gh4b3p0fj309h',
@@ -265,6 +273,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 33,
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
+    picture: '/images/players/riccardo-calafiori.png',
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
@@ -276,6 +285,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 15,
     age: 24,
     country: CountryEnum.POLAND,
+    picture: '/images/players/jakub-kiwior.png',
   }, {
     id: 'nw8fgwfbnoqr03r93hnof',
     name: ArsenalPlayersEnum.OLEKSANDR_ZINCHENKO,
@@ -286,6 +296,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 35,
     age: 27,
     country: CountryEnum.UKRAINE,
+    picture: '/images/players/oleksandr-zinchenko.png',
   },
   {
     id: '3r6eegh129r29r1odhdmed',
@@ -297,6 +308,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 5,
     age: 30,
     country: CountryEnum.GHANA,
+    picture: '/images/players/thomas-partey.png',
   },
   {
     id: '39rj2j10rw9gn9rnwenw2j',
@@ -308,6 +320,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 41,
     age: 25,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/declan-rice.png',
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
@@ -319,6 +332,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 20,
     age: 32,
     country: CountryEnum.ITALY,
+    picture: '/images/players/jorginho.png',
   },
   {
     id: 'rh27tg9fofh9w4ghnfoif',
@@ -330,6 +344,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 21,
     age: 24,
     country: CountryEnum.PORTUGAL,
+    picture: '/images/players/fabio-vieira.png',
   },
   {
     id: 'mwokepoe2yr4wr8yr4owru',
@@ -341,6 +356,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 8,
     age: 25,
     country: CountryEnum.NORWAY,
+    picture: '/images/players/martin-odegaard.png',
   },
   {
     id: 'cbwgr8h90ejqrjwf8gwrf',
@@ -352,6 +368,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 7,
     age: 22,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/bukayo-saka.png',
   },
   {
     id: '83rtgfjwheg9heo9rowdw',
@@ -363,6 +380,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 24,
     age: 24,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/reiss-nelson.png',
   }, {
     id: 'fhty9ejpqrnoiwthrhj',
     name: ArsenalPlayersEnum.GABRIEL_MARTINELLI,
@@ -373,6 +391,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 11,
     age: 22,
     country: CountryEnum.BRAZIL,
+    picture: '/images/players/gabriel-martinelli.png',
   },
   {
     id: 'qfujw0jw0rj90g3pork3po3',
@@ -384,6 +403,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 19,
     age: 29,
     country: CountryEnum.BELGIUM,
+    picture: '/images/players/leandro-trossard.png',
   }, {
     id: '30jtgeifnqorhgwowjj9d',
     name: ArsenalPlayersEnum.KAI_HAVERTZ,
@@ -394,6 +414,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 29,
     age: 25,
     country: CountryEnum.GERMANY,
+    picture: '/images/players/kai-havertz.png',
   },
   {
     id: 'bgwehroqnrbuwbuiwnfwifbe',
@@ -405,6 +426,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 9,
     age: 27,
     country: CountryEnum.BRAZIL,
+    picture: '/images/players/gabriel-jesus.png',
   },
   {
     id: 'v14se6fvewhwe9rgqrh9',
@@ -416,6 +438,7 @@ export const ArsenalPlayers: Array<Player> = [
     number: 14,
     age: 25,
     country: CountryEnum.ENGLAND,
+    picture: '/images/players/eddie-nketiah.png',
   },
 ];
 

@@ -4,22 +4,20 @@ import styled from 'styled-components';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
-import {
-  GeneralPositionEnum, Player, getPlayerById, getPlayersByGeneralPosition,
-} from '../../utils/Players';
+import { ArsenalPlayers, Player } from '../../utils/Players';
 import { AvatarSize } from '../avatar/Avatar';
 import { devices, theme } from '../../theme';
 import { Team } from '../../utils/Team';
 import { Divider } from '../Divider';
 // import FormIcon from '../form/FormIcon';
-import Select from '../input/Select';
 import Button from '../buttons/Button';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import GoalsInput from './GoalsInput';
-import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import SelectImitation from '../input/SelectImitation';
+import GoalScorerModal from './GoalScorerModal';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -42,52 +40,20 @@ const GamePredictor = ({
   const [homeGoals, setHomeGoals] = useState<string>(predictionValue?.homeGoals.toString() ?? '');
   const [awayGoals, setAwayGoals] = useState<string>(predictionValue?.awayGoals.toString() ?? '');
   const [predictedPlayerToScore, setPredictedPlayerToScore] = useState<Player | undefined>(predictionValue && predictionValue.goalScorer ? predictionValue.goalScorer : undefined);
+  const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
-
-  const getTeam = (team: Team, isAwayTeam: boolean) => {
-    const { name, shortName } = team;
-    const logoUrl = team.logoUrl ?? team.relativeLogoUrl;
-    const displayName = (isMobile && shortName) ? shortName : name;
-
-    return (
-      <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
-        <AvatarAndTeamName>
-          {game.teamType === TeamType.CLUBS ? (
-            <ClubAvatar
-              clubName={displayName}
-              logoUrl={logoUrl}
-              size={isMobile ? AvatarSize.M : AvatarSize.L}
-              showBorder={hasPredicted}
-              isDarkMode={hasPredicted}
-            />
-          ) : (
-            <NationAvatar
-              nationName={name}
-              flagUrl={logoUrl}
-              size={isMobile ? AvatarSize.M : AvatarSize.L}
-              isDarkMode={hasPredicted}
-            />
-          )}
-          <TeamName variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault} align="center">
-            {displayName}
-          </TeamName>
-        </AvatarAndTeamName>
-        {/* {getTeamForm(isAwayTeam)} */}
-      </TeamContainer>
-    );
-  };
 
   // const getTeamForm = (isAwayTeam: boolean) => {
   //   const form = isAwayTeam ? game.awayTeamForm : game.homeTeamForm;
   //   return (
-  //     <Section flexDirection='row' gap='xxxs' justifyContent={isAwayTeam ? 'flex-start' : 'flex-end'}>
+  //     <Section flexDirection="row" gap="xxxs" justifyContent={isAwayTeam ? 'flex-start' : 'flex-end'}>
   //       {form.map((outcome, index) => (
   //         <FormIcon key={index} outcome={outcome} />
   //       ))}
   //     </Section>
-  //   )
-  // }
+  //   );
+  // };
 
   const handleIncreaseGoals = (team: 'home' | 'away') => {
     if (new Date(game.kickOffTime) < new Date()) {
@@ -156,36 +122,6 @@ const GamePredictor = ({
     return `${weekdayCapitalized} ${date.replaceAll('.', '')} ${time}`;
   };
 
-  const getOptionItem = (player: Player) => ({
-    value: player.id,
-    label: player.name,
-  });
-
-  const getOptionGroups = () => {
-    const defenders = getPlayersByGeneralPosition(GeneralPositionEnum.DF);
-    const midfielders = getPlayersByGeneralPosition(GeneralPositionEnum.MF);
-    const forwards = getPlayersByGeneralPosition(GeneralPositionEnum.FW);
-
-    return [
-      {
-        label: 'Välj spelare',
-        options: [{ value: 'Välj spelare', label: 'Välj spelare' }],
-      },
-      {
-        label: `Försvarare (${defenderGoalPoints}p)`,
-        options: defenders.map(getOptionItem),
-      },
-      {
-        label: `Mittfältare (${midfielderGoalPoints}p)`,
-        options: midfielders.map(getOptionItem),
-      },
-      {
-        label: `Anfallare (${forwardGoalPoints}p)`,
-        options: forwards.map(getOptionItem),
-      },
-    ];
-  };
-
   const getTextColor = () => (hasPredicted ? theme.colors.white : theme.colors.textDefault);
 
   const handleInputChange = (team: 'home' | 'away', value: string) => {
@@ -208,6 +144,39 @@ const GamePredictor = ({
     if (!player) return;
     setPredictedPlayerToScore(player);
     onPlayerPredictionUpdate(gameNumber, player);
+  };
+
+  const getTeam = (team: Team, isAwayTeam: boolean) => {
+    const { name, shortName } = team;
+    const logoUrl = team.logoUrl ?? team.relativeLogoUrl;
+    const displayName = (isMobile && shortName) ? shortName : name;
+
+    return (
+      <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
+        <AvatarAndTeamName>
+          {game.teamType === TeamType.CLUBS ? (
+            <ClubAvatar
+              clubName={displayName}
+              logoUrl={logoUrl}
+              size={isMobile ? AvatarSize.L : AvatarSize.L}
+              showBorder={hasPredicted}
+              isDarkMode={hasPredicted}
+            />
+          ) : (
+            <NationAvatar
+              nationName={name}
+              flagUrl={logoUrl}
+              size={isMobile ? AvatarSize.L : AvatarSize.L}
+              isDarkMode={hasPredicted}
+            />
+          )}
+          <TeamName variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault} align="center">
+            {displayName}
+          </TeamName>
+        </AvatarAndTeamName>
+        {/* {getTeamForm(isAwayTeam)} */}
+      </TeamContainer>
+    );
   };
 
   const getCardHeaderContent = () => {
@@ -241,57 +210,66 @@ const GamePredictor = ({
   };
 
   return (
-    <Card hasPredicted={hasPredicted}>
-      <CardHeader>
-        {getCardHeaderContent()}
-      </CardHeader>
-      <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-      <GameWrapper>
-        {getTeam(game.homeTeam, false)}
-        <GoalsInput
-          goals={homeGoals}
-          onIncrease={() => handleIncreaseGoals('home')}
-          onDecrease={() => handleDecreaseGoals('home')}
-          onInputChange={(value) => handleInputChange('home', value)}
-          hasPredicted={hasPredicted}
-          disabled={kickoffTimeHasPassed}
-        />
-        <NormalTypography variant="l" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>–</NormalTypography>
-        <GoalsInput
-          goals={awayGoals}
-          onIncrease={() => handleIncreaseGoals('away')}
-          onDecrease={() => handleDecreaseGoals('away')}
-          onInputChange={(value) => handleInputChange('away', value)}
-          hasPredicted={hasPredicted}
-          disabled={kickoffTimeHasPassed}
-        />
-        {getTeam(game.awayTeam, true)}
-      </GameWrapper>
-      <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-      {/* {anyFixtureHasPredictGoalScorer && ( */}
-      <>
-        <GoalScorerSection>
-          {game.shouldPredictGoalScorer ? (
-            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
-          ) : (
-            <Section flexDirection="row" alignItems="center" justifyContent="center">
-              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
-            </Section>
-          )}
-          {game.shouldPredictGoalScorer && (
-          <Select
-            options={[]}
-            optionGroups={getOptionGroups()}
-            value={predictedPlayerToScore?.id || ''}
-            onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
-            disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
-          />
-          )}
-        </GoalScorerSection>
+    <>
+      <Card hasPredicted={hasPredicted}>
+        <CardHeader>
+          {getCardHeaderContent()}
+        </CardHeader>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-      </>
-      {/* )} */}
-      {!kickoffTimeHasPassed && (
+        <GameWrapper>
+          {getTeam(game.homeTeam, false)}
+          <GoalInputWrapper>
+            <GoalsInput
+              goals={homeGoals}
+              onIncrease={() => handleIncreaseGoals('home')}
+              onDecrease={() => handleDecreaseGoals('home')}
+              onInputChange={(value) => handleInputChange('home', value)}
+              hasPredicted={hasPredicted}
+              disabled={kickoffTimeHasPassed}
+            />
+            <NormalTypography variant="l" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>–</NormalTypography>
+            <GoalsInput
+              goals={awayGoals}
+              onIncrease={() => handleIncreaseGoals('away')}
+              onDecrease={() => handleDecreaseGoals('away')}
+              onInputChange={(value) => handleInputChange('away', value)}
+              hasPredicted={hasPredicted}
+              disabled={kickoffTimeHasPassed}
+            />
+          </GoalInputWrapper>
+          {getTeam(game.awayTeam, true)}
+        </GameWrapper>
+        <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+        {/* {anyFixtureHasPredictGoalScorer && ( */}
+        <>
+          <GoalScorerSection>
+            {game.shouldPredictGoalScorer ? (
+              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
+            ) : (
+              <Section flexDirection="row" alignItems="center" justifyContent="center">
+                <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
+              </Section>
+            )}
+            {game.shouldPredictGoalScorer && (
+            // <Select
+            //   options={[]}
+            //   optionGroups={getOptionGroups()}
+            //   value={predictedPlayerToScore?.id || ''}
+            //   onChange={(value) => handleUpdatePlayerPrediction(getPlayerById(value))}
+            //   disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+            // />
+            <SelectImitation
+              value={predictedPlayerToScore?.name || ''}
+              onClick={() => setIsSelectGoalScorerModalOpen(true)}
+              disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+              placeholder="Välj målskytt"
+            />
+            )}
+          </GoalScorerSection>
+          {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
+        </>
+        {/* )} */}
+        {!kickoffTimeHasPassed && (
         <SaveButtonSection hasPredicted={hasPredicted}>
           <Button
             variant="primary"
@@ -305,8 +283,16 @@ const GamePredictor = ({
             Spara
           </Button>
         </SaveButtonSection>
+        )}
+      </Card>
+      {isSelectGoalScorerModalOpen && (
+        <GoalScorerModal
+          players={ArsenalPlayers}
+          onSave={(player) => handleUpdatePlayerPrediction(player)}
+          onClose={() => setIsSelectGoalScorerModalOpen(false)}
+        />
       )}
-    </Card>
+    </>
   );
 };
 
@@ -340,19 +326,25 @@ const CardHeader = styled.div`
 `;
 
 const GameWrapper = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-items: center;
-  width: fit-content;
+  width: 100%;
   box-sizing: border-box;
   margin: auto 0;
   padding: ${theme.spacing.s} 0;
-  gap: ${theme.spacing.xs};
   
   @media ${devices.tablet} {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 1fr auto auto auto 1fr;
+    gap: ${theme.spacing.s};
+  }
+`;
+
+const GoalInputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+
+  @media ${devices.tablet} {
     gap: ${theme.spacing.s};
   }
 `;
@@ -364,21 +356,21 @@ const TeamContainer = styled.div<{ team: 'home' | 'away' }>`
   box-sizing: border-box;
   flex: 1;
   align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-  padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xxs)};
-  padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xxs)};
+  /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xxs)};
+  padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xxs)}; */
   
   @media ${devices.tablet} {
     width: 100%;
     align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-    padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.s)};
-    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.s)};
+    /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.s)};
+    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.s)}; */
   }
 
   @media ${devices.mobile} {
     width: 100%;
     align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-    padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xs)};
-    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xs)};
+    /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xs)};
+    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xs)}; */
   }
 `;
 
@@ -389,6 +381,7 @@ const AvatarAndTeamName = styled.div`
   justify-content: center;
   box-sizing: border-box;
   align-items: center;
+  margin: 0 auto;
 `;
 
 const GoalScorerSection = styled.div`

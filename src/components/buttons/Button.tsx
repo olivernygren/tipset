@@ -137,13 +137,13 @@ const StyledButton = styled.button<ButtonProps>`
   &:hover {
     background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
     border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-    transform: ${({ disabled }) => (disabled ? 'none' : 'scale(1.02)')};
+    transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(1.02)')};
   }
 
   &:active {
     background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
     border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-    transform: ${({ disabled }) => (disabled ? 'none' : 'scale(0.98)')};
+    transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(0.98)')};
   }
 
   &:disabled {
