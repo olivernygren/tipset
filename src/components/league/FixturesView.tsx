@@ -40,6 +40,7 @@ import Tag from '../tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import SelectImitation from '../input/SelectImitation';
 import SelectTeamModal from '../game/SelectTeamModal';
+import SelectTournamentModal from '../game/SelectTournamentModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -68,6 +69,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [createGameWeekLoading, setCreateGameWeekLoading] = useState<boolean>(false);
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
   const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
+  const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState(false);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -548,13 +550,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         )}
         <Section gap="xxs">
           <EmphasisTypography variant="s">Bortalag</EmphasisTypography>
-          {/* <Select
-            options={[]}
-            optionGroups={getOptionGroups()}
-            value={newFixtureAwayTeam?.name ?? 'Välj lag'}
-            onChange={(value) => handleSelectTeam(getTeamByName(value), false)}
-            fullWidth
-          /> */}
           <SelectImitation
             value={newFixtureAwayTeam?.name ?? ''}
             placeholder="Välj lag"
@@ -570,13 +565,22 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onChange={(e) => setNewFixtureStadium(e.currentTarget.value)}
           fullWidth
         />
-        <Input
+        {/* <Input
           label="Turnering"
           name="tournament"
           value={newFixtureTournament}
           onChange={(e) => setNewFixtureTournament(e.currentTarget.value)}
           fullWidth
-        />
+        /> */}
+        <Section gap="xxs">
+          <EmphasisTypography variant="s">Turnering</EmphasisTypography>
+          <SelectImitation
+            value={newFixtureTournament}
+            placeholder="Välj turnering"
+            onClick={() => setSelectTournamentModalOpen(true)}
+            fullWidth
+          />
+        </Section>
         <CustomDatePicker
           label="Avsparkstid"
           selectedDate={newFixtureKickoffDateTime}
@@ -888,6 +892,14 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           teamType={teamType}
           isHomeTeam={selectTeamModalOpen === 'home'}
           value={selectTeamModalOpen === 'home' ? newFixtureHomeTeam : newFixtureAwayTeam}
+        />
+      )}
+      {selectTournamentModalOpen && (
+        <SelectTournamentModal
+          onClose={() => setSelectTournamentModalOpen(false)}
+          onSave={(tournament) => setNewFixtureTournament(tournament)}
+          teamType={teamType}
+          defaultValue={newFixtureTournament}
         />
       )}
     </>

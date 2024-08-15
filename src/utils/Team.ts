@@ -25,6 +25,25 @@ export enum LeagueEnum {
   NATIONS = 'Landslag',
 }
 
+export enum TournamentsEnum {
+  PREMIER_LEAGUE = 'Premier League',
+  FA_CUP = 'FA Cup',
+  CARABAO_CUP = 'Carabao Cup',
+  CHAMPIONSHIP = 'Championship',
+  LA_LIGA = 'La Liga',
+  COPA_DEL_REY = 'Copa del Rey',
+  SERIE_A = 'Serie A',
+  COPPA_ITALIA = 'Coppa Italia',
+  BUNDESLIGA = 'Bundesliga',
+  BUNDESLIGA_2 = '2. Bundesliga',
+  DFB_POKAL = 'DFB-Pokal',
+  LIGUE_1 = 'Ligue 1',
+  CHAMPIONS_LEAGUE = 'Champions League',
+  EUROPA_LEAGUE = 'Europa League',
+  CONFERENCE_LEAGUE = 'Conference League',
+  ALLSVENSKAN = 'Allsvenskan',
+}
+
 export const getTeamByNameAndLeague = (teamName: string, league: string) => Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
 
 export const getTeamByName = (teamName: string): Team | undefined => {
@@ -591,7 +610,7 @@ export const Teams = {
       country: CountryEnum.ITALY,
     },
     {
-      name: 'Como 1917',
+      name: 'Como 1907',
       shortName: 'Como',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
       stadium: 'Stadio Giuseppe Sinigaglia',

@@ -135,6 +135,7 @@ const SelectTeamModal = ({
           <TextButton
             icon={showFilters ? <XCircle size={24} color={theme.colors.primary} /> : <Funnel size={24} color={theme.colors.primary} />}
             onClick={() => setShowFilters(!showFilters)}
+            noPadding={isMobile}
           >
             Filtrera
           </TextButton>
@@ -213,10 +214,14 @@ const ModalToolBar = styled.div`
 const ModalToolBarTopRow = styled.div`
   width: 100%;
   box-sizing: border-box;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.s};
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media ${devices.tablet} {
+    gap: ${theme.spacing.xs};
+  }
 `;
 
 const ModalContent = styled.div`
