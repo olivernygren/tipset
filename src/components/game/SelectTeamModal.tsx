@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
-  XCircle, Funnel, CaretDown, CaretUp,
+  CaretDown, CaretUp,
   CheckCircle,
   Circle,
 } from '@phosphor-icons/react';
@@ -13,7 +13,6 @@ import { TeamType } from '../../utils/Fixture';
 import Modal from '../modal/Modal';
 import { theme, devices } from '../../theme';
 import Button from '../buttons/Button';
-import TextButton from '../buttons/TextButton';
 import Input from '../input/Input';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -39,7 +38,7 @@ const SelectTeamModal = ({
   const [teams, setTeams] = useState(originalTeams);
   const [selectedTeam, setSelectedTeam] = useState<Team | undefined>(value);
   const [searchValue, setSearchValue] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  // const [showFilters, setShowFilters] = useState(false);
   const [expandedCountries, setExpandedCountries] = useState<Array<string>>([]); // Object.keys(teams)
 
   const handleSearch = (value: string) => {
@@ -132,13 +131,13 @@ const SelectTeamModal = ({
             compact={isMobile}
             fullWidth
           />
-          <TextButton
+          {/* <TextButton
             icon={showFilters ? <XCircle size={24} color={theme.colors.primary} /> : <Funnel size={24} color={theme.colors.primary} />}
             onClick={() => setShowFilters(!showFilters)}
             noPadding={isMobile}
           >
             Filtrera
-          </TextButton>
+          </TextButton> */}
         </ModalToolBarTopRow>
       </ModalToolBar>
       <ModalContent>
@@ -209,6 +208,10 @@ const ModalToolBar = styled.div`
   gap: ${theme.spacing.xs};
   border-bottom: 1px solid ${theme.colors.silverLight};
   padding: ${theme.spacing.s} ${theme.spacing.m};
+
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.s} ${theme.spacing.l};
+  }
 `;
 
 const ModalToolBarTopRow = styled.div`
