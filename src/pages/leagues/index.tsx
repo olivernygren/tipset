@@ -349,6 +349,9 @@ const PredictionLeaguesPage = () => {
                   onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
                   fullWidth={isMobile}
                 />
+                {showJoinLeagueError.length > 0 && (
+                  <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+                )}
                 <Button
                   onClick={handleJoinLeague}
                   loading={joinLeagueLoading === 'input'}
