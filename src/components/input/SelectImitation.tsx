@@ -65,7 +65,7 @@ const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
-  min-height: ${({ compact }) => (compact ? '36px' : '44px')};
+  min-height: ${({ compact }) => (compact ? '40px' : '48px')};
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
 `;
 

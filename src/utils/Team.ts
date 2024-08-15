@@ -22,6 +22,10 @@ export enum LeagueEnum {
   LIGUE_1 = 'Ligue 1',
   EREDIVISIE = 'Eredivisie',
   PRIMEIRA_LIGA = 'Primeira Liga',
+  BELGIAN_PRO_LEAGUE = 'Belgian Pro League',
+  UKRAINIAN_PREMIER_LEAGUE = 'Ukrainian Premier League',
+  SCOTTISH_PREMIERSHIP = 'Scottish Premiership',
+  AUSTRIAN_BUNDESLIGA = 'Austrian Bundesliga',
   NATIONS = 'Landslag',
 }
 
@@ -816,6 +820,99 @@ export const Teams = {
       stadium: 'Stade Louis II',
       country: CountryEnum.FRANCE,
     },
+    {
+      name: 'Stade Brestois',
+      shortName: 'Brest',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/Stade_Brestois_29_logo.svg',
+      stadium: 'Stade Francis-Le Blé',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'LOSC Lille',
+      shortName: 'Lille',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/3f/Lille_OSC_2018_logo.svg',
+      stadium: 'Stade Pierre-Mauroy',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Stade Rennais',
+      shortName: 'Rennes',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Stade_Rennais_FC.svg',
+      stadium: 'Roazhon Park',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'OGC Nice',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/OGC_Nice_logo.svg',
+      stadium: 'Allianz Riviera',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Montpellier',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a8/Montpellier_HSC_logo.svg',
+      stadium: 'Stade de la Mosson',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Angers SCO',
+      shortName: 'Angers',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d4/Angers_SCO_logo.svg',
+      stadium: 'Stade Raymond Kopa',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'AJ Auxerre',
+      shortName: 'Auxerre',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/51/AJAuxerreLogo.svg',
+      stadium: 'Stade de l\'Abbé-Deschamps',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Le Havre',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fc/Le_Havre_AC_logo.svg',
+      stadium: 'Stade Océane',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'RC Lens',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cc/RC_Lens_logo.svg',
+      stadium: 'Stade Bollaert-Delelis',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Nantes',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Logo_FC_Nantes_%28avec_fond%29_-_2019.svg',
+      stadium: 'Stade de la Beaujoire',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Stade de Reims',
+      shortName: 'Stade Reims',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/19/Stade_de_Reims_logo.svg',
+      stadium: 'Stade Auguste-Delaune',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Toulouse FC',
+      shortName: 'Toulouse',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/63/Toulouse_FC_2018_logo.svg',
+      stadium: 'Stadium de Toulouse',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'Saint-Étienne',
+      shortName: 'St. Étienne',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/25/AS_Saint-%C3%89tienne_logo.svg',
+      stadium: 'Stade Geoffroy-Guichard',
+      country: CountryEnum.FRANCE,
+    },
+    {
+      name: 'RC Strasbourg',
+      shortName: 'Strasbourg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/80/Racing_Club_de_Strasbourg_logo.svg',
+      stadium: 'Stade de la Meinau',
+      country: CountryEnum.FRANCE,
+    },
   ],
   [LeagueEnum.EREDIVISIE]: [
     {
@@ -854,6 +951,12 @@ export const Teams = {
       name: 'Sporting CP',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg',
       stadium: 'Estádio José Alvalade',
+      country: CountryEnum.PORTUGAL,
+    },
+    {
+      name: 'SC Braga',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/79/S.C._Braga_logo.svg',
+      stadium: 'Estádio Municipal de Braga',
       country: CountryEnum.PORTUGAL,
     },
   ],
@@ -929,6 +1032,42 @@ export const Teams = {
     {
       name: 'Norge',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
+    },
+    {
+      name: 'Österrike',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg',
+    },
+  ],
+  [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
+    {
+      name: 'Club Brugge',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Club_Brugge_KV_logo.svg',
+      stadium: 'Jan Breydel Stadium',
+      country: CountryEnum.BELGIUM,
+    },
+  ],
+  [LeagueEnum.UKRAINIAN_PREMIER_LEAGUE]: [
+    {
+      name: 'Shakhtar Donetsk',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a1/FC_Shakhtar_Donetsk.svg',
+      stadium: 'Volksparkstadion',
+      country: CountryEnum.UKRAINE,
+    },
+  ],
+  [LeagueEnum.SCOTTISH_PREMIERSHIP]: [
+    {
+      name: 'Celtic',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/71/Celtic_FC_crest.svg',
+      stadium: 'Celtic Park',
+      country: CountryEnum.SCOTLAND,
+    },
+  ],
+  [LeagueEnum.AUSTRIAN_BUNDESLIGA]: [
+    {
+      name: 'Sturm Graz',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/91/SK_Sturm_Graz_logo.svg',
+      stadium: 'Merkur Arena',
+      country: CountryEnum.AUSTRIA,
     },
   ],
 };
