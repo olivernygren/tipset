@@ -34,14 +34,14 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
       <Section gap="m">
         {fixture && <FixtureResultPreview fixture={fixture} showBorder isFullTime={gameHasFinished} compact={isMobile} />}
         {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
-          <Section gap="xs" flexDirection="row" alignItems="center" justifyContent="space-between">
+          <GoalScorersContainer>
             <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
             <Section gap="xxs" flexDirection="row" alignItems="center" fitContent>
               {fixture.finalResult?.goalScorers && (
                 <NormalTypography variant="m">{goalScorers}</NormalTypography>
               )}
             </Section>
-          </Section>
+          </GoalScorersContainer>
         )}
         <PredictionsContainer>
           {predictions?.map((prediction) => (
@@ -69,5 +69,17 @@ const PredictionsContainer = styled.div`
     gap: ${theme.spacing.xxs};
   }
 `;
+
+const GoalScorersContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+
+  @media ${devices.tablet} {
+    align-items: center;
+    justify-content: space-between;
+    gap: ${theme.spacing.xs};
+  }
+  `;
 
 export default PredictionsModal;

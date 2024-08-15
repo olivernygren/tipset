@@ -17,10 +17,11 @@ import TextButton from '../buttons/TextButton';
 import Tag from '../tag/Tag';
 
 interface GoalScorerModalProps {
-  onSave: (player: Player | undefined) => void;
+  onSave: (players: Array<Player | undefined>) => void;
   onClose: () => void;
   players: Array<Player>;
-  initialSelectedPlayer?: Player;
+  initialSelectedPlayers?: Array<Player | undefined>;
+  multiple?: boolean;
 }
 
 enum FilterEnum {
@@ -30,17 +31,19 @@ enum FilterEnum {
 }
 
 const GoalScorerModal = ({
-  onSave, onClose, players, initialSelectedPlayer,
+  onSave, onClose, players, initialSelectedPlayers, multiple,
 }: GoalScorerModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [selectedGoalScorer, setSelectedGoalScorer] = useState<Player | undefined>(initialSelectedPlayer);
+  const [selectedGoalScorers, setSelectedGoalScorers] = useState<Array<Player | undefined>>(initialSelectedPlayers || []);
   const [defenders, setDefenders] = useState<Array<Player>>([]);
   const [midfielders, setMidfielders] = useState<Array<Player>>([]);
   const [forwards, setForwards] = useState<Array<Player>>([]);
   const [searchValue, setSearchValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
+
+  const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
 
   useEffect(() => {
     const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
@@ -52,8 +55,16 @@ const GoalScorerModal = ({
     setForwards(forwards);
   }, [players]);
 
-  const handleCardClick = (player: Player) => {
-    setSelectedGoalScorer(player);
+  const handlePlayerClick = (player: Player) => {
+    if (multiple) {
+      if (selectedGoalScorers.includes(player)) {
+        setSelectedGoalScorers(selectedGoalScorers.filter((selectedPlayer) => selectedPlayer !== player));
+      } else {
+        setSelectedGoalScorers([...selectedGoalScorers, player]);
+      }
+    } else {
+      setSelectedGoalScorers([player]);
+    }
   };
 
   const handleSearch = (value: string) => {
@@ -79,8 +90,8 @@ const GoalScorerModal = ({
     <PlayerItem
       key={player.id}
       hasPlayerPicture={Boolean(player.picture)}
-      onClick={() => handleCardClick(player)}
-      isSelected={selectedGoalScorer && selectedGoalScorer.id === player.id}
+      onClick={() => handlePlayerClick(player)}
+      isSelected={isPlayerIsSelected(player)}
     >
       <PlayerInfo>
         {player.picture && (
@@ -92,25 +103,25 @@ const GoalScorerModal = ({
             showBorder
           />
         )}
-        <NormalTypography variant="m" onClick={() => setSelectedGoalScorer(player)}>
+        <NormalTypography variant="m">
           {player.name}
         </NormalTypography>
       </PlayerInfo>
       <IconButtonContainer onClick={(e) => e.stopPropagation()}>
         <IconButton
-          icon={selectedGoalScorer && selectedGoalScorer.id === player.id ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
+          icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
           colors={
-          selectedGoalScorer && selectedGoalScorer.id === player.id ? {
-            normal: theme.colors.primary,
-            hover: theme.colors.primary,
-            active: theme.colors.primary,
-          } : {
-            normal: theme.colors.silverDarker,
-            hover: theme.colors.textDefault,
-            active: theme.colors.textDefault,
-          }
+            isPlayerIsSelected(player) ? {
+              normal: theme.colors.primary,
+              hover: theme.colors.primary,
+              active: theme.colors.primary,
+            } : {
+              normal: theme.colors.silverDarker,
+              hover: theme.colors.textDefault,
+              active: theme.colors.textDefault,
+            }
         }
-          onClick={() => setSelectedGoalScorer(player)}
+          onClick={() => handlePlayerClick(player)}
         />
       </IconButtonContainer>
     </PlayerItem>
@@ -217,11 +228,11 @@ const GoalScorerModal = ({
         </Button>
         <Button
           onClick={() => {
-            onSave(selectedGoalScorer);
+            onSave(selectedGoalScorers);
             onClose();
           }}
           fullWidth
-          disabled={!selectedGoalScorer}
+          disabled={!selectedGoalScorers}
         >
           Välj spelare
         </Button>

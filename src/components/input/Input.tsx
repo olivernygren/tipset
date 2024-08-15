@@ -77,7 +77,7 @@ const StyledInput = styled.input<StyledInputProps>`
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 'normal'};
-  border: 1px solid #ccc;
+  border: 1px solid ${theme.colors.silver};
   border-radius: ${theme.borderRadius.s};
   font-size: 16px;
   font-family: 'Readex Pro', sans-serif;

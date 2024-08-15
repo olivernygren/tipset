@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
-  CaretDown, CaretUp,
+  CaretDown,
   CheckCircle,
   Circle,
 } from '@phosphor-icons/react';
@@ -87,7 +87,7 @@ const SelectTeamModal = ({
             size={AvatarSize.S}
           />
         )}
-        <NormalTypography variant="m" onClick={() => setSelectedTeam(team)}>
+        <NormalTypography variant="m">
           {team.name}
         </NormalTypography>
       </TeamInfo>
@@ -143,7 +143,7 @@ const SelectTeamModal = ({
       <ModalContent>
         {Object.entries(teams).map(([country, teamList]) => (
           <CountrysTeamsContainer key={country}>
-            <CountryHeader isNation={teamType === TeamType.NATIONS}>
+            <CountryHeader isNation={teamType === TeamType.NATIONS} onClick={() => handleToggleExpandCountry(country)}>
               <Country>
                 <HeadingsTypography variant="h4">
                   {country}
@@ -156,11 +156,13 @@ const SelectTeamModal = ({
                   />
                 )}
               </Country>
-              <IconButton
-                icon={expandedCountries.includes(country) ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
-                colors={{ normal: theme.colors.silverDarker, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
-                onClick={() => handleToggleExpandCountry(country)}
-              />
+              <IconButtonContainer isExpanded={expandedCountries.includes(country)} onClick={(e) => e.stopPropagation()}>
+                <IconButton
+                  icon={<CaretDown size={20} weight="bold" />}
+                  colors={{ normal: theme.colors.silverDarker, hover: theme.colors.textDefault, active: theme.colors.textDefault }}
+                  onClick={() => handleToggleExpandCountry(country)}
+                />
+              </IconButtonContainer>
             </CountryHeader>
             {expandedCountries.includes(country) && (
               <TeamsList
@@ -268,6 +270,7 @@ const CountryHeader = styled.div<{ isNation: boolean }>`
   padding: ${({ isNation }) => (isNation ? '10px' : theme.spacing.xxxs)} ${theme.spacing.xs};
   border-radius: ${theme.borderRadius.m};
   background-color: ${theme.colors.silverLighter};
+  cursor: pointer;
 `;
 
 const Country = styled.div`
@@ -305,7 +308,10 @@ const TeamInfo = styled.div`
   gap: ${theme.spacing.xxxs};
 `;
 
-const IconButtonContainer = styled.div``;
+const IconButtonContainer = styled.div<{ isExpanded?: boolean }>`
+  transition: all 0.2s;
+  transform: ${({ isExpanded }) => (isExpanded ? 'rotate(180deg)' : 'rotate(0deg)')};
+`;
 
 const BottomContainer = styled.div`
   display: flex;
