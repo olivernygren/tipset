@@ -72,7 +72,7 @@ const SelectTeamModal = ({
   };
 
   const getTeam = (team: Team) => (
-    <TeamItem isSelected={selectedTeam?.name === team.name}>
+    <TeamItem isSelected={selectedTeam?.name === team.name} onClick={() => setSelectedTeam(team)}>
       <TeamInfo>
         {teamType === TeamType.NATIONS ? (
           <NationAvatar
