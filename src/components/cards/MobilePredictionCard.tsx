@@ -21,58 +21,54 @@ interface MobilePredictionCardProps {
 
 const MobilePredictionCard = ({
   prediction, finalResult, hasPredictedResult, onCalculatePoints, points,
-}: MobilePredictionCardProps) => {
-  console.log(finalResult, onCalculatePoints, points);
-
-  return (
-    <Card>
-      <HeadingContainer>
-        <HeadingsTypography variant="h4" color={theme.colors.primary}>
-          {prediction.username ? prediction.username : (
-            <UserName userId={prediction.userId} />
-          )}
-        </HeadingsTypography>
-      </HeadingContainer>
-      <Row>
-        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Utfall</EmphasisTypography>
-        <Outcome>
-          <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '?'}</NormalTypography>
-        </Outcome>
-      </Row>
-      <Divider />
-      <Row>
-        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Resultat</EmphasisTypography>
-        <NormalTypography variant="m">{hasPredictedResult ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
-      </Row>
-      <Divider />
-      <Row>
-        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
-        {prediction.goalScorer ? (
-          <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
-        ) : (
-          <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
+}: MobilePredictionCardProps) => (
+  <Card>
+    <HeadingContainer>
+      <HeadingsTypography variant="h4" color={theme.colors.primary}>
+        {prediction.username ? prediction.username : (
+          <UserName userId={prediction.userId} />
         )}
-      </Row>
-      <Divider />
-      <Row>
-        <HeadingsTypography variant="h6" color={theme.colors.textDefault}>Poäng</HeadingsTypography>
-        <NormalTypography variant="m">{points}</NormalTypography>
-      </Row>
-      <ButtonContainer>
-        <Button
-          size="m"
-          variant="secondary"
-          onClick={() => onCalculatePoints(prediction)}
-          icon={<Calculator size={24} color={finalResult.homeGoals === '' || finalResult.awayGoals === '' ? theme.colors.silverLight : theme.colors.primary} />}
-          fullWidth
-          disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
-        >
-          Beräkna poäng
-        </Button>
-      </ButtonContainer>
-    </Card>
-  );
-};
+      </HeadingsTypography>
+    </HeadingContainer>
+    <Row>
+      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Utfall</EmphasisTypography>
+      <Outcome>
+        <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '?'}</NormalTypography>
+      </Outcome>
+    </Row>
+    <Divider />
+    <Row>
+      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Resultat</EmphasisTypography>
+      <NormalTypography variant="m">{hasPredictedResult ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
+    </Row>
+    <Divider />
+    <Row>
+      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
+      {prediction.goalScorer ? (
+        <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
+      ) : (
+        <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
+      )}
+    </Row>
+    <Divider />
+    <Row>
+      <HeadingsTypography variant="h6" color={theme.colors.textDefault}>Poäng</HeadingsTypography>
+      <NormalTypography variant="m">{points}</NormalTypography>
+    </Row>
+    <ButtonContainer>
+      <Button
+        size="m"
+        variant="secondary"
+        onClick={() => onCalculatePoints(prediction)}
+        icon={<Calculator size={24} color={finalResult.homeGoals === '' || finalResult.awayGoals === '' ? theme.colors.silverLight : theme.colors.primary} />}
+        fullWidth
+        disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
+      >
+        Beräkna poäng
+      </Button>
+    </ButtonContainer>
+  </Card>
+);
 
 const Card = styled.div`
   display: flex;

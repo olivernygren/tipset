@@ -79,13 +79,15 @@ const FixtureResultPreview = ({
                 />
               )
             )}
-            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.shortName || fixture.homeTeam.name}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.name}</EmphasisTypography>
+            {/* <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.shortName || fixture.homeTeam.name}</EmphasisTypography> */}
           </TeamContainer>
           {!isMobile && !compact && (
             <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
           )}
           <TeamContainer compact={compact}>
-            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.shortName || fixture.awayTeam.name}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.name}</EmphasisTypography>
+            {/* <EmphasisTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.shortName || fixture.awayTeam.name}</EmphasisTypography> */}
             {!compact && (
               fixture.teamType === TeamType.CLUBS ? (
                 <ClubAvatar

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile,
+  createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signInWithEmailAndPassword, signInWithPopup, updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -70,7 +70,23 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      const { user } = result;
+
+      if (!user || !user.email) {
+        errorNotify('Ett fel uppstod');
+        return;
+      }
+
+      // Check if the email already exists
+      const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
+      if (signInMethods.length === 0) {
+        // Sign out the user if no sign-in methods are found
+        await auth.signOut();
+        setError('Kontot finns inte. Skapa ett konto först.');
+        return;
+      }
+
       navigate('/');
     } catch (e) {
       errorNotify('Ett fel uppstod');

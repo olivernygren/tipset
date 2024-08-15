@@ -281,9 +281,9 @@ const GamePredictor = ({
       {isSelectGoalScorerModalOpen && (
         <GoalScorerModal
           players={ArsenalPlayers}
-          onSave={(player) => handleUpdatePlayerPrediction(player)}
+          onSave={(players) => handleUpdatePlayerPrediction(players[0])}
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
-          initialSelectedPlayer={predictedPlayerToScore}
+          initialSelectedPlayers={[predictedPlayerToScore]}
         />
       )}
     </>

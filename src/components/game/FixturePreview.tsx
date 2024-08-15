@@ -17,10 +17,11 @@ interface FixturePreviewProps {
   onShowPredictionsClick?: () => void;
   simple?: boolean;
   isCorrectionMode?: boolean;
+  useShortNames?: boolean;
 }
 
 const FixturePreview = ({
-  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode,
+  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode, useShortNames,
 }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -71,13 +72,13 @@ const FixturePreview = ({
               size={isMobile ? AvatarSize.XS : AvatarSize.S}
             />
           )}
-          <NormalTypography variant={isMobile ? 's' : 'm'}>{fixture.homeTeam.name}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>{useShortNames && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}</NormalTypography>
         </TeamContainer>
         {!isMobile && (
           <NormalTypography variant="s" color={theme.colors.textLight}>vs</NormalTypography>
         )}
         <TeamContainer reverse={isMobile}>
-          <NormalTypography variant={isMobile ? 's' : 'm'}>{fixture.awayTeam.name}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>{useShortNames && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}</NormalTypography>
           {fixture.teamType === TeamType.CLUBS ? (
             <ClubAvatar
               logoUrl={fixture.awayTeam.logoUrl}

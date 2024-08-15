@@ -730,6 +730,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             league={league}
             ongoingGameWeek={ongoingGameWeek}
             refetchLeague={refetchLeague}
+            savedFinalResult={ongoingGameWeek.games.fixtures.find((f) => f.id === showPredictionsModalFixtureId)?.finalResult}
           />
         )}
         {ongoingGameWeek.games.fixtures.every((f) => Boolean(f.finalResult)) && (

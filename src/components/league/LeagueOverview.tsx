@@ -30,6 +30,7 @@ const LeagueOverview = ({
 }: LeagueOverviewProps) => {
   const { user, hasAdminRights } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+  const isTablet = useResizeListener(DeviceSizes.TABLET);
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
@@ -144,6 +145,7 @@ const LeagueOverview = ({
                         hidePredictions={new Date(fixture.kickOffTime) > new Date()}
                         onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
                         simple
+                        useShortNames={!isTablet && !isMobile}
                       />
                     ))}
                   </FixturesContainer>
