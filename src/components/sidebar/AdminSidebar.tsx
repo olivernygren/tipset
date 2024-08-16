@@ -2,12 +2,14 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import { NavLink } from '../../utils/Nav';
+import { RoutesEnum } from '../../utils/Routes';
 
 const AdminSidebar = () => {
   const links: Array<NavLink> = [
-    { href: '/admin', label: 'Dashboard', icon: <></> },
-    { href: '/admin/users', label: 'Användare', icon: <></> },
-    { href: '/admin/leagues', label: 'Ligor', icon: <></> },
+    { href: `/${RoutesEnum.ADMIN}`, label: 'Dashboard', icon: <></> },
+    { href: `/${RoutesEnum.ADMIN_USERS}`, label: 'Användare', icon: <></> },
+    { href: `/${RoutesEnum.ADMIN_LEAGUES}`, label: 'Ligor', icon: <></> },
+    { href: `/${RoutesEnum.PLAYER_RATINGS}`, label: 'Spelarbetyg', icon: <></> },
   ];
 
   return (

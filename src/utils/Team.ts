@@ -1037,6 +1037,18 @@ export const Teams = {
       name: 'Österrike',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg',
     },
+    {
+      name: 'Polen',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/Flag_of_Poland.svg',
+    },
+    {
+      name: 'Ghana',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Ghana.svg',
+    },
+    {
+      name: 'Japan',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg',
+    },
   ],
   [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
     {

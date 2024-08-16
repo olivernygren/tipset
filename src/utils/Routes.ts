@@ -10,6 +10,8 @@ export enum RoutesEnum {
   ADMIN = 'admin',
   ADMIN_LEAGUES = 'admin/leagues',
   ADMIN_USERS = 'admin/users',
+
+  PLAYER_RATINGS = 'player-ratings',
 }
 
 export enum QueryEnum {

@@ -27,7 +27,7 @@ const AdminPageLayout = styled.div`
 
 const PageContent = styled.div`
   overflow-y: auto;
-  background-color: ${theme.colors.silverLight};
+  background-color: ${theme.colors.silverLighter};
 `;
 
 export default AdminLayout;

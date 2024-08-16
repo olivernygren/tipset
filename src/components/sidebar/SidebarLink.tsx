@@ -32,7 +32,7 @@ const StyledSidebarLink = styled.div<StyledSidebarLinkProps>`
   align-items: center;
   padding: 0 ${theme.spacing.m};
   height: 48px;
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   background-color: ${({ active }) => (active ? theme.colors.primaryLight : theme.colors.silverLight)};
   width: 100%;
   box-sizing: border-box;

@@ -19,9 +19,9 @@ const Sidebar = ({ links }: SidebarProps) => (
 );
 
 const StyledSidebar = styled.div`
-  height: 100vh;
+  min-height: 100vh;
   width: 250px;
-  border-right: 1px solid ${theme.colors.silver};
+  border-right: 1px solid ${theme.colors.silverLight};
 `;
 
 const LinksContainer = styled.div`

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { signOut } from 'firebase/auth';
 import {
-  Gear, List, SignOut,
+  Gear, List, Lock, SignOut,
 } from '@phosphor-icons/react';
 import Cookies from 'js-cookie';
 import { devices, theme } from '../../theme';
@@ -18,7 +18,7 @@ import { Divider } from '../Divider';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 
 const Header = () => {
-  const { user } = useUser();
+  const { user, hasAdminRights } = useUser();
   const isTablet = useResizeListener(DeviceSizes.TABLET);
 
   const hasUserCookie = Cookies.get('user');
@@ -85,15 +85,26 @@ const Header = () => {
                   <Divider vertical />
                 )}
                 {isSignedIn && (
-                <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
-                  <IconButton
-                    icon={<Gear size={24} weight="light" />}
-                    colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                    onClick={() => {}}
-                    title="Profil"
-                    showBorder
-                  />
-                </InvisibleLink>
+                  <InvisibleLink href={`/${RoutesEnum.PROFILE}`}>
+                    <IconButton
+                      icon={<Gear size={24} weight="light" />}
+                      colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                      onClick={() => {}}
+                      title="Kontoinställningar"
+                      showBorder
+                    />
+                  </InvisibleLink>
+                )}
+                {isSignedIn && hasAdminRights && (
+                  <InvisibleLink href={`/${RoutesEnum.ADMIN}`}>
+                    <IconButton
+                      icon={<Lock size={24} weight="light" />}
+                      colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                      onClick={() => {}}
+                      title="Admin"
+                      showBorder
+                    />
+                  </InvisibleLink>
                 )}
                 {isSignedIn ? (
                   <IconButton

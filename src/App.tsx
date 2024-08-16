@@ -19,6 +19,7 @@ import PredictionLeaguePage from './pages/leagues/[leagueId]';
 import RulesPage from './pages/rules';
 import HowToPlayPage from './pages/how-to-play';
 import ProfilePage from './pages/profile';
+import PlayerRatingsPage from './pages/player-ratings';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -78,6 +79,10 @@ const App = () => {
     {
       pageComponentElement: <AdminLeaguesPage />,
       path: `/${RoutesEnum.ADMIN_LEAGUES}`,
+    },
+    {
+      pageComponentElement: <PlayerRatingsPage />,
+      path: `/${RoutesEnum.PLAYER_RATINGS}`,
     },
   ];
 
