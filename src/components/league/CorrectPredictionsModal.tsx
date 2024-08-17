@@ -100,12 +100,39 @@ const CorrectPredictionsModal = ({
       const points = pointsDistribution?.points;
       const predictedCorrectResult = pointsDistribution?.points?.correctResult;
 
+      // Find the fixture to check if it already has a final result
+      const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
+      let previousPoints = 0;
+      let previousCorrectResults = 0;
+
+      if (fixture?.finalResult && standing.awardedPointsForFixtures?.includes(gameId)) {
+        // Calculate the previously awarded points
+        const previousPointsDistribution = ongoingGameWeek.games.predictions.find((p) => p.userId === standing.userId && p.fixtureId === gameId);
+        previousPoints = previousPointsDistribution?.points?.total || 0;
+        previousCorrectResults = previousPointsDistribution?.points?.correctResult ? 1 : 0;
+      }
+
+      const updatedPoints = points ? standing.points - previousPoints + points.total : standing.points;
+      const updatedCorrectResults = predictedCorrectResult ? standing.correctResults - previousCorrectResults + 1 : standing.correctResults;
+
       return {
         ...standing,
-        points: points ? standing.points + points.total : standing.points,
-        correctResults: predictedCorrectResult ? standing.correctResults + 1 : standing.correctResults,
+        points: updatedPoints,
+        correctResults: updatedCorrectResults,
+        awardedPointsForFixtures: [...(standing.awardedPointsForFixtures ?? []).filter((id) => id !== gameId), gameId],
       };
     });
+
+    try {
+      const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, league.documentId));
+      const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
+
+      if (!leagueData || !leagueData.gameWeeks) return;
+
+      // ... rest of the code
+    } catch (error) {
+      console.error('Error updating league standings: ', error);
+    }
 
     try {
       const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, league.documentId));
