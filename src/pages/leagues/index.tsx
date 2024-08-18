@@ -99,6 +99,7 @@ const PredictionLeaguesPage = () => {
         username: (user?.lastname ? `${user?.firstname} ${user?.lastname}` : user?.firstname) ?? '?',
         points: 0,
         correctResults: 0,
+        awardedPointsForFixtures: [],
       }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
       hasEnded: false,

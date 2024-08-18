@@ -10,7 +10,7 @@ import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typ
 import Input from '../input/Input';
 import Button from '../buttons/Button';
 import { auth, db, provider as googleProvider } from '../../config/firebase';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { Divider } from '../Divider';
 import { CollectionEnum } from '../../utils/Firebase';
 import { CreateUserInput, RolesEnum } from '../../utils/Auth';
@@ -422,10 +422,14 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
+  border-radius: 0;
+
+  @media ${devices.mobileL} {
+    border-radius: ${theme.borderRadius.l};
+  }
   
   #google-sign-in {
-    border-radius: ${theme.borderRadius.xl};
-    padding: ${theme.spacing.xl};
+    /* padding: ${theme.spacing.xl}; */
     color: ${theme.colors.textDefault} !important;
   }
 `;

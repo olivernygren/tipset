@@ -2,4 +2,5 @@
 export enum CollectionEnum {
   USERS = 'users',
   LEAGUES = 'leagues',
+  PLAYER_RATINGS = 'playerRatings',
 }

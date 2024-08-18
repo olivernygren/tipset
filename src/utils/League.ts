@@ -35,6 +35,7 @@ export interface PredictionLeagueStanding {
   username: string;
   points: number;
   correctResults: number;
+  awardedPointsForFixtures?: Array<string>;
 }
 
 export interface LeagueGameWeekFixtures {

@@ -109,6 +109,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               selectedDate={deadlineToJoin}
               onChange={(date) => setDeadlineToJoin(date!)}
               fullWidth
+              minDate={new Date()}
             />
           </InputContainer>
           <Button

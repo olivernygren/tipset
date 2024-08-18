@@ -95,6 +95,39 @@ export interface Player {
   picture?: string;
 }
 
+export interface PlayerRating {
+  documentId: string;
+  playerId: string;
+  playerName: string;
+  startingAppearances: number;
+  substituteAppearances: number;
+  goals: number;
+  assists: number;
+  ratings: Array<Rating>;
+}
+
+export interface Rating {
+  opponent: string;
+  date: string;
+  rating: number;
+}
+
+export interface PlayerRatingInput {
+  playerId: string;
+  playerName: string;
+  startingAppearances: number;
+  substituteAppearances: number;
+  goals: number;
+  assists: number;
+  ratings: Array<RatingInput>;
+}
+
+export interface RatingInput {
+  opponent: string;
+  date: string;
+  rating: number;
+}
+
 export const getPlayersByGeneralPosition = (generalPosition: GeneralPositionEnum): Array<Player> => ArsenalPlayers.filter((player) => player.position.general === generalPosition);
 
 export const getPlayerById = (id: string): Player | undefined => ArsenalPlayers.find((player) => player.id === id);

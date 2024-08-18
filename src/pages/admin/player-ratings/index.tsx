@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   ArrowsDownUp, FloppyDisk, PlusCircle,
 } from '@phosphor-icons/react';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
-import { theme } from '../../theme';
-import { Section } from '../../components/section/Section';
-import { ArsenalPlayers, GeneralPositionEnum, Player } from '../../utils/Players';
-import Avatar, { AvatarSize } from '../../components/avatar/Avatar';
-import Button from '../../components/buttons/Button';
-import SelectTeamModal from '../../components/game/SelectTeamModal';
-import { TeamType } from '../../utils/Fixture';
-import { getFlagUrlByCountryName, Team } from '../../utils/Team';
-import CustomDatePicker from '../../components/input/DatePicker';
-import SelectImitation from '../../components/input/SelectImitation';
-import NationAvatar from '../../components/avatar/NationAvatar';
+import { collection, getDocs } from 'firebase/firestore';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
+import { theme } from '../../../theme';
+import { Section } from '../../../components/section/Section';
+import {
+  ArsenalPlayers, GeneralPositionEnum, Player, PlayerRating,
+} from '../../../utils/Players';
+import Avatar, { AvatarSize } from '../../../components/avatar/Avatar';
+import Button from '../../../components/buttons/Button';
+import SelectTeamModal from '../../../components/game/SelectTeamModal';
+import { TeamType } from '../../../utils/Fixture';
+import { getFlagUrlByCountryName, Team } from '../../../utils/Team';
+import CustomDatePicker from '../../../components/input/DatePicker';
+import SelectImitation from '../../../components/input/SelectImitation';
+import NationAvatar from '../../../components/avatar/NationAvatar';
+import { CollectionEnum } from '../../../utils/Firebase';
+import { db } from '../../../config/firebase';
+import { withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
+import PlayerRatingModal from '../../../components/ratings/PlayerRatingModal';
+import {
+  getNumberOfAppearances, getPlayerMonthlyRating, getPlayerRatingObject, getPlayerSeasonRating,
+} from '../../../utils/playerRatingHelpers';
 
 enum SortByEnum {
   POSITION = 'Position',
@@ -24,6 +34,7 @@ enum SortByEnum {
 const PlayerRatingsPage = () => {
   const originalPlayers = ArsenalPlayers;
 
+  const [ratings, setRatings] = useState<Array<PlayerRating>>([]);
   const [sorting, setSorting] = useState<SortByEnum>(SortByEnum.POSITION);
   const [goalKeepers] = useState<Array<Player>>(originalPlayers.filter((player) => player.position.general === GeneralPositionEnum.GK));
   const [defenders] = useState<Array<Player>>(originalPlayers.filter((player) => player.position.general === GeneralPositionEnum.DF));
@@ -33,57 +44,83 @@ const PlayerRatingsPage = () => {
   const [showGameContent, setShowGameContent] = useState<boolean>(false);
   const [opponent, setOpponent] = useState<Team | undefined>(undefined);
   const [gameDate, setGameDate] = useState(new Date());
+  const [playerModalOpen, setPlayerModalOpen] = useState<Player | null>(null);
 
   console.log(setSorting);
 
-  // Skapa PlayerRatings collection
+  useEffect(() => {
+    fetchRatings();
+  }, []);
 
-  // Varje objekt i collection ska ha:
-  // playerId: string
-  // playerName: string
-  // startingAppearances: number
-  // substituteAppearances: number (startingAppearances + substituteAppearances = totalAppearances)
-  // goals: number
-  // assists: number
-  // ratings: [{ opponent: string, date: Date, rating: number }]
+  const fetchRatings = async () => {
+    try {
+      const playerRatingCollectionRef = collection(db, CollectionEnum.PLAYER_RATINGS);
+      if (!playerRatingCollectionRef) return;
 
-  // Månadsbetyg: (summa av alla ratings för månaden) / antal matcher
-  // Säsongsbetyg: (summa av alla ratings för säsongen) / antal matcher
+      const playerRatingData = await getDocs(playerRatingCollectionRef);
+      const playerRatings = withDocumentIdOnObjectsInArray<PlayerRating>(playerRatingData.docs);
 
-  // När man klickar på knappen "Ny match" ska man kunna välja motståndare
+      setRatings(playerRatings);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // Varje spelare kan klickas på för att öppna modal där betyg, mål, assist samt om spelare spelade från start eller som inhoppare kan fyllas i
 
-  const getPlayer = (player: Player) => (
-    <PlayerItem key={player.id}>
-      <AvatarContainer>
-        {player.picture && (
-          <Avatar
-            src={player.picture}
-            alt={player.name}
-            size={AvatarSize.M}
-            objectFit="cover"
-            showBorder
-          />
-        )}
-        <NationAvatarContainer>
-          {player.country && (
-            <NationAvatar
-              flagUrl={getFlagUrlByCountryName(player.country)}
-              nationName={player.country as string}
-              size={AvatarSize.XS}
+  const getPlayer = (player: Player) => {
+    const playerRating = getPlayerRatingObject(player, ratings);
+
+    return (
+      <PlayerItem key={player.id} onClick={() => setPlayerModalOpen(player)}>
+        <PlayerInfoContainer>
+          <AvatarContainer>
+            {player.picture && (
+            <Avatar
+              src={player.picture}
+              alt={player.name}
+              size={AvatarSize.M}
+              objectFit="cover"
+              showBorder
             />
-          )}
-        </NationAvatarContainer>
-      </AvatarContainer>
-      <NormalTypography variant="m">{player.name}</NormalTypography>
-    </PlayerItem>
-  );
+            )}
+            <NationAvatarContainer>
+              {player.country && (
+                <NationAvatar
+                  flagUrl={getFlagUrlByCountryName(player.country)}
+                  nationName={player.country as string}
+                  size={AvatarSize.XS}
+                />
+              )}
+            </NationAvatarContainer>
+          </AvatarContainer>
+          <NormalTypography variant="m">{player.name}</NormalTypography>
+          <NormalTypography variant="s" color={theme.colors.silverDark}>{`#${player.number}`}</NormalTypography>
+        </PlayerInfoContainer>
+        <PlayerItemTableCell>
+          <NormalTypography variant="m">{getNumberOfAppearances(playerRating)}</NormalTypography>
+        </PlayerItemTableCell>
+        <PlayerItemTableCell>
+          <NormalTypography variant="m">{playerRating?.assists ?? 0}</NormalTypography>
+        </PlayerItemTableCell>
+        <PlayerItemTableCell>
+          <NormalTypography variant="m">{playerRating?.goals ?? 0}</NormalTypography>
+        </PlayerItemTableCell>
+        <PlayerItemTableCell>
+          <EmphasisTypography variant="m">{getPlayerMonthlyRating(playerRating)}</EmphasisTypography>
+        </PlayerItemTableCell>
+        <PlayerItemTableCell>
+          <EmphasisTypography variant="m" color={theme.colors.primary}>{getPlayerSeasonRating(playerRating)}</EmphasisTypography>
+        </PlayerItemTableCell>
+      </PlayerItem>
+    );
+  };
 
   return (
     <>
       <Section padding={theme.spacing.l} gap="m">
         <PageHeader>
-          <HeadingsTypography variant="h2">Player Ratings</HeadingsTypography>
+          <HeadingsTypography variant="h2">Spelarbetyg</HeadingsTypography>
           <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
             <Button
               variant="secondary"
@@ -116,40 +153,50 @@ const PlayerRatingsPage = () => {
               selectedDate={gameDate}
               onChange={(date) => setGameDate(date!)}
               includeTime={false}
+              minDate={undefined}
             />
           </GameContainer>
         )}
         <TableHeader>
-          <div />
           <EmphasisTypography color={theme.colors.silverDark} variant="s">Spelare</EmphasisTypography>
-          <EmphasisTypography color={theme.colors.silverDark} variant="s">Matcher</EmphasisTypography>
-          <EmphasisTypography color={theme.colors.silverDark} variant="s">Mål</EmphasisTypography>
-          <EmphasisTypography color={theme.colors.silverDark} variant="s">Assist</EmphasisTypography>
-          <EmphasisTypography color={theme.colors.silverDark} variant="s">Månadsbetyg</EmphasisTypography>
-          <EmphasisTypography color={theme.colors.silverDark} variant="s">Säsongsbetyg</EmphasisTypography>
+          <PlayerItemTableCell>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Matcher</EmphasisTypography>
+          </PlayerItemTableCell>
+          <PlayerItemTableCell>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Assist</EmphasisTypography>
+          </PlayerItemTableCell>
+          <PlayerItemTableCell>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Mål</EmphasisTypography>
+          </PlayerItemTableCell>
+          <PlayerItemTableCell>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Månadsbetyg</EmphasisTypography>
+          </PlayerItemTableCell>
+          <PlayerItemTableCell>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Säsongsbetyg</EmphasisTypography>
+          </PlayerItemTableCell>
         </TableHeader>
         {sorting === SortByEnum.POSITION && (
           <>
             <PositionContainer>
-              <HeadingsTypography variant="h4">Goalkeepers</HeadingsTypography>
+              <HeadingsTypography variant="h4">Målvakter</HeadingsTypography>
               <PlayerList>
                 {goalKeepers.map((player) => getPlayer(player))}
               </PlayerList>
             </PositionContainer>
             <PositionContainer>
-              <HeadingsTypography variant="h4">Defenders</HeadingsTypography>
+              <HeadingsTypography variant="h4">Försvarare</HeadingsTypography>
               <PlayerList>
                 {defenders.map((player) => getPlayer(player))}
               </PlayerList>
             </PositionContainer>
             <PositionContainer>
-              <HeadingsTypography variant="h4">Midfielders</HeadingsTypography>
+              <HeadingsTypography variant="h4">Mittfältare</HeadingsTypography>
               <PlayerList>
                 {midfielders.map((player) => getPlayer(player))}
               </PlayerList>
             </PositionContainer>
             <PositionContainer>
-              <HeadingsTypography variant="h4">Forwards</HeadingsTypography>
+              <HeadingsTypography variant="h4">Anfallare</HeadingsTypography>
               <PlayerList>
                 {forwards.map((player) => getPlayer(player))}
               </PlayerList>
@@ -170,6 +217,19 @@ const PlayerRatingsPage = () => {
           value={opponent}
           teamType={TeamType.CLUBS}
           isHomeTeam={false}
+        />
+      )}
+      {playerModalOpen && (
+        <PlayerRatingModal
+          onClose={() => {
+            setPlayerModalOpen(null);
+            fetchRatings();
+          }}
+          player={playerModalOpen}
+          playerRatingObject={getPlayerRatingObject(playerModalOpen, ratings)}
+          opponent={opponent}
+          ratings={ratings}
+          gameDate={gameDate}
         />
       )}
     </>
@@ -204,9 +264,9 @@ const PlayerList = styled.div`
 
 const PlayerItem = styled.div`
   display: grid;
-  grid-template-columns: auto auto 3fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 110px 110px 110px 110px 96px;
   align-items: center;
-  gap: ${theme.spacing.xxs};
+  gap: ${theme.spacing.xl};
   padding: 2px ${theme.spacing.xs} 2px ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.m};
   background-color: ${theme.colors.white};
@@ -223,23 +283,34 @@ const PlayerItem = styled.div`
   }
 `;
 
+const PlayerInfoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  box-sizing: border-box;
+`;
+
 const AvatarContainer = styled.div`
   height: fit-content;
   width: fit-content;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const NationAvatarContainer = styled.div`
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: 0px;
+  right: 0px;
 `;
 
 const TableHeader = styled.div`
   display: grid;
-  grid-template-columns: auto 3fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 110px 110px 110px 110px 96px;
   align-items: flex-end;
-  gap: ${theme.spacing.xxxs};
+  gap: ${theme.spacing.xl};
   padding: 2px ${theme.spacing.xs} ${theme.spacing.xxs} ${theme.spacing.xxs};
   color: ${theme.colors.white};
   width: 100%;
@@ -268,6 +339,14 @@ const SelectContainer = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.xxs};
   min-width: 200px;
+`;
+
+const PlayerItemTableCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default PlayerRatingsPage;

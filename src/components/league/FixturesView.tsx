@@ -586,6 +586,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           selectedDate={newFixtureKickoffDateTime}
           onChange={(date) => handleUpdateKickoffTime(date!)}
           fullWidth
+          minDate={new Date()}
         />
       </Section>
       {(newFixtureHomeTeam?.name === 'Arsenal' || newFixtureAwayTeam?.name === 'Arsenal') && (
@@ -657,6 +658,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           selectedDate={newGameWeekStartDate}
           onChange={(date) => setNewGameWeekStartDate(date!)}
           fullWidth={isMobile}
+          minDate={new Date()}
         />
       </Section>
       <Divider />

@@ -48,7 +48,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
 
   return (
     <Card>
-      <HeadingsTypography variant={isMobile ? 'h5' : 'h4'} color={theme.colors.gold}>
+      <HeadingsTypography variant={isMobile ? 'h5' : 'h3'} color={theme.colors.white}>
         {prediction.username ? (
           prediction.username
         ) : (

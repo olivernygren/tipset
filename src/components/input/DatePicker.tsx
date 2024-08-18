@@ -16,10 +16,11 @@ interface CustomDatePickerProps {
   inline?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
+  minDate?: Date;
 }
 
 const CustomDatePicker = ({
-  selectedDate, onChange, includeTime = true, label, inline, disabled, fullWidth,
+  selectedDate, onChange, includeTime = true, label, inline, disabled, fullWidth, minDate,
 }: CustomDatePickerProps) => {
   registerLocale('sv', sv);
 
@@ -43,7 +44,7 @@ const CustomDatePicker = ({
           inline={inline}
           disabled={disabled}
           disabledKeyboardNavigation
-          minDate={new Date()}
+          minDate={minDate}
         />
         <Calendar size={24} color={theme.colors.silverDark} />
       </DatePickerWrapper>

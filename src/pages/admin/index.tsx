@@ -15,18 +15,18 @@ const AdminDashboard = () => {
   const fetchCollections = async () => {
     try {
       const leagueCollectionRef = collection(db, 'leagues');
-      const anotherCollectionRef = collection(db, 'users');
+      const userCollectionRef = collection(db, 'users');
 
       const [leagueData, anotherData] = await Promise.all([
         getDocs(leagueCollectionRef),
-        getDocs(anotherCollectionRef),
+        getDocs(userCollectionRef),
       ]);
 
       const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(leagueData.docs);
-      const anotherCollection = withDocumentIdOnObjectsInArray<User>(anotherData.docs);
+      const users = withDocumentIdOnObjectsInArray<User>(anotherData.docs);
 
       setLeagues(leagues);
-      setUsers(anotherCollection);
+      setUsers(users);
     } catch (e) {
       console.error(e);
     }
