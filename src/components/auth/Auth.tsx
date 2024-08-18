@@ -136,26 +136,26 @@ const Auth = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const { user } = result;
 
-      const displayNameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+      const displayNameParts = user.providerData[0]?.displayName ? user.providerData[0].displayName.split(' ') : ['', ''];
       const firstName = displayNameParts[0];
       let lastName = displayNameParts.slice(1).join(' ');
 
       // If there's no space in the displayName, you might decide to leave lastname empty or handle it differently
-      if (!user.displayName || displayNameParts.length === 1) {
+      if ((!user.displayName && !user.providerData.length) || displayNameParts.length === 1) {
         lastName = ''; // Or any other fallback logic you prefer
       }
 
       const input = {
         email: user.email, // Google account's email
-        firstName,
-        lastName,
+        firstname: firstName,
+        lastname: lastName,
         role: RolesEnum.USER,
         profilePicture: 'generic',
       };
 
       await setDoc(doc(db, CollectionEnum.USERS, user.uid), input);
       await updateProfile(user, {
-        displayName: `${firstname} ${lastname}`,
+        displayName: `${firstName} ${lastName}`,
       });
 
       navigate('/');
