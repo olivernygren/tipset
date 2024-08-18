@@ -377,7 +377,8 @@ export const Teams = {
       name: 'FC Barcelona',
       shortName: 'Barcelona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg',
-      stadium: 'Camp Nou',
+      // stadium: 'Camp Nou',
+      stadium: 'Estadi Olímpic Lluís Companys',
       country: CountryEnum.SPAIN,
     },
     {
