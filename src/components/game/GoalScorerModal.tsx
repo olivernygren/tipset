@@ -204,11 +204,11 @@ const GoalScorerModal = ({
               <Info size={24} color={theme.colors.silverDarker} weight="fill" />
               <HeadingsTypography variant="h6" color={theme.colors.silverDarker}>Välj en ny målskytt</HeadingsTypography>
             </Section>
-            <Section flexDirection="column" gap="xxxs" padding={`0 0 0 ${theme.spacing.l}`}>
+            <Section flexDirection="column" gap={isMobile ? 'xxs' : 'xxxs'} padding={`0 0 0 ${theme.spacing.l}`}>
               <NormalTypography variant="s" color={theme.colors.silverDarker}>
                 Kom ihåg att du inte kan välja samma målskytt som förra omgången
               </NormalTypography>
-              <Section flexDirection="row" alignItems="center" gap="xxs">
+              <Section flexDirection={isMobile ? 'column' : 'row'} alignItems={isMobile ? 'flex-start' : 'center'} gap={isMobile ? 'xxxs' : 'xxs'}>
                 <NormalTypography variant="s" color={theme.colors.silverDarker}>
                   Förra omgången valde du:
                 </NormalTypography>
