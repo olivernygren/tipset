@@ -139,15 +139,17 @@ const LeagueOverview = ({
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
                   <FixturesContainer>
-                    {currentGameWeek.games.fixtures.map((fixture) => (
-                      <FixturePreview
-                        fixture={fixture}
-                        hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-                        onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
-                        simple
-                        useShortNames={!isTablet && !isMobile}
-                      />
-                    ))}
+                    {currentGameWeek.games.fixtures
+                      .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                      .map((fixture) => (
+                        <FixturePreview
+                          fixture={fixture}
+                          hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                          onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
+                          simple
+                          useShortNames={!isTablet && !isMobile}
+                        />
+                      ))}
                   </FixturesContainer>
                   {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && (
                     <MarginTopButton>
@@ -226,13 +228,15 @@ const LeagueOverview = ({
               </Section>
               <Divider color={theme.colors.silverLight} />
               <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
-                {previousGameWeek.games.fixtures.map((fixture) => (
-                  <FixtureResultPreview
-                    fixture={fixture}
-                    predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                    compact
-                  />
-                ))}
+                {previousGameWeek.games.fixtures
+                  .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                  .map((fixture) => (
+                    <FixtureResultPreview
+                      fixture={fixture}
+                      predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                      compact
+                    />
+                  ))}
               </Section>
             </PreviousRoundCard>
           ) : (

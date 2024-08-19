@@ -481,20 +481,22 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     return (
       <FixturesGrid>
-        {ongoingGameWeek.games.fixtures.map((fixture, index) => (
-          <GamePredictor
-            key={fixture.id}
-            gameNumber={index + 1}
-            game={fixture}
-            onResultUpdate={() => handleUpdatePredictionScoreline(fixture.id)}
-            onPlayerPredictionUpdate={(_, playerToScore) => handleUpdatePlayerPrediction(fixture.id, playerToScore)}
-            onSave={(homeGoals, awayGoals, playerToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore)}
-            hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
-            predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
-            loading={predictionLoading === fixture.id}
-            anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
-          />
-        ))}
+        {ongoingGameWeek.games.fixtures
+          .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+          .map((fixture, index) => (
+            <GamePredictor
+              key={fixture.id}
+              gameNumber={index + 1}
+              game={fixture}
+              onResultUpdate={() => handleUpdatePredictionScoreline(fixture.id)}
+              onPlayerPredictionUpdate={(_, playerToScore) => handleUpdatePlayerPrediction(fixture.id, playerToScore)}
+              onSave={(homeGoals, awayGoals, playerToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore)}
+              hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
+              predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
+              loading={predictionLoading === fixture.id}
+              anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
+            />
+          ))}
       </FixturesGrid>
     );
   };
@@ -665,16 +667,18 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <Section gap="s">
         <HeadingsTypography variant="h5">Matcher</HeadingsTypography>
         {newGameWeekFixtures.length > 0 && (
-          newGameWeekFixtures.map((fixture, index) => (
-            <Section flexDirection="row" gap="xxs" alignItems="center">
-              <FixturePreview fixture={fixture} key={index} hidePredictions />
-              <IconButton
-                icon={<XCircle size={24} weight="fill" />}
-                colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
-              />
-            </Section>
-          ))
+          newGameWeekFixtures
+            .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+            .map((fixture, index) => (
+              <Section flexDirection="row" gap="xxs" alignItems="center">
+                <FixturePreview fixture={fixture} key={index} hidePredictions />
+                <IconButton
+                  icon={<XCircle size={24} weight="fill" />}
+                  colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                  onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
+                />
+              </Section>
+            ))
         )}
         {addFixtureViewOpen ? (
           <>
@@ -871,13 +875,15 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                   </Section>
                   <Divider color={theme.colors.silverLight} />
                   <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
-                    {gameWeek.games.fixtures.map((fixture) => (
-                      <FixtureResultPreview
-                        fixture={fixture}
-                        predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                        compact={isMobile}
-                      />
-                    ))}
+                    {gameWeek.games.fixtures
+                      .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                      .map((fixture) => (
+                        <FixtureResultPreview
+                          fixture={fixture}
+                          predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                          compact={isMobile}
+                        />
+                      ))}
                   </Section>
                 </PreviousRoundCard>
               ))}
