@@ -36,7 +36,7 @@ const SelectImitation = ({
       fullWidth={fullWidth}
       compact={compact}
       maxWidth={maxWidth}
-      onClick={onClick}
+      onClick={!disabled ? onClick : () => {}}
     >
       {placeholder && !value && (
         <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.silverDarker}>
@@ -67,6 +67,7 @@ const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   min-height: ${({ compact }) => (compact ? '40px' : '48px')};
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
+  pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 `;
 
 export default SelectImitation;

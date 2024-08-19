@@ -110,5 +110,7 @@ export const getLastGameWeek = (previousGameWeeks: Array<LeagueGameWeek> | undef
     return undefined;
   }
 
-  return previousGameWeeks[previousGameWeeks.length - 1];
+  const sortedGameWeeks = previousGameWeeks.sort((a, b) => a.round - b.round);
+
+  return sortedGameWeeks[sortedGameWeeks.length - 1];
 };
