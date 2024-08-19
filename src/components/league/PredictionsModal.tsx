@@ -77,8 +77,9 @@ const GoalScorersContainer = styled.div`
 
   @media ${devices.tablet} {
     align-items: center;
+    flex-direction: row;
     justify-content: space-between;
-    gap: ${theme.spacing.xs};
+    gap: ${theme.spacing.m};
   }
   `;
 
