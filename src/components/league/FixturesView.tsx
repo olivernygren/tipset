@@ -20,7 +20,8 @@ import {
   Fixture, FixtureInput, PredictionInput, PredictionStatus, TeamType,
 } from '../../utils/Fixture';
 import {
-  getPredictionOutcome, getPredictionStatus, hasInvalidTeamName, withDocumentIdOnObject,
+  getLastGameWeek,
+  getPredictionOutcome, getPredictionStatus, getUserPreviousGameWeekPrecitedGoalScorer, hasInvalidTeamName, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import Input from '../input/Input';
 import Select from '../input/Select';
@@ -495,6 +496,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               loading={predictionLoading === fixture.id}
               anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
+              previousGameWeekPredictedGoalScorer={getUserPreviousGameWeekPrecitedGoalScorer(getLastGameWeek(previousGameWeeks), user?.documentId ?? '')}
             />
           ))}
       </FixturesGrid>

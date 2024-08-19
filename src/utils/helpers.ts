@@ -2,6 +2,7 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
+import { Player } from './Players';
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;
@@ -88,4 +89,26 @@ export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
     default:
       return '/images/generic.png';
   }
+};
+
+export const getUserPreviousGameWeekPrecitedGoalScorer = (previousGameWeek: LeagueGameWeek | undefined, userId: string): Player | undefined => {
+  if (!previousGameWeek) {
+    return undefined;
+  }
+
+  const prediction = previousGameWeek.games.predictions.find((prediction) => prediction.userId === userId && prediction.goalScorer);
+
+  if (!prediction) {
+    return undefined;
+  }
+
+  return prediction.goalScorer;
+};
+
+export const getLastGameWeek = (previousGameWeeks: Array<LeagueGameWeek> | undefined): LeagueGameWeek | undefined => {
+  if (!previousGameWeeks || previousGameWeeks.length === 0) {
+    return undefined;
+  }
+
+  return previousGameWeeks[previousGameWeeks.length - 1];
 };

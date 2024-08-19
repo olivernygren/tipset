@@ -29,11 +29,12 @@ interface GamePredictorProps {
   predictionValue?: Prediction;
   loading?: boolean;
   anyFixtureHasPredictGoalScorer: boolean;
+  previousGameWeekPredictedGoalScorer?: Player;
 }
 
 const GamePredictor = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, hasPredicted, predictionValue, loading, anyFixtureHasPredictGoalScorer,
+  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, hasPredicted, predictionValue, loading, anyFixtureHasPredictGoalScorer, previousGameWeekPredictedGoalScorer,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -284,6 +285,7 @@ const GamePredictor = ({
           onSave={(players) => handleUpdatePlayerPrediction(players[0])}
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
           initialSelectedPlayers={[predictedPlayerToScore]}
+          previousGameWeekPredictedGoalScorer={previousGameWeekPredictedGoalScorer}
         />
       )}
     </>

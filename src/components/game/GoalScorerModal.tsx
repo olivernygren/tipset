@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import {
-  CheckCircle, Circle, Funnel, XCircle,
+  CheckCircle, Circle, Funnel, Info, XCircle,
 } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
 import { GeneralPositionEnum, Player } from '../../utils/Players';
-import { HeadingsTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
 import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
@@ -15,6 +15,7 @@ import Input from '../input/Input';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import TextButton from '../buttons/TextButton';
 import Tag from '../tag/Tag';
+import { Section } from '../section/Section';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
@@ -22,6 +23,7 @@ interface GoalScorerModalProps {
   players: Array<Player>;
   initialSelectedPlayers?: Array<Player | undefined>;
   multiple?: boolean;
+  previousGameWeekPredictedGoalScorer?: Player | undefined;
 }
 
 enum FilterEnum {
@@ -31,7 +33,7 @@ enum FilterEnum {
 }
 
 const GoalScorerModal = ({
-  onSave, onClose, players, initialSelectedPlayers, multiple,
+  onSave, onClose, players, initialSelectedPlayers, multiple, previousGameWeekPredictedGoalScorer,
 }: GoalScorerModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -44,6 +46,7 @@ const GoalScorerModal = ({
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
+  const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
 
   useEffect(() => {
     const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
@@ -92,6 +95,7 @@ const GoalScorerModal = ({
       hasPlayerPicture={Boolean(player.picture)}
       onClick={() => handlePlayerClick(player)}
       isSelected={isPlayerIsSelected(player)}
+      disabled={wasLastWeeksSelectedGoalScorer(player)}
     >
       <PlayerInfo>
         {player.picture && (
@@ -101,9 +105,10 @@ const GoalScorerModal = ({
             size={AvatarSize.M}
             objectFit="cover"
             showBorder
+            opacity={wasLastWeeksSelectedGoalScorer(player) ? 0.4 : 1}
           />
         )}
-        <NormalTypography variant="m">
+        <NormalTypography variant="m" color={wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silver : theme.colors.textDefault}>
           {player.name}
         </NormalTypography>
       </PlayerInfo>
@@ -116,9 +121,9 @@ const GoalScorerModal = ({
               hover: theme.colors.primary,
               active: theme.colors.primary,
             } : {
-              normal: theme.colors.silverDarker,
-              hover: theme.colors.textDefault,
-              active: theme.colors.textDefault,
+              normal: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.silverDarker,
+              hover: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
+              active: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
             }
         }
           onClick={() => handlePlayerClick(player)}
@@ -193,6 +198,27 @@ const GoalScorerModal = ({
         )}
       </ModalToolBar>
       <ModalContent>
+        {previousGameWeekPredictedGoalScorer && (
+          <PreviousGoalScorer>
+            <Section flexDirection="row" gap="xxs" alignItems="center">
+              <Info size={24} color={theme.colors.silverDarker} weight="fill" />
+              <HeadingsTypography variant="h6" color={theme.colors.silverDarker}>Välj en ny målskytt</HeadingsTypography>
+            </Section>
+            <Section flexDirection="column" gap="xxxs" padding={`0 0 0 ${theme.spacing.l}`}>
+              <NormalTypography variant="s" color={theme.colors.silverDarker}>
+                Kom ihåg att du inte kan välja samma målskytt som förra omgången
+              </NormalTypography>
+              <Section flexDirection="row" alignItems="center" gap="xxs">
+                <NormalTypography variant="s" color={theme.colors.silverDarker}>
+                  Förra omgången valde du:
+                </NormalTypography>
+                <EmphasisTypography variant="s" color={theme.colors.silverDarker}>
+                  {previousGameWeekPredictedGoalScorer.name}
+                </EmphasisTypography>
+              </Section>
+            </Section>
+          </PreviousGoalScorer>
+        )}
         {selectedFilters.includes(FilterEnum.DEFENDERS) && defenders.length > 0 && (
           <PositionContainer>
             <HeadingsTypography variant="h5">{`Försvarare (${defenderGoalPoints}p)`}</HeadingsTypography>
@@ -267,19 +293,26 @@ const FiltersContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const PlayerItem = styled.div<{ hasPlayerPicture: boolean, isSelected?: boolean }>`
+const PlayerItem = styled.div<{ hasPlayerPicture: boolean, isSelected?: boolean, disabled?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: ${({ hasPlayerPicture }) => (hasPlayerPicture ? `0 ${theme.spacing.xs} 0 ${theme.spacing.xxxs}` : `${theme.spacing.xxs} ${theme.spacing.xs}`)};
   box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
   border-radius: ${theme.borderRadius.m};
-  background-color: ${({ isSelected }) => (isSelected ? theme.colors.primaryFade : theme.colors.silverBleach)};
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid ${({ isSelected }) => (isSelected ? theme.colors.primaryLighter : theme.colors.silverLight)};
   transition: background-color 0.2s;
+  
+  ${({ disabled, isSelected }) => (disabled ? css`
+    background-color: ${theme.colors.silverLighter};
+    border: 1px solid ${theme.colors.silverLight};
+    pointer-events: none;
+  ` : css`
+    background-color: ${isSelected ? theme.colors.primaryFade : theme.colors.silverBleach};
+    border: 1px solid ${isSelected ? theme.colors.primaryLighter : theme.colors.silverLight};
+  `)};
 `;
 
 const PlayerInfo = styled.div`
@@ -327,5 +360,17 @@ const ButtonsContainer = styled.div`
 `;
 
 const IconButtonContainer = styled.div``;
+
+const PreviousGoalScorer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  flex-direction: column;
+  padding: ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.m};
+  background-color: ${theme.colors.silverBleach};
+  border: 1px solid ${theme.colors.silverLight};
+  width: 100%;
+  box-sizing: border-box;
+`;
 
 export default GoalScorerModal;
