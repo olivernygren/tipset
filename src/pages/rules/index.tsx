@@ -29,7 +29,7 @@ const RulesPage = () => {
             <NormalTypography variant="m">1 poäng för rätt målskillnad (t.ex. du tippar 2-1 men matchen slutar 1-0)</NormalTypography>
             <NormalTypography variant="m">1 extra poäng för exakt rätt resultat</NormalTypography>
             <HeadingsTypography variant="h5">Poäng för målskytt</HeadingsTypography>
-            <NormalTypography variant="m">Antalet poäng du får om du tippar rätt målskytt i en match avgörs av vilken position spelaren du tippat har. Försvarare har statistiskt sätt minst chans att göra mål, därefter mittfältare och sedan anfallare som oftast gör mål. Du blir alltså belönad om du lyckas pricka in en spelare som statistiskt sätt har en mindre chans att bli målskytt. Poäng delas ut OM spelaren gör mål i matchen, det spelar alltså ingen roll hur många mål spelaren gör.</NormalTypography>
+            <NormalTypography variant="m">Antalet poäng du får om du tippar rätt målskytt i en match avgörs av vilken position spelaren du tippat har. Försvarare har statistiskt sätt minst chans att göra mål, därefter mittfältare och sedan anfallare som oftast gör mål. Du blir alltså belönad om du lyckas pricka in en spelare som statistiskt sätt har en mindre chans att bli målskytt. Poäng delas ut OM spelaren gör mål i matchen, det spelar alltså ingen roll hur många mål spelaren gör. Du kan INTE välja samma målskytt två omgångar i rad.</NormalTypography>
             <NormalTypography variant="m">
               {defenderGoalPoints}
               {' '}
