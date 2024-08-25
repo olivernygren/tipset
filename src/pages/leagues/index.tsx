@@ -305,7 +305,7 @@ const PredictionLeaguesPage = () => {
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
         {!currentUserId && (
-          <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
+          <NormalTypography variant="m" color={theme.colors.silverDarker}>Hämtar... Om du inte är inloggad, logga in för att se och gå med i ligor</NormalTypography>
         )}
         {fetchLoading && currentUserId && getSkeletonLoader()}
         {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
