@@ -35,7 +35,7 @@ const PlayerRatingModal = ({
   const [assists, setAssists] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log('keke', setRating, setGoalsScored, setAssists, ratings);
+  console.log(ratings);
 
   const handleSavePlayerRating = async () => {
     if (!opponent || !gameDate) {

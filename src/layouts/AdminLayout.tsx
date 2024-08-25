@@ -2,18 +2,22 @@ import React from 'react';
 import styled from 'styled-components';
 import AdminSidebar from '../components/sidebar/AdminSidebar';
 import { theme } from '../theme';
+import RootToast from '../components/toast/RootToast';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => (
-  <AdminPageLayout>
-    <AdminSidebar />
-    <PageContent>
-      {children}
-    </PageContent>
-  </AdminPageLayout>
+  <>
+    <AdminPageLayout>
+      <AdminSidebar />
+      <PageContent>
+        {children}
+      </PageContent>
+    </AdminPageLayout>
+    <RootToast />
+  </>
 );
 
 const AdminPageLayout = styled.div`

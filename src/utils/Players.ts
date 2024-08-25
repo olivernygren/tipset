@@ -161,6 +161,7 @@ export enum ArsenalPlayersEnum {
   THOMAS_PARTEY = 'Thomas Partey',
   DECLAN_RICE = 'Declan Rice',
   JORGINHO = 'Jorginho',
+  ETHAN_NWANERI = 'Ethan Nwaneri',
   FABIO_VIEIRA = 'Fabio Vieira',
   MARTIN_ODEGAARD = 'Martin Ødegaard',
   BUKAYO_SAKA = 'Bukayo Saka',
@@ -200,6 +201,7 @@ export enum IFKGoteborgPlayersEnum {
   SULEIMAN_ABDULLAHI = 'Suleiman Abdullahi',
   LINUS_CARLSTRAND = 'Linus Carlstrand',
   LAURS_SKJELLERUP = 'Laurs Skjellerup',
+  NIKOLAI_BADEN = 'Nikolai Baden',
 }
 
 export const ArsenalPlayers: Array<Player> = [
@@ -367,6 +369,18 @@ export const ArsenalPlayers: Array<Player> = [
     age: 32,
     country: CountryEnum.ITALY,
     picture: '/images/players/jorginho.png',
+  },
+  {
+    id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
+    name: ArsenalPlayersEnum.ETHAN_NWANERI,
+    position: {
+      exact: ExactPositionEnum.CM,
+      general: GeneralPositionEnum.MF,
+    },
+    number: 53,
+    age: getAgeByBirthDate('2007-03-21'),
+    country: CountryEnum.ENGLAND,
+    picture: '/images/players/ethan-nwaneri.png',
   },
   {
     id: 'rh27tg9fofh9w4ghnfoif',
