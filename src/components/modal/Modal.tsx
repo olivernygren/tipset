@@ -85,9 +85,9 @@ const Modal = ({
 const getModalPadding = (noPadding?: boolean, headerDivider?: boolean, isMobile?: boolean) => {
   if (noPadding) return '0';
 
-  if (isMobile) return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.l}`;
+  if (isMobile) return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}`;
 
-  return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m}`;
+  return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`;
 };
 
 const getBorderRadius = (mobileBottomSheet?: boolean, mobileFullScreen?: boolean) => {

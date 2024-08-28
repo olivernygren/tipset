@@ -161,6 +161,7 @@ export enum ArsenalPlayersEnum {
   THOMAS_PARTEY = 'Thomas Partey',
   DECLAN_RICE = 'Declan Rice',
   JORGINHO = 'Jorginho',
+  MIKEL_MERINO = 'Mikel Merino',
   ETHAN_NWANERI = 'Ethan Nwaneri',
   FABIO_VIEIRA = 'Fabio Vieira',
   MARTIN_ODEGAARD = 'Martin Ødegaard',
@@ -371,6 +372,18 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/jorginho.png',
   },
   {
+    id: 'ghi9q3hf84y98hr489dw',
+    name: ArsenalPlayersEnum.MIKEL_MERINO,
+    position: {
+      exact: ExactPositionEnum.CM,
+      general: GeneralPositionEnum.MF,
+    },
+    number: 23,
+    age: getAgeByBirthDate('1996-06-22'),
+    country: CountryEnum.SPAIN,
+    picture: '/images/players/mikel-merino.png',
+  },
+  {
     id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
     name: ArsenalPlayersEnum.ETHAN_NWANERI,
     position: {
@@ -382,18 +395,18 @@ export const ArsenalPlayers: Array<Player> = [
     country: CountryEnum.ENGLAND,
     picture: '/images/players/ethan-nwaneri.png',
   },
-  {
-    id: 'rh27tg9fofh9w4ghnfoif',
-    name: ArsenalPlayersEnum.FABIO_VIEIRA,
-    position: {
-      exact: ExactPositionEnum.CAM,
-      general: GeneralPositionEnum.MF,
-    },
-    number: 21,
-    age: 24,
-    country: CountryEnum.PORTUGAL,
-    picture: '/images/players/fabio-vieira.png',
-  },
+  // {
+  //   id: 'rh27tg9fofh9w4ghnfoif',
+  //   name: ArsenalPlayersEnum.FABIO_VIEIRA,
+  //   position: {
+  //     exact: ExactPositionEnum.CAM,
+  //     general: GeneralPositionEnum.MF,
+  //   },
+  //   number: 21,
+  //   age: 24,
+  //   country: CountryEnum.PORTUGAL,
+  //   picture: '/images/players/fabio-vieira.png',
+  // },
   {
     id: 'mwokepoe2yr4wr8yr4owru',
     name: ArsenalPlayersEnum.MARTIN_ODEGAARD,

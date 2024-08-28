@@ -26,6 +26,9 @@ export enum LeagueEnum {
   UKRAINIAN_PREMIER_LEAGUE = 'Ukrainian Premier League',
   SCOTTISH_PREMIERSHIP = 'Scottish Premiership',
   AUSTRIAN_BUNDESLIGA = 'Austrian Bundesliga',
+  SWISS_SUPER_LEAGUE = 'Swiss Super League',
+  CZECH_FIRST_LEAGUE = 'Czech First League',
+  CROATIAN_FIRST_FOOTBALL_LEAGUE = 'Prva HNL',
   NATIONS = 'Landslag',
 }
 
@@ -579,7 +582,7 @@ export const Teams = {
     },
     {
       name: 'Empoli',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/ed/Empoli_FC_logo.svg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Empoli_FC.png',
       stadium: 'Stadio Carlo Castellani',
       country: CountryEnum.ITALY,
     },
@@ -961,6 +964,69 @@ export const Teams = {
       country: CountryEnum.PORTUGAL,
     },
   ],
+  [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
+    {
+      name: 'Club Brugge',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Club_Brugge_KV_logo.svg',
+      stadium: 'Jan Breydel Stadium',
+      country: CountryEnum.BELGIUM,
+    },
+  ],
+  [LeagueEnum.UKRAINIAN_PREMIER_LEAGUE]: [
+    {
+      name: 'Shakhtar Donetsk',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a1/FC_Shakhtar_Donetsk.svg',
+      stadium: 'Volksparkstadion',
+      country: CountryEnum.UKRAINE,
+    },
+  ],
+  [LeagueEnum.SCOTTISH_PREMIERSHIP]: [
+    {
+      name: 'Celtic',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/71/Celtic_FC_crest.svg',
+      stadium: 'Celtic Park',
+      country: CountryEnum.SCOTLAND,
+    },
+  ],
+  [LeagueEnum.AUSTRIAN_BUNDESLIGA]: [
+    {
+      name: 'Red Bull Salzburg',
+      shortName: 'RB Salzburg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/77/FC_Red_Bull_Salzburg_logo.svg',
+      stadium: 'Red Bull Arena',
+      country: CountryEnum.AUSTRIA,
+    },
+    {
+      name: 'Sturm Graz',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/91/SK_Sturm_Graz_logo.svg',
+      stadium: 'Merkur Arena',
+      country: CountryEnum.AUSTRIA,
+    },
+  ],
+  [LeagueEnum.SWISS_SUPER_LEAGUE]: [
+    {
+      name: 'Young Boys',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6b/BSC_Young_Boys_logo.svg',
+      stadium: 'Wankdorf Stadium',
+      country: CountryEnum.SWITZERLAND,
+    },
+  ],
+  [LeagueEnum.CZECH_FIRST_LEAGUE]: [
+    {
+      name: 'Sparta Prag',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/AC-Sparta-LOGO2021.svg',
+      stadium: 'epet ARENA',
+      country: CountryEnum.CZECH_REPUBLIC,
+    },
+  ],
+  [LeagueEnum.CROATIAN_FIRST_FOOTBALL_LEAGUE]: [
+    {
+      name: 'Dinamo Zagreb',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Dinamo_Zagreb_logo.png',
+      stadium: 'Stadion Maksimir',
+      country: CountryEnum.CROATIA,
+    },
+  ],
   [LeagueEnum.NATIONS]: [
     {
       name: 'England',
@@ -1050,37 +1116,13 @@ export const Teams = {
       name: 'Japan',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg',
     },
-  ],
-  [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
     {
-      name: 'Club Brugge',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Club_Brugge_KV_logo.svg',
-      stadium: 'Jan Breydel Stadium',
-      country: CountryEnum.BELGIUM,
+      name: 'Tjeckien',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg',
     },
-  ],
-  [LeagueEnum.UKRAINIAN_PREMIER_LEAGUE]: [
     {
-      name: 'Shakhtar Donetsk',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a1/FC_Shakhtar_Donetsk.svg',
-      stadium: 'Volksparkstadion',
-      country: CountryEnum.UKRAINE,
-    },
-  ],
-  [LeagueEnum.SCOTTISH_PREMIERSHIP]: [
-    {
-      name: 'Celtic',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/71/Celtic_FC_crest.svg',
-      stadium: 'Celtic Park',
-      country: CountryEnum.SCOTLAND,
-    },
-  ],
-  [LeagueEnum.AUSTRIAN_BUNDESLIGA]: [
-    {
-      name: 'Sturm Graz',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/91/SK_Sturm_Graz_logo.svg',
-      stadium: 'Merkur Arena',
-      country: CountryEnum.AUSTRIA,
+      name: 'Kroatien',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg',
     },
   ],
 };

@@ -185,6 +185,7 @@ const GoalScorerModal = ({
           <TextButton
             icon={showFilters ? <XCircle size={24} color={theme.colors.primary} /> : <Funnel size={24} color={theme.colors.primary} />}
             onClick={() => setShowFilters(!showFilters)}
+            noPadding={isMobile}
           >
             Filtrera
           </TextButton>
@@ -275,6 +276,10 @@ const ModalToolBar = styled.div`
   gap: ${theme.spacing.xs};
   border-bottom: 1px solid ${theme.colors.silverLight};
   padding: ${theme.spacing.s} ${theme.spacing.m};
+
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.s} ${theme.spacing.l};
+  }
 `;
 
 const ModalToolBarTopRow = styled.div`
