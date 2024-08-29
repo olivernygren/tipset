@@ -14,6 +14,7 @@ export interface Team {
 
 export enum LeagueEnum {
   PREMIER_LEAGUE = 'Premier League',
+  EFL_LEAGUE_ONE = 'EFL League One',
   ALLSVENSKAN = 'Allsvenskan',
   LA_LIGA = 'La Liga',
   SERIE_A = 'Serie A',
@@ -29,6 +30,8 @@ export enum LeagueEnum {
   SWISS_SUPER_LEAGUE = 'Swiss Super League',
   CZECH_FIRST_LEAGUE = 'Czech First League',
   CROATIAN_FIRST_FOOTBALL_LEAGUE = 'Prva HNL',
+  SLOVAK_1_LIGA = 'Niké Liga',
+  SERBIAN_SUPER_LIGA = 'Serbian SuperLiga',
   NATIONS = 'Landslag',
 }
 
@@ -258,6 +261,15 @@ export const Teams = {
       name: 'Fulham',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg',
       stadium: 'Craven Cottage',
+      country: CountryEnum.ENGLAND,
+    },
+  ],
+  [LeagueEnum.EFL_LEAGUE_ONE]: [
+    {
+      name: 'Bolton Wanderers',
+      shortName: 'Bolton',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/82/Bolton_Wanderers_FC_logo.svg',
+      stadium: 'University of Bolton Stadium',
       country: CountryEnum.ENGLAND,
     },
   ],
@@ -1027,6 +1039,24 @@ export const Teams = {
       country: CountryEnum.CROATIA,
     },
   ],
+  [LeagueEnum.SLOVAK_1_LIGA]: [
+    {
+      name: 'Slovan Bratislava',
+      shortName: 'S. Bratislava',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/01/SK_Slovan_Bratislava_logo.svg',
+      stadium: 'Tehelné pole',
+      country: CountryEnum.SLOVAKIA,
+    },
+  ],
+  [LeagueEnum.SERBIAN_SUPER_LIGA]: [
+    {
+      name: 'Crvena Zvezda',
+      shortName: 'Red Star',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Grb-fk-crvena-zvezda.svg',
+      stadium: 'Rajko Mitić Stadium',
+      country: CountryEnum.SERBIA,
+    },
+  ],
   [LeagueEnum.NATIONS]: [
     {
       name: 'England',
@@ -1123,6 +1153,14 @@ export const Teams = {
     {
       name: 'Kroatien',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg',
+    },
+    {
+      name: 'Slovakien',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg',
+    },
+    {
+      name: 'Serbien',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg',
     },
   ],
 };
