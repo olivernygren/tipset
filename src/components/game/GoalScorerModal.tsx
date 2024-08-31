@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-  CheckCircle, Circle, Funnel, Info, XCircle,
+  Ambulance,
+  CheckCircle, Circle, Funnel, Info, Square, XCircle,
 } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
@@ -47,6 +48,7 @@ const GoalScorerModal = ({
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
+  const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended;
 
   useEffect(() => {
     const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
@@ -95,7 +97,7 @@ const GoalScorerModal = ({
       hasPlayerPicture={Boolean(player.picture)}
       onClick={() => handlePlayerClick(player)}
       isSelected={isPlayerIsSelected(player)}
-      disabled={wasLastWeeksSelectedGoalScorer(player)}
+      disabled={isPlayerItemDisabled(player)}
     >
       <PlayerInfo>
         {player.picture && (
@@ -108,14 +110,24 @@ const GoalScorerModal = ({
             opacity={wasLastWeeksSelectedGoalScorer(player) ? 0.4 : 1}
           />
         )}
-        <NormalTypography variant="m" color={wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silver : theme.colors.textDefault}>
+        <NormalTypography variant="m" color={isPlayerItemDisabled(player) ? theme.colors.silver : theme.colors.textDefault}>
           {player.name}
         </NormalTypography>
       </PlayerInfo>
       <IconButtonContainer onClick={(e) => e.stopPropagation()}>
-        <IconButton
-          icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
-          colors={
+        {isPlayerItemDisabled(player) ? (
+          <IconContainer>
+            {player.isInjured && (
+              <Ambulance size={24} color={theme.colors.redDark} weight="fill" />
+            )}
+            {player.isSuspended && (
+              <Square size={24} color={theme.colors.redDark} weight="fill" />
+            )}
+          </IconContainer>
+        ) : (
+          <IconButton
+            icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
+            colors={
             isPlayerIsSelected(player) ? {
               normal: theme.colors.primary,
               hover: theme.colors.primary,
@@ -125,9 +137,10 @@ const GoalScorerModal = ({
               hover: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
               active: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
             }
-        }
-          onClick={() => handlePlayerClick(player)}
-        />
+          }
+            onClick={() => handlePlayerClick(player)}
+          />
+        )}
       </IconButtonContainer>
     </PlayerItem>
   );
@@ -376,6 +389,13 @@ const PreviousGoalScorer = styled.div`
   border: 1px solid ${theme.colors.silverLight};
   width: 100%;
   box-sizing: border-box;
+`;
+
+const IconContainer = styled.div`
+  margin-right: ${theme.spacing.xxs};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default GoalScorerModal;

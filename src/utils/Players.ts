@@ -93,6 +93,8 @@ export interface Player {
   age: number;
   country: CountryEnum;
   picture?: string;
+  isInjured?: boolean;
+  isSuspended?: boolean;
 }
 
 export interface PlayerRating {
@@ -146,7 +148,7 @@ export const getAgeByBirthDate = (birthDate: string): number => {
 
 export enum ArsenalPlayersEnum {
   DAVID_RAYA = 'David Raya',
-  AARON_RAMSDALE = 'Aaron Ramsdale',
+  NETO = 'Neto',
   KARL_HEIN = 'Karl Hein',
   TOM_SETFORD = 'Tom Setford',
   BEN_WHITE = 'Ben White',
@@ -163,15 +165,15 @@ export enum ArsenalPlayersEnum {
   JORGINHO = 'Jorginho',
   MIKEL_MERINO = 'Mikel Merino',
   ETHAN_NWANERI = 'Ethan Nwaneri',
-  FABIO_VIEIRA = 'Fabio Vieira',
+  // FABIO_VIEIRA = 'Fabio Vieira',
   MARTIN_ODEGAARD = 'Martin Ødegaard',
   BUKAYO_SAKA = 'Bukayo Saka',
-  REISS_NELSON = 'Reiss Nelson',
+  RAHEEM_STERLING = 'Raheem Sterling',
+  // REISS_NELSON = 'Reiss Nelson',
   GABRIEL_MARTINELLI = 'Gabriel Martinelli',
   LEANDRO_TROSSARD = 'Leandro Trossard',
   KAI_HAVERTZ = 'Kai Havertz',
   GABRIEL_JESUS = 'Gabriel Jesus',
-  EDDIE_NKETIAH = 'Eddie Nketiah',
 }
 
 export enum IFKGoteborgPlayersEnum {
@@ -219,17 +221,29 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/david-raya.png',
   },
   {
-    id: 'e8fg8wgr4hrw9frtw9hd',
-    name: ArsenalPlayersEnum.AARON_RAMSDALE,
+    id: 'rh924ghrt42ihnfro2rhty43o8',
+    name: ArsenalPlayersEnum.NETO,
     position: {
       exact: ExactPositionEnum.GK,
       general: GeneralPositionEnum.GK,
     },
-    number: 1,
-    age: 26,
-    country: CountryEnum.ENGLAND,
-    picture: '/images/players/aaron-ramsdale.png',
+    number: 13,
+    age: 35,
+    country: CountryEnum.BRAZIL,
+    picture: '/images/players/neto.png',
   },
+  // {
+  //   id: 'e8fg8wgr4hrw9frtw9hd',
+  //   name: ArsenalPlayersEnum.AARON_RAMSDALE,
+  //   position: {
+  //     exact: ExactPositionEnum.GK,
+  //     general: GeneralPositionEnum.GK,
+  //   },
+  //   number: 1,
+  //   age: 26,
+  //   country: CountryEnum.ENGLAND,
+  //   picture: '/images/players/aaron-ramsdale.png',
+  // },
   // {
   //   id: 'uewbfouwr48of938hf93',
   //   name: ArsenalPlayersEnum.KARL_HEIN,
@@ -264,6 +278,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.JAPAN,
     picture: '/images/players/takehiro-tomiyasu.png',
+    isInjured: true,
   }, {
     id: 'fhwefh9hrrh94ofof',
     name: ArsenalPlayersEnum.JURRIEN_TIMBER,
@@ -358,6 +373,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
+    isSuspended: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
@@ -382,6 +398,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1996-06-22'),
     country: CountryEnum.SPAIN,
     picture: '/images/players/mikel-merino.png',
+    isInjured: true,
   },
   {
     id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
@@ -432,17 +449,30 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/bukayo-saka.png',
   },
   {
-    id: '83rtgfjwheg9heo9rowdw',
-    name: ArsenalPlayersEnum.REISS_NELSON,
+    id: 'ehfiehre923rh4or98hotw9',
+    name: ArsenalPlayersEnum.RAHEEM_STERLING,
     position: {
       exact: ExactPositionEnum.RW,
       general: GeneralPositionEnum.FW,
     },
-    number: 24,
-    age: 24,
+    number: 10,
+    age: 29,
     country: CountryEnum.ENGLAND,
-    picture: '/images/players/reiss-nelson.png',
-  }, {
+    picture: '/images/players/raheem-sterling.png',
+  },
+  // {
+  //   id: '83rtgfjwheg9heo9rowdw',
+  //   name: ArsenalPlayersEnum.REISS_NELSON,
+  //   position: {
+  //     exact: ExactPositionEnum.RW,
+  //     general: GeneralPositionEnum.FW,
+  //   },
+  //   number: 24,
+  //   age: 24,
+  //   country: CountryEnum.ENGLAND,
+  //   picture: '/images/players/reiss-nelson.png',
+  // },
+  {
     id: 'fhty9ejpqrnoiwthrhj',
     name: ArsenalPlayersEnum.GABRIEL_MARTINELLI,
     position: {
@@ -488,18 +518,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-jesus.png',
-  },
-  {
-    id: 'v14se6fvewhwe9rgqrh9',
-    name: ArsenalPlayersEnum.EDDIE_NKETIAH,
-    position: {
-      exact: ExactPositionEnum.ST,
-      general: GeneralPositionEnum.FW,
-    },
-    number: 14,
-    age: 25,
-    country: CountryEnum.ENGLAND,
-    picture: '/images/players/eddie-nketiah.png',
+    isInjured: true,
   },
 ];
 
