@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   addDoc, collection, doc, updateDoc,
 } from 'firebase/firestore';
 import { CheckCircle, Circle } from '@phosphor-icons/react';
-import { Player, PlayerRating, PlayerRatingInput } from '../../utils/Players';
+import {
+  Player, PlayerRating, PlayerRatingInput, Rating,
+} from '../../utils/Players';
 import Modal from '../modal/Modal';
 import { devices, theme } from '../../theme';
-import { HeadingsTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { Team } from '../../utils/Team';
 import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
@@ -15,18 +17,18 @@ import { CollectionEnum } from '../../utils/Firebase';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import IconButton from '../buttons/IconButton';
 import Input from '../input/Input';
+import { getPlayerMonthlyRating } from '../../utils/playerRatingHelpers';
 
 interface PlayerRatingModalProps {
   onClose: () => void;
   player: Player;
   playerRatingObject: PlayerRating | undefined;
-  ratings: Array<PlayerRating>;
   opponent?: Team | undefined;
   gameDate?: Date;
 }
 
 const PlayerRatingModal = ({
-  onClose, player, playerRatingObject, opponent, ratings, gameDate,
+  onClose, player, playerRatingObject, opponent, gameDate,
 }: PlayerRatingModalProps) => {
   const [startingAppearance, setStartingAppearance] = useState<boolean>(false);
   const [substituteAppearance, setSubstituteAppearance] = useState<boolean>(false);
@@ -34,8 +36,31 @@ const PlayerRatingModal = ({
   const [goalsScored, setGoalsScored] = useState<number>(0);
   const [assists, setAssists] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [allPlayerRatings, setAllPlayerRatings] = useState<Array<Array<Rating>>>([[]]);
 
-  console.log(ratings);
+  useEffect(() => {
+    const getPlayerRatings = () => {
+      if (!playerRatingObject || !playerRatingObject.ratings || playerRatingObject.ratings.length === 0) return [];
+
+      const ratingsByMonth = new Map<string, Array<Rating>>();
+
+      playerRatingObject.ratings.forEach((rating) => {
+        const date = new Date(rating.date);
+        const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
+
+        if (!ratingsByMonth.has(monthYear)) {
+          ratingsByMonth.set(monthYear, []);
+        }
+
+        ratingsByMonth.get(monthYear)!.push(rating);
+      });
+
+      return Array.from(ratingsByMonth.values());
+    };
+
+    const ratings = getPlayerRatings();
+    setAllPlayerRatings(ratings);
+  }, []);
 
   const handleSavePlayerRating = async () => {
     if (!opponent || !gameDate) {
@@ -121,6 +146,7 @@ const PlayerRatingModal = ({
       }
     } catch (error) {
       console.error(error);
+      errorNotify('Något gick fel');
       setLoading(false);
     }
   };
@@ -148,108 +174,127 @@ const PlayerRatingModal = ({
     >
       <ModalContent>
         {gameDate && opponent && (
-          <OpponentContainer>
-            <HeadingsTypography variant="h5">Motståndare</HeadingsTypography>
-            <NormalTypography variant="m">{opponent.name}</NormalTypography>
-          </OpponentContainer>
+          <>
+            <OpponentContainer>
+              <HeadingsTypography variant="h5">Motståndare</HeadingsTypography>
+              <NormalTypography variant="m">{opponent.name}</NormalTypography>
+            </OpponentContainer>
+            <HeadingsTypography variant="h4">Spelminuter</HeadingsTypography>
+            <AppearanceSelectionContainer>
+              <AppearanceSelector onClick={() => handleSelectAppearance('starting')} isSelected={startingAppearance}>
+                <NormalTypography variant="m">Startade matchen</NormalTypography>
+                <IconButtonContainer onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    icon={startingAppearance ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
+                    colors={startingAppearance ? {
+                      normal: theme.colors.primary,
+                      hover: theme.colors.primary,
+                      active: theme.colors.primary,
+                    } : {
+                      normal: theme.colors.silverDarker,
+                      hover: theme.colors.textDefault,
+                      active: theme.colors.textDefault,
+                    }}
+                    onClick={() => handleSelectAppearance('starting')}
+                  />
+                </IconButtonContainer>
+              </AppearanceSelector>
+              <AppearanceSelector onClick={() => handleSelectAppearance('substitute')} isSelected={substituteAppearance}>
+                <NormalTypography variant="m">Hoppade in</NormalTypography>
+                <IconButtonContainer onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    icon={substituteAppearance ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
+                    colors={substituteAppearance ? {
+                      normal: theme.colors.primary,
+                      hover: theme.colors.primary,
+                      active: theme.colors.primary,
+                    } : {
+                      normal: theme.colors.silverDarker,
+                      hover: theme.colors.textDefault,
+                      active: theme.colors.textDefault,
+                    }}
+                    onClick={() => handleSelectAppearance('substitute')}
+                  />
+                </IconButtonContainer>
+              </AppearanceSelector>
+              <AppearanceSelector onClick={() => handleSelectAppearance('none')} isSelected={!startingAppearance && !substituteAppearance}>
+                <NormalTypography variant="m">Spelade inte</NormalTypography>
+                <IconButtonContainer onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    icon={!(startingAppearance || substituteAppearance) ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
+                    colors={!(startingAppearance || substituteAppearance) ? {
+                      normal: theme.colors.primary,
+                      hover: theme.colors.primary,
+                      active: theme.colors.primary,
+                    } : {
+                      normal: theme.colors.silverDarker,
+                      hover: theme.colors.textDefault,
+                      active: theme.colors.textDefault,
+                    }}
+                    onClick={() => handleSelectAppearance('none')}
+                  />
+                </IconButtonContainer>
+              </AppearanceSelector>
+            </AppearanceSelectionContainer>
+            <HeadingsTypography variant="h4">Betyg & Statistik</HeadingsTypography>
+            <InputsContainer>
+              <Input
+                label="Mål"
+                type="number"
+                value={goalsScored.toString()}
+                onChange={(e) => setGoalsScored(Number(e.target.value))}
+                fullWidth
+              />
+              <Input
+                label="Assist"
+                type="number"
+                value={assists.toString()}
+                onChange={(e) => setAssists(Number(e.target.value))}
+                fullWidth
+              />
+              <Input
+                label="Betyg"
+                type="number"
+                value={rating.toString()}
+                onChange={(e) => setRating(Number(e.target.value))}
+                fullWidth
+              />
+            </InputsContainer>
+          </>
         )}
-        <HeadingsTypography variant="h4">Spelminuter</HeadingsTypography>
-        <AppearanceSelectionContainer>
-          <AppearanceSelector onClick={() => handleSelectAppearance('starting')} isSelected={startingAppearance}>
-            <NormalTypography variant="m">Startade matchen</NormalTypography>
-            <IconButtonContainer onClick={(e) => e.stopPropagation()}>
-              <IconButton
-                icon={startingAppearance ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
-                colors={
-                startingAppearance ? {
-                  normal: theme.colors.primary,
-                  hover: theme.colors.primary,
-                  active: theme.colors.primary,
-                } : {
-                  normal: theme.colors.silverDarker,
-                  hover: theme.colors.textDefault,
-                  active: theme.colors.textDefault,
-                }
-              }
-                onClick={() => handleSelectAppearance('starting')}
-              />
-            </IconButtonContainer>
-          </AppearanceSelector>
-          <AppearanceSelector onClick={() => handleSelectAppearance('substitute')} isSelected={substituteAppearance}>
-            <NormalTypography variant="m">Hoppade in</NormalTypography>
-            <IconButtonContainer onClick={(e) => e.stopPropagation()}>
-              <IconButton
-                icon={substituteAppearance ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
-                colors={
-                substituteAppearance ? {
-                  normal: theme.colors.primary,
-                  hover: theme.colors.primary,
-                  active: theme.colors.primary,
-                } : {
-                  normal: theme.colors.silverDarker,
-                  hover: theme.colors.textDefault,
-                  active: theme.colors.textDefault,
-                }
-              }
-                onClick={() => handleSelectAppearance('substitute')}
-              />
-            </IconButtonContainer>
-          </AppearanceSelector>
-          <AppearanceSelector onClick={() => handleSelectAppearance('none')} isSelected={!startingAppearance && !substituteAppearance}>
-            <NormalTypography variant="m">Spelade inte</NormalTypography>
-            <IconButtonContainer onClick={(e) => e.stopPropagation()}>
-              <IconButton
-                icon={!(startingAppearance || substituteAppearance) ? <CheckCircle size={24} weight="fill" color={theme.colors.primary} /> : <Circle size={24} color={theme.colors.primary} />}
-                colors={
-                !(startingAppearance || substituteAppearance) ? {
-                  normal: theme.colors.primary,
-                  hover: theme.colors.primary,
-                  active: theme.colors.primary,
-                } : {
-                  normal: theme.colors.silverDarker,
-                  hover: theme.colors.textDefault,
-                  active: theme.colors.textDefault,
-                }
-              }
-                onClick={() => handleSelectAppearance('none')}
-              />
-            </IconButtonContainer>
-          </AppearanceSelector>
-        </AppearanceSelectionContainer>
-        <HeadingsTypography variant="h4">Betyg & Statistik</HeadingsTypography>
-        <InputsContainer>
-          <Input
-            label="Mål"
-            type="number"
-            value={goalsScored.toString()}
-            onChange={(e) => setGoalsScored(Number(e.target.value))}
-            fullWidth
-          />
-          <Input
-            label="Assist"
-            type="number"
-            value={assists.toString()}
-            onChange={(e) => setAssists(Number(e.target.value))}
-            fullWidth
-          />
-          <Input
-            label="Betyg"
-            type="number"
-            value={rating.toString()}
-            onChange={(e) => setRating(Number(e.target.value))}
-            fullWidth
-          />
-        </InputsContainer>
-        {/* <CardGrid>
-          <Card>
-            <HeadingsTypography variant="h5" color={theme.colors.silverDark}>Nationalitet</HeadingsTypography>
-            <NationAvatar
-              flagUrl={getFlagUrlByCountryName(player.country)}
-              nationName={player.country as string}
-              size={AvatarSize.L}
-            />
-          </Card>
-        </CardGrid> */}
+        {!(gameDate && opponent) && (
+          <>
+            <NormalTypography variant="m" color={theme.colors.silverDark}>
+              Välj motståndare och datum för matchen för att kunna spara spelarbetyg
+            </NormalTypography>
+            {allPlayerRatings && allPlayerRatings.length > 0 && (
+              <>
+                <HeadingsTypography variant="h4">Tidigare betyg</HeadingsTypography>
+                  {allPlayerRatings.map((monthRating, index) => (
+                    <React.Fragment key={index}>
+                      {monthRating.length > 0 && (
+                        <MonthContainer>
+                          <HeadingsTypography variant="h6">{new Date(monthRating[0].date).toLocaleString('default', { month: 'long', year: 'numeric' })}</HeadingsTypography>
+                          <RatingsContainer>
+                            {monthRating.map((rating) => (
+                              <MatchRatingContainer key={rating.date}>
+                                <NormalTypography variant="m">{`vs ${rating.opponent}`}</NormalTypography>
+                                <NormalTypography variant="m">{rating.rating}</NormalTypography>
+                              </MatchRatingContainer>
+                            ))}
+                          </RatingsContainer>
+                          <MonthlyAverageContainer>
+                            <EmphasisTypography variant="m" color={theme.colors.white}>Månadens snitt</EmphasisTypography>
+                            <HeadingsTypography variant="h6" color={theme.colors.gold}>{getPlayerMonthlyRating(playerRatingObject, new Date(monthRating[0].date).getMonth())}</HeadingsTypography>
+                          </MonthlyAverageContainer>
+                        </MonthContainer>
+                      )}
+                    </React.Fragment>
+                  ))}
+              </>
+            )}
+          </>
+        )}
       </ModalContent>
       <ButtonsContainer>
         <Button
@@ -337,6 +382,42 @@ const OpponentContainer = styled.div`
   box-sizing: border-box;
   padding: ${theme.spacing.m} ${theme.spacing.s};
   justify-content: space-between;
+`;
+
+const RatingsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+`;
+
+const MatchRatingContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.s};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  box-sizing: border-box;
+  border: 1px solid ${theme.colors.silverLight};
+  box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.08);
+`;
+
+const MonthlyAverageContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${theme.colors.primary};
+  border-radius: ${theme.borderRadius.s};
+  padding: ${theme.spacing.xs};
+  box-sizing: border-box;
+`;
+
+const MonthContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  flex-direction: column;
 `;
 
 // const CardGrid = styled.div`

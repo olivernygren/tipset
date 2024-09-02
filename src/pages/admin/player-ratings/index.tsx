@@ -66,8 +66,6 @@ const PlayerRatingsPage = () => {
     }
   };
 
-  // Varje spelare kan klickas på för att öppna modal där betyg, mål, assist samt om spelare spelade från start eller som inhoppare kan fyllas i
-
   const getPlayer = (player: Player) => {
     const playerRating = getPlayerRatingObject(player, ratings);
 
@@ -228,7 +226,6 @@ const PlayerRatingsPage = () => {
           player={playerModalOpen}
           playerRatingObject={getPlayerRatingObject(playerModalOpen, ratings)}
           opponent={opponent}
-          ratings={ratings}
           gameDate={gameDate}
         />
       )}

@@ -8,12 +8,16 @@ export const getNumberOfAppearances = (playerRating: PlayerRating | undefined) =
 
 export const getPlayerRatingObject = (player: Player, ratingsArr: Array<PlayerRating>) => ratingsArr.find((rating) => rating.playerId === player.id);
 
-export const getPlayerMonthlyRating = (playerRating: PlayerRating | undefined) => {
+export const getPlayerMonthlyRating = (playerRating: PlayerRating | undefined, customMonth?: number) => {
   if (!playerRating || !playerRating.ratings || !playerRating.ratings.length) return '-';
 
   const currentMonth = new Date().getMonth();
-  const numberOfGamesThisMonth = playerRating.ratings.filter((rating) => new Date(rating.date).getMonth() === currentMonth).length;
-  const totalRatingThisMonth = playerRating.ratings.filter((rating) => new Date(rating.date).getMonth() === currentMonth)
+  const month = customMonth || currentMonth;
+  const numberOfGamesThisMonth = playerRating.ratings.filter((rating) => new Date(rating.date).getMonth() === month).length;
+
+  if (!numberOfGamesThisMonth) return '-';
+
+  const totalRatingThisMonth = playerRating.ratings.filter((rating) => new Date(rating.date).getMonth() === month)
     .reduce((acc, curr) => acc + curr.rating, 0);
   const averageRatingThisMonth = totalRatingThisMonth / numberOfGamesThisMonth;
   return averageRatingThisMonth.toFixed(1);
