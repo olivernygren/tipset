@@ -156,7 +156,7 @@ export enum ArsenalPlayersEnum {
   JURRIEN_TIMBER = 'Jurrien Timber',
   GABRIEL_MAGALHAES = 'Gabriel Magalhães',
   RICCARDO_CALAFIORI = 'Riccardo Calafiori',
-  WILLAIM_SALIBA = 'William Saliba',
+  WILLIAM_SALIBA = 'William Saliba',
   JAKUB_KIWIOR = 'Jakub Kiwior',
   OLEKSANDR_ZINCHENKO = 'Oleksandr Zinchenko',
   KIERAN_TIERNEY = 'Kieran Tierney',
@@ -279,11 +279,12 @@ export const ArsenalPlayers: Array<Player> = [
     country: CountryEnum.JAPAN,
     picture: '/images/players/takehiro-tomiyasu.png',
     isInjured: true,
-  }, {
+  },
+  {
     id: 'fhwefh9hrrh94ofof',
     name: ArsenalPlayersEnum.JURRIEN_TIMBER,
     position: {
-      exact: ExactPositionEnum.RB,
+      exact: ExactPositionEnum.LB,
       general: GeneralPositionEnum.DF,
     },
     number: 12,
@@ -293,7 +294,7 @@ export const ArsenalPlayers: Array<Player> = [
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
-    name: ArsenalPlayersEnum.WILLAIM_SALIBA,
+    name: ArsenalPlayersEnum.WILLIAM_SALIBA,
     position: {
       exact: ExactPositionEnum.CB,
       general: GeneralPositionEnum.DF,
@@ -338,7 +339,8 @@ export const ArsenalPlayers: Array<Player> = [
     age: 24,
     country: CountryEnum.POLAND,
     picture: '/images/players/jakub-kiwior.png',
-  }, {
+  },
+  {
     id: 'nw8fgwfbnoqr03r93hnof',
     name: ArsenalPlayersEnum.OLEKSANDR_ZINCHENKO,
     position: {
@@ -349,6 +351,18 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.UKRAINE,
     picture: '/images/players/oleksandr-zinchenko.png',
+  },
+  {
+    id: 'nw8fgwfbnoqr03r93hnof',
+    name: ArsenalPlayersEnum.KIERAN_TIERNEY,
+    position: {
+      exact: ExactPositionEnum.LB,
+      general: GeneralPositionEnum.DF,
+    },
+    number: 3,
+    age: getAgeByBirthDate('1997-06-05'),
+    country: CountryEnum.SCOTLAND,
+    picture: '/images/players/kieran-tierney.png',
   },
   {
     id: '3r6eegh129r29r1odhdmed',
@@ -435,6 +449,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.NORWAY,
     picture: '/images/players/martin-odegaard.png',
+    isInjured: true,
   },
   {
     id: 'cbwgr8h90ejqrjwf8gwrf',
@@ -495,7 +510,8 @@ export const ArsenalPlayers: Array<Player> = [
     age: 29,
     country: CountryEnum.BELGIUM,
     picture: '/images/players/leandro-trossard.png',
-  }, {
+  },
+  {
     id: '30jtgeifnqorhgwowjj9d',
     name: ArsenalPlayersEnum.KAI_HAVERTZ,
     position: {
@@ -518,7 +534,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-jesus.png',
-    isInjured: true,
   },
 ];
 
