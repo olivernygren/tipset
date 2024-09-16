@@ -233,18 +233,6 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/neto.png',
   },
   // {
-  //   id: 'e8fg8wgr4hrw9frtw9hd',
-  //   name: ArsenalPlayersEnum.AARON_RAMSDALE,
-  //   position: {
-  //     exact: ExactPositionEnum.GK,
-  //     general: GeneralPositionEnum.GK,
-  //   },
-  //   number: 1,
-  //   age: 26,
-  //   country: CountryEnum.ENGLAND,
-  //   picture: '/images/players/aaron-ramsdale.png',
-  // },
-  // {
   //   id: 'uewbfouwr48of938hf93',
   //   name: ArsenalPlayersEnum.KARL_HEIN,
   //   position: {
@@ -327,6 +315,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
     picture: '/images/players/riccardo-calafiori.png',
+    isInjured: true,
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
@@ -351,6 +340,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.UKRAINE,
     picture: '/images/players/oleksandr-zinchenko.png',
+    isInjured: true,
   },
   {
     id: 'nw8fgwfbnoqr03r93hnof',
@@ -363,6 +353,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1997-06-05'),
     country: CountryEnum.SCOTLAND,
     picture: '/images/players/kieran-tierney.png',
+    isInjured: true,
   },
   {
     id: '3r6eegh129r29r1odhdmed',
@@ -387,7 +378,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
-    isSuspended: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
@@ -470,7 +460,7 @@ export const ArsenalPlayers: Array<Player> = [
       exact: ExactPositionEnum.RW,
       general: GeneralPositionEnum.FW,
     },
-    number: 10,
+    number: 30,
     age: 29,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/raheem-sterling.png',
