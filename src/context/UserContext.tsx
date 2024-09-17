@@ -41,7 +41,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
         if (userDocSnap.exists()) {
           const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
           setUser(userWithDocId);
-          Cookies.set('user', JSON.stringify(userWithDocId), { expires: 365, secure: true, sameSite: 'strict' });
+          Cookies.set('user', JSON.stringify(userWithDocId), { expires: 365 * 3, secure: true, sameSite: 'strict' });
           if (userWithDocId?.role === 'ADMIN') {
             setHasAdminRights(true);
           }

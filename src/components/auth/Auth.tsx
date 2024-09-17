@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signInWithEmailAndPassword, signInWithPopup, updateProfile,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -79,13 +79,14 @@ const Auth = () => {
       }
 
       // Check if the email already exists
-      const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
-      if (signInMethods.length === 0) {
-        // Sign out the user if no sign-in methods are found
-        await auth.signOut();
-        setError('Kontot finns inte. Skapa ett konto först.');
-        return;
-      }
+      // const existingUser = await getUserByEmail(user.email);
+      // const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
+      // if (signInMethods.length === 0) {
+      //   // Sign out the user if no sign-in methods are found
+      //   await auth.signOut();
+      //   setError('Kontot finns inte. Skapa ett konto först.');
+      //   return;
+      // }
 
       navigate('/');
     } catch (e) {
@@ -429,7 +430,6 @@ const Card = styled.div`
   }
   
   #google-sign-in {
-    /* padding: ${theme.spacing.xl}; */
     color: ${theme.colors.textDefault} !important;
   }
 `;
