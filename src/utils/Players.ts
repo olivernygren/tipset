@@ -160,6 +160,7 @@ export enum ArsenalPlayersEnum {
   JAKUB_KIWIOR = 'Jakub Kiwior',
   OLEKSANDR_ZINCHENKO = 'Oleksandr Zinchenko',
   KIERAN_TIERNEY = 'Kieran Tierney',
+  MYLES_LEWIS_SKELLY = 'Myles Lewis-Skelly',
   THOMAS_PARTEY = 'Thomas Partey',
   DECLAN_RICE = 'Declan Rice',
   JORGINHO = 'Jorginho',
@@ -353,6 +354,18 @@ export const ArsenalPlayers: Array<Player> = [
     country: CountryEnum.SCOTLAND,
     picture: '/images/players/kieran-tierney.png',
     isInjured: true,
+  },
+  {
+    id: '248tgegh0rhq3rijw3ogt0ert',
+    name: ArsenalPlayersEnum.MYLES_LEWIS_SKELLY,
+    position: {
+      exact: ExactPositionEnum.LB,
+      general: GeneralPositionEnum.DF,
+    },
+    number: 49,
+    age: getAgeByBirthDate('2006-09-26'),
+    country: CountryEnum.ENGLAND,
+    picture: '/images/players/myles-lewis-skelly.png',
   },
   {
     id: '3r6eegh129r29r1odhdmed',
