@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin } from '@phosphor-icons/react';
+import { ChartBar, MapPin } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
@@ -18,6 +18,7 @@ import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import SelectImitation from '../input/SelectImitation';
 import GoalScorerModal from './GoalScorerModal';
+import IconButton from '../buttons/IconButton';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -25,16 +26,17 @@ interface GamePredictorProps {
   onResultUpdate: (gameNumber: number, homeGoals: string, awayGoals: string) => void;
   onPlayerPredictionUpdate: (gameNumber: number, player: Player | undefined) => void;
   onSave: (homeGoals: string, awayGoals: string, predictedPlayerToScore?: Player) => void;
+  onShowStats: (fixture: Fixture) => void;
   hasPredicted?: boolean;
   predictionValue?: Prediction;
   loading?: boolean;
-  anyFixtureHasPredictGoalScorer: boolean;
   previousGameWeekPredictedGoalScorer?: Player;
+  isLeagueCreator?: boolean;
 }
 
 const GamePredictor = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, hasPredicted, predictionValue, loading, anyFixtureHasPredictGoalScorer, previousGameWeekPredictedGoalScorer,
+  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, onShowStats, hasPredicted, predictionValue, loading, previousGameWeekPredictedGoalScorer, isLeagueCreator,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -193,6 +195,15 @@ const GamePredictor = ({
             <NormalTypography variant="s" color={getTextColor()}>•</NormalTypography>
             <EllipsisTypography variant="s" align="center" color={getTextColor()}>{game.tournament}</EllipsisTypography>
           </Section>
+          <IconButton
+            icon={<ChartBar size={24} weight="fill" />}
+            colors={{
+              normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
+              hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
+              active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
+            }}
+            onClick={() => onShowStats(game)}
+          />
         </>
       );
     }
@@ -206,6 +217,15 @@ const GamePredictor = ({
         <NoWrapTypography variant="s" align="center" color={getTextColor()}>{getKickoffTime()}</NoWrapTypography>
         <NormalTypography variant="s" color={getTextColor()}>•</NormalTypography>
         <EllipsisTypography variant="s" align="center" color={getTextColor()}>{game.tournament}</EllipsisTypography>
+        <IconButton
+          icon={<ChartBar size={24} weight="fill" />}
+          colors={{
+            normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
+            hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
+            active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
+          }}
+          onClick={() => onShowStats(game)}
+        />
       </>
     );
   };
@@ -241,28 +261,23 @@ const GamePredictor = ({
           {getTeam(game.awayTeam, true)}
         </GameWrapper>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        {/* {anyFixtureHasPredictGoalScorer && ( */}
-        <>
-          <GoalScorerSection>
-            {game.shouldPredictGoalScorer ? (
-              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
-            ) : (
-              <Section flexDirection="row" alignItems="center" justifyContent="center">
-                <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
-              </Section>
-            )}
-            {game.shouldPredictGoalScorer && (
-              <SelectImitation
-                value={predictedPlayerToScore?.name || ''}
-                onClick={() => setIsSelectGoalScorerModalOpen(true)}
-                disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
-                placeholder="Välj målskytt"
-              />
-            )}
-          </GoalScorerSection>
-          {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
-        </>
-        {/* )} */}
+        <GoalScorerSection>
+          {game.shouldPredictGoalScorer ? (
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
+          ) : (
+            <Section flexDirection="row" alignItems="center" justifyContent="center">
+              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
+            </Section>
+          )}
+          {game.shouldPredictGoalScorer && (
+          <SelectImitation
+            value={predictedPlayerToScore?.name || ''}
+            onClick={() => setIsSelectGoalScorerModalOpen(true)}
+            disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+            placeholder="Välj målskytt"
+          />
+          )}
+        </GoalScorerSection>
         {!kickoffTimeHasPassed && (
         <SaveButtonSection hasPredicted={hasPredicted}>
           <Button
@@ -352,21 +367,15 @@ const TeamContainer = styled.div<{ team: 'home' | 'away' }>`
   box-sizing: border-box;
   flex: 1;
   align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-  /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xxs)};
-  padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xxs)}; */
   
   @media ${devices.tablet} {
     width: 100%;
     align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-    /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.s)};
-    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.s)}; */
   }
 
   @media ${devices.mobile} {
     width: 100%;
     align-items: ${({ team }) => (team === 'home' ? 'flex-end' : 'flex-start')};
-    /* padding-left: ${({ team }) => (team === 'home' ? '0' : theme.spacing.xs)};
-    padding-right: ${({ team }) => (team === 'away' ? '0' : theme.spacing.xs)}; */
   }
 `;
 

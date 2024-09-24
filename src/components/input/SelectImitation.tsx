@@ -16,6 +16,7 @@ interface SelectImitationProps {
   maxWidth?: string;
   placeholder?: string;
   dropdownIcon?: React.ReactNode;
+  borderless?: boolean;
 }
 
 interface StyledSelectImitationProps {
@@ -23,10 +24,11 @@ interface StyledSelectImitationProps {
   disabled?: boolean;
   compact?: boolean;
   maxWidth?: string;
+  borderless?: boolean;
 }
 
 const SelectImitation = ({
-  value, onClick, disabled, fullWidth, compact, maxWidth, placeholder, dropdownIcon,
+  value, onClick, disabled, fullWidth, compact, maxWidth, placeholder, dropdownIcon, borderless,
 }: SelectImitationProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -37,9 +39,10 @@ const SelectImitation = ({
       compact={compact}
       maxWidth={maxWidth}
       onClick={!disabled ? onClick : () => {}}
+      borderless={borderless}
     >
       {placeholder && !value && (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.silverDarker}>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.silverDark}>
           {placeholder}
         </NormalTypography>
       )}
@@ -55,7 +58,7 @@ const SelectImitation = ({
 
 const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   background-color: ${({ disabled }) => (disabled ? theme.colors.silverLighter : theme.colors.white)};
-  border: 1px solid ${({ disabled }) => (disabled ? theme.colors.silverLight : theme.colors.silver)};
+  ${({ borderless, disabled }) => !borderless && `border: 1px solid ${disabled ? theme.colors.silverLight : theme.colors.silver};`};
   border-radius: ${theme.borderRadius.s};
   display: inline-flex;
   align-items: center;
@@ -63,7 +66,7 @@ const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   gap: ${theme.spacing.s};
   box-sizing: border-box;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  padding: ${({ borderless }) => `${theme.spacing.xxs} ${borderless ? 0 : theme.spacing.xs}`};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   min-height: ${({ compact }) => (compact ? '40px' : '48px')};
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};

@@ -42,6 +42,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import SelectImitation from '../input/SelectImitation';
 import SelectTeamModal from '../game/SelectTeamModal';
 import SelectTournamentModal from '../game/SelectTournamentModal';
+import FixtureStatsModal from '../game/FixtureStatsModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -71,6 +72,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
   const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState(false);
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -495,8 +497,10 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               loading={predictionLoading === fixture.id}
-              anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
+              // anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
+              isLeagueCreator={isCreator}
               previousGameWeekPredictedGoalScorer={getUserPreviousGameWeekPrecitedGoalScorer(getLastGameWeek(previousGameWeeks), user?.documentId ?? '')}
+              onShowStats={() => setIsStatsModalOpen(fixture)}
             />
           ))}
       </FixturesGrid>
@@ -533,13 +537,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
         <Section gap="xxs">
           <EmphasisTypography variant="s">Hemmalag</EmphasisTypography>
-          {/* <Select
-            options={[]}
-            optionGroups={getOptionGroups()}
-            value={newFixtureHomeTeam?.name ?? 'Välj lag'}
-            onChange={(value) => handleSelectTeam(getTeamByName(value), true)}
-            fullWidth
-          /> */}
           <SelectImitation
             value={newFixtureHomeTeam?.name ?? ''}
             placeholder="Välj lag"
@@ -911,6 +908,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onSave={(tournament) => setNewFixtureTournament(tournament)}
           teamType={teamType}
           defaultValue={newFixtureTournament}
+        />
+      )}
+      {isStatsModalOpen && (
+        <FixtureStatsModal
+          fixture={isStatsModalOpen}
+          onClose={() => setIsStatsModalOpen(null)}
+          isLeagueCreator={isCreator}
+          ongoingGameWeek={ongoingGameWeek}
+          league={league}
+          refetchLeague={refetchLeague}
         />
       )}
     </>

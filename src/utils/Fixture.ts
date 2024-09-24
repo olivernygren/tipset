@@ -38,6 +38,8 @@ export interface Fixture {
   shouldPredictGoalScorer?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names
   teamType: TeamType;
+  previewStats?: FixturePreviewStats;
+  includeStats?: boolean;
 }
 
 export interface FixtureInput {
@@ -53,6 +55,7 @@ export interface FixtureInput {
   shouldPredictGoalScorer?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names
   teamType: TeamType;
+  includeStats?: boolean;
 }
 
 export interface PredictionPoints {
@@ -91,4 +94,21 @@ export enum PredictionStatus {
   NOT_PREDICTED = 'NOT_PREDICTED',
   UPDATED = 'UPDATED',
   PREDICTED = 'PREDICTED',
+}
+
+export interface TeamFixturePreviewStats {
+  standingsPosition?: string;
+  standingsPoints?: string;
+  form: Array<FixtureOutcomeEnum>;
+  lastFixture?: {
+    outcome: FixtureOutcomeEnum;
+    result: FixtureResult;
+    opponent: string;
+  };
+}
+
+export interface FixturePreviewStats {
+  homeTeam: TeamFixturePreviewStats;
+  awayTeam: TeamFixturePreviewStats;
+  lastUpdated: string;
 }

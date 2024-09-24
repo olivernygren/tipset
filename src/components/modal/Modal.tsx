@@ -87,7 +87,7 @@ const getModalPadding = (noPadding?: boolean, headerDivider?: boolean, isMobile?
 
   if (isMobile) return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}`;
 
-  return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`;
+  return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`;
 };
 
 const getBorderRadius = (mobileBottomSheet?: boolean, mobileFullScreen?: boolean) => {

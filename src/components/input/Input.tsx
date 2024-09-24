@@ -11,6 +11,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   maxWidth?: string;
   maxLength?: number;
+  maxLengthInvisible?: boolean;
   placeholder?: string;
   disabled?: boolean;
   fullWidth?: boolean;
@@ -20,6 +21,8 @@ interface InputProps {
   compact?: boolean;
   label?: string;
   customPadding?: string;
+  noBorder?: boolean;
+  autoFocus?: boolean;
 }
 
 interface StyledInputProps {
@@ -30,10 +33,11 @@ interface StyledInputProps {
   fontWeight?: string;
   compact?: boolean;
   customPadding?: string;
+  noBorder?: boolean;
 }
 
 const Input = ({
-  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding,
+  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus,
 }: InputProps) => (
   <Section gap="xxxs">
     {label && (
@@ -56,8 +60,10 @@ const Input = ({
       fontWeight={fontWeight}
       compact={compact}
       customPadding={customPadding}
+      noBorder={noBorder}
+      autoFocus={autoFocus}
     />
-    {maxLength && (
+    {maxLength && !maxLengthInvisible && (
       <NormalTypography variant="s" color={theme.colors.textLight}>
         {value.length}
         {' '}
@@ -77,7 +83,7 @@ const StyledInput = styled.input<StyledInputProps>`
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 'normal'};
-  border: 1px solid ${theme.colors.silver};
+  border: ${({ noBorder }) => (noBorder ? 'none' : `1px solid ${theme.colors.silver}`)};
   border-radius: ${theme.borderRadius.s};
   font-size: 16px;
   font-family: 'Readex Pro', sans-serif;

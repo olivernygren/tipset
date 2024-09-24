@@ -26,7 +26,7 @@ interface SelectTeamModalProps {
   onSave: (team: Team) => void;
   onClose: () => void;
   teamType: TeamType;
-  isHomeTeam: boolean;
+  isHomeTeam?: boolean;
 }
 
 const SelectTeamModal = ({
@@ -40,6 +40,18 @@ const SelectTeamModal = ({
   const [searchValue, setSearchValue] = useState('');
   // const [showFilters, setShowFilters] = useState(false);
   const [expandedCountries, setExpandedCountries] = useState<Array<string>>([]); // Object.keys(teams)
+
+  const getHeading = () => {
+    if (isHomeTeam === true) {
+      return 'Välj hemmalag';
+    }
+
+    if (isHomeTeam === false) {
+      return 'Välj bortalag';
+    }
+
+    return 'Välj lag';
+  };
 
   const handleSearch = (value: string) => {
     setExpandedCountries(Object.keys(originalTeams));
@@ -113,7 +125,7 @@ const SelectTeamModal = ({
 
   return (
     <Modal
-      title={isHomeTeam ? 'Välj hemmalag' : 'Välj bortalag'}
+      title={getHeading()}
       onClose={onClose}
       headerDivider
       mobileFullScreen
@@ -130,6 +142,7 @@ const SelectTeamModal = ({
             placeholder="Sök lag"
             compact={isMobile}
             fullWidth
+            autoFocus
           />
           {/* <TextButton
             icon={showFilters ? <XCircle size={24} color={theme.colors.primary} /> : <Funnel size={24} color={theme.colors.primary} />}

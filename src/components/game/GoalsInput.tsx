@@ -8,8 +8,8 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 
 interface GoalsInputProps {
   goals: string;
-  onIncrease: () => void;
-  onDecrease: () => void;
+  onIncrease?: () => void;
+  onDecrease?: () => void;
   onInputChange: (value: string) => void;
   hasPredicted?: boolean;
   disabled?: boolean;
@@ -39,12 +39,14 @@ const GoalsInput = ({
 
   return (
     <Section alignItems="center" fitContent gap="xxxs">
-      <IconButton
-        icon={<PlusCircle size={24} />}
-        onClick={onIncrease}
-        colors={getIconButtonColors()}
-        disabled={goals === '9' || disabled}
-      />
+      {onIncrease && (
+        <IconButton
+          icon={<PlusCircle size={24} />}
+          onClick={onIncrease}
+          colors={getIconButtonColors()}
+          disabled={goals === '9' || disabled}
+        />
+      )}
       <Input
         value={goals}
         onChange={(e) => onInputChange(e.currentTarget.value)}
@@ -56,12 +58,14 @@ const GoalsInput = ({
         disabled={disabled}
         customPadding={theme.spacing.xxxs}
       />
-      <IconButton
-        icon={<MinusCircle size={24} />}
-        onClick={onDecrease}
-        colors={getIconButtonColors()}
-        disabled={goals === '0' || goals === '' || disabled}
-      />
+      {onDecrease && (
+        <IconButton
+          icon={<MinusCircle size={24} />}
+          onClick={onDecrease}
+          colors={getIconButtonColors()}
+          disabled={goals === '0' || goals === '' || disabled}
+        />
+      )}
     </Section>
   );
 };
