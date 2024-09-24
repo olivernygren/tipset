@@ -9,7 +9,6 @@ import { AvatarSize } from '../avatar/Avatar';
 import { devices, theme } from '../../theme';
 import { Team } from '../../utils/Team';
 import { Divider } from '../Divider';
-// import FormIcon from '../form/FormIcon';
 import Button from '../buttons/Button';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
@@ -19,6 +18,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import SelectImitation from '../input/SelectImitation';
 import GoalScorerModal from './GoalScorerModal';
 import IconButton from '../buttons/IconButton';
+import Tag from '../tag/Tag';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -46,17 +46,6 @@ const GamePredictor = ({
   const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
-
-  // const getTeamForm = (isAwayTeam: boolean) => {
-  //   const form = isAwayTeam ? game.awayTeamForm : game.homeTeamForm;
-  //   return (
-  //     <Section flexDirection="row" gap="xxxs" justifyContent={isAwayTeam ? 'flex-start' : 'flex-end'}>
-  //       {form.map((outcome, index) => (
-  //         <FormIcon key={index} outcome={outcome} />
-  //       ))}
-  //     </Section>
-  //   );
-  // };
 
   const handleIncreaseGoals = (team: 'home' | 'away') => {
     if (new Date(game.kickOffTime) < new Date()) {
@@ -237,7 +226,17 @@ const GamePredictor = ({
           {getCardHeaderContent()}
         </CardHeader>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        <GameWrapper>
+        {game.fixtureNickname && (
+          <Section padding={`${theme.spacing.xs} 0 0 0`} justifyContent="center" flexDirection="row">
+            <Tag
+              text={game.fixtureNickname}
+              textAndIconColor={hasPredicted ? theme.colors.primaryDark : theme.colors.primaryDark}
+              backgroundColor={hasPredicted ? theme.colors.gold : theme.colors.primaryBleach}
+              size="s"
+            />
+          </Section>
+        )}
+        <GameWrapper noPaddingTop={Boolean(game.fixtureNickname)}>
           {getTeam(game.homeTeam, false)}
           <GoalInputWrapper>
             <GoalsInput
@@ -336,14 +335,14 @@ const CardHeader = styled.div`
   }
 `;
 
-const GameWrapper = styled.div`
+const GameWrapper = styled.div<{ noPaddingTop?: boolean }>`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   margin: auto 0;
-  padding: ${theme.spacing.s} 0;
+  padding: ${({ noPaddingTop }) => (noPaddingTop ? theme.spacing.xxs : theme.spacing.s)} 0 ${theme.spacing.s} 0;
   
   @media ${devices.tablet} {
     gap: ${theme.spacing.s};
@@ -406,7 +405,7 @@ const GoalScorerSection = styled.div`
 const SaveButtonSection = styled.div<{ hasPredicted?: boolean }>`
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primary)};
   width: 100%;
-  margin-top: auto;
+  /* margin-top: auto; */
 `;
 
 const EllipsisTypography = styled(NormalTypography)`

@@ -88,6 +88,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [newFixtureKickoffDateTime, setNewFixtureKickoffDateTime] = useState<Date>(new Date());
   const [newFixtureShouldPredictGoalScorer, setNewFixtureShouldPredictGoalScorer] = useState<boolean>(false);
   const [newFixtureGoalScorerTeam, setNewFixtureGoalScorerTeam] = useState<Array<string> | null>(null);
+  const [newFixtureNickname, setNewFixtureNickname] = useState<string>('');
 
   const [predictionStatuses, setPredictionStatuses] = useState<Array<{ fixtureId: string, status: PredictionStatus }>>([]);
   const [gameWeekPredictionStatus, setGameWeekPredictionStatus] = useState<string>('');
@@ -262,6 +263,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setNewFixtureKickoffDateTime(new Date());
     setNewFixtureShouldPredictGoalScorer(false);
     setNewFixtureGoalScorerTeam(null);
+    setNewFixtureNickname('');
   };
 
   const handleSetGoalScrorerTeam = (selection: string) => {
@@ -295,6 +297,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       kickOffTime: new Date(newFixtureKickoffDateTime).toISOString(),
       shouldPredictGoalScorer: newFixtureShouldPredictGoalScorer,
       ...(newFixtureShouldPredictGoalScorer && { goalScorerFromTeam: newFixtureGoalScorerTeam }),
+      ...(newFixtureNickname && { fixtureNickname: newFixtureNickname }),
       teamType,
     };
 
@@ -590,6 +593,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           minDate={new Date()}
         />
       </Section>
+      <Input
+        label="Smeknamn på match"
+        value={newFixtureNickname}
+        onChange={(e) => setNewFixtureNickname(e.currentTarget.value)}
+      />
       {(newFixtureHomeTeam?.name === 'Arsenal' || newFixtureAwayTeam?.name === 'Arsenal') && (
         <Checkbox
           label="Ska målskytt i matchen tippas?"

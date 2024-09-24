@@ -45,6 +45,9 @@ const Modal = ({
   return (
     <>
       <Backdrop
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         mobileBottomSheet={mobileBottomSheet}
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) {
@@ -96,7 +99,7 @@ const getBorderRadius = (mobileBottomSheet?: boolean, mobileFullScreen?: boolean
   return mobileBottomSheet ? `${theme.borderRadius.l} ${theme.borderRadius.l} 0 0` : theme.borderRadius.l;
 };
 
-const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
+const Backdrop = styled(motion.div)<{ mobileBottomSheet?: boolean }>`
   display: flex;
   align-items: ${({ mobileBottomSheet }) => (mobileBottomSheet ? 'flex-end' : 'center')};
   justify-content: center;

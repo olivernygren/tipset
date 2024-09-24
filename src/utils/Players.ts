@@ -166,6 +166,7 @@ export enum ArsenalPlayersEnum {
   DECLAN_RICE = 'Declan Rice',
   JORGINHO = 'Jorginho',
   MIKEL_MERINO = 'Mikel Merino',
+  SALAH_EDDINE_OULAD_MHAND = 'Salah-Eddine Oulad M’Hand',
   ETHAN_NWANERI = 'Ethan Nwaneri',
   // FABIO_VIEIRA = 'Fabio Vieira',
   MARTIN_ODEGAARD = 'Martin Ødegaard',
@@ -229,7 +230,7 @@ export const ArsenalPlayers: Array<Player> = [
       exact: ExactPositionEnum.GK,
       general: GeneralPositionEnum.GK,
     },
-    number: 13,
+    number: 32,
     age: 35,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/neto.png',
@@ -342,7 +343,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.UKRAINE,
     picture: '/images/players/oleksandr-zinchenko.png',
-    mayBeInjured: true,
+    isInjured: true,
   },
   {
     id: 'rewfgogengoengoribirg84r',
@@ -355,7 +356,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1997-06-05'),
     country: CountryEnum.SCOTLAND,
     picture: '/images/players/kieran-tierney.png',
-    mayBeInjured: true,
+    isInjured: true,
   },
   {
     id: '248tgegh0rhq3rijw3ogt0ert',
@@ -417,6 +418,18 @@ export const ArsenalPlayers: Array<Player> = [
     country: CountryEnum.SPAIN,
     picture: '/images/players/mikel-merino.png',
     isInjured: true,
+  },
+  {
+    id: 'jhtb3oirhfbg3oqfwijq2R3H',
+    name: ArsenalPlayersEnum.SALAH_EDDINE_OULAD_MHAND,
+    position: {
+      exact: ExactPositionEnum.CM,
+      general: GeneralPositionEnum.MF,
+    },
+    number: 59,
+    age: getAgeByBirthDate('2003-08-20'),
+    country: CountryEnum.NETHERLANDS,
+    picture: '/images/players/salah-eddine.png',
   },
   {
     id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',

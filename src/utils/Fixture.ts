@@ -40,6 +40,7 @@ export interface Fixture {
   teamType: TeamType;
   previewStats?: FixturePreviewStats;
   includeStats?: boolean;
+  fixtureNickname?: string;
 }
 
 export interface FixtureInput {
@@ -56,6 +57,7 @@ export interface FixtureInput {
   goalScorerFromTeam?: Array<string> | null; // team names
   teamType: TeamType;
   includeStats?: boolean;
+  fixtureNickname?: string;
 }
 
 export interface PredictionPoints {

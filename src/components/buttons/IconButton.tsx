@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { motion } from 'framer-motion';
 import { theme } from '../../theme';
 
@@ -70,14 +70,12 @@ const StyledButton = styled(motion.button)<StyledButtonProps>`
   align-items: center;
   border: ${({ showBorder, borderColor }) => (showBorder ? `1px solid ${borderColor || theme.colors.silverLight}` : 'none')};
 
-  svg {
-    fill: ${({ colors }) => colors.normal};
-  }
-
   &:hover {
-    svg {
-      fill: ${({ colors }) => colors.hover};
-    }
+    ${({ disabled, colors }) => !disabled && css`
+      svg {
+        fill: ${colors.hover};
+      }
+    `}
   }
 
   &:active {
@@ -109,6 +107,10 @@ const StyledButton = styled(motion.button)<StyledButtonProps>`
       background-color: transparent;
     `;
   }}
+  }
+
+  svg {
+    fill: ${({ colors, disabled }) => (disabled ? colors.disabled : colors.normal)};
   }
 `;
 

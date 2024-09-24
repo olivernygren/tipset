@@ -176,7 +176,6 @@ const FixtureStatsModal = ({
       });
       refetchLeague();
     } catch (error) {
-      console.error(error);
       errorNotify('Något gick fel när statistiken skulle sparas');
       setSaveLoading(false);
     } finally {
@@ -262,7 +261,7 @@ const FixtureStatsModal = ({
     }
 
     if (!lastFixture) {
-      return <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match</NormalTypography>;
+      return <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match tillgänglig</NormalTypography>;
     }
 
     return (
