@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
   Check, PencilSimple, X, XCircle,
@@ -304,11 +304,12 @@ const FixtureStatsModal = ({
 
     const date = new Date(lastUpdated);
     const day = date.getDate();
-    const month = date.toLocaleDateString('sv-SE', { month: 'short' }).replace('.', '');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const month = date.toLocaleDateString('sv-SE', { month: 'long' }).replace('.', '');
+    // const hours = date.getHours().toString().padStart(2, '0');
+    // const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    const formattedDate = `${day} ${month} ${hours}:${minutes}`;
+    // const formattedDate = `${day} ${month} ${hours}:${minutes}`;
+    const formattedDate = `${day} ${month}`;
 
     return (
       <NormalTypography variant="m" color={theme.colors.silverDark}>{`Senast uppdaterad: ${formattedDate}`}</NormalTypography>
