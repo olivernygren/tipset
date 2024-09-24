@@ -94,6 +94,7 @@ export interface Player {
   country: CountryEnum;
   picture?: string;
   isInjured?: boolean;
+  mayBeInjured?: boolean;
   isSuspended?: boolean;
 }
 
@@ -280,6 +281,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.NETHERLANDS,
     picture: '/images/players/jurrien-timber.png',
+    mayBeInjured: true,
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
@@ -340,10 +342,10 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.UKRAINE,
     picture: '/images/players/oleksandr-zinchenko.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
-    id: 'nw8fgwfbnoqr03r93hnof',
+    id: 'rewfgogengoengoribirg84r',
     name: ArsenalPlayersEnum.KIERAN_TIERNEY,
     position: {
       exact: ExactPositionEnum.LB,
@@ -353,7 +355,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1997-06-05'),
     country: CountryEnum.SCOTLAND,
     picture: '/images/players/kieran-tierney.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
     id: '248tgegh0rhq3rijw3ogt0ert',

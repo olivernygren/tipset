@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
   Ambulance,
+  Bandaids,
   CheckCircle, Circle, Funnel, Info, Square, XCircle,
 } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
@@ -125,21 +126,26 @@ const GoalScorerModal = ({
             )}
           </IconContainer>
         ) : (
-          <IconButton
-            icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
-            colors={
-            isPlayerIsSelected(player) ? {
-              normal: theme.colors.primary,
-              hover: theme.colors.primary,
-              active: theme.colors.primary,
-            } : {
-              normal: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.silverDarker,
-              hover: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
-              active: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
-            }
-          }
-            onClick={() => handlePlayerClick(player)}
-          />
+          <Flex>
+            {player.mayBeInjured && (
+              <Bandaids size={24} color={theme.colors.gold} weight="fill" />
+            )}
+            <IconButton
+              icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}
+              colors={
+                isPlayerIsSelected(player) ? {
+                  normal: theme.colors.primary,
+                  hover: theme.colors.primary,
+                  active: theme.colors.primary,
+                } : {
+                  normal: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.silverDarker,
+                  hover: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
+                  active: wasLastWeeksSelectedGoalScorer(player) ? theme.colors.silverLight : theme.colors.textDefault,
+                }
+              }
+              onClick={() => handlePlayerClick(player)}
+            />
+          </Flex>
         )}
       </IconButtonContainer>
     </PlayerItem>
@@ -396,6 +402,12 @@ const IconContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const Flex = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
 `;
 
 export default GoalScorerModal;

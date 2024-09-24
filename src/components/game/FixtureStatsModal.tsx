@@ -327,7 +327,7 @@ const FixtureStatsModal = ({
     };
 
     if (!opponent) {
-      return <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match</NormalTypography>;
+      return <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match tillgänglig</NormalTypography>;
     }
 
     const getGoalsSection = () => (
