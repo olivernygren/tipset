@@ -512,6 +512,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 29,
     country: CountryEnum.BELGIUM,
     picture: '/images/players/leandro-trossard.png',
+    isSuspended: true,
   },
   {
     id: '30jtgeifnqorhgwowjj9d',

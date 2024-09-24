@@ -107,7 +107,7 @@ const GoalScorerModal = ({
             size={AvatarSize.M}
             objectFit="cover"
             showBorder
-            opacity={wasLastWeeksSelectedGoalScorer(player) ? 0.4 : 1}
+            opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
           />
         )}
         <NormalTypography variant="m" color={isPlayerItemDisabled(player) ? theme.colors.silver : theme.colors.textDefault}>
