@@ -500,6 +500,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               loading={predictionLoading === fixture.id}
+              numberOfParticipantsPredicted={ongoingGameWeek.games.predictions.filter((p) => p.fixtureId === fixture.id).length}
               // anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
               isLeagueCreator={isCreator}
               previousGameWeekPredictedGoalScorer={getUserPreviousGameWeekPrecitedGoalScorer(getLastGameWeek(previousGameWeeks), user?.documentId ?? '')}
@@ -569,13 +570,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onChange={(e) => setNewFixtureStadium(e.currentTarget.value)}
           fullWidth
         />
-        {/* <Input
-          label="Turnering"
-          name="tournament"
-          value={newFixtureTournament}
-          onChange={(e) => setNewFixtureTournament(e.currentTarget.value)}
-          fullWidth
-        /> */}
         <Section gap="xxs">
           <EmphasisTypography variant="s">Turnering</EmphasisTypography>
           <SelectImitation

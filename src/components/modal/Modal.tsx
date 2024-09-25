@@ -45,9 +45,9 @@ const Modal = ({
   return (
     <>
       <Backdrop
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        // initial={{ opacity: 0 }}
+        // animate={{ opacity: 1 }}
+        // exit={{ opacity: 0 }}
         mobileBottomSheet={mobileBottomSheet}
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) {
@@ -57,10 +57,10 @@ const Modal = ({
       >
         <ModalContainer
           width={getModalWidth()}
-          initial={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
-          animate={{ opacity: 1, scale: 1, y: '0%' }}
-          exit={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
-          transition={{ duration: 0.25 }}
+          // initial={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
+          // animate={{ opacity: 1, scale: 1, y: '0%' }}
+          // exit={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
+          // transition={{ duration: 0.25 }}
           mobileBottomSheet={mobileBottomSheet}
           mobileFullScreen={mobileFullScreen}
         >
@@ -99,7 +99,7 @@ const getBorderRadius = (mobileBottomSheet?: boolean, mobileFullScreen?: boolean
   return mobileBottomSheet ? `${theme.borderRadius.l} ${theme.borderRadius.l} 0 0` : theme.borderRadius.l;
 };
 
-const Backdrop = styled(motion.div)<{ mobileBottomSheet?: boolean }>`
+const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   display: flex;
   align-items: ${({ mobileBottomSheet }) => (mobileBottomSheet ? 'flex-end' : 'center')};
   justify-content: center;
@@ -107,14 +107,23 @@ const Backdrop = styled(motion.div)<{ mobileBottomSheet?: boolean }>`
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
-
+  animation: fadeIn 0.2s ease;
+  
   @media ${devices.tablet} {
     align-items: center;
   }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
-const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: boolean, mobileFullScreen?: boolean }>`
-  transform: translate(-50%, -50%);
+const ModalContainer = styled.div<{ width: string, mobileBottomSheet?: boolean, mobileFullScreen?: boolean }>`
   display: flex;
   flex-direction: column;
   background-color: ${theme.colors.white};
@@ -123,11 +132,31 @@ const ModalContainer = styled(motion.div)<{ width: string, mobileBottomSheet?: b
   width: ${({ width }) => width};
   border-radius: ${({ mobileBottomSheet, mobileFullScreen }) => getBorderRadius(mobileBottomSheet, mobileFullScreen)};
   ${({ mobileFullScreen }) => mobileFullScreen && 'height: 100vh;'}
+  animation: slideIn 0.2s ease;
   
   @media ${devices.tablet} {
     max-height: 85vh;
     border-radius: ${theme.borderRadius.l};
     height: auto;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 `;
 

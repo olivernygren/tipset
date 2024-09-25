@@ -756,14 +756,21 @@ const FixtureStatsModal = ({
                   />
                 </FormIconContainer>
               ))}
-              {!canEdit && fixtureHasForm && fixture.previewStats?.homeTeam.form.map((outcome, index) => (
-                <FormIconContainer key={`${index}-${outcome}`}>
-                  <FormIcon
-                    outcome={outcome as FixtureOutcomeEnum}
-                    showBorder={index === 4}
-                  />
-                </FormIconContainer>
-              ))}
+              {!canEdit && (
+                fixtureHasForm ? fixture.previewStats?.homeTeam.form.map((outcome, index) => (
+                  <FormIconContainer key={`${index}-${outcome}`}>
+                    <FormIcon
+                      outcome={outcome as FixtureOutcomeEnum}
+                      showBorder={index === 4}
+                    />
+                  </FormIconContainer>
+                )) : (
+                  Array.from({ length: 5 }, (_, index) => (
+                    <FormIconContainer key={index}>
+                      <FormIcon outcome={FixtureOutcomeEnum.NONE} />
+                    </FormIconContainer>
+                  ))
+                ))}
             </TableCell>
             <TableCell>
               {canEdit && editFormValue.awayTeam.map((outcome, index) => (
@@ -784,14 +791,21 @@ const FixtureStatsModal = ({
                   />
                 </FormIconContainer>
               ))}
-              {!canEdit && fixtureHasForm && fixture.previewStats?.awayTeam.form.map((outcome, index) => (
-                <FormIconContainer key={`${index}-${outcome}`}>
-                  <FormIcon
-                    outcome={outcome as FixtureOutcomeEnum}
-                    showBorder={index === 4}
-                  />
-                </FormIconContainer>
-              ))}
+              {!canEdit && (
+                fixtureHasForm ? fixture.previewStats?.awayTeam.form.map((outcome, index) => (
+                  <FormIconContainer key={`${index}-${outcome}`}>
+                    <FormIcon
+                      outcome={outcome as FixtureOutcomeEnum}
+                      showBorder={index === 4}
+                    />
+                  </FormIconContainer>
+                )) : (
+                  Array.from({ length: 5 }, (_, index) => (
+                    <FormIconContainer key={index}>
+                      <FormIcon outcome={FixtureOutcomeEnum.NONE} />
+                    </FormIconContainer>
+                  ))
+                ))}
             </TableCell>
           </TableRow>
           {(!canEdit || includeLastFixture) && (
