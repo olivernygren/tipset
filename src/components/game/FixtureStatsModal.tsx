@@ -28,6 +28,7 @@ import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Checkbox from '../input/Checkbox';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import Textarea from '../textarea/Textarea';
 
 interface FixtureStatsModalProps {
   fixture: Fixture;
@@ -47,6 +48,7 @@ const FixtureStatsModal = ({
   const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
   const [includeLastFixture, setIncludeLastFixture] = useState<boolean>(false);
   const [includeStandings, setIncludeStandings] = useState<boolean>(false);
+  const [includeAnalysis, setIncludeAnalysis] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [mobileSelectedTeam, setMobileSelectedTeam] = useState<'home' | 'away'>('home');
 
@@ -78,10 +80,12 @@ const FixtureStatsModal = ({
   });
   const [homeTeamLastFixtureOutcome, setHomeTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.homeTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
   const [awayTeamLastFixtureOutcome, setAwayTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.awayTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
+  const [editAnalysisValue, setEditAnalysisValue] = useState(fixture.previewStats?.analysis ?? '');
 
   const canEdit = isLeagueCreator && isEditMode;
   const fixtureHasStandings = Boolean(fixture.previewStats && fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints);
   const fixtureHasForm = fixture.previewStats && fixture.previewStats?.homeTeam.form && fixture.previewStats?.awayTeam.form;
+  const fixtureHasAnalysis = fixture.previewStats && fixture.previewStats.analysis;
 
   // useEffect(() => {
   //   setEditStandingsPositionValue({
@@ -143,6 +147,7 @@ const FixtureStatsModal = ({
           },
         }),
       },
+      ...(includeAnalysis && { analysis: editAnalysisValue }),
     };
 
     const updatedFixture: Fixture = {
@@ -223,10 +228,12 @@ const FixtureStatsModal = ({
   const handleSetEditMode = () => {
     const fixtureSavedWithLastFixture = Boolean(fixture.previewStats?.homeTeam.lastFixture?.opponent || fixture.previewStats?.awayTeam.lastFixture?.opponent) && Boolean(fixture.previewStats?.lastUpdated);
     const fixtureSavedWithStandings = Boolean(fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints) && Boolean(fixture.previewStats?.lastUpdated);
+    const fixtureSavedWithAnalysis = Boolean(fixture.previewStats?.analysis);
 
     setIsEditMode(!isEditMode);
     setIncludeLastFixture(fixtureSavedWithLastFixture);
     setIncludeStandings(fixtureSavedWithStandings);
+    setIncludeAnalysis(fixtureSavedWithAnalysis);
   };
 
   const getTeamAvatar = (isAwayTeam: boolean, customTeam?: Team) => {
@@ -412,6 +419,11 @@ const FixtureStatsModal = ({
                     checked={includeLastFixture}
                     onChange={() => setIncludeLastFixture(!includeLastFixture)}
                   />
+                  <Checkbox
+                    label="Inkludera analys"
+                    checked={includeAnalysis}
+                    onChange={() => setIncludeAnalysis(!includeAnalysis)}
+                  />
                 </Section>
               )}
             </MobileTopItems>
@@ -524,14 +536,29 @@ const FixtureStatsModal = ({
                     />
                   </FormIconContainer>
                 ))}
-                {!canEdit && fixtureHasForm && teamPreviewStats && teamPreviewStats.form.map((outcome, index) => (
+                {/* {!canEdit && fixtureHasForm && teamPreviewStats && teamPreviewStats.form.map((outcome, index) => (
                   <FormIconContainer key={`${index}-${outcome}`}>
                     <FormIcon
                       outcome={outcome as FixtureOutcomeEnum}
                       showBorder={index === 4}
                     />
                   </FormIconContainer>
-                ))}
+                ))} */}
+                {!canEdit && (
+                  (fixtureHasForm && teamPreviewStats) ? teamPreviewStats.form.map((outcome, index) => (
+                    <FormIconContainer key={`${index}-${outcome}`}>
+                      <FormIcon
+                        outcome={outcome as FixtureOutcomeEnum}
+                        showBorder={index === 4}
+                      />
+                    </FormIconContainer>
+                  )) : (
+                    Array.from({ length: 5 }, (_, index) => (
+                      <FormIconContainer key={index}>
+                        <FormIcon outcome={FixtureOutcomeEnum.NONE} />
+                      </FormIconContainer>
+                    ))
+                  ))}
               </Section>
             </MobileSection>
             {(!canEdit || includeLastFixture) && (
@@ -562,6 +589,26 @@ const FixtureStatsModal = ({
                     borderRadius={theme.borderRadius.s}
                   >
                     {getLastFixtureResult(mobileSelectedTeam === 'away')}
+                  </Section>
+                )}
+              </MobileSection>
+            )}
+            {(fixtureHasAnalysis || (canEdit && includeAnalysis)) && (
+              <MobileSection>
+                <HeadingsTypography variant="h6">
+                  Analys
+                </HeadingsTypography>
+                {canEdit ? (
+                  <Textarea
+                    value={editAnalysisValue}
+                    onChange={(e) => setEditAnalysisValue(e.target.value)}
+                    placeholder="Analys"
+                    customHeight="200px"
+                    fullWidth
+                  />
+                ) : (
+                  <Section padding={theme.spacing.s} backgroundColor={theme.colors.silverBleach} borderRadius={theme.borderRadius.s}>
+                    <NormalTypography variant="s">{fixture.previewStats?.analysis}</NormalTypography>
                   </Section>
                 )}
               </MobileSection>
@@ -619,6 +666,11 @@ const FixtureStatsModal = ({
                   label="Inkludera senaste matchen"
                   checked={includeLastFixture}
                   onChange={() => setIncludeLastFixture(!includeLastFixture)}
+                />
+                <Checkbox
+                  label="Inkludera analys"
+                  checked={includeAnalysis}
+                  onChange={() => setIncludeAnalysis(!includeAnalysis)}
                 />
               </Section>
             )}
@@ -849,6 +901,31 @@ const FixtureStatsModal = ({
               </TableCell>
             </TableRow>
           )}
+          {(fixtureHasAnalysis || (canEdit && includeAnalysis)) && (
+            <TableRow isDoubleColSpan>
+              <TableCell>
+                <FlexColumn>
+                  <EmphasisTypography variant="m">Analys</EmphasisTypography>
+                </FlexColumn>
+              </TableCell>
+              <TableCell>
+                {canEdit ? (
+                  <Textarea
+                    value={editAnalysisValue}
+                    onChange={(e) => setEditAnalysisValue(e.target.value)}
+                    customPadding={`${theme.spacing.xxs} 0`}
+                    placeholder="Analys"
+                    fullWidth
+                    noBorder
+                  />
+                ) : (
+                  <Section padding={`${theme.spacing.xxs} 0`}>
+                    <NormalTypography variant="s">{fixture.previewStats?.analysis}</NormalTypography>
+                  </Section>
+                )}
+              </TableCell>
+            </TableRow>
+          )}
         </Layout>
         {canEdit && (
           <Section padding={isMobile ? `${theme.spacing.s} ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}` : `${theme.spacing.s} ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`}>
@@ -881,10 +958,9 @@ const Layout = styled.div<{ isEditMode: boolean }>`
   margin-bottom: ${({ isEditMode }) => (isEditMode ? 0 : theme.spacing.xl)};
 `;
 
-const TableRow = styled.div`
+const TableRow = styled.div<{ isDoubleColSpan?: boolean }>`
   display: grid;
-  grid-template-columns: 3fr 4fr 4fr;
-  grid-template-rows: auto;
+  grid-template-columns: ${({ isDoubleColSpan }) => (isDoubleColSpan ? '3fr 8fr' : '3fr 4fr 4fr')};
   align-items: center;
   padding: 0 ${theme.spacing.s};
   border-bottom: 1px solid ${theme.colors.silverLight};

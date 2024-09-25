@@ -112,5 +112,6 @@ export interface TeamFixturePreviewStats {
 export interface FixturePreviewStats {
   homeTeam: TeamFixturePreviewStats;
   awayTeam: TeamFixturePreviewStats;
+  analysis?: string;
   lastUpdated: string;
 }

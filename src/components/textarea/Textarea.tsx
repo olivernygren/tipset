@@ -4,11 +4,10 @@ import { theme } from '../../theme';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 
-interface InputProps {
-  type?: 'text' | 'password' | 'number';
+interface TextareaProps {
   name?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   maxWidth?: string;
   maxLength?: number;
   maxLengthInvisible?: boolean;
@@ -26,7 +25,7 @@ interface InputProps {
   customHeight?: string;
 }
 
-interface StyledInputProps {
+interface StyledTextareaProps {
   maxWidth?: string;
   fullWidth?: boolean;
   textAlign?: 'left' | 'center' | 'right';
@@ -38,18 +37,17 @@ interface StyledInputProps {
   customHeight?: string;
 }
 
-const Input = ({
-  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight,
-}: InputProps) => (
+const Textarea = ({
+  value, onChange, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight,
+}: TextareaProps) => (
   <Section gap="xxxs">
     {label && (
       <LabelContainer>
         <EmphasisTypography variant="s">{label}</EmphasisTypography>
       </LabelContainer>
     )}
-    <StyledInput
+    <StyledTextarea
       name={name}
-      type={type || 'text'}
       value={value}
       onChange={onChange}
       maxLength={maxLength}
@@ -79,7 +77,7 @@ const Input = ({
   </Section>
 );
 
-const StyledInput = styled.input<StyledInputProps>`
+const StyledTextarea = styled.textarea<StyledTextareaProps>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   padding: ${({ customPadding }) => customPadding || `${theme.spacing.xxs} ${theme.spacing.xs}`};
@@ -94,7 +92,8 @@ const StyledInput = styled.input<StyledInputProps>`
   transition: border-color 0.1s;
   box-sizing: border-box;
   color: ${theme.colors.textDefault};
-  height: ${({ compact }) => (compact ? '40px' : '48px')};
+  min-height: ${({ customHeight }) => customHeight || '96px'};
+  resize: none;
 
   &:focus {
     border-color: ${theme.colors.primary};
@@ -116,4 +115,4 @@ const LabelContainer = styled.div`
   margin-bottom: ${theme.spacing.xxxs};
 `;
 
-export default Input;
+export default Textarea;
