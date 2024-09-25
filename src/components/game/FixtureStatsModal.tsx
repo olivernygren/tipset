@@ -487,8 +487,8 @@ const FixtureStatsModal = ({
                 )}
                 {!canEdit && (
                   <Section flexDirection="row" alignItems="center" gap="xxs">
-                    <EmphasisTypography variant="m">{`${fixture.previewStats?.homeTeam.standingsPosition} plats`}</EmphasisTypography>
-                    <NormalTypography variant="s" color={theme.colors.silverDarker}>{`(${fixture.previewStats?.homeTeam.standingsPoints} p)`}</NormalTypography>
+                    <EmphasisTypography variant="m">{`${mobileSelectedTeam === 'home' ? fixture.previewStats?.homeTeam.standingsPosition : fixture.previewStats?.awayTeam.standingsPosition} plats`}</EmphasisTypography>
+                    <NormalTypography variant="s" color={theme.colors.silverDarker}>{`(${mobileSelectedTeam === 'home' ? fixture.previewStats?.homeTeam.standingsPoints : fixture.previewStats?.awayTeam.standingsPoints} p)`}</NormalTypography>
                   </Section>
                 )}
               </MobileSection>
@@ -526,7 +526,10 @@ const FixtureStatsModal = ({
                 ))}
                 {!canEdit && fixtureHasForm && teamPreviewStats && teamPreviewStats.form.map((outcome, index) => (
                   <FormIconContainer key={`${index}-${outcome}`}>
-                    <FormIcon outcome={outcome as FixtureOutcomeEnum} />
+                    <FormIcon
+                      outcome={outcome as FixtureOutcomeEnum}
+                      showBorder={index === 4}
+                    />
                   </FormIconContainer>
                 ))}
               </Section>
@@ -755,7 +758,10 @@ const FixtureStatsModal = ({
               ))}
               {!canEdit && fixtureHasForm && fixture.previewStats?.homeTeam.form.map((outcome, index) => (
                 <FormIconContainer key={`${index}-${outcome}`}>
-                  <FormIcon outcome={outcome as FixtureOutcomeEnum} />
+                  <FormIcon
+                    outcome={outcome as FixtureOutcomeEnum}
+                    showBorder={index === 4}
+                  />
                 </FormIconContainer>
               ))}
             </TableCell>
@@ -780,7 +786,10 @@ const FixtureStatsModal = ({
               ))}
               {!canEdit && fixtureHasForm && fixture.previewStats?.awayTeam.form.map((outcome, index) => (
                 <FormIconContainer key={`${index}-${outcome}`}>
-                  <FormIcon outcome={outcome as FixtureOutcomeEnum} />
+                  <FormIcon
+                    outcome={outcome as FixtureOutcomeEnum}
+                    showBorder={index === 4}
+                  />
                 </FormIconContainer>
               ))}
             </TableCell>

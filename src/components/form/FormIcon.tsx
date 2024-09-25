@@ -7,10 +7,15 @@ import { EmphasisTypography } from '../typography/Typography';
 interface FormIconProps {
   outcome: FixtureOutcomeEnum;
   onClick?: () => void;
+  showBorder?: boolean;
 }
 
-const FormIcon = ({ outcome, onClick }: FormIconProps) => (
-  <StyledFormIcon outcome={outcome} onClick={onClick}>
+const FormIcon = ({ outcome, onClick, showBorder }: FormIconProps) => (
+  <StyledFormIcon
+    outcome={outcome}
+    onClick={onClick}
+    showBorder={showBorder}
+  >
     <EmphasisTypography variant="s" color={theme.colors.white}>{outcome}</EmphasisTypography>
   </StyledFormIcon>
 );
@@ -38,6 +43,8 @@ const StyledFormIcon = styled.div<FormIconProps>`
   align-items: center;
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   transition: all 0.2s ease;
+  border: ${({ showBorder }) => (showBorder ? `2px solid ${theme.colors.white}` : 'none')};
+  box-shadow: ${({ showBorder }) => (showBorder ? `0 0 0 1px ${theme.colors.silver}` : 'none')};
 
   ${({ onClick }) => onClick && css`
     &:hover {
