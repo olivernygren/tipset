@@ -337,7 +337,7 @@ const CardHeader = styled.div`
   @media ${devices.tablet} {
     flex-direction: row;
     gap: ${theme.spacing.s};
-    padding: ${theme.spacing.s};
+    padding: ${theme.spacing.xxs} ${theme.spacing.s};
   }
 `;
 

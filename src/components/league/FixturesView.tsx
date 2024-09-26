@@ -442,8 +442,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     } catch (err) {
       console.log(err);
       errorNotify('Något gick fel, försök igen senare');
+    } finally {
+      setPredictionLoading(null);
     }
-    setPredictionLoading(null);
   };
 
   const getNextGameWeekStartDate = () => {
