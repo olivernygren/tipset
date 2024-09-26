@@ -607,7 +607,7 @@ const FixtureStatsModal = ({
                     fullWidth
                   />
                 ) : (
-                  <Section padding={theme.spacing.s} backgroundColor={theme.colors.silverBleach} borderRadius={theme.borderRadius.s}>
+                  <Section padding={theme.spacing.s} backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.s}>
                     <NormalTypography variant="s">{fixture.previewStats?.analysis}</NormalTypography>
                   </Section>
                 )}

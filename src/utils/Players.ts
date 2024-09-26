@@ -80,6 +80,7 @@ export enum CountryEnum {
   RUSSIA = 'Ryssland',
   MOLDOVA = 'Moldavien',
   ESTONIA = 'Estland',
+  AZERBAIJAN = 'Azerbajdzjan',
 }
 
 export interface Player {
@@ -419,18 +420,18 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/mikel-merino.png',
     isInjured: true,
   },
-  {
-    id: 'jhtb3oirhfbg3oqfwijq2R3H',
-    name: ArsenalPlayersEnum.SALAH_EDDINE_OULAD_MHAND,
-    position: {
-      exact: ExactPositionEnum.CM,
-      general: GeneralPositionEnum.MF,
-    },
-    number: 59,
-    age: getAgeByBirthDate('2003-08-20'),
-    country: CountryEnum.NETHERLANDS,
-    picture: '/images/players/salah-eddine.png',
-  },
+  // {
+  //   id: 'jhtb3oirhfbg3oqfwijq2R3H',
+  //   name: ArsenalPlayersEnum.SALAH_EDDINE_OULAD_MHAND,
+  //   position: {
+  //     exact: ExactPositionEnum.CM,
+  //     general: GeneralPositionEnum.MF,
+  //   },
+  //   number: 59,
+  //   age: getAgeByBirthDate('2003-08-20'),
+  //   country: CountryEnum.NETHERLANDS,
+  //   picture: '/images/players/salah-eddine.png',
+  // },
   {
     id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
     name: ArsenalPlayersEnum.ETHAN_NWANERI,

@@ -15,6 +15,7 @@ export interface Team {
 export enum LeagueEnum {
   PREMIER_LEAGUE = 'Premier League',
   EFL_LEAGUE_ONE = 'EFL League One',
+  EFL_LEAGUE_TWO = 'EFL League Two',
   ALLSVENSKAN = 'Allsvenskan',
   LA_LIGA = 'La Liga',
   SEGUNDA_DIVISION = 'Segunda Division',
@@ -33,6 +34,7 @@ export enum LeagueEnum {
   CROATIAN_FIRST_FOOTBALL_LEAGUE = 'Prva HNL',
   SLOVAK_1_LIGA = 'Niké Liga',
   SERBIAN_SUPER_LIGA = 'Serbian SuperLiga',
+  AZERBAIJAN_PREMIER_LEAGUE = 'Azerbaijan Premier League',
   NATIONS = 'Landslag',
 }
 
@@ -271,6 +273,14 @@ export const Teams = {
       shortName: 'Bolton',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/82/Bolton_Wanderers_FC_logo.svg',
       stadium: 'University of Bolton Stadium',
+      country: CountryEnum.ENGLAND,
+    },
+  ],
+  [LeagueEnum.EFL_LEAGUE_TWO]: [
+    {
+      name: 'Walsall',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/ef/Walsall_FC.svg',
+      stadium: 'Bescot Stadium',
       country: CountryEnum.ENGLAND,
     },
   ],
@@ -1002,6 +1012,13 @@ export const Teams = {
       stadium: 'De Kuip',
       country: CountryEnum.NETHERLANDS,
     },
+    {
+      name: 'FC Twente',
+      shortName: 'Twente',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e3/FC_Twente.svg',
+      stadium: 'De Grolsch Veste',
+      country: CountryEnum.NETHERLANDS,
+    },
   ],
   [LeagueEnum.PRIMEIRA_LIGA]: [
     {
@@ -1110,6 +1127,14 @@ export const Teams = {
       country: CountryEnum.SERBIA,
     },
   ],
+  [LeagueEnum.AZERBAIJAN_PREMIER_LEAGUE]: [
+    {
+      name: 'Qarabağ',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d3/Qaraba%C4%9F_FK_logo.png',
+      stadium: 'Azersun Arena',
+      country: CountryEnum.AZERBAIJAN,
+    },
+  ],
   [LeagueEnum.NATIONS]: [
     {
       name: 'England',
@@ -1214,6 +1239,10 @@ export const Teams = {
     {
       name: 'Serbien',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg',
+    },
+    {
+      name: 'Azerbajdzjan',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg',
     },
   ],
 };
