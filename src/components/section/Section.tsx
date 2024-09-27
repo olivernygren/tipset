@@ -13,6 +13,7 @@ interface SectionProps {
   fitContent?: boolean;
   height?: string;
   expandMobile?: boolean;
+  pointer?: boolean;
 }
 
 export const Section = styled.section<SectionProps>`
@@ -28,6 +29,7 @@ export const Section = styled.section<SectionProps>`
   width: ${({ fitContent }) => (fitContent ? 'fit-content' : '100%')};
   position: relative;
   height: ${({ height }) => height || 'auto'};
+  cursor: ${({ pointer }) => (pointer ? 'pointer' : 'auto')};
 
   @media ${devices.tablet} {
     border-radius: ${({ borderRadius }) => borderRadius || 0};

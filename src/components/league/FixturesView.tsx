@@ -286,14 +286,14 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       return;
     }
 
+    const alreadyExistingFixture = newGameWeekFixtures.find((f) => f.homeTeam.name === newFixtureHomeTeam.name && f.awayTeam.name === newFixtureAwayTeam.name);
+
     const newFixtureInput: FixtureInput = {
-      id: generateRandomID(),
+      id: alreadyExistingFixture ? alreadyExistingFixture.id : generateRandomID(),
       homeTeam: newFixtureHomeTeam,
       awayTeam: newFixtureAwayTeam,
       stadium: newFixtureStadium,
       tournament: newFixtureTournament,
-      homeTeamForm: [],
-      awayTeamForm: [],
       kickOffTime: new Date(newFixtureKickoffDateTime).toISOString(),
       shouldPredictGoalScorer: newFixtureShouldPredictGoalScorer,
       ...(newFixtureShouldPredictGoalScorer && { goalScorerFromTeam: newFixtureGoalScorerTeam }),
@@ -301,7 +301,18 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       teamType,
     };
 
-    setNewGameWeekFixtures([...newGameWeekFixtures, { ...newFixtureInput }]);
+    if (alreadyExistingFixture) {
+      const updatedFixtures = newGameWeekFixtures.map((f) => {
+        if (f.id === alreadyExistingFixture.id) {
+          return newFixtureInput;
+        }
+        return f;
+      });
+      setNewGameWeekFixtures(updatedFixtures);
+    } else {
+      setNewGameWeekFixtures([...newGameWeekFixtures, { ...newFixtureInput }]);
+    }
+
     setAddFixtureViewOpen(false);
     handleResetNewFixture();
   };
@@ -445,6 +456,18 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     } finally {
       setPredictionLoading(null);
     }
+  };
+
+  const handlePreFillFixtureData = (fixture: Fixture) => {
+    setNewFixtureHomeTeam(fixture.homeTeam);
+    setNewFixtureAwayTeam(fixture.awayTeam);
+    setNewFixtureStadium(fixture.stadium);
+    setNewFixtureTournament(fixture.tournament);
+    setNewFixtureKickoffDateTime(new Date(fixture.kickOffTime));
+    setNewFixtureShouldPredictGoalScorer(Boolean(fixture.shouldPredictGoalScorer));
+    setNewFixtureGoalScorerTeam(fixture.goalScorerFromTeam ? fixture.goalScorerFromTeam : null);
+    setNewFixtureNickname(fixture.fixtureNickname ?? '');
+    setAddFixtureViewOpen(true);
   };
 
   const getNextGameWeekStartDate = () => {
@@ -607,9 +630,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             options={[
               { value: 'Välj lag', label: 'Välj lag' },
               { value: 'Arsenal', label: 'Arsenal' },
-              // { value: newFixtureHomeTeam.name, label: newFixtureHomeTeam.name },
-              // { value: newFixtureAwayTeam.name, label: newFixtureAwayTeam.name },
-              // { value: 'Båda lagen', label: 'Båda lagen' },
             ]}
             value={newFixtureGoalScorerTeam ? newFixtureGoalScorerTeam[0] : 'Välj lag'}
             onChange={(value) => handleSetGoalScrorerTeam(value)}
@@ -618,23 +638,26 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         </Section>
       )}
       <Section gap="m">
-        {/* {isMobile && (
-          <TextButton color="red" onClick={handleResetNewFixture} noPadding>
-            Nollställ
-          </TextButton>
-        )} */}
         <Section flexDirection="row" alignItems="center" gap="xxs">
-          <Button variant="secondary" size="m" onClick={() => setAddFixtureViewOpen(false)}>
+          <Button
+            variant="secondary"
+            size="m"
+            onClick={() => {
+              setAddFixtureViewOpen(false);
+              handleResetNewFixture();
+            }}
+          >
             Avbryt
           </Button>
-          <Button size="m" onClick={handleAddFixtureToGameWeek} icon={<PlusCircle size={20} color={theme.colors.white} />} disabled={isAddFixtureButtonDisabled} fullWidth={isMobile}>
+          <Button
+            size="m"
+            onClick={handleAddFixtureToGameWeek}
+            icon={<PlusCircle size={20} color={theme.colors.white} />}
+            disabled={isAddFixtureButtonDisabled}
+            fullWidth={isMobile}
+          >
             Lägg till match
           </Button>
-          {/* {!isMobile && (
-            <TextButton color="red" onClick={handleResetNewFixture}>
-              Nollställ matchinfo
-            </TextButton>
-          )} */}
         </Section>
       </Section>
     </AddFixtureContainer>
@@ -673,7 +696,12 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
             .map((fixture, index) => (
               <Section flexDirection="row" gap="xxs" alignItems="center">
-                <FixturePreview fixture={fixture} key={index} hidePredictions />
+                <FixturePreview
+                  fixture={fixture}
+                  key={index}
+                  hidePredictions
+                  onClick={() => handlePreFillFixtureData(fixture)}
+                />
                 <IconButton
                   icon={<XCircle size={24} weight="fill" />}
                   colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
@@ -703,10 +731,19 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </NormalTypography>
           )}
           <Section flexDirection="row" gap="xs">
-            <Button variant="secondary" onClick={() => setShowCreateGameWeekSection(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCreateGameWeekSection(false)}
+            >
               Avbryt
             </Button>
-            <Button variant="primary" onClick={handleCreateGameWeek} disabled={addFixtureViewOpen || createGameWeekLoading} loading={createGameWeekLoading} fullWidth={isMobile}>
+            <Button
+              variant="primary"
+              onClick={handleCreateGameWeek}
+              disabled={addFixtureViewOpen || createGameWeekLoading}
+              loading={createGameWeekLoading}
+              fullWidth={isMobile}
+            >
               Skapa omgång
             </Button>
           </Section>

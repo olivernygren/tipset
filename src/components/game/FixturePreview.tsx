@@ -15,13 +15,14 @@ interface FixturePreviewProps {
   hidePredictions?: boolean;
   hasBeenCorrected?: boolean;
   onShowPredictionsClick?: () => void;
+  onClick?: () => void;
   simple?: boolean;
   isCorrectionMode?: boolean;
   useShortNames?: boolean;
 }
 
 const FixturePreview = ({
-  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode, useShortNames,
+  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode, useShortNames, onClick,
 }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -56,6 +57,8 @@ const FixturePreview = ({
       gap="s"
       backgroundColor={theme.colors.silverLighter}
       borderRadius={theme.borderRadius.s}
+      onClick={onClick}
+      pointer={Boolean(onClick)}
     >
       <Teams showPrediction={!hidePredictions}>
         <TeamContainer>

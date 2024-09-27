@@ -31,8 +31,8 @@ export interface Fixture {
   awayTeam: Team;
   stadium: string;
   tournament: string;
-  homeTeamForm: Array<FixtureOutcomeEnum>;
-  awayTeamForm: Array<FixtureOutcomeEnum>;
+  homeTeamForm?: Array<FixtureOutcomeEnum>;
+  awayTeamForm?: Array<FixtureOutcomeEnum>;
   kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
@@ -49,8 +49,6 @@ export interface FixtureInput {
   awayTeam: Team;
   stadium: string;
   tournament: string;
-  homeTeamForm: Array<FixtureOutcomeEnum>;
-  awayTeamForm: Array<FixtureOutcomeEnum>;
   kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
