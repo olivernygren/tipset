@@ -14,6 +14,7 @@ interface SectionProps {
   height?: string;
   expandMobile?: boolean;
   pointer?: boolean;
+  overflow?: string;
 }
 
 export const Section = styled.section<SectionProps>`
@@ -30,6 +31,7 @@ export const Section = styled.section<SectionProps>`
   position: relative;
   height: ${({ height }) => height || 'auto'};
   cursor: ${({ pointer }) => (pointer ? 'pointer' : 'auto')};
+  overflow: ${({ overflow }) => overflow || 'visible'};
 
   @media ${devices.tablet} {
     border-radius: ${({ borderRadius }) => borderRadius || 0};

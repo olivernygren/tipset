@@ -199,7 +199,7 @@ const GamePredictor = ({
     }
     return (
       <>
-        <Section flexDirection="row" gap="xxxs" alignItems="center" fitContent>
+        <Section flexDirection="row" gap="xxxs" alignItems="center" fitContent overflow="hidden">
           <MapPin size={16} weight="fill" color={getTextColor()} />
           <EllipsisTypography variant="s" align="center" color={getTextColor()}>{game.stadium}</EllipsisTypography>
         </Section>

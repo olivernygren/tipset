@@ -258,6 +258,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/ben-white.png',
+    mayBeInjured: true,
   },
   {
     id: 'jdb38fg9fhwwh9wfhw0fe',
