@@ -271,7 +271,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.JAPAN,
     picture: '/images/players/takehiro-tomiyasu.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
     id: 'fhwefh9hrrh94ofof',
@@ -284,6 +284,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.NETHERLANDS,
     picture: '/images/players/jurrien-timber.png',
+    mayBeInjured: true,
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
@@ -320,7 +321,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
     picture: '/images/players/riccardo-calafiori.png',
-    mayBeInjured: true,
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
@@ -419,7 +419,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1996-06-22'),
     country: CountryEnum.SPAIN,
     picture: '/images/players/mikel-merino.png',
-    isInjured: true,
   },
   // {
   //   id: 'jhtb3oirhfbg3oqfwijq2R3H',
@@ -437,7 +436,7 @@ export const ArsenalPlayers: Array<Player> = [
     id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
     name: ArsenalPlayersEnum.ETHAN_NWANERI,
     position: {
-      exact: ExactPositionEnum.CM,
+      exact: ExactPositionEnum.CAM,
       general: GeneralPositionEnum.MF,
     },
     number: 53,
