@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import {
   Check, PencilSimple, X, XCircle,
 } from '@phosphor-icons/react';
@@ -14,7 +14,7 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import FormIcon, { getOutcomeBackgroundColor } from '../form/FormIcon';
-import { getTeamByName, Team } from '../../utils/Team';
+import { getTeamByName, Team, TournamentsEnum } from '../../utils/Team';
 import Button from '../buttons/Button';
 import SelectImitation from '../input/SelectImitation';
 import SelectTeamModal from './SelectTeamModal';
@@ -29,6 +29,7 @@ import Checkbox from '../input/Checkbox';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import Textarea from '../textarea/Textarea';
+import { getIsBottomOfLeague } from '../../utils/helpers';
 
 interface FixtureStatsModalProps {
   fixture: Fixture;
@@ -236,7 +237,7 @@ const FixtureStatsModal = ({
     setIncludeAnalysis(fixtureSavedWithAnalysis);
   };
 
-  const getTeamAvatar = (isAwayTeam: boolean, customTeam?: Team) => {
+  const getTeamAvatar = (isAwayTeam: boolean, customTeam?: Team, customSize?: AvatarSize) => {
     const team = customTeam || (isAwayTeam ? fixture.awayTeam : fixture.homeTeam);
 
     if (fixture.teamType === TeamType.CLUBS) {
@@ -244,7 +245,7 @@ const FixtureStatsModal = ({
         <ClubAvatar
           clubName={team.name}
           logoUrl={team.logoUrl}
-          size={AvatarSize.M}
+          size={customSize ?? AvatarSize.M}
         />
       );
     }
@@ -253,7 +254,7 @@ const FixtureStatsModal = ({
       <NationAvatar
         nationName={team.name}
         flagUrl={team.logoUrl}
-        size={AvatarSize.M}
+        size={customSize ?? AvatarSize.M}
       />
     );
   };
@@ -380,6 +381,43 @@ const FixtureStatsModal = ({
     );
   };
 
+  const getStandings = (isHomeTeam: boolean) => {
+    if (!fixture.previewStats) return null;
+
+    const team = isHomeTeam ? fixture.homeTeam : fixture.awayTeam;
+    const previewStats = isHomeTeam ? fixture.previewStats.homeTeam : fixture.previewStats.awayTeam;
+
+    const isTopOfTable = previewStats.standingsPosition === '1';
+    const isBottomOfTable = getIsBottomOfLeague(parseInt(previewStats.standingsPosition ?? ''), fixture.tournament as TournamentsEnum);
+
+    return (
+      <>
+        {!isTopOfTable && (
+          <img className="standing-row-mock" src="/images/table-row-top.svg" alt="table row" />
+        )}
+        {isBottomOfTable && (
+          <img className="standing-row-mock" src="/images/table-row-full.svg" alt="table row" />
+        )}
+        <StandingsRow>
+          <StandingsPosition>
+            <EmphasisTypography variant="s" color={theme.colors.primaryDark}>{previewStats.standingsPosition}</EmphasisTypography>
+          </StandingsPosition>
+          <StandingsRowTeam>
+            {getTeamAvatar(false, team, AvatarSize.XS)}
+            <NormalTypography variant="s">{team.name}</NormalTypography>
+          </StandingsRowTeam>
+          <EmphasisTypography variant="s" color={theme.colors.silverDarker}>{`${previewStats.standingsPoints} p`}</EmphasisTypography>
+        </StandingsRow>
+        {isTopOfTable && (
+          <img className="standing-row-mock" src="/images/table-row-full.svg" alt="table row" />
+        )}
+        {!isBottomOfTable && (
+          <img className="standing-row-mock" src="/images/table-row-bottom.svg" alt="table row" />
+        )}
+      </>
+    );
+  };
+
   if (isMobile) {
     const teamFormEditValue = mobileSelectedTeam === 'home' ? editFormValue.homeTeam : editFormValue.awayTeam;
     const teamOpponent = mobileSelectedTeam === 'home' ? editLastFixtureOpponents.homeTeamOpponent : editLastFixtureOpponents.awayTeamOpponent;
@@ -498,9 +536,8 @@ const FixtureStatsModal = ({
                   </>
                 )}
                 {!canEdit && (
-                  <Section flexDirection="row" alignItems="center" gap="xxs">
-                    <EmphasisTypography variant="m">{`${mobileSelectedTeam === 'home' ? fixture.previewStats?.homeTeam.standingsPosition : fixture.previewStats?.awayTeam.standingsPosition} plats`}</EmphasisTypography>
-                    <NormalTypography variant="s" color={theme.colors.silverDarker}>{`(${mobileSelectedTeam === 'home' ? fixture.previewStats?.homeTeam.standingsPoints : fixture.previewStats?.awayTeam.standingsPoints} p)`}</NormalTypography>
+                  <Section gap="xxs">
+                    {getStandings(mobileSelectedTeam === 'home')}
                   </Section>
                 )}
               </MobileSection>
@@ -536,14 +573,6 @@ const FixtureStatsModal = ({
                     />
                   </FormIconContainer>
                 ))}
-                {/* {!canEdit && fixtureHasForm && teamPreviewStats && teamPreviewStats.form.map((outcome, index) => (
-                  <FormIconContainer key={`${index}-${outcome}`}>
-                    <FormIcon
-                      outcome={outcome as FixtureOutcomeEnum}
-                      showBorder={index === 4}
-                    />
-                  </FormIconContainer>
-                ))} */}
                 {!canEdit && (
                   (fixtureHasForm && teamPreviewStats) ? teamPreviewStats.form.map((outcome, index) => (
                     <FormIconContainer key={`${index}-${outcome}`}>
@@ -710,7 +739,7 @@ const FixtureStatsModal = ({
                 </FlexColumn>
               </TableCell>
               <TableCell>
-                {canEdit && (
+                {canEdit ? (
                   <>
                     <Input
                       value={editStandingsPositionValue.homeTeam}
@@ -737,12 +766,10 @@ const FixtureStatsModal = ({
                       customPadding={`${theme.spacing.xxs} 0`}
                     />
                   </>
-                )}
-                {!canEdit && (
-                  <>
-                    <EmphasisTypography variant="m">{`${fixture.previewStats?.homeTeam.standingsPosition} plats`}</EmphasisTypography>
-                    <NormalTypography variant="s" color={theme.colors.silverDarker}>{`(${fixture.previewStats?.homeTeam.standingsPoints} p)`}</NormalTypography>
-                  </>
+                ) : (
+                  <Section gap="xxs" padding={`${theme.spacing.xxs} 0`}>
+                    {getStandings(true)}
+                  </Section>
                 )}
               </TableCell>
               <TableCell>
@@ -774,10 +801,9 @@ const FixtureStatsModal = ({
                     />
                   </>
                 ) : (
-                  <>
-                    <EmphasisTypography variant="m">{`${fixture.previewStats?.awayTeam.standingsPosition} plats`}</EmphasisTypography>
-                    <NormalTypography variant="s" color={theme.colors.silverDarker}>{`(${fixture.previewStats?.awayTeam.standingsPoints} p)`}</NormalTypography>
-                  </>
+                  <Section gap="xxs" padding={`${theme.spacing.xxs} 0`}>
+                    {getStandings(false)}
+                  </Section>
                 )}
               </TableCell>
             </TableRow>
@@ -1088,6 +1114,69 @@ const MobileSection = styled.div`
   gap: ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
+
+  .standing-row-mock {
+    display: none;
+  }
+
+  @media ${devices.tablet} {
+    display: block;
+  }
+`;
+
+const StandingsRow = styled.div<{ isMock?: boolean }>`
+  background-color: ${theme.colors.silverLighter};
+  padding: ${theme.spacing.xxs};
+  border-radius: ${theme.borderRadius.s};
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid ${theme.colors.silverLight};
+
+  ${({ isMock }) => isMock && css`
+    background-image: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 100%);
+  `}
+`;
+
+const StandingsRowTeam = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxs};
+  flex: 1;
+`;
+
+const StandingsPosition = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.silverLight};
+  border-radius: ${theme.borderRadius.xs};
+  width: 24px;
+  height: 24px;
+`;
+
+const StandingsMockTeamBadge = styled.div`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: ${theme.colors.silverLight};
+`;
+
+const StandingMockTeamName = styled.div`
+  width: 90px;
+  height: 20px;
+  border-radius: ${theme.borderRadius.s};
+  background-color: ${theme.colors.silverLight};
+`;
+
+const StandingMockPoints = styled.div`
+  width: 30px;
+  height: 20px;
+  border-radius: ${theme.borderRadius.s};
+  background-color: ${theme.colors.silverLight};
+  margin-left: auto;
 `;
 
 export default FixtureStatsModal;

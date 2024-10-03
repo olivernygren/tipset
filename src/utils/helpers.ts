@@ -3,6 +3,7 @@ import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import { Player } from './Players';
+import { TournamentsEnum } from './Team';
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;
@@ -113,4 +114,23 @@ export const getLastGameWeek = (previousGameWeeks: Array<LeagueGameWeek> | undef
   const sortedGameWeeks = previousGameWeeks.sort((a, b) => a.round - b.round);
 
   return sortedGameWeeks[sortedGameWeeks.length - 1];
+};
+
+export const getIsBottomOfLeague = (position: number, tournament: TournamentsEnum): boolean => {
+  switch (tournament) {
+    case TournamentsEnum.ALLSVENSKAN:
+      return position >= 16;
+    case TournamentsEnum.SERIE_A:
+    case TournamentsEnum.LA_LIGA:
+    case TournamentsEnum.PREMIER_LEAGUE:
+      return position >= 20;
+    case TournamentsEnum.LIGUE_1:
+    case TournamentsEnum.BUNDESLIGA:
+      return position >= 18;
+    case TournamentsEnum.CHAMPIONS_LEAGUE:
+    case TournamentsEnum.EUROPA_LEAGUE:
+      return position >= 36;
+    default:
+      return false;
+  }
 };

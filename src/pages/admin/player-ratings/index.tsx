@@ -99,10 +99,10 @@ const PlayerRatingsPage = () => {
           <NormalTypography variant="m">{getNumberOfAppearances(playerRating)}</NormalTypography>
         </PlayerItemTableCell>
         <PlayerItemTableCell>
-          <NormalTypography variant="m">{playerRating?.assists ?? 0}</NormalTypography>
+          <NormalTypography variant="m">{playerRating?.goals ?? 0}</NormalTypography>
         </PlayerItemTableCell>
         <PlayerItemTableCell>
-          <NormalTypography variant="m">{playerRating?.goals ?? 0}</NormalTypography>
+          <NormalTypography variant="m">{playerRating?.assists ?? 0}</NormalTypography>
         </PlayerItemTableCell>
         <PlayerItemTableCell>
           <EmphasisTypography variant="m">{getPlayerMonthlyRating(playerRating)}</EmphasisTypography>
@@ -161,10 +161,10 @@ const PlayerRatingsPage = () => {
             <EmphasisTypography color={theme.colors.silverDark} variant="s">Matcher</EmphasisTypography>
           </PlayerItemTableCell>
           <PlayerItemTableCell>
-            <EmphasisTypography color={theme.colors.silverDark} variant="s">Assist</EmphasisTypography>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Mål</EmphasisTypography>
           </PlayerItemTableCell>
           <PlayerItemTableCell>
-            <EmphasisTypography color={theme.colors.silverDark} variant="s">Mål</EmphasisTypography>
+            <EmphasisTypography color={theme.colors.silverDark} variant="s">Assist</EmphasisTypography>
           </PlayerItemTableCell>
           <PlayerItemTableCell>
             <EmphasisTypography color={theme.colors.silverDark} variant="s">Månadsbetyg</EmphasisTypography>
@@ -201,9 +201,6 @@ const PlayerRatingsPage = () => {
             </PositionContainer>
           </>
         )}
-        <Button icon={<FloppyDisk color={theme.colors.white} size={24} />}>
-          Spara betyg
-        </Button>
       </Section>
       {selectOpponentModalOpen && (
         <SelectTeamModal
