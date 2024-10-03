@@ -88,35 +88,6 @@ const FixtureStatsModal = ({
   const fixtureHasForm = fixture.previewStats && fixture.previewStats?.homeTeam.form && fixture.previewStats?.awayTeam.form;
   const fixtureHasAnalysis = fixture.previewStats && fixture.previewStats.analysis;
 
-  // useEffect(() => {
-  //   setEditStandingsPositionValue({
-  //     homeTeam: fixture.previewStats?.homeTeam.standingsPosition ?? '',
-  //     awayTeam: fixture.previewStats?.awayTeam.standingsPosition ?? '',
-  //   });
-  //   setEditStandingsPositionPoints({
-  //     homeTeam: fixture.previewStats?.homeTeam.standingsPoints ?? '',
-  //     awayTeam: fixture.previewStats?.awayTeam.standingsPoints ?? '',
-  //   });
-  //   setEditFormValue({
-  //     homeTeam: fixture.previewStats?.homeTeam.form ?? [FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE],
-  //     awayTeam: fixture.previewStats?.awayTeam.form ?? [FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE, FixtureOutcomeEnum.NONE],
-  //   });
-  //   setEditLastFixtureOpponents({
-  //     homeTeamOpponent: fixture.previewStats?.homeTeam.lastFixture?.opponent ? getTeamByName(fixture.previewStats?.homeTeam.lastFixture?.opponent) : undefined,
-  //     awayTeamOpponent: fixture.previewStats?.awayTeam.lastFixture?.opponent ? getTeamByName(fixture.previewStats?.awayTeam.lastFixture?.opponent) : undefined,
-  //   });
-  //   setEditHomeTeamLastFixtureResult({
-  //     homeTeamGoals: fixture.previewStats?.homeTeam.lastFixture?.result.homeTeamGoals ?? 0,
-  //     awayTeamGoals: fixture.previewStats?.homeTeam.lastFixture?.result.awayTeamGoals ?? 0,
-  //   });
-  //   setEditAwayTeamLastFixtureResult({
-  //     homeTeamGoals: fixture.previewStats?.awayTeam.lastFixture?.result.homeTeamGoals ?? 0,
-  //     awayTeamGoals: fixture.previewStats?.awayTeam.lastFixture?.result.awayTeamGoals ?? 0,
-  //   });
-  //   setHomeTeamLastFixtureOutcome(fixture.previewStats?.homeTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
-  //   setAwayTeamLastFixtureOutcome(fixture.previewStats?.awayTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
-  // }, [league]);
-
   const handleSaveStats = async () => {
     if (!ongoingGameWeek) return;
 
@@ -1157,26 +1128,26 @@ const StandingsPosition = styled.div`
   height: 24px;
 `;
 
-const StandingsMockTeamBadge = styled.div`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: ${theme.colors.silverLight};
-`;
+// const StandingsMockTeamBadge = styled.div`
+//   width: 20px;
+//   height: 20px;
+//   border-radius: 50%;
+//   background-color: ${theme.colors.silverLight};
+// `;
 
-const StandingMockTeamName = styled.div`
-  width: 90px;
-  height: 20px;
-  border-radius: ${theme.borderRadius.s};
-  background-color: ${theme.colors.silverLight};
-`;
+// const StandingMockTeamName = styled.div`
+//   width: 90px;
+//   height: 20px;
+//   border-radius: ${theme.borderRadius.s};
+//   background-color: ${theme.colors.silverLight};
+// `;
 
-const StandingMockPoints = styled.div`
-  width: 30px;
-  height: 20px;
-  border-radius: ${theme.borderRadius.s};
-  background-color: ${theme.colors.silverLight};
-  margin-left: auto;
-`;
+// const StandingMockPoints = styled.div`
+//   width: 30px;
+//   height: 20px;
+//   border-radius: ${theme.borderRadius.s};
+//   background-color: ${theme.colors.silverLight};
+//   margin-left: auto;
+// `;
 
 export default FixtureStatsModal;
