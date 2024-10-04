@@ -30,6 +30,7 @@ import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import Textarea from '../textarea/Textarea';
 import { getIsBottomOfLeague } from '../../utils/helpers';
+import MockedStandingsRow from '../stats/MockedStandingsRow';
 
 interface FixtureStatsModalProps {
   fixture: Fixture;
@@ -364,10 +365,10 @@ const FixtureStatsModal = ({
     return (
       <>
         {!isTopOfTable && (
-          <img className="standing-row-mock" src="/images/table-row-top.svg" alt="table row" />
+          <MockedStandingsRow type="top" position={parseInt(previewStats.standingsPosition ?? '') - (isBottomOfTable ? 2 : 1)} />
         )}
         {isBottomOfTable && (
-          <img className="standing-row-mock" src="/images/table-row-full.svg" alt="table row" />
+          <MockedStandingsRow type="full" position={parseInt(previewStats.standingsPosition ?? '') - 1} />
         )}
         <StandingsRow>
           <StandingsPosition>
@@ -380,10 +381,10 @@ const FixtureStatsModal = ({
           <EmphasisTypography variant="s" color={theme.colors.silverDarker}>{`${previewStats.standingsPoints} p`}</EmphasisTypography>
         </StandingsRow>
         {isTopOfTable && (
-          <img className="standing-row-mock" src="/images/table-row-full.svg" alt="table row" />
+          <MockedStandingsRow type="full" position={parseInt(previewStats.standingsPosition ?? '') + 1} />
         )}
         {!isBottomOfTable && (
-          <img className="standing-row-mock" src="/images/table-row-bottom.svg" alt="table row" />
+          <MockedStandingsRow type="bottom" position={parseInt(previewStats.standingsPosition ?? '') + (isTopOfTable ? 2 : 1)} />
         )}
       </>
     );
@@ -1086,10 +1087,6 @@ const MobileSection = styled.div`
   width: 100%;
   box-sizing: border-box;
 
-  .standing-row-mock {
-    display: none;
-  }
-
   @media ${devices.tablet} {
     display: block;
   }
@@ -1127,27 +1124,5 @@ const StandingsPosition = styled.div`
   width: 24px;
   height: 24px;
 `;
-
-// const StandingsMockTeamBadge = styled.div`
-//   width: 20px;
-//   height: 20px;
-//   border-radius: 50%;
-//   background-color: ${theme.colors.silverLight};
-// `;
-
-// const StandingMockTeamName = styled.div`
-//   width: 90px;
-//   height: 20px;
-//   border-radius: ${theme.borderRadius.s};
-//   background-color: ${theme.colors.silverLight};
-// `;
-
-// const StandingMockPoints = styled.div`
-//   width: 30px;
-//   height: 20px;
-//   border-radius: ${theme.borderRadius.s};
-//   background-color: ${theme.colors.silverLight};
-//   margin-left: auto;
-// `;
 
 export default FixtureStatsModal;
