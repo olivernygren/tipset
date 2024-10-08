@@ -483,6 +483,10 @@ const LeagueCard = styled(motion.div)`
   min-height: 250px;
   box-sizing: border-box;
 
+  > * {
+    cursor: pointer;
+  }
+
   @media ${devices.tablet} {
     padding: ${theme.spacing.m};
   }

@@ -155,7 +155,8 @@ export const Teams = {
     },
     {
       name: 'Liverpool',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',
+      logoUrl: 'https://backend.liverpoolfc.com/sites/default/files/styles/lg/public/2022-07/MicrosoftTeams-image%20%2818%29%20%281%29.webp?itok=mhoZb73-&width=1680',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',
       stadium: 'Anfield',
       country: CountryEnum.ENGLAND,
     },
