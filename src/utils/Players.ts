@@ -271,6 +271,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.JAPAN,
     picture: '/images/players/takehiro-tomiyasu.png',
+    isInjured: true,
   },
   {
     id: 'fhwefh9hrrh94ofof',
@@ -479,6 +480,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/bukayo-saka.png',
+    mayBeInjured: true,
   },
   {
     id: 'ehfiehre923rh4or98hotw9',
@@ -515,6 +517,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-martinelli.png',
+    mayBeInjured: true,
   },
   {
     id: 'qfujw0jw0rj90g3pork3po3',
@@ -539,6 +542,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.GERMANY,
     picture: '/images/players/kai-havertz.png',
+    mayBeInjured: true,
   },
   {
     id: 'bgwehroqnrbuwbuiwnfwifbe',
