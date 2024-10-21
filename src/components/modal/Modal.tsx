@@ -88,7 +88,7 @@ const Modal = ({
 const getModalPadding = (noPadding?: boolean, headerDivider?: boolean, isMobile?: boolean) => {
   if (noPadding) return '0';
 
-  if (isMobile) return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}`;
+  if (isMobile) return headerDivider ? `${theme.spacing.m}` : `0 ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}`;
 
   return headerDivider ? `${theme.spacing.l}` : `0 ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`;
 };

@@ -1062,6 +1062,13 @@ export const Teams = {
       stadium: 'Volksparkstadion',
       country: CountryEnum.UKRAINE,
     },
+    {
+      name: 'FK Kolos Kovalivka',
+      shortName: 'Kolos',
+      stadium: 'Kolos Stadium',
+      country: CountryEnum.UKRAINE,
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/31/FCKolos2018.svg',
+    },
   ],
   [LeagueEnum.SCOTTISH_PREMIERSHIP]: [
     {

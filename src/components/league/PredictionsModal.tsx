@@ -37,8 +37,10 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
           <GoalScorersContainer>
             <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
             <Section gap="xxs" flexDirection="row" alignItems="center" fitContent>
-              {fixture.finalResult?.goalScorers && (
+              {fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length > 0 ? (
                 <NormalTypography variant="m">{goalScorers}</NormalTypography>
+              ) : (
+                <NormalTypography variant="s" color={theme.colors.silverDark}>Inga målskyttar</NormalTypography>
               )}
             </Section>
           </GoalScorersContainer>
@@ -66,7 +68,7 @@ const PredictionsContainer = styled.div`
   margin-bottom: ${theme.spacing.s};
 
   @media ${devices.tablet} {
-    gap: ${theme.spacing.xxs};
+    gap: ${theme.spacing.s};
   }
 `;
 
