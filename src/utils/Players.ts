@@ -321,7 +321,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
     picture: '/images/players/riccardo-calafiori.png',
-    mayBeInjured: true,
+    isInjured: true,
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
