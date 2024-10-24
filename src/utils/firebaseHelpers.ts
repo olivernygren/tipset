@@ -21,7 +21,7 @@ export const getLeagueByInvitationCode = async (inviteCode: string) => {
 
 export const getSortedLeagueStandings = (standings: Array<PredictionLeagueStanding>) => standings.sort((a, b) => {
   if (a.points === b.points) {
-    return a.correctResults - b.correctResults;
+    return b.correctResults - a.correctResults;
   }
   return b.points - a.points;
 });

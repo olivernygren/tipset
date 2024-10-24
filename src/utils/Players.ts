@@ -296,6 +296,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 23,
     country: CountryEnum.FRANCE,
     picture: '/images/players/william-saliba.png',
+    isSuspended: true,
   },
   {
     id: 'moehg9n0h01rh0fhfdk',
@@ -320,6 +321,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
     picture: '/images/players/riccardo-calafiori.png',
+    mayBeInjured: true,
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
@@ -515,7 +517,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-martinelli.png',
-    mayBeInjured: true,
   },
   {
     id: 'qfujw0jw0rj90g3pork3po3',

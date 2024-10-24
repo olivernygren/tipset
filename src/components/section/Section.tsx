@@ -30,7 +30,7 @@ export const Section = styled.section<SectionProps>`
   width: ${({ fitContent }) => (fitContent ? 'fit-content' : '100%')};
   position: relative;
   height: ${({ height }) => height || 'auto'};
-  cursor: ${({ pointer }) => (pointer ? 'pointer' : 'auto')};
+  cursor: ${({ pointer }) => (pointer ? 'pointer' : 'inherit')};
   overflow: ${({ overflow }) => overflow || 'visible'};
 
   @media ${devices.tablet} {
