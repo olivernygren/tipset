@@ -277,6 +277,13 @@ export const Teams = {
       stadium: 'Deepdale',
       country: CountryEnum.ENGLAND,
     },
+    {
+      name: 'Plymouth Argyle',
+      shortName: 'Plymouth',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a8/Plymouth_Argyle_F.C._logo.svg',
+      stadium: 'Home Park',
+      country: CountryEnum.ENGLAND,
+    },
   ],
   [LeagueEnum.EFL_LEAGUE_ONE]: [
     {
