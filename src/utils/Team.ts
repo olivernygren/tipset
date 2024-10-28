@@ -14,6 +14,7 @@ export interface Team {
 
 export enum LeagueEnum {
   PREMIER_LEAGUE = 'Premier League',
+  EFL_CHAMPIONSHIP = 'EFL Championship',
   EFL_LEAGUE_ONE = 'EFL League One',
   EFL_LEAGUE_TWO = 'EFL League Two',
   ALLSVENSKAN = 'Allsvenskan',
@@ -265,6 +266,15 @@ export const Teams = {
       name: 'Fulham',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg',
       stadium: 'Craven Cottage',
+      country: CountryEnum.ENGLAND,
+    },
+  ],
+  [LeagueEnum.EFL_CHAMPIONSHIP]: [
+    {
+      name: 'Preston North End',
+      shortName: 'Preston',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/82/Preston_North_End_FC.svg',
+      stadium: 'Deepdale',
       country: CountryEnum.ENGLAND,
     },
   ],
