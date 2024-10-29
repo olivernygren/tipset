@@ -106,7 +106,7 @@ const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  z-index: 100;
   animation: fadeIn 0.2s ease;
   
   @media ${devices.tablet} {

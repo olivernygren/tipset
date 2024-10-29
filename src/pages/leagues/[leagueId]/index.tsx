@@ -34,6 +34,8 @@ import { errorNotify } from '../../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../../utils/hooks/useResizeListener';
 import CustomSkeleton, { ParagraphSkeleton } from '../../../components/skeleton/CustomSkeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import Modal from '../../../components/modal/Modal';
+import Input from '../../../components/input/Input';
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
@@ -57,6 +59,9 @@ const PredictionLeaguePage = () => {
   const [showJoinLeagueError, setShowJoinLeagueError] = useState<string>('');
   const [sortedLeagueStandings, setSortedLeagueStandings] = useState<Array<PredictionLeagueStanding>>([]);
   const [mobileTabsMenuOpen, setMobileTabsMenuOpen] = useState<boolean>(false);
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<boolean>(false);
+  const [deleteLeagueInputValue, setDeleteLeagueInputValue] = useState<string>('');
+  const [deleteLeagueLoading, setDeleteLeagueLoading] = useState<boolean>(false);
 
   const leagueIdFromUrl = window.location.pathname.split('/')[2];
   const currentUserId = auth.currentUser?.uid ?? '';
@@ -92,6 +97,8 @@ const PredictionLeaguePage = () => {
   };
 
   const handleDeleteLeague = async () => {
+    setDeleteLeagueLoading(true);
+
     if (!league) {
       console.log('No league found');
       return;
@@ -109,6 +116,8 @@ const PredictionLeaguePage = () => {
       navigate(`/${RoutesEnum.LEAGUES}`);
     } catch (error) {
       console.log('Error deleting league', error);
+    } finally {
+      setDeleteLeagueLoading(false);
     }
   };
 
@@ -294,25 +303,25 @@ const PredictionLeaguePage = () => {
             <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
             <Section gap="s" flexDirection="row" alignItems="center" fitContent>
               {(isCreator || hasAdminRights) && (
-              <>
-                <IconButton
-                  icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
-                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                  onClick={() => setContextMenuOpen(!contextMenuOpen)}
-                  showBorder
-                  backgroundColor={theme.colors.white}
-                />
-                {contextMenuOpen && (
-                  <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
-                    <ContextMenuOption
-                      icon={<Trash size={24} color={theme.colors.red} />}
-                      onClick={() => handleDeleteLeague()}
-                      label="Radera liga"
-                      color={theme.colors.red}
-                    />
-                  </ContextMenu>
-                )}
-              </>
+                <>
+                  <IconButton
+                    icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
+                    colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                    onClick={() => setContextMenuOpen(!contextMenuOpen)}
+                    showBorder
+                    backgroundColor={theme.colors.white}
+                  />
+                  {contextMenuOpen && (
+                    <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
+                      <ContextMenuOption
+                        icon={<Trash size={24} color={theme.colors.red} />}
+                        onClick={() => setConfirmDeleteModal(true)}
+                        label="Radera liga"
+                        color={theme.colors.red}
+                      />
+                    </ContextMenu>
+                  )}
+                </>
               )}
             </Section>
           </>
@@ -321,73 +330,119 @@ const PredictionLeaguePage = () => {
       {initialFetchLoading ? getSkeletonLoader() : (
         <PageContent>
           {isParticipant && (
-          <>
-            {isMobile ? (
-              <MobileTabs>
-                <MobileTabsButton onClick={() => setMobileTabsMenuOpen(!mobileTabsMenuOpen)}>
-                  <Section flexDirection="row" alignItems="center" gap="xxs">
-                    {getTabIcon(activeTab, true)}
-                    <EmphasisTypography variant="m" color={theme.colors.primary}>
-                      {getTabText(activeTab)}
-                    </EmphasisTypography>
-                  </Section>
-                  <MobileMenuIcon isOpen={mobileTabsMenuOpen}>
-                    <CaretDown size={16} color={theme.colors.primary} weight="bold" />
-                  </MobileMenuIcon>
-                </MobileTabsButton>
-                {mobileTabsMenuOpen && (
-                <MobileTabsOptionsMenu
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
+            <>
+              {isMobile ? (
+                <MobileTabs>
+                  <MobileTabsButton onClick={() => setMobileTabsMenuOpen(!mobileTabsMenuOpen)}>
+                    <Section flexDirection="row" alignItems="center" gap="xxs">
+                      {getTabIcon(activeTab, true)}
+                      <EmphasisTypography variant="m" color={theme.colors.primary}>
+                        {getTabText(activeTab)}
+                      </EmphasisTypography>
+                    </Section>
+                    <MobileMenuIcon isOpen={mobileTabsMenuOpen}>
+                      <CaretDown size={16} color={theme.colors.primary} weight="bold" />
+                    </MobileMenuIcon>
+                  </MobileTabsButton>
+                  {mobileTabsMenuOpen && (
+                  <MobileTabsOptionsMenu
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {tabs.map((tab) => (
+                      <MobileMenuOption
+                        isActive={activeTab === tab}
+                        onClick={() => {
+                          setActiveTab(tab);
+                          setMobileTabsMenuOpen(false);
+                        }}
+                      >
+                        <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
+                          {getTabText(tab)}
+                        </EmphasisTypography>
+                        {getTabIcon(tab, activeTab === tab)}
+                      </MobileMenuOption>
+                    ))}
+                  </MobileTabsOptionsMenu>
+                  )}
+                </MobileTabs>
+              ) : (
+                <TabsContainer>
                   {tabs.map((tab) => (
-                    <MobileMenuOption
-                      isActive={activeTab === tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        setMobileTabsMenuOpen(false);
-                      }}
-                    >
-                      <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
+                    <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
+                      {getTabIcon(tab, activeTab === tab)}
+                      <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
                         {getTabText(tab)}
                       </EmphasisTypography>
-                      {getTabIcon(tab, activeTab === tab)}
-                    </MobileMenuOption>
+                    </Tab>
                   ))}
-                </MobileTabsOptionsMenu>
-                )}
-              </MobileTabs>
-            ) : (
-              <TabsContainer>
-                {tabs.map((tab) => (
-                  <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
-                    {getTabIcon(tab, activeTab === tab)}
-                    <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textLight}>
-                      {getTabText(tab)}
-                    </EmphasisTypography>
-                  </Tab>
-                ))}
-              </TabsContainer>
-            )}
-            {getPageContent()}
-          </>
+                </TabsContainer>
+              )}
+              {getPageContent()}
+            </>
           )}
           {!isParticipant && currentUserId && (
-          <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m" expandMobile>
-            <HeadingsTypography variant="h5">
-              {`Vill du gå med i ligan ${league?.name}?`}
-            </HeadingsTypography>
-            <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>
-              Acceptera inbjudan
-            </Button>
-            {showJoinLeagueError.length > 0 && (
-            <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
-            )}
-          </Section>
+            <Section backgroundColor={theme.colors.white} padding={theme.spacing.m} borderRadius={theme.borderRadius.m} gap="m" expandMobile>
+              <HeadingsTypography variant="h5">
+                {`Vill du gå med i ligan ${league?.name}?`}
+              </HeadingsTypography>
+              <Button onClick={handleJoinLeague} disabled={joinLeagueLoading} loading={joinLeagueLoading}>
+                Acceptera inbjudan
+              </Button>
+              {showJoinLeagueError.length > 0 && (
+              <NormalTypography variant="s" color={theme.colors.red}>{showJoinLeagueError}</NormalTypography>
+              )}
+            </Section>
           )}
         </PageContent>
+      )}
+      {confirmDeleteModal && (
+        <Modal
+          title="Radera liga"
+          onClose={() => setConfirmDeleteModal(false)}
+          size="s"
+        >
+          <Section gap="m">
+            <Section gap="xs">
+              <NormalTypography variant="m">
+                Vill du radera ligan permanent? Detta kan ej ångras!
+              </NormalTypography>
+              <NormalTypography variant="m">
+                Fyll i ligans namn för att bekräfta att du vill radera den.
+              </NormalTypography>
+            </Section>
+            <Input
+              value={deleteLeagueInputValue}
+              onChange={(e) => setDeleteLeagueInputValue(e.target.value)}
+              placeholder={league?.name}
+              fullWidth
+            />
+            <Section flexDirection="row" gap="xs" alignItems="center">
+              <Button
+                onClick={() => setConfirmDeleteModal(false)}
+                variant="secondary"
+                fullWidth
+                color="red"
+                textColor={theme.colors.red}
+              >
+                Avbryt
+              </Button>
+              <Button
+                onClick={handleDeleteLeague}
+                variant="primary"
+                fullWidth
+                color="red"
+                disabled={deleteLeagueInputValue !== league?.name}
+                icon={<Trash size={20} color="white" weight="fill" />}
+                loading={deleteLeagueLoading}
+              >
+                Radera liga
+              </Button>
+            </Section>
+          </Section>
+        </Modal>
       )}
     </Page>
   );

@@ -29,6 +29,9 @@ const Button = ({
       if (disabled) {
         return theme.colors.silverLight;
       }
+      if (color !== 'primary') {
+        return color;
+      }
       return theme.colors.primary;
     }
     return textColor;
@@ -48,17 +51,19 @@ const Button = ({
       color={color}
       size={size}
     >
-      {icon}
       {loading ? (
         <RotationalSpinner>
           <SpinnerGap size={24} color={variant === 'primary' ? theme.colors.white : theme.colors.primary} />
         </RotationalSpinner>
       ) : (
-        <EmphasisTypography id={id} variant="m" color={getButtonTextColor()} align="center">
-          {children}
-        </EmphasisTypography>
+        <>
+          {icon}
+          <EmphasisTypography id={id} variant="m" color={getButtonTextColor()} align="center">
+            {children}
+          </EmphasisTypography>
+          {endIcon}
+        </>
       )}
-      {endIcon}
     </StyledButton>
   );
 };
