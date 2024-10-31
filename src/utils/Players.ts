@@ -152,7 +152,7 @@ export enum ArsenalPlayersEnum {
   DAVID_RAYA = 'David Raya',
   NETO = 'Neto',
   KARL_HEIN = 'Karl Hein',
-  TOM_SETFORD = 'Tom Setford',
+  TOMMY_SETFORD = 'Tommy Setford',
   BEN_WHITE = 'Ben White',
   TAKEHIRO_TOMIYASU = 'Takehiro Tomiyasu',
   JURRIEN_TIMBER = 'Jurrien Timber',
@@ -236,6 +236,18 @@ export const ArsenalPlayers: Array<Player> = [
     country: CountryEnum.BRAZIL,
     picture: '/images/players/neto.png',
   },
+  {
+    id: 'ht943hnrwo48ho49ohin',
+    name: ArsenalPlayersEnum.TOMMY_SETFORD,
+    position: {
+      exact: ExactPositionEnum.GK,
+      general: GeneralPositionEnum.GK,
+    },
+    number: 36,
+    age: getAgeByBirthDate('2006-03-13'),
+    country: CountryEnum.NETHERLANDS,
+    picture: '/images/players/tom-setford.png',
+  },
   // {
   //   id: 'uewbfouwr48of938hf93',
   //   name: ArsenalPlayersEnum.KARL_HEIN,
@@ -283,7 +295,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.NETHERLANDS,
     picture: '/images/players/jurrien-timber.png',
-    mayBeInjured: true,
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
@@ -308,7 +319,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-magalhaes.png',
-    mayBeInjured: true,
+    isInjured: true,
   },
   {
     id: 'h7fhghgw08hn3gh4b3p0fj309h',
