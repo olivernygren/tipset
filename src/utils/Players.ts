@@ -319,7 +319,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-magalhaes.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
     id: 'h7fhghgw08hn3gh4b3p0fj309h',

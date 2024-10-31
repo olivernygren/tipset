@@ -3,21 +3,26 @@ import styled, { css } from 'styled-components';
 import {
   Ambulance,
   Bandaids,
-  CheckCircle, Circle, Funnel, Info, Square, XCircle,
+  CheckCircle, Circle, Football, Funnel, Info, SoccerBall, Square, XCircle,
 } from '@phosphor-icons/react';
+import { collection, getDocs } from 'firebase/firestore';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
-import { GeneralPositionEnum, Player } from '../../utils/Players';
+import { GeneralPositionEnum, Player, PlayerRating } from '../../utils/Players';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
-import { defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints } from '../../utils/helpers';
+import {
+  defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObjectsInArray,
+} from '../../utils/helpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import Input from '../input/Input';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import TextButton from '../buttons/TextButton';
 import Tag from '../tag/Tag';
 import { Section } from '../section/Section';
+import { db } from '../../config/firebase';
+import { CollectionEnum } from '../../utils/Firebase';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
@@ -46,6 +51,7 @@ const GoalScorerModal = ({
   const [searchValue, setSearchValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
+  const [playerRatings, setPlayerRatings] = useState<Array<PlayerRating>>([]);
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
@@ -60,6 +66,24 @@ const GoalScorerModal = ({
     setMidfielders(midfielders);
     setForwards(forwards);
   }, [players]);
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      try {
+        const playerRatingCollectionRef = collection(db, CollectionEnum.PLAYER_RATINGS);
+        if (!playerRatingCollectionRef) return;
+
+        const playerRatingData = await getDocs(playerRatingCollectionRef);
+        const playerRatings = withDocumentIdOnObjectsInArray<PlayerRating>(playerRatingData.docs);
+
+        setPlayerRatings(playerRatings);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRatings();
+  }, []);
 
   const handlePlayerClick = (player: Player) => {
     if (multiple) {
@@ -90,6 +114,11 @@ const GoalScorerModal = ({
     } else {
       setSelectedFilters([...selectedFilters, filter]);
     }
+  };
+
+  const getGoalsScoredForPlayer = (playerName: string) => {
+    const playerRating = playerRatings.find((rating) => rating.playerName === playerName);
+    return playerRating ? playerRating.goals : 0;
   };
 
   const getPlayer = (player: Player) => (
@@ -127,6 +156,12 @@ const GoalScorerModal = ({
           </IconContainer>
         ) : (
           <Flex>
+            <GoalsScored>
+              <NormalTypography variant="s" color={theme.colors.silver}>
+                {getGoalsScoredForPlayer(player.name)}
+              </NormalTypography>
+              <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
+            </GoalsScored>
             {player.mayBeInjured && (
               <Bandaids size={24} color={theme.colors.gold} weight="fill" />
             )}
@@ -228,7 +263,7 @@ const GoalScorerModal = ({
               <NormalTypography variant="s" color={theme.colors.silverDarker}>
                 Kom ihåg att du inte kan välja samma målskytt som förra omgången
               </NormalTypography>
-              <Section flexDirection={isMobile ? 'column' : 'row'} alignItems={isMobile ? 'flex-start' : 'center'} gap={isMobile ? 'xxxs' : 'xxs'}>
+              <Section flexDirection={isMobile ? 'column' : 'row'} alignItems={isMobile ? 'flex-start' : 'center'} gap="xxxs">
                 <NormalTypography variant="s" color={theme.colors.silverDarker}>
                   Förra omgången valde du:
                 </NormalTypography>
@@ -408,6 +443,13 @@ const Flex = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xs};
+`;
+
+const GoalsScored = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxxs};
+  width: fit-content;
 `;
 
 export default GoalScorerModal;
