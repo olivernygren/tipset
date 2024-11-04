@@ -700,7 +700,7 @@ export const Teams = {
     },
     {
       name: 'Venezia',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Venezia_FC_-_logo_%28Italy%2C_2022-%29.svg',
+      logoUrl: 'https://shop.veneziafc.it/cdn/shop/files/logo_veneziafc.svg?v=1720436518&width=120',
       stadium: 'Stadio Pierluigi Penzo',
       country: CountryEnum.ITALY,
     },

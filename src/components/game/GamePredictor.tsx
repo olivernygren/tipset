@@ -107,7 +107,7 @@ const GamePredictor = ({
   };
 
   const getKickoffTime = () => {
-    const weekday = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { weekday: 'long' });
+    const weekday = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { weekday: 'short' });
     const weekdayCapitalized = weekday.charAt(0).toUpperCase() + weekday.slice(1);
     const date = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
     const time = new Date(game.kickOffTime).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });

@@ -478,7 +478,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.NORWAY,
     picture: '/images/players/martin-odegaard.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
     id: 'cbwgr8h90ejqrjwf8gwrf',
