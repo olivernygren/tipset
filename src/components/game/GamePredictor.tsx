@@ -172,6 +172,8 @@ const GamePredictor = ({
     );
   };
 
+  console.log('game', game);
+
   const getCardHeaderContent = () => {
     if (isMobile) {
       return (
@@ -242,6 +244,25 @@ const GamePredictor = ({
           <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
         </TagsSection>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+        {game.odds && (
+          <>
+            <OddsContainer hasPredicted={hasPredicted}>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
+              </OddsWrapper>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
+              </OddsWrapper>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
+              </OddsWrapper>
+            </OddsContainer>
+            {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
+          </>
+        )}
         <GameWrapper>
           {getTeam(game.homeTeam, false)}
           <GoalInputWrapper>
@@ -435,11 +456,36 @@ const TagsSection = styled.div`
   padding: ${theme.spacing.xs} 0;
   flex-direction: column;
   min-height: 24px;
+  width: 100%;
   
   @media ${devices.tablet} {
     flex-direction: row;
     gap: ${theme.spacing.m};
   }
+`;
+
+const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
+  /* background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primaryFade)}; */
+  padding-top: ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.s};
+  /* display: flex;
+  justify-content: space-between; */
+  align-items: center;
+  display: grid;
+  grid-template-columns: 4fr 3fr 4fr;
+  gap: ${theme.spacing.s};
+  width: 100%;
+  box-sizing: border-box;
+  `;
+
+const OddsWrapper = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default GamePredictor;
