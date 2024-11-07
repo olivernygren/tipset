@@ -942,7 +942,7 @@ const FixtureStatsModal = ({
               </TableCell>
             </TableRow>
           )}
-          {(fixtureHasOdds || (canEdit && includeOdds)) && (
+          {(canEdit && (includeOdds || fixtureHasOdds)) && (
             <TableRow isDoubleColSpan>
               <TableCell>
                 <FlexColumn>
