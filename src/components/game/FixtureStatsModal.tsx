@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-  Check, PencilSimple, X, XCircle,
+  Check, PencilSimple, XCircle,
 } from '@phosphor-icons/react';
 import { doc, updateDoc } from 'firebase/firestore';
 import {
@@ -953,7 +953,6 @@ const FixtureStatsModal = ({
                 {canEdit ? (
                   <>
                     <Input
-                      // type="number"
                       value={odds.homeWin}
                       onChange={(e) => handleUpdateOddsInput('homeWin', e.currentTarget.value)}
                       placeholder="1"
@@ -963,7 +962,6 @@ const FixtureStatsModal = ({
                       customPadding={`${theme.spacing.xxs} 0`}
                     />
                     <Input
-                      // type="number"
                       value={odds.draw}
                       onChange={(e) => handleUpdateOddsInput('draw', e.currentTarget.value)}
                       placeholder="X"
@@ -973,7 +971,6 @@ const FixtureStatsModal = ({
                       customPadding={`${theme.spacing.xxs} 0`}
                     />
                     <Input
-                      // type="number"
                       value={odds.awayWin}
                       onChange={(e) => handleUpdateOddsInput('awayWin', e.currentTarget.value)}
                       placeholder="2"
@@ -991,41 +988,6 @@ const FixtureStatsModal = ({
                   </>
                 )}
               </TableCell>
-              {/* <TableCell>
-                {canEdit ? (
-                  <Input
-                    type="number"
-                    value={odds.draw.toString() ?? '0'}
-                    onChange={(e) => setOdds((oldstate) => ({ ...oldstate, draw: Number(e.currentTarget.value) }))}
-                    placeholder="Oavgjort"
-                    fullWidth
-                    noBorder
-                    compact
-                    customPadding={`${theme.spacing.xxs} 0`}
-                  />
-                ) : (
-                  <NormalTypography variant="s">{`Oavgjort: ${fixture.odds?.draw}`}</NormalTypography>
-
-                )}
-              </TableCell>
-              <TableCell>
-                {canEdit ? (
-                  <Input
-                    type="number"
-                    value={odds.awayWin.toString() ?? '0'}
-                    onChange={(e) => setOdds((oldstate) => ({ ...oldstate, awayWin: Number(e.currentTarget.value) }))}
-                    placeholder="Bortalag"
-                    fullWidth
-                    noBorder
-                    compact
-                    customPadding={`${theme.spacing.xxs} 0`}
-                  />
-                ) : (
-                  <Section gap="xxs">
-                    <NormalTypography variant="s">{`Bortalag: ${fixture.odds?.awayWin}`}</NormalTypography>
-                  </Section>
-                )}
-              </TableCell> */}
             </TableRow>
           )}
         </Layout>
@@ -1038,13 +1000,6 @@ const FixtureStatsModal = ({
               loading={saveLoading}
             >
               Spara
-            </Button>
-            <Button
-              size="m"
-              onClick={() => console.log({ homeWin: parseFloat(odds.homeWin), draw: parseFloat(odds.draw), awayWin: parseFloat(odds.awayWin) })}
-              color="gold"
-            >
-              Se odds
             </Button>
           </Section>
         )}
@@ -1059,19 +1014,6 @@ const FixtureStatsModal = ({
       )}
     </>
   );
-};
-
-const getTableRowColumnLayout = (style: 'triple' | 'double' | 'single') => {
-  switch (style) {
-    case 'triple':
-      return '3fr auto auto auto';
-    case 'double':
-      return '3fr 4fr 4fr';
-    case 'single':
-      return '3fr 8fr';
-    default:
-      return '3fr 4fr 4fr';
-  }
 };
 
 const Layout = styled.div<{ isEditMode: boolean }>`
