@@ -45,8 +45,34 @@ const RulesPage = () => {
               {' '}
               poäng för anfallare
             </NormalTypography>
+            <HeadingsTypography variant="h5">Oddsbonus</HeadingsTypography>
+            <NormalTypography variant="m">Om du tippat rätt utfall i en match som har odds tillagt får du bonuspoäng enligt hur hur höga oddsen var för det utfallet du tippade.</NormalTypography>
+            <NormalTypography variant="m">
+              Inga extra poäng för odds från 1.00 till 2.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              {1}
+              {' '}
+              poäng för odds mellan 3.00 och 3.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              {2}
+              {' '}
+              poäng för odds mellan 4.00 och 5.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              {3}
+              {' '}
+              poäng för odds mellan 6.00 och 9.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              {5}
+              {' '}
+              poäng för odds 10.00 eller högre
+            </NormalTypography>
           </Section>
-          <EmphasisTypography variant="m">Maxpoäng per match = 10 poäng</EmphasisTypography>
+          <EmphasisTypography variant="m">Maxpoäng per match utan odds = 10 poäng</EmphasisTypography>
+          <EmphasisTypography variant="m">Maxpoäng per match med odds = 15 poäng</EmphasisTypography>
         </Section>
         <Divider color={theme.colors.silver} />
         <Section gap="s">

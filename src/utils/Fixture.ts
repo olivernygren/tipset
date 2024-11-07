@@ -66,6 +66,7 @@ export interface PredictionPoints {
   correctGoalDifference: number;
   correctGoalsByHomeTeam: number;
   correctGoalsByAwayTeam: number;
+  oddsBonus: number;
   total: number;
 }
 

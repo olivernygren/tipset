@@ -167,12 +167,9 @@ const GamePredictor = ({
             {displayName}
           </TeamName>
         </AvatarAndTeamName>
-        {/* {getTeamForm(isAwayTeam)} */}
       </TeamContainer>
     );
   };
-
-  console.log('game', game);
 
   const getCardHeaderContent = () => {
     if (isMobile) {
@@ -244,25 +241,6 @@ const GamePredictor = ({
           <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
         </TagsSection>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        {game.odds && (
-          <>
-            <OddsContainer hasPredicted={hasPredicted}>
-              <OddsWrapper>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
-              </OddsWrapper>
-              <OddsWrapper>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
-              </OddsWrapper>
-              <OddsWrapper>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
-              </OddsWrapper>
-            </OddsContainer>
-            {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
-          </>
-        )}
         <GameWrapper>
           {getTeam(game.homeTeam, false)}
           <GoalInputWrapper>
@@ -286,6 +264,25 @@ const GamePredictor = ({
           </GoalInputWrapper>
           {getTeam(game.awayTeam, true)}
         </GameWrapper>
+        {game.odds && (
+          <>
+            <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+            <OddsContainer hasPredicted={hasPredicted}>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
+              </OddsWrapper>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
+              </OddsWrapper>
+              <OddsWrapper>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
+                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
+              </OddsWrapper>
+            </OddsContainer>
+          </>
+        )}
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
         <GoalScorerSection>
           {game.shouldPredictGoalScorer ? (
@@ -466,7 +463,7 @@ const TagsSection = styled.div`
 
 const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
   /* background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primaryFade)}; */
-  padding-top: ${theme.spacing.xs};
+  padding: ${theme.spacing.xs} 0;
   border-radius: ${theme.borderRadius.s};
   /* display: flex;
   justify-content: space-between; */
