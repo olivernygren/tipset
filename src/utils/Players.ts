@@ -406,6 +406,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
+    mayBeInjured: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
