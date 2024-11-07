@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Info,
   ListChecks,
   PlusCircle, XCircle,
 } from '@phosphor-icons/react';
@@ -43,6 +44,8 @@ import SelectImitation from '../input/SelectImitation';
 import SelectTeamModal from '../game/SelectTeamModal';
 import SelectTournamentModal from '../game/SelectTournamentModal';
 import FixtureStatsModal from '../game/FixtureStatsModal';
+import TextButton from '../buttons/TextButton';
+import Modal from '../modal/Modal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -72,6 +75,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
   const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState(false);
+  const [oddsBonusModalOpen, setOddsBonusModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
@@ -133,7 +137,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
   useEffect(() => {
     if (!league || !predictionStatuses.length) return;
-    console.log(predictionStatuses);
 
     if (predictionStatuses.some(({ status }) => status === PredictionStatus.UPDATED)) {
       setGameWeekPredictionStatus(GameWeekPredictionStatus.UNSAVED_CHANGES);
@@ -862,7 +865,20 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               )}
             </OngoingGameWeekHeader>
             {ongoingGameWeek ? (
-              getOngoingGameWeekContent()
+              <>
+                {getOngoingGameWeekContent()}
+                {ongoingGameWeek.games.fixtures.some((f) => f.odds) && (
+                  <Section padding="8px 0">
+                    <TextButton
+                      icon={<Info size={20} color={theme.colors.primary} />}
+                      noPadding
+                      onClick={() => setOddsBonusModalOpen(true)}
+                    >
+                      Läs mer om oddsbonus
+                    </TextButton>
+                  </Section>
+                )}
+              </>
             ) : (
               <NormalTypography variant="m" color={theme.colors.textLight}>Ingen pågående omgång</NormalTypography>
             )}
@@ -959,6 +975,29 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           league={league}
           refetchLeague={refetchLeague}
         />
+      )}
+      {oddsBonusModalOpen && (
+        <Modal size="s" title="Oddsbonus" onClose={() => setOddsBonusModalOpen(false)}>
+          <NormalTypography variant="m">Om du tippat rätt utfall i en match får du bonuspoäng enligt hur hur höga oddsen var för det utfallet du tippade.</NormalTypography>
+          <HeadingsTypography variant="h6">Utdelning av bonuspoäng</HeadingsTypography>
+          <Section gap="xs">
+            <NormalTypography variant="m">
+              Inga extra poäng för odds från 1.00 till 2.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              1 poäng för odds mellan 3.00 och 3.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              2 poäng för odds mellan 4.00 och 5.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              3 poäng för odds mellan 6.00 och 9.99
+            </NormalTypography>
+            <NormalTypography variant="m">
+              5 poäng för odds 10.00 eller högre
+            </NormalTypography>
+          </Section>
+        </Modal>
       )}
     </>
   );

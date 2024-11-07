@@ -41,6 +41,7 @@ export interface Fixture {
   previewStats?: FixturePreviewStats;
   includeStats?: boolean;
   fixtureNickname?: string;
+  odds?: FixtureOdds;
 }
 
 export interface FixtureInput {
@@ -65,6 +66,7 @@ export interface PredictionPoints {
   correctGoalDifference: number;
   correctGoalsByHomeTeam: number;
   correctGoalsByAwayTeam: number;
+  oddsBonus: number;
   total: number;
 }
 
@@ -112,4 +114,10 @@ export interface FixturePreviewStats {
   awayTeam: TeamFixturePreviewStats;
   analysis?: string;
   lastUpdated: string;
+}
+
+export interface FixtureOdds {
+  homeWin: string;
+  draw: string;
+  awayWin: string;
 }

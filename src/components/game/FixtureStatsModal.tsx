@@ -5,7 +5,7 @@ import {
 } from '@phosphor-icons/react';
 import { doc, updateDoc } from 'firebase/firestore';
 import {
-  Fixture, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult, TeamType,
+  Fixture, FixtureOdds, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult, TeamType,
 } from '../../utils/Fixture';
 import Modal from '../modal/Modal';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -51,6 +51,7 @@ const FixtureStatsModal = ({
   const [includeLastFixture, setIncludeLastFixture] = useState<boolean>(false);
   const [includeStandings, setIncludeStandings] = useState<boolean>(false);
   const [includeAnalysis, setIncludeAnalysis] = useState<boolean>(false);
+  const [includeOdds, setIncludeOdds] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [mobileSelectedTeam, setMobileSelectedTeam] = useState<'home' | 'away'>('home');
 
@@ -83,11 +84,13 @@ const FixtureStatsModal = ({
   const [homeTeamLastFixtureOutcome, setHomeTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.homeTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
   const [awayTeamLastFixtureOutcome, setAwayTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.awayTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
   const [editAnalysisValue, setEditAnalysisValue] = useState(fixture.previewStats?.analysis ?? '');
+  const [odds, setOdds] = useState<FixtureOdds>({ homeWin: fixture.odds?.homeWin.toString() ?? '', draw: fixture.odds?.draw.toString() ?? '', awayWin: fixture.odds?.awayWin.toString() ?? '' });
 
   const canEdit = isLeagueCreator && isEditMode;
   const fixtureHasStandings = Boolean(fixture.previewStats && fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints);
   const fixtureHasForm = fixture.previewStats && fixture.previewStats?.homeTeam.form && fixture.previewStats?.awayTeam.form;
   const fixtureHasAnalysis = fixture.previewStats && fixture.previewStats.analysis;
+  const fixtureHasOdds = fixture.odds && fixture.odds.homeWin && fixture.odds.draw && fixture.odds.awayWin;
 
   const handleSaveStats = async () => {
     if (!ongoingGameWeek) return;
@@ -126,6 +129,7 @@ const FixtureStatsModal = ({
     const updatedFixture: Fixture = {
       ...fixture,
       previewStats,
+      ...(includeOdds && { odds }),
     };
 
     const updatedGameWeek: LeagueGameWeek = {
@@ -202,11 +206,13 @@ const FixtureStatsModal = ({
     const fixtureSavedWithLastFixture = Boolean(fixture.previewStats?.homeTeam.lastFixture?.opponent || fixture.previewStats?.awayTeam.lastFixture?.opponent) && Boolean(fixture.previewStats?.lastUpdated);
     const fixtureSavedWithStandings = Boolean(fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints) && Boolean(fixture.previewStats?.lastUpdated);
     const fixtureSavedWithAnalysis = Boolean(fixture.previewStats?.analysis);
+    const fixtureSavedWithOdds = Boolean(fixture.odds?.homeWin && fixture.odds?.draw && fixture.odds?.awayWin);
 
     setIsEditMode(!isEditMode);
     setIncludeLastFixture(fixtureSavedWithLastFixture);
     setIncludeStandings(fixtureSavedWithStandings);
     setIncludeAnalysis(fixtureSavedWithAnalysis);
+    setIncludeOdds(fixtureSavedWithOdds);
   };
 
   const getTeamAvatar = (isAwayTeam: boolean, customTeam?: Team, customSize?: AvatarSize) => {
@@ -293,6 +299,13 @@ const FixtureStatsModal = ({
     return (
       <NormalTypography variant="m" color={theme.colors.silverDark}>{`Senast uppdaterad: ${formattedDate}`}</NormalTypography>
     );
+  };
+
+  const handleUpdateOddsInput = (type: 'homeWin' | 'draw' | 'awayWin', value: string) => {
+    setOdds((oldstate) => ({
+      ...oldstate,
+      [type]: value,
+    }));
   };
 
   const getLastFixtureResultEdit = (isHomeTeam: boolean) => {
@@ -673,6 +686,11 @@ const FixtureStatsModal = ({
                   checked={includeAnalysis}
                   onChange={() => setIncludeAnalysis(!includeAnalysis)}
                 />
+                <Checkbox
+                  label="Inkludera odds"
+                  checked={includeOdds}
+                  onChange={() => setIncludeOdds(!includeOdds)}
+                />
               </Section>
             )}
           </LastUpdatedContainer>
@@ -924,9 +942,95 @@ const FixtureStatsModal = ({
               </TableCell>
             </TableRow>
           )}
+          {(fixtureHasOdds || (canEdit && includeOdds)) && (
+            <TableRow isDoubleColSpan>
+              <TableCell>
+                <FlexColumn>
+                  <EmphasisTypography variant="m">Odds</EmphasisTypography>
+                </FlexColumn>
+              </TableCell>
+              <TableCell>
+                {canEdit ? (
+                  <>
+                    <Input
+                      // type="number"
+                      value={odds.homeWin}
+                      onChange={(e) => handleUpdateOddsInput('homeWin', e.currentTarget.value)}
+                      placeholder="1"
+                      fullWidth
+                      noBorder
+                      compact
+                      customPadding={`${theme.spacing.xxs} 0`}
+                    />
+                    <Input
+                      // type="number"
+                      value={odds.draw}
+                      onChange={(e) => handleUpdateOddsInput('draw', e.currentTarget.value)}
+                      placeholder="X"
+                      fullWidth
+                      noBorder
+                      compact
+                      customPadding={`${theme.spacing.xxs} 0`}
+                    />
+                    <Input
+                      // type="number"
+                      value={odds.awayWin}
+                      onChange={(e) => handleUpdateOddsInput('awayWin', e.currentTarget.value)}
+                      placeholder="2"
+                      fullWidth
+                      noBorder
+                      compact
+                      customPadding={`${theme.spacing.xxs} 0`}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <NormalTypography variant="s">{`1 ${fixture.odds?.homeWin}`}</NormalTypography>
+                    <NormalTypography variant="s">{`X ${fixture.odds?.draw}`}</NormalTypography>
+                    <NormalTypography variant="s">{`2 ${fixture.odds?.awayWin}`}</NormalTypography>
+                  </>
+                )}
+              </TableCell>
+              {/* <TableCell>
+                {canEdit ? (
+                  <Input
+                    type="number"
+                    value={odds.draw.toString() ?? '0'}
+                    onChange={(e) => setOdds((oldstate) => ({ ...oldstate, draw: Number(e.currentTarget.value) }))}
+                    placeholder="Oavgjort"
+                    fullWidth
+                    noBorder
+                    compact
+                    customPadding={`${theme.spacing.xxs} 0`}
+                  />
+                ) : (
+                  <NormalTypography variant="s">{`Oavgjort: ${fixture.odds?.draw}`}</NormalTypography>
+
+                )}
+              </TableCell>
+              <TableCell>
+                {canEdit ? (
+                  <Input
+                    type="number"
+                    value={odds.awayWin.toString() ?? '0'}
+                    onChange={(e) => setOdds((oldstate) => ({ ...oldstate, awayWin: Number(e.currentTarget.value) }))}
+                    placeholder="Bortalag"
+                    fullWidth
+                    noBorder
+                    compact
+                    customPadding={`${theme.spacing.xxs} 0`}
+                  />
+                ) : (
+                  <Section gap="xxs">
+                    <NormalTypography variant="s">{`Bortalag: ${fixture.odds?.awayWin}`}</NormalTypography>
+                  </Section>
+                )}
+              </TableCell> */}
+            </TableRow>
+          )}
         </Layout>
         {canEdit && (
-          <Section padding={isMobile ? `${theme.spacing.s} ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}` : `${theme.spacing.s} ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`}>
+          <Section flexDirection="row" padding={isMobile ? `${theme.spacing.s} ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m}` : `${theme.spacing.s} ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l}`}>
             <Button
               size="m"
               disabled={saveLoading || (includeLastFixture && (!editLastFixtureOpponents.homeTeamOpponent || !editLastFixtureOpponents.awayTeamOpponent)) || (includeStandings && (!editStandingsPositionValue.homeTeam || !editStandingsPositionValue.awayTeam || !editStandingsPositionPoints.homeTeam || !editStandingsPositionPoints.awayTeam))}
@@ -934,6 +1038,13 @@ const FixtureStatsModal = ({
               loading={saveLoading}
             >
               Spara
+            </Button>
+            <Button
+              size="m"
+              onClick={() => console.log({ homeWin: parseFloat(odds.homeWin), draw: parseFloat(odds.draw), awayWin: parseFloat(odds.awayWin) })}
+              color="gold"
+            >
+              Se odds
             </Button>
           </Section>
         )}
@@ -948,6 +1059,19 @@ const FixtureStatsModal = ({
       )}
     </>
   );
+};
+
+const getTableRowColumnLayout = (style: 'triple' | 'double' | 'single') => {
+  switch (style) {
+    case 'triple':
+      return '3fr auto auto auto';
+    case 'double':
+      return '3fr 4fr 4fr';
+    case 'single':
+      return '3fr 8fr';
+    default:
+      return '3fr 4fr 4fr';
+  }
 };
 
 const Layout = styled.div<{ isEditMode: boolean }>`

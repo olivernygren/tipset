@@ -214,6 +214,46 @@ const CorrectPredictionsModal = ({
     }
   };
 
+  const getOddsBonusPoints = (prediction: Prediction) => {
+    if (!ongoingGameWeek || !ongoingGameWeek.games.fixtures) return 0;
+
+    const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
+    if (!fixture || !fixture.odds) return 0;
+
+    const homeWinOdds = parseFloat(fixture.odds.homeWin);
+    const drawOdds = parseFloat(fixture.odds.draw);
+    const awayWinOdds = parseFloat(fixture.odds.awayWin);
+
+    const getBonusPointsFromOdds = (odds: number): number => {
+      if (odds >= 1 && odds <= 2.99) return 0;
+      if (odds >= 3.0 && odds <= 3.99) return 1;
+      if (odds >= 4.0 && odds <= 5.99) return 2;
+      if (odds >= 6.0 && odds <= 9.99) return 3;
+      if (odds >= 10) return 5;
+      return 0;
+    };
+
+    const homeWinPredicted = prediction.homeGoals > prediction.awayGoals;
+    const drawPredicted = prediction.homeGoals === prediction.awayGoals;
+    const awayWinPredicted = prediction.homeGoals < prediction.awayGoals;
+
+    const finalResultHomeWin = parseInt(finalResult.homeGoals) > parseInt(finalResult.awayGoals);
+    const finalResultDraw = parseInt(finalResult.homeGoals) === parseInt(finalResult.awayGoals);
+    const finalResultAwayWin = parseInt(finalResult.homeGoals) < parseInt(finalResult.awayGoals);
+
+    if (homeWinPredicted && homeWinOdds && finalResultHomeWin) {
+      return getBonusPointsFromOdds(homeWinOdds);
+    }
+    if (drawPredicted && drawOdds && finalResultDraw) {
+      return getBonusPointsFromOdds(drawOdds);
+    }
+    if (awayWinPredicted && awayWinOdds && finalResultAwayWin) {
+      return getBonusPointsFromOdds(awayWinOdds);
+    }
+
+    return 0;
+  };
+
   const handleCalculatePoints = (prediction: Prediction) => {
     if (!prediction || finalResult.homeGoals === '' || finalResult.awayGoals === '') {
       return;
@@ -227,6 +267,7 @@ const CorrectPredictionsModal = ({
       correctGoalDifference: 0,
       correctGoalsByHomeTeam: 0,
       correctGoalsByAwayTeam: 0,
+      oddsBonus: 0,
       total: 0,
     };
 
@@ -247,19 +288,36 @@ const CorrectPredictionsModal = ({
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
 
+    const oddsBonusPoints = getOddsBonusPoints(prediction);
+
     if (homeWinPredicted && wasHomeWin) {
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
+
+      if (oddsBonusPoints > 0) {
+        totalPoints += oddsBonusPoints;
+        pointDistribution.oddsBonus += oddsBonusPoints;
+      }
     }
 
     if (awayWinPredicted && wasAwayWin) {
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
+
+      if (oddsBonusPoints > 0) {
+        totalPoints += oddsBonusPoints;
+        pointDistribution.oddsBonus += oddsBonusPoints;
+      }
     }
 
     if (drawPredicted && wasDraw) {
       totalPoints += 1;
       pointDistribution.correctOutcome += 1;
+
+      if (oddsBonusPoints > 0) {
+        totalPoints += oddsBonusPoints;
+        pointDistribution.oddsBonus += oddsBonusPoints;
+      }
     }
 
     if (correctHomeGoals) {

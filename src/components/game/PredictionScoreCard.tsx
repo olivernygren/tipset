@@ -20,6 +20,40 @@ interface PredictionScoreCardProps {
 const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
+  const getOddsForPredictedOutcome = () => {
+    let predictedOutcome;
+    if (prediction.homeGoals > prediction.awayGoals) {
+      predictedOutcome = '1';
+    } else if (prediction.homeGoals === prediction.awayGoals) {
+      predictedOutcome = 'X';
+    } else {
+      predictedOutcome = '2';
+    }
+
+    let finalOutcome = null;
+    if (fixture?.finalResult?.homeTeamGoals !== undefined && fixture?.finalResult?.awayTeamGoals !== undefined) {
+      if (fixture.finalResult.homeTeamGoals > fixture.finalResult.awayTeamGoals) {
+        finalOutcome = '1';
+      } else if (fixture.finalResult.homeTeamGoals === fixture.finalResult.awayTeamGoals) {
+        finalOutcome = 'X';
+      } else {
+        finalOutcome = '2';
+      }
+    }
+
+    if (predictedOutcome === finalOutcome) {
+      if (predictedOutcome === '1') {
+        return fixture?.odds?.homeWin;
+      }
+      if (predictedOutcome === 'X') {
+        return fixture?.odds?.draw;
+      }
+      if (predictedOutcome === '2') {
+        return fixture?.odds?.awayWin;
+      }
+    }
+  };
+
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
     return (
@@ -76,9 +110,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           <EmphasisTypography variant="m" color={theme.colors.white}>
             {prediction.goalScorer?.name}
             {' '}
-            (
             {getGeneralPositionShorthand(prediction.goalScorer.position.general)}
-            )
           </EmphasisTypography>
         )}
       </Section>
@@ -92,6 +124,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           gap="xxs"
         >
           {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
+          {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
           {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
           {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
           {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
