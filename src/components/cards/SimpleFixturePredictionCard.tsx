@@ -80,7 +80,6 @@ const SimpleFixturePredictionCard = ({ prediction, fixture }: SimpleFixturePredi
 const Card = styled.div`
   background-color: ${theme.colors.silverLighter};
   border-radius: ${theme.borderRadius.m};
-  /* box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08); */
   width: 100%;
   box-sizing: border-box;
   border: 1px solid ${theme.colors.silverLight};

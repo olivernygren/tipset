@@ -83,21 +83,6 @@ const CreateAndCorrectFixturePreview = ({
         </TextButton>
         )}
       </ButtonsContainer>
-      {/* {!hidePredictions && !hasBeenCorrected && (
-        <Absolute>
-          {isCorrectionMode ? (
-            <TextButton color="primary" onClick={onShowPredictionsClick}>
-              Rätta
-            </TextButton>
-          ) : (
-            <IconButton
-              icon={<Eye size={24} />}
-              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
-              onClick={onShowPredictionsClick || (() => {})}
-            />
-          )}
-        </Absolute>
-      )} */}
     </Container>
   );
 };
