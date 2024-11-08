@@ -89,12 +89,20 @@ const FixtureContainer = styled.div`
 `;
 
 const Teams = styled.div`
-  display: flex;
+  /* display: flex; */
   gap: ${theme.spacing.xxs};
   height: 52px;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  /* flex: 1; */
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  width: 100%;
+
+  & > div:first-child {
+    margin-left: auto;
+  }
 `;
 
 const TeamContainer = styled.div`

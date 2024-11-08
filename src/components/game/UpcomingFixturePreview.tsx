@@ -83,13 +83,14 @@ const UpcomingFixturePreview = ({
 const Container = styled.div<{ canViewPredictions?: boolean }>`
   display: flex;
   align-items: center;
+  /* justify-content: ${({ canViewPredictions }) => (canViewPredictions ? 'flex-start' : 'center')}; */
   justify-content: center;
   background-color: ${theme.colors.silverLighter};
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  padding: ${theme.spacing.xxxs} 0;
-
+  padding: ${theme.spacing.xs} 0 ${theme.spacing.xs} ${theme.spacing.xs};
+  
   ${({ canViewPredictions }) => canViewPredictions && css`
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -97,15 +98,24 @@ const Container = styled.div<{ canViewPredictions?: boolean }>`
       background-color: ${theme.colors.silverLight};
     }
   `}
+
+  /* @media ${devices.mobileL} {
+    justify-content: center;
+  } */
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.xxxs} 0;
+  }
 `;
 
 const Teams = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: ${theme.spacing.s};
+  gap: ${theme.spacing.xxs};
   
   @media ${devices.tablet} {
+    gap: ${theme.spacing.s};
     padding: 0;
     min-height: 48px;
   }
@@ -117,7 +127,10 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
   gap: ${theme.spacing.xxxs};
   width: fit-content;
   white-space: nowrap;
-  ${({ isHomeTeam }) => isHomeTeam && 'margin-left: auto;'}
+  
+  @media ${devices.mobileL} {
+    ${({ isHomeTeam }) => isHomeTeam && 'margin-left: auto;'}
+  }
 `;
 
 const Absolute = styled.div`

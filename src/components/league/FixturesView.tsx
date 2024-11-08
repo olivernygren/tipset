@@ -32,7 +32,7 @@ import GamePredictor from '../game/GamePredictor';
 import { generateRandomID } from '../../utils/firebaseHelpers';
 import { Player } from '../../utils/Players';
 import IconButton from '../buttons/IconButton';
-import FixturePreview from '../game/FixturePreview';
+import CreateAndCorrectFixturePreview from '../game/CreateAndCorrectFixturePreview';
 import CorrectPredictionsModal from './CorrectPredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
@@ -697,26 +697,28 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <Divider />
       <Section gap="s">
         <HeadingsTypography variant="h5">Matcher</HeadingsTypography>
-        {newGameWeekFixtures.length > 0 && (
-          newGameWeekFixtures
-            .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-            .map((fixture, index) => (
-              <Section flexDirection="row" gap="xxs" alignItems="center">
-                <FixturePreview
-                  fixture={fixture}
-                  key={index}
-                  hidePredictions
-                  onClick={() => handlePreFillFixtureData(fixture)}
-                  isCreationMode
-                />
-                <IconButton
-                  icon={<XCircle size={24} weight="fill" />}
-                  colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                  onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
-                />
-              </Section>
-            ))
-        )}
+        <Section gap="xxs">
+          {newGameWeekFixtures.length > 0 && (
+            newGameWeekFixtures
+              .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+              .map((fixture, index) => (
+                <Section flexDirection="row" gap="xxs" alignItems="center">
+                  <CreateAndCorrectFixturePreview
+                    fixture={fixture}
+                    key={index}
+                    hidePredictions
+                    onClick={() => handlePreFillFixtureData(fixture)}
+                    isCreationMode
+                  />
+                  <IconButton
+                    icon={<XCircle size={24} weight="fill" />}
+                    colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                    onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
+                  />
+                </Section>
+              ))
+          )}
+        </Section>
         {addFixtureViewOpen ? (
           <>
             {newGameWeekFixtures.length > 0 && <Divider />}
@@ -766,7 +768,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       <>
         <Section gap="xxs">
           {ongoingGameWeek.games.fixtures.map((fixture) => (
-            <FixturePreview
+            <CreateAndCorrectFixturePreview
               fixture={fixture}
               hasBeenCorrected={ongoingGameWeek.hasBeenCorrected || Boolean(fixture.finalResult)}
               onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
@@ -959,7 +961,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             <FixtureResultPreview
                               fixture={fixture}
                               predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                              compact={isMobile}
                             />
                           )}
                           {!isMobile && index < array.length - 1 && <Divider />}

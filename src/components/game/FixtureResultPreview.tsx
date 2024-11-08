@@ -19,13 +19,10 @@ import { Team } from '../../utils/Team';
 interface FixtureResultPreviewProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
-  showBorder?: boolean;
-  compact?: boolean;
-  isFullTime?: boolean;
 }
 
 const FixtureResultPreview = ({
-  fixture, predictions, compact, showBorder, isFullTime = true,
+  fixture, predictions,
 }: FixtureResultPreviewProps) => {
   const { user } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
@@ -55,24 +52,24 @@ const FixtureResultPreview = ({
 
   return (
     <>
-      <FixtureContainer showBorder={showBorder}>
-        {isFullTime ? (
-          <FullTimeIndicator compact={compact}>
-            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'} color={theme.colors.white}>FT</EmphasisTypography>
+      <FixtureContainer>
+        {fixture.finalResult ? (
+          <FullTimeIndicator>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.white}>FT</EmphasisTypography>
           </FullTimeIndicator>
         ) : (
           <KickOffTime>
             <EmphasisTypography variant="s" color={theme.colors.white}>LIVE</EmphasisTypography>
           </KickOffTime>
         )}
-        <Teams compact={compact}>
-          <TeamContainer compact={compact}>
-            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>
+        <Teams>
+          <TeamContainer>
+            <NormalTypography variant={isMobile ? 's' : 'm'}>
               {useShortTeamNames ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
-            </EmphasisTypography>
-            {!compact && getAvatar(fixture.homeTeam)}
+            </NormalTypography>
+            {getAvatar(fixture.homeTeam)}
           </TeamContainer>
-          {!isMobile && !compact && (
+          {!isMobile && (
             <ResultContainer>
               <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault}>
                 {fixture.finalResult?.homeTeamGoals ?? '?'}
@@ -83,11 +80,11 @@ const FixtureResultPreview = ({
               </NoWrapTypography>
             </ResultContainer>
           )}
-          <TeamContainer compact={compact}>
-            {!compact && getAvatar(fixture.awayTeam)}
-            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>
+          <TeamContainer>
+            {getAvatar(fixture.awayTeam)}
+            <NormalTypography variant={isMobile ? 's' : 'm'}>
               {useShortTeamNames ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}
-            </EmphasisTypography>
+            </NormalTypography>
           </TeamContainer>
         </Teams>
         <Section flexDirection="row" alignItems="center" justifyContent="flex-end" fitContent>

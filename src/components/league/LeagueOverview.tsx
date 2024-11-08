@@ -11,7 +11,7 @@ import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
 // eslint-disable-next-line import/no-cycle
 import { LeagueTabs } from '../../pages/leagues/[leagueId]';
-import FixturePreview from '../game/FixturePreview';
+import CreateAndCorrectFixturePreview from '../game/CreateAndCorrectFixturePreview';
 import { Divider } from '../Divider';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import { useUser } from '../../context/UserContext';
@@ -171,20 +171,6 @@ const LeagueOverview = ({
               </HeadingsTypography>
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
-                  {/* <FixturesContainer>
-                    {currentGameWeek.games.fixtures
-                      .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-                      .map((fixture) => (
-                        <FixturePreview
-                          fixture={fixture}
-                          hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-                          onShowPredictionsClick={() => setShowPredictionsModalForFixture(fixture.id)}
-                          simple
-                          useShortNames={!isTablet && !isMobile}
-                        />
-                      ))}
-                  </FixturesContainer> */}
-                  {/* TODO: CREATE SEPARATE FIXTURE PREVIEW COMPONENTS FOR EACH USE CASE */}
                   <FixturesContainer>
                     {Array.from(groupFixturesByDate(currentGameWeek.games.fixtures).entries()).map(([date, fixtures]) => (
                       <UpcomingFixturesDateContainer>
@@ -200,14 +186,6 @@ const LeagueOverview = ({
                           .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
                           .map((fixture: Fixture, index: number, array: Array<any>) => (
                             <>
-                              {/* <FixturePreview
-                                key={fixture.id}
-                                fixture={fixture}
-                                hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-                                onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
-                                simple
-                                useShortNames={!isTablet && !isMobile}
-                              /> */}
                               <UpcomingFixturePreview
                                 fixture={fixture}
                                 onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
@@ -382,7 +360,8 @@ const GridRow = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
-  gap: ${theme.spacing.s};
+  column-gap: ${theme.spacing.m};
+  row-gap: ${theme.spacing.m};
   
   @media ${devices.laptop} {
     grid-template-columns: 1fr 1fr;
