@@ -14,6 +14,7 @@ import { useUser } from '../../context/UserContext';
 import PredictionsModal from '../league/PredictionsModal';
 import IconButton from '../buttons/IconButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import { Team } from '../../utils/Team';
 
 interface FixtureResultPreviewProps {
   fixture: Fixture;
@@ -28,12 +29,29 @@ const FixtureResultPreview = ({
 }: FixtureResultPreviewProps) => {
   const { user } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+  const isTablet = useResizeListener(DeviceSizes.TABLET);
+
+  const useShortTeamNames = isTablet;
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const handleOpenModal = () => {
     setModalOpen(true);
   };
+
+  const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
+    <ClubAvatar
+      logoUrl={team.logoUrl}
+      clubName={team.name}
+      size={AvatarSize.XS}
+    />
+  ) : (
+    <NationAvatar
+      flagUrl={team.logoUrl}
+      nationName={team.name}
+      size={AvatarSize.XS}
+    />
+  ));
 
   return (
     <>
@@ -49,22 +67,10 @@ const FixtureResultPreview = ({
         )}
         <Teams compact={compact}>
           <TeamContainer compact={compact}>
-            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>{fixture.homeTeam.name}</EmphasisTypography>
-            {!compact && (
-              fixture.teamType === TeamType.CLUBS ? (
-                <ClubAvatar
-                  logoUrl={fixture.homeTeam.logoUrl}
-                  clubName={fixture.homeTeam.name}
-                  size={compact ? AvatarSize.XS : AvatarSize.S}
-                />
-              ) : (
-                <NationAvatar
-                  flagUrl={fixture.homeTeam.logoUrl}
-                  nationName={fixture.homeTeam.name}
-                  size={compact ? AvatarSize.XS : AvatarSize.S}
-                />
-              )
-            )}
+            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>
+              {useShortTeamNames ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
+            </EmphasisTypography>
+            {!compact && getAvatar(fixture.homeTeam)}
           </TeamContainer>
           {!isMobile && !compact && (
             <ResultContainer>
@@ -78,22 +84,10 @@ const FixtureResultPreview = ({
             </ResultContainer>
           )}
           <TeamContainer compact={compact}>
-            {!compact && (
-              fixture.teamType === TeamType.CLUBS ? (
-                <ClubAvatar
-                  logoUrl={fixture.awayTeam.logoUrl}
-                  clubName={fixture.awayTeam.name}
-                  size={compact ? AvatarSize.XS : AvatarSize.S}
-                />
-              ) : (
-                <NationAvatar
-                  flagUrl={fixture.awayTeam.logoUrl}
-                  nationName={fixture.awayTeam.name}
-                  size={compact ? AvatarSize.XS : AvatarSize.S}
-                />
-              )
-            )}
-            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>{fixture.awayTeam.name}</EmphasisTypography>
+            {!compact && getAvatar(fixture.awayTeam)}
+            <EmphasisTypography variant={compact || isMobile ? 's' : 'm'}>
+              {useShortTeamNames ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}
+            </EmphasisTypography>
           </TeamContainer>
         </Teams>
         <Section flexDirection="row" alignItems="center" justifyContent="flex-end" fitContent>
@@ -124,7 +118,6 @@ const FixtureResultPreview = ({
               </TextButton>
             )
           )}
-          {/* UPDATE COMPACT VERSION TO LOOK LIKE FORZA */}
         </Section>
       </FixtureContainer>
       {modalOpen && (

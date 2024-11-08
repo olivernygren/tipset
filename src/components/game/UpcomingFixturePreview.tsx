@@ -1,30 +1,28 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Eye } from '@phosphor-icons/react';
 import { Fixture, TeamType } from '../../utils/Fixture';
-import { Section } from '../section/Section';
 import { devices, theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { NormalTypography } from '../typography/Typography';
-import TextButton from '../buttons/TextButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import IconButton from '../buttons/IconButton';
 import { Team } from '../../utils/Team';
 
-interface OverviewFixturePreviewProps {
+interface UpcomingFixturePreviewProps {
   fixture: Fixture;
   onShowPredictionsClick?: () => void;
   useShortNames?: boolean;
 }
 
-const OverviewFixturePreview = ({
+const UpcomingFixturePreview = ({
   fixture, onShowPredictionsClick, useShortNames,
-}: OverviewFixturePreviewProps) => {
+}: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const canViewPredictions = fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date();
+  const canViewPredictions = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
 
   const getKickoffTime = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
@@ -48,16 +46,25 @@ const OverviewFixturePreview = ({
   ));
 
   return (
-    <Container>
+    <Container
+      canViewPredictions={canViewPredictions}
+      onClick={canViewPredictions ? onShowPredictionsClick : undefined}
+    >
       <Teams>
         <TeamContainer isHomeTeam>
-          <NormalTypography variant={isMobile ? 's' : 'm'}>{useShortNames && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'} align="right">
+            {useShortNames && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}
+          </NormalTypography>
           {getTeamAvatar(fixture.homeTeam)}
         </TeamContainer>
-        <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>{canViewPredictions ? 'LIVE' : getKickoffTime(fixture.kickOffTime)}</NormalTypography>
+        <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>
+          {canViewPredictions ? 'LIVE' : getKickoffTime(fixture.kickOffTime)}
+        </NormalTypography>
         <TeamContainer>
           {getTeamAvatar(fixture.awayTeam)}
-          <NormalTypography variant={isMobile ? 's' : 'm'}>{useShortNames && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}</NormalTypography>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>
+            {useShortNames && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}
+          </NormalTypography>
         </TeamContainer>
       </Teams>
       {canViewPredictions && (
@@ -73,7 +80,7 @@ const OverviewFixturePreview = ({
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ canViewPredictions?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,17 +90,20 @@ const Container = styled.div`
   position: relative;
   padding: ${theme.spacing.xxxs} 0;
 
-  @media ${devices.tablet} {
-    padding: 0;
-  }
+  ${({ canViewPredictions }) => canViewPredictions && css`
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    &:hover {
+      background-color: ${theme.colors.silverLight};
+    }
+  `}
 `;
 
 const Teams = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  padding: ${theme.spacing.xxxs};
   align-items: center;
-  gap: ${theme.spacing.xxs};
+  gap: ${theme.spacing.s};
   
   @media ${devices.tablet} {
     padding: 0;
@@ -108,10 +118,6 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
   width: fit-content;
   white-space: nowrap;
   ${({ isHomeTeam }) => isHomeTeam && 'margin-left: auto;'}
-  
-  @media ${devices.tablet} {
-    gap: 0;
-  }
 `;
 
 const Absolute = styled.div`
@@ -121,4 +127,4 @@ const Absolute = styled.div`
   transform: translateY(-50%);
 `;
 
-export default OverviewFixturePreview;
+export default UpcomingFixturePreview;

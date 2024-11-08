@@ -46,7 +46,8 @@ import SelectTournamentModal from '../game/SelectTournamentModal';
 import FixtureStatsModal from '../game/FixtureStatsModal';
 import TextButton from '../buttons/TextButton';
 import Modal from '../modal/Modal';
-import LastRoundFixtureResult from '../game/LastRoundFixtureResult';
+import CompactFixtureResult from '../game/CompactFixtureResult';
+import PredictionsModal from './PredictionsModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -78,6 +79,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState(false);
   const [oddsBonusModalOpen, setOddsBonusModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
+  const [showFixturePredictionsModal, setShowFixturePredictionsModal] = useState<string | null>(null);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -948,9 +950,10 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       .map((fixture, index, array) => (
                         <>
                           {isMobile ? (
-                            <LastRoundFixtureResult
+                            <CompactFixtureResult
                               fixture={fixture}
                               predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                              onModalOpen={() => setShowFixturePredictionsModal(fixture.id)}
                             />
                           ) : (
                             <FixtureResultPreview
@@ -1021,6 +1024,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </NormalTypography>
           </Section>
         </Modal>
+      )}
+      {showFixturePredictionsModal && (
+        <PredictionsModal
+          predictions={previousGameWeeks?.map((gw) => gw.games.predictions).flat().filter((p) => p.fixtureId === showFixturePredictionsModal) ?? []}
+          fixture={previousGameWeeks?.map((gw) => gw.games.fixtures).flat().find((f) => f.id === showFixturePredictionsModal)}
+          onClose={() => setShowFixturePredictionsModal(null)}
+        />
       )}
     </>
   );

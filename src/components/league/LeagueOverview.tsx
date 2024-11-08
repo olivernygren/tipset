@@ -19,8 +19,8 @@ import IconButton from '../buttons/IconButton';
 import PredictionsModal from './PredictionsModal';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { Fixture } from '../../utils/Fixture';
-import LastRoundFixtureResult from '../game/LastRoundFixtureResult';
-import OverviewFixturePreview from '../game/OverviewFixturePreview';
+import CompactFixtureResult from '../game/CompactFixtureResult';
+import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -157,7 +157,7 @@ const LeagueOverview = ({
 
   return (
     <>
-      <OverviewGrid>
+      <Wrapper>
         <GridSection>
           {league.hasEnded ? (
             <>
@@ -187,13 +187,7 @@ const LeagueOverview = ({
                   {/* TODO: CREATE SEPARATE FIXTURE PREVIEW COMPONENTS FOR EACH USE CASE */}
                   <FixturesContainer>
                     {Array.from(groupFixturesByDate(currentGameWeek.games.fixtures).entries()).map(([date, fixtures]) => (
-                      <Section
-                        gap="xxxs"
-                        key={date}
-                        backgroundColor={theme.colors.silverLighter}
-                        borderRadius={theme.borderRadius.m}
-                        padding={`0 0 ${theme.spacing.xxxs} 0`}
-                      >
+                      <UpcomingFixturesDateContainer>
                         <Section
                           padding={theme.spacing.xs}
                           backgroundColor={theme.colors.silverLight}
@@ -214,7 +208,7 @@ const LeagueOverview = ({
                                 simple
                                 useShortNames={!isTablet && !isMobile}
                               /> */}
-                              <OverviewFixturePreview
+                              <UpcomingFixturePreview
                                 fixture={fixture}
                                 onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
                                 useShortNames={isMobile}
@@ -222,7 +216,7 @@ const LeagueOverview = ({
                               {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
                             </>
                           ))}
-                      </Section>
+                      </UpcomingFixturesDateContainer>
                     ))}
                   </FixturesContainer>
                   {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && (
@@ -252,10 +246,11 @@ const LeagueOverview = ({
             </>
           )}
         </GridSection>
-        <GridSection>
-          <TableSectionHeader>
-            <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
-            {league.standings && league.standings.length > 0 && (
+        <GridRow>
+          <GridSection>
+            <TableSectionHeader>
+              <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
+              {league.standings && league.standings.length > 0 && (
               <>
                 <EmphasisTypography variant="m" color={theme.colors.textLight}>
                   {`Din placering: ${getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}`}
@@ -263,74 +258,75 @@ const LeagueOverview = ({
                 {/* Show separate user placing somewhere if they are outside the top 5 */}
                 {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
               </>
+              )}
+            </TableSectionHeader>
+            {league.standings && league.standings.length > 0 ? (
+              <LeagueStandings>
+                <LeagueStandingsHeader>
+                  <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
+                  <RightAlignedGridItem>
+                    <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">KR</EmphasisTypography>
+                  </RightAlignedGridItem>
+                  <RightAlignedGridItem>
+                    <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'OB' : 'Bonus'}</EmphasisTypography>
+                  </RightAlignedGridItem>
+                  <RightAlignedGridItem>
+                    <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
+                  </RightAlignedGridItem>
+                </LeagueStandingsHeader>
+                {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
+              </LeagueStandings>
+            ) : (
+              <NormalTypography variant="m" color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
             )}
-          </TableSectionHeader>
-          {league.standings && league.standings.length > 0 ? (
-            <LeagueStandings>
-              <LeagueStandingsHeader>
-                <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
-                <RightAlignedGridItem>
-                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">KR</EmphasisTypography>
-                </RightAlignedGridItem>
-                <RightAlignedGridItem>
-                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'OB' : 'Bonus'}</EmphasisTypography>
-                </RightAlignedGridItem>
-                <RightAlignedGridItem>
-                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
-                </RightAlignedGridItem>
-              </LeagueStandingsHeader>
-              {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
-            </LeagueStandings>
-          ) : (
-            <NormalTypography variant="m" color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
-          )}
-        </GridSection>
-        <GridSection>
-          <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
-          {previousGameWeek ? (
-            <PreviousRoundCard>
-              <Section
-                justifyContent="space-between"
-                alignItems="flex-start"
-                flexDirection="row"
-                backgroundColor={theme.colors.silverLighter}
-                borderRadius={`${theme.borderRadius.l} ${theme.borderRadius.l} 0 0`}
-              >
-                <Section padding={theme.spacing.s} fitContent>
-                  <EmphasisTypography variant="m" color={theme.colors.textDefault}>
-                    {`Omgång ${previousGameWeek.round}`}
-                  </EmphasisTypography>
+          </GridSection>
+          <GridSection>
+            <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
+            {previousGameWeek ? (
+              <PreviousRoundCard>
+                <Section
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  flexDirection="row"
+                  backgroundColor={theme.colors.silverLighter}
+                  borderRadius={`${theme.borderRadius.l} ${theme.borderRadius.l} 0 0`}
+                >
+                  <Section padding={theme.spacing.s} fitContent>
+                    <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                      {`Omgång ${previousGameWeek.round}`}
+                    </EmphasisTypography>
+                  </Section>
+                  <RoundPointsContainer>
+                    <Target size={16} color={theme.colors.textDefault} />
+                    <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                      {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
+                      {' '}
+                      poäng
+                    </EmphasisTypography>
+                  </RoundPointsContainer>
                 </Section>
-                <RoundPointsContainer>
-                  <Target size={16} color={theme.colors.textDefault} />
-                  <EmphasisTypography variant="m" color={theme.colors.textDefault}>
-                    {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
-                    {' '}
-                    poäng
-                  </EmphasisTypography>
-                </RoundPointsContainer>
-              </Section>
-              {/* <Divider color={theme.colors.silverLight} /> */}
-              <Section
-                gap="xxs"
-                padding={`${theme.spacing.xs}`}
-                backgroundColor={theme.colors.white}
-              >
-                {previousGameWeek.games.fixtures
-                  .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-                  .map((fixture) => (
-                    <LastRoundFixtureResult
-                      fixture={fixture}
-                      predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                      onModalOpen={() => setShowPreviousFixturePredictionsModal(fixture.id)}
-                    />
-                  ))}
-              </Section>
-            </PreviousRoundCard>
-          ) : (
-            <NormalTypography variant="m" color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
-          )}
-        </GridSection>
+                {/* <Divider color={theme.colors.silverLight} /> */}
+                <Section
+                  gap="xxs"
+                  padding={`${theme.spacing.xs}`}
+                  backgroundColor={theme.colors.white}
+                >
+                  {previousGameWeek.games.fixtures
+                    .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                    .map((fixture) => (
+                      <CompactFixtureResult
+                        fixture={fixture}
+                        predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                        onModalOpen={() => setShowPreviousFixturePredictionsModal(fixture.id)}
+                      />
+                    ))}
+                </Section>
+              </PreviousRoundCard>
+            ) : (
+              <NormalTypography variant="m" color={theme.colors.textLight}>Ingen tidigare omgång finns</NormalTypography>
+            )}
+          </GridSection>
+        </GridRow>
         <GridSection>
           <Section justifyContent="space-between" alignItems="center" flexDirection="row">
             <HeadingsTypography variant="h3">Information</HeadingsTypography>
@@ -357,7 +353,7 @@ const LeagueOverview = ({
             <NormalTypography variant="m">{getFormattedDeadline()}</NormalTypography>
           </Section>
         </GridSection>
-      </OverviewGrid>
+      </Wrapper>
       {showCurrentFixturePredictionsModal && (
         <PredictionsModal
           predictions={currentGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showCurrentFixturePredictionsModal) ?? []}
@@ -376,16 +372,23 @@ const LeagueOverview = ({
   );
 };
 
-const OverviewGrid = styled.div`
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.m};
+`;
+
+const GridRow = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
-  gap: ${theme.spacing.m};
+  gap: ${theme.spacing.s};
   
   @media ${devices.laptop} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(2, auto);
-    gap: ${theme.spacing.s};
+    column-gap: ${theme.spacing.m};
+    row-gap: 0;
   }
 `;
 
@@ -493,6 +496,18 @@ const PreviousRoundCard = styled.div`
   box-sizing: border-box;
   border: 2px solid ${theme.colors.gold};
   overflow: hidden;
+`;
+
+const UpcomingFixturesDateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  background-color: ${theme.colors.silverLighter};
+  border-radius: ${theme.borderRadius.l};
+  overflow: hidden;
+  border: 1px solid ${theme.colors.silverLight};
 `;
 
 export default LeagueOverview;

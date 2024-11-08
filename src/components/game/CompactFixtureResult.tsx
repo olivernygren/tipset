@@ -12,16 +12,16 @@ import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
-interface LastRoundFixtureResultProps {
+interface CompactFixtureResultProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
   onModalOpen?: () => void;
   showButtonsAndPoints?: boolean;
 }
 
-const LastRoundFixtureResult = ({
+const CompactFixtureResult = ({
   fixture, predictions, onModalOpen, showButtonsAndPoints = true,
-}: LastRoundFixtureResultProps) => {
+}: CompactFixtureResultProps) => {
   const { user } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -58,13 +58,13 @@ const LastRoundFixtureResult = ({
         <TeamWrapper>
           {!isMobile && getClubAvatar(fixture.homeTeam)}
           <NormalTypography variant="s">
-            {fixture.homeTeam.name}
+            {isMobile ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
           </NormalTypography>
         </TeamWrapper>
         <TeamWrapper>
           {!isMobile && getClubAvatar(fixture.awayTeam)}
           <NormalTypography variant="s">
-            {fixture.awayTeam.name}
+            {isMobile ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}
           </NormalTypography>
         </TeamWrapper>
       </Teams>
@@ -80,9 +80,6 @@ const LastRoundFixtureResult = ({
             </NoWrapTypography>
           </PointsTag>
           )}
-          {/* <TextButton noPadding>
-            Se allas tips
-            </TextButton> */}
           <IconButton
             icon={<Eye size={24} />}
             colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
@@ -95,7 +92,7 @@ const LastRoundFixtureResult = ({
 };
 
 const Container = styled.div`
-  min-height: 50px;
+  height: 52px;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -112,7 +109,6 @@ const FullTimeContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
 `;
 
 const ResultContainer = styled.div`
@@ -124,7 +120,6 @@ const ResultContainer = styled.div`
   justify-content: center;
   gap: ${theme.spacing.xxxs};
   box-sizing: border-box;
-  min-height: 50px;
 `;
 
 const Teams = styled.div`
@@ -180,4 +175,4 @@ const NoWrapTypography = styled(NormalTypography)`
   text-overflow: ellipsis;
 `;
 
-export default LastRoundFixtureResult;
+export default CompactFixtureResult;
