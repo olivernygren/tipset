@@ -23,6 +23,9 @@ export const theme = {
     redDark: '#B81A1A',
     redDarker: '#7D0707',
     gold: '#FFCF56',
+    goldFade: '#FFF3D9',
+    goldDark: '#FFB400',
+    goldDarker: '#9c7408',
     green: '#52C68E',
   },
   spacing: {

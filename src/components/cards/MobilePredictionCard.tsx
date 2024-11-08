@@ -17,10 +17,11 @@ interface MobilePredictionCardProps {
   hasPredictedResult: boolean;
   onCalculatePoints: (prediction: Prediction) => void;
   points: number | '-' | undefined;
+  oddsBonus?: number;
 }
 
 const MobilePredictionCard = ({
-  prediction, finalResult, hasPredictedResult, onCalculatePoints, points,
+  prediction, finalResult, hasPredictedResult, onCalculatePoints, points, oddsBonus,
 }: MobilePredictionCardProps) => (
   <Card>
     <HeadingContainer>
@@ -52,7 +53,12 @@ const MobilePredictionCard = ({
     </Row>
     <Divider />
     <Row>
-      <HeadingsTypography variant="h6" color={theme.colors.textDefault}>Poäng</HeadingsTypography>
+      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Oddsbonus</EmphasisTypography>
+      <NormalTypography variant="m">{oddsBonus}</NormalTypography>
+    </Row>
+    <Divider />
+    <Row>
+      <HeadingsTypography variant="h6" color={theme.colors.textDefault}>Totalpoäng</HeadingsTypography>
       <NormalTypography variant="m">{points}</NormalTypography>
     </Row>
     <ButtonContainer>

@@ -25,7 +25,7 @@ const SimpleFixturePredictionCard = ({ prediction, fixture }: SimpleFixturePredi
         <UserContainer>
           <UserProfilePicture userId={prediction.userId} size={isMobile ? AvatarSize.S : AvatarSize.M} />
           {prediction.username ? (
-            <EmphasisTypography variant={isMobile ? 's' : 'l'}>{prediction.username}</EmphasisTypography>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'}>{prediction.username}</EmphasisTypography>
           ) : (
             <EmphasisTypography variant={isMobile ? 's' : 'm'}>
               <UserName userId={prediction.userId} />
@@ -76,12 +76,14 @@ const SimpleFixturePredictionCard = ({ prediction, fixture }: SimpleFixturePredi
     </Card>
   );
 };
+
 const Card = styled.div`
   background-color: ${theme.colors.silverLighter};
   border-radius: ${theme.borderRadius.m};
-  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
+  /* box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08); */
   width: 100%;
   box-sizing: border-box;
+  border: 1px solid ${theme.colors.silverLight};
 `;
 
 const CardTopRow = styled.div`
