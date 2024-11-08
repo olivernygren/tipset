@@ -104,35 +104,28 @@ const CorrectPredictionsModal = ({
       const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
       let previousPoints = 0;
       let previousCorrectResults = 0;
+      let previousOddsBonus = 0;
 
       if (fixture?.finalResult && standing.awardedPointsForFixtures?.includes(gameId)) {
         // Calculate the previously awarded points
         const previousPointsDistribution = ongoingGameWeek.games.predictions.find((p) => p.userId === standing.userId && p.fixtureId === gameId);
         previousPoints = previousPointsDistribution?.points?.total || 0;
         previousCorrectResults = previousPointsDistribution?.points?.correctResult ? 1 : 0;
+        previousOddsBonus = previousPointsDistribution?.points?.oddsBonus || 0;
       }
 
       const updatedPoints = points ? standing.points - previousPoints + points.total : standing.points;
       const updatedCorrectResults = predictedCorrectResult ? standing.correctResults - previousCorrectResults + 1 : standing.correctResults;
+      const updatedOddsBonus = points ? (standing.oddsBonusPoints ?? 0) - previousOddsBonus + points.oddsBonus : (standing.oddsBonusPoints ?? 0);
 
       return {
         ...standing,
         points: updatedPoints,
         correctResults: updatedCorrectResults,
+        oddsBonusPoints: updatedOddsBonus,
         awardedPointsForFixtures: [...(standing.awardedPointsForFixtures ?? []).filter((id) => id !== gameId), gameId],
       };
     });
-
-    try {
-      const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, league.documentId));
-      const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
-
-      if (!leagueData || !leagueData.gameWeeks) return;
-
-      // ... rest of the code
-    } catch (error) {
-      console.error('Error updating league standings: ', error);
-    }
 
     try {
       const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, league.documentId));
@@ -160,36 +153,6 @@ const CorrectPredictionsModal = ({
       setSavingLoading(false);
     }
   };
-
-  // const getOptionItem = (player: Player) => ({
-  //   value: player.id,
-  //   label: player.name,
-  // });
-
-  // const getOptionGroups = () => {
-  //   const defenders = getPlayersByGeneralPosition(GeneralPositionEnum.DF);
-  //   const midfielders = getPlayersByGeneralPosition(GeneralPositionEnum.MF);
-  //   const forwards = getPlayersByGeneralPosition(GeneralPositionEnum.FW);
-
-  //   return [
-  //     {
-  //       label: 'Välj spelare',
-  //       options: [{ value: 'Välj spelare', label: 'Välj spelare' }],
-  //     },
-  //     {
-  //       label: `Försvarare (${defenderGoalPoints}p)`,
-  //       options: defenders.map(getOptionItem),
-  //     },
-  //     {
-  //       label: `Mittfältare (${midfielderGoalPoints}p)`,
-  //       options: midfielders.map(getOptionItem),
-  //     },
-  //     {
-  //       label: `Anfallare (${forwardGoalPoints}p)`,
-  //       options: forwards.map(getOptionItem),
-  //     },
-  //   ];
-  // };
 
   const handleSelectGoalScorers = (players: Array<Player | undefined>) => {
     const playerNames = players
@@ -479,6 +442,7 @@ const CorrectPredictionsModal = ({
                   onCalculatePoints={handleCalculatePoints}
                   points={getPointsValue(prediction.userId, prediction)}
                   hasPredictedResult={hasPredictedResult(prediction)}
+                  oddsBonus={getOddsBonusPoints(prediction)}
                 />
               ))
           ) : (
@@ -488,6 +452,7 @@ const CorrectPredictionsModal = ({
                 <NormalTypography variant="s" color={theme.colors.textLight}>Utgång</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Resultat</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Målgörare</NormalTypography>
+                <NormalTypography variant="s" color={theme.colors.textLight}>varav bonus</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Poäng</NormalTypography>
               </TableHeader>
               <Table>
@@ -507,6 +472,7 @@ const CorrectPredictionsModal = ({
                       ) : (
                         <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
                       )}
+                      <NormalTypography variant="m">{getOddsBonusPoints(prediction)}</NormalTypography>
                       <PointsCell>
                         <NormalTypography variant="m">{getPointsValue(prediction.userId, prediction)}</NormalTypography>
                         <IconButton
@@ -552,7 +518,7 @@ const CorrectPredictionsModal = ({
 
 const TableHeader = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 2fr 1fr 1fr;
   gap: ${theme.spacing.s};
   padding-bottom: ${theme.spacing.xs};
   border-bottom: 1px solid ${theme.colors.silver};
@@ -561,7 +527,7 @@ const TableHeader = styled.div`
 
 const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 2fr 1fr 1fr;
   gap: ${theme.spacing.s};
   align-items: center;
   width: 100%;

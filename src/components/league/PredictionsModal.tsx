@@ -10,6 +10,7 @@ import SimpleFixturePredictionCard from '../cards/SimpleFixturePredictionCard';
 import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import LastRoundFixtureResult from '../game/LastRoundFixtureResult';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -32,7 +33,19 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
       mobileBottomSheet
     >
       <Section gap="m">
-        {fixture && <FixtureResultPreview fixture={fixture} showBorder isFullTime={gameHasFinished} compact={isMobile} />}
+        {fixture && (
+          // <FixtureResultPreview
+          //   fixture={fixture}
+          //   showBorder
+          //   isFullTime={gameHasFinished}
+          //   compact={isMobile}
+          // />
+          <LastRoundFixtureResult
+            fixture={fixture}
+            predictions={predictions}
+            showButtonsAndPoints={false}
+          />
+        )}
         {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
           <GoalScorersContainer>
             <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>

@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { ArrowCircleRight, PencilSimple, PlusCircle } from '@phosphor-icons/react';
+import {
+  ArrowCircleRight, PencilSimple, PlusCircle, Target,
+} from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import { theme, devices } from '../../theme';
@@ -16,6 +18,9 @@ import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
 import PredictionsModal from './PredictionsModal';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import { Fixture } from '../../utils/Fixture';
+import LastRoundFixtureResult from '../game/LastRoundFixtureResult';
+import OverviewFixturePreview from '../game/OverviewFixturePreview';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -35,7 +40,8 @@ const LeagueOverview = ({
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
-  const [showPredictionsModalForFixture, setShowPredictionsModalForFixture] = useState<string | null>(null);
+  const [showCurrentFixturePredictionsModal, setShowCurrentFixturePredictionModal] = useState<string | null>(null);
+  const [showPreviousFixturePredictionsModal, setShowPreviousFixturePredictionsModal] = useState<string | null>(null);
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -94,6 +100,28 @@ const LeagueOverview = ({
     return `${day} ${month} ${hours}:${minutes}`;
   };
 
+  const getFixturesDateFormatted = (date: string) => {
+    const fixtureDate = new Date(date);
+    const day = fixtureDate.getDate();
+    const weekday = fixtureDate.toLocaleString('default', { weekday: 'long' }).replaceAll('.', '').charAt(0).toUpperCase() + fixtureDate.toLocaleString('default', { weekday: 'long' }).slice(1);
+    const month = fixtureDate.toLocaleString('default', { month: 'long' }).replaceAll('.', '');
+    return `${weekday} ${day} ${month}`;
+  };
+
+  const groupFixturesByDate = (fixtures: Array<Fixture>) => {
+    const groupedFixtures = new Map();
+
+    fixtures.forEach((fixture) => {
+      const date = new Date(fixture.kickOffTime).toLocaleDateString();
+      if (!groupedFixtures.has(date)) {
+        groupedFixtures.set(date, []);
+      }
+      groupedFixtures.get(date).push(fixture);
+    });
+
+    return groupedFixtures;
+  };
+
   const getUserLeagueStandingsItem = (position: number, place?: PredictionLeagueStanding) => {
     if (!place) return null;
     const isLoggedInUser = place.userId === currentUserId;
@@ -115,8 +143,13 @@ const LeagueOverview = ({
         </RightAlignedGridItem>
         <RightAlignedGridItem>
           <NormalTypography variant="m" color={theme.colors.textDefault}>
-            {place.points}
+            {place.oddsBonusPoints ?? 0}
           </NormalTypography>
+        </RightAlignedGridItem>
+        <RightAlignedGridItem>
+          <EmphasisTypography variant="m" color={theme.colors.primary}>
+            {place.points}
+          </EmphasisTypography>
         </RightAlignedGridItem>
       </UserLeaguePosition>
     );
@@ -138,7 +171,7 @@ const LeagueOverview = ({
               </HeadingsTypography>
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
-                  <FixturesContainer>
+                  {/* <FixturesContainer>
                     {currentGameWeek.games.fixtures
                       .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
                       .map((fixture) => (
@@ -150,6 +183,47 @@ const LeagueOverview = ({
                           useShortNames={!isTablet && !isMobile}
                         />
                       ))}
+                  </FixturesContainer> */}
+                  {/* TODO: CREATE SEPARATE FIXTURE PREVIEW COMPONENTS FOR EACH USE CASE */}
+                  <FixturesContainer>
+                    {Array.from(groupFixturesByDate(currentGameWeek.games.fixtures).entries()).map(([date, fixtures]) => (
+                      <Section
+                        gap="xxxs"
+                        key={date}
+                        backgroundColor={theme.colors.silverLighter}
+                        borderRadius={theme.borderRadius.m}
+                        padding={`0 0 ${theme.spacing.xxxs} 0`}
+                      >
+                        <Section
+                          padding={theme.spacing.xs}
+                          backgroundColor={theme.colors.silverLight}
+                          borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
+                          alignItems="center"
+                        >
+                          <EmphasisTypography variant="m" color={theme.colors.textDefault}>{getFixturesDateFormatted(date)}</EmphasisTypography>
+                        </Section>
+                        {fixtures
+                          .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                          .map((fixture: Fixture, index: number, array: Array<any>) => (
+                            <>
+                              {/* <FixturePreview
+                                key={fixture.id}
+                                fixture={fixture}
+                                hidePredictions={new Date(fixture.kickOffTime) > new Date()}
+                                onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
+                                simple
+                                useShortNames={!isTablet && !isMobile}
+                              /> */}
+                              <OverviewFixturePreview
+                                fixture={fixture}
+                                onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
+                                useShortNames={isMobile}
+                              />
+                              {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
+                            </>
+                          ))}
+                      </Section>
+                    ))}
                   </FixturesContainer>
                   {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && (
                     <MarginTopButton>
@@ -196,7 +270,10 @@ const LeagueOverview = ({
               <LeagueStandingsHeader>
                 <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
                 <RightAlignedGridItem>
-                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'KR' : 'Korrekta resultat'}</EmphasisTypography>
+                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">KR</EmphasisTypography>
+                </RightAlignedGridItem>
+                <RightAlignedGridItem>
+                  <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'OB' : 'Bonus'}</EmphasisTypography>
                 </RightAlignedGridItem>
                 <RightAlignedGridItem>
                   <EmphasisTypography variant="s" color={theme.colors.textLight} align="right">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
@@ -212,29 +289,40 @@ const LeagueOverview = ({
           <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
           {previousGameWeek ? (
             <PreviousRoundCard>
-              <Section justifyContent="space-between" alignItems="center" flexDirection="row" padding={`${theme.spacing.s} ${theme.spacing.s} 0 ${theme.spacing.s}`}>
-                <HeadingsTypography variant="h6" color={theme.colors.primaryDark}>
-                  {`Omgång ${previousGameWeek.round}`}
-                </HeadingsTypography>
-                <Section flexDirection="row" gap="s" alignItems="center" fitContent>
-                  <RoundPointsContainer>
-                    <EmphasisTypography variant="m" color={theme.colors.gold}>
-                      {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
-                      {' '}
-                      poäng
-                    </EmphasisTypography>
-                  </RoundPointsContainer>
+              <Section
+                justifyContent="space-between"
+                alignItems="flex-start"
+                flexDirection="row"
+                backgroundColor={theme.colors.silverLighter}
+                borderRadius={`${theme.borderRadius.l} ${theme.borderRadius.l} 0 0`}
+              >
+                <Section padding={theme.spacing.s} fitContent>
+                  <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                    {`Omgång ${previousGameWeek.round}`}
+                  </EmphasisTypography>
                 </Section>
+                <RoundPointsContainer>
+                  <Target size={16} color={theme.colors.textDefault} />
+                  <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                    {previousGameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
+                    {' '}
+                    poäng
+                  </EmphasisTypography>
+                </RoundPointsContainer>
               </Section>
-              <Divider color={theme.colors.silverLight} />
-              <Section gap="xxs" padding={`0 ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s}`}>
+              {/* <Divider color={theme.colors.silverLight} /> */}
+              <Section
+                gap="xxs"
+                padding={`${theme.spacing.xs}`}
+                backgroundColor={theme.colors.white}
+              >
                 {previousGameWeek.games.fixtures
                   .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
                   .map((fixture) => (
-                    <FixtureResultPreview
+                    <LastRoundFixtureResult
                       fixture={fixture}
                       predictions={previousGameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
-                      compact
+                      onModalOpen={() => setShowPreviousFixturePredictionsModal(fixture.id)}
                     />
                   ))}
               </Section>
@@ -270,11 +358,18 @@ const LeagueOverview = ({
           </Section>
         </GridSection>
       </OverviewGrid>
-      {showPredictionsModalForFixture && (
+      {showCurrentFixturePredictionsModal && (
         <PredictionsModal
-          predictions={currentGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showPredictionsModalForFixture) ?? []}
-          onClose={() => setShowPredictionsModalForFixture(null)}
-          fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPredictionsModalForFixture)}
+          predictions={currentGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showCurrentFixturePredictionsModal) ?? []}
+          onClose={() => setShowCurrentFixturePredictionModal(null)}
+          fixture={currentGameWeek?.games.fixtures.find((fixture) => fixture.id === showCurrentFixturePredictionsModal) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showCurrentFixturePredictionsModal)}
+        />
+      )}
+      {showPreviousFixturePredictionsModal && (
+        <PredictionsModal
+          predictions={previousGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showPreviousFixturePredictionsModal) ?? []}
+          onClose={() => setShowPreviousFixturePredictionsModal(null)}
+          fixture={previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPreviousFixturePredictionsModal) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPreviousFixturePredictionsModal)}
         />
       )}
     </>
@@ -327,7 +422,7 @@ const LeagueStandings = styled.div`
 
 const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   display: grid;
-  grid-template-columns: 4fr 1fr 1fr;
+  grid-template-columns: 6fr 1fr 1fr 1fr;
   gap: ${theme.spacing.xxs};
   align-items: center;
   padding: ${theme.spacing.xxs};
@@ -337,13 +432,13 @@ const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   /* border: ${({ isLoggedInUser }) => (isLoggedInUser ? `2px solid ${theme.colors.primary}` : 'none')}; */
 
   @media ${devices.tablet} {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
   }
 `;
 
 const LeagueStandingsHeader = styled.div`
   display: grid;
-  grid-template-columns: 4fr 1fr 1fr;
+  grid-template-columns: 6fr 1fr 1fr 1fr;
   gap: ${theme.spacing.xxs};
   align-items: center;
   padding: 0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs};
@@ -351,7 +446,7 @@ const LeagueStandingsHeader = styled.div`
   background-color: ${theme.colors.white};
 
   @media ${devices.tablet} {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
   }
 `;
 
@@ -373,16 +468,17 @@ const TableSectionHeader = styled.div`
 const RoundPointsContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: ${theme.spacing.xxs};
   justify-content: center;
-  background-color: ${theme.colors.primaryDark};
-  border-radius: ${theme.borderRadius.s};
+  background-color: ${theme.colors.gold};
+  border-radius: 0 ${theme.borderRadius.m} 0 ${theme.borderRadius.xl};
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
 `;
 
 const FixturesContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xxs};
+  gap: ${theme.spacing.s};
   width: 100%;
   box-sizing: border-box;
   margin-bottom: ${theme.spacing.s};
@@ -391,12 +487,12 @@ const FixturesContainer = styled.div`
 const PreviousRoundCard = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.s};
   background-color: ${theme.colors.silverLighter};
-  border-radius: ${theme.borderRadius.m};
+  border-radius: ${theme.borderRadius.l};
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.08);
+  border: 2px solid ${theme.colors.gold};
+  overflow: hidden;
 `;
 
 export default LeagueOverview;

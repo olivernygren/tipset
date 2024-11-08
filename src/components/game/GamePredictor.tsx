@@ -331,7 +331,7 @@ const GamePredictor = ({
 };
 
 const Card = styled.div<{ hasPredicted?: boolean }>`
-  border-radius: ${theme.borderRadius.m};
+  border-radius: ${theme.borderRadius.l};
   border: 2px solid ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primary)};
   display: flex;
   flex-direction: column;
