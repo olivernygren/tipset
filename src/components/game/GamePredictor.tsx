@@ -291,7 +291,7 @@ const GamePredictor = ({
           </>
         )}
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        <GoalScorerSection>
+        <GoalScorerSection shouldPredictGoalScorer={game.shouldPredictGoalScorer}>
           {game.shouldPredictGoalScorer ? (
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
           ) : (
@@ -299,9 +299,9 @@ const GamePredictor = ({
               <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
             </Section>
           )}
-          <GoalScorer>
-            {game.shouldPredictGoalScorer && (
-              predictedPlayerToScore ? (
+          {game.shouldPredictGoalScorer && (
+            <GoalScorer>
+              {predictedPlayerToScore ? (
                 <AvatarWrapper
                   disabled={kickoffTimeHasPassed}
                   onClick={kickoffTimeHasPassed ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
@@ -322,11 +322,11 @@ const GamePredictor = ({
                     disabled: theme.colors.silverLight,
                   }}
                   onClick={() => setIsSelectGoalScorerModalOpen(true)}
-                  disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+                  disabled={kickoffTimeHasPassed}
                 />
-              )
-            )}
-          </GoalScorer>
+              )}
+            </GoalScorer>
+          )}
         </GoalScorerSection>
         {!kickoffTimeHasPassed && (
           <SaveButtonSection hasPredicted={hasPredicted}>
@@ -439,17 +439,17 @@ const AvatarAndTeamName = styled.div`
   margin: 0 auto;
 `;
 
-const GoalScorerSection = styled.div`
+const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${theme.spacing.xxxs} ${theme.spacing.xs};
+  padding: ${({ shouldPredictGoalScorer }) => (shouldPredictGoalScorer ? theme.spacing.xxxs : theme.spacing.xs)} ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
   gap: ${theme.spacing.xs};
 
   @media ${devices.tablet} {
-    padding: ${theme.spacing.xxxs} ${theme.spacing.s};
+    padding: ${({ shouldPredictGoalScorer }) => (shouldPredictGoalScorer ? theme.spacing.xxxs : theme.spacing.s)} ${theme.spacing.s};
   }
 `;
 
