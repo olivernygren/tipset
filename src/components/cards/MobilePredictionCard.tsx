@@ -1,27 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Calculator } from '@phosphor-icons/react';
-import { Prediction } from '../../utils/Fixture';
+import { Fixture, Prediction } from '../../utils/Fixture';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
 import { Divider } from '../Divider';
-import Button from '../buttons/Button';
 
 interface MobilePredictionCardProps {
   prediction: Prediction;
-  finalResult: {
-    homeGoals: string;
-    awayGoals: string;
-  }
+  fixture?: Fixture;
   hasPredictedResult: boolean;
-  onCalculatePoints: (prediction: Prediction) => void;
   points: number | '-' | undefined;
   oddsBonus?: number;
 }
 
 const MobilePredictionCard = ({
-  prediction, finalResult, hasPredictedResult, onCalculatePoints, points, oddsBonus,
+  prediction, hasPredictedResult, points, oddsBonus, fixture,
 }: MobilePredictionCardProps) => (
   <Card>
     <HeadingContainer>
@@ -34,7 +28,7 @@ const MobilePredictionCard = ({
     <Row>
       <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Utfall</EmphasisTypography>
       <Outcome>
-        <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '?'}</NormalTypography>
+        <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '-'}</NormalTypography>
       </Outcome>
     </Row>
     <Divider />
@@ -43,36 +37,28 @@ const MobilePredictionCard = ({
       <NormalTypography variant="m">{hasPredictedResult ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
     </Row>
     <Divider />
-    <Row>
-      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
-      {prediction.goalScorer ? (
-        <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
-      ) : (
-        <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen tippad</NormalTypography>
-      )}
-    </Row>
-    <Divider />
+    {fixture?.shouldPredictGoalScorer && (
+      <>
+        <Row>
+          <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
+          {prediction.goalScorer ? (
+            <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
+          ) : (
+            <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen</NormalTypography>
+          )}
+        </Row>
+        <Divider />
+      </>
+    )}
     <Row>
       <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Oddsbonus</EmphasisTypography>
       <NormalTypography variant="m">{oddsBonus}</NormalTypography>
     </Row>
     <Divider />
     <Row>
-      <HeadingsTypography variant="h6" color={theme.colors.textDefault}>Totalpoäng</HeadingsTypography>
-      <NormalTypography variant="m">{points}</NormalTypography>
+      <HeadingsTypography variant="h6" color={theme.colors.primary}>Totalpoäng</HeadingsTypography>
+      <NormalTypography variant="m" color={theme.colors.primary}>{points}</NormalTypography>
     </Row>
-    <ButtonContainer>
-      <Button
-        size="m"
-        variant="secondary"
-        onClick={() => onCalculatePoints(prediction)}
-        icon={<Calculator size={24} color={finalResult.homeGoals === '' || finalResult.awayGoals === '' ? theme.colors.silverLight : theme.colors.primary} />}
-        fullWidth
-        disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
-      >
-        Beräkna poäng
-      </Button>
-    </ButtonContainer>
   </Card>
 );
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export enum DeviceSizes {
+  MOBILE_DEVICE = 420,
   MOBILE = 768,
   TABLET = 1024,
 }

@@ -17,6 +17,8 @@ interface SelectImitationProps {
   placeholder?: string;
   dropdownIcon?: React.ReactNode;
   borderless?: boolean;
+  bgColor?: string;
+  textColor?: string;
 }
 
 interface StyledSelectImitationProps {
@@ -25,12 +27,26 @@ interface StyledSelectImitationProps {
   compact?: boolean;
   maxWidth?: string;
   borderless?: boolean;
+  bgColor?: string;
+  textColor?: string;
 }
 
 const SelectImitation = ({
-  value, onClick, disabled, fullWidth, compact, maxWidth, placeholder, dropdownIcon, borderless,
+  value, onClick, disabled, fullWidth, compact, maxWidth, placeholder, dropdownIcon, borderless, bgColor, textColor,
 }: SelectImitationProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const getTextColor = (isPlaceholder?: boolean) => {
+    if (textColor && !isPlaceholder) {
+      return textColor;
+    }
+
+    if (disabled) {
+      return isPlaceholder ? theme.colors.silver : theme.colors.silverDark;
+    }
+
+    return isPlaceholder ? theme.colors.silverDark : theme.colors.textDefault;
+  };
 
   return (
     <StyledSelectImitation
@@ -40,30 +56,43 @@ const SelectImitation = ({
       maxWidth={maxWidth}
       onClick={!disabled ? onClick : () => {}}
       borderless={borderless}
+      bgColor={bgColor}
     >
       {placeholder && !value && (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.silverDark}>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={getTextColor(true)}>
           {placeholder}
         </NormalTypography>
       )}
       {value && (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={disabled ? theme.colors.silver : theme.colors.textDefault}>
+        <NormalTypography variant={isMobile ? 's' : 'm'} color={getTextColor()}>
           {value}
         </NormalTypography>
       )}
-      {dropdownIcon || <CaretDown size={16} weight="bold" color={disabled ? theme.colors.silverDark : theme.colors.textDefault} />}
+      {dropdownIcon || <CaretDown size={16} weight="bold" color={getTextColor(Boolean(placeholder && !value))} />}
     </StyledSelectImitation>
   );
 };
 
+const getBackgroundColor = (bgColor: string | undefined, disabled?: boolean) => {
+  if (bgColor) {
+    return bgColor;
+  }
+
+  if (disabled) {
+    return theme.colors.silverLighter;
+  }
+
+  return theme.colors.white;
+};
+
 const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
-  background-color: ${({ disabled }) => (disabled ? theme.colors.silverLighter : theme.colors.white)};
+  background-color: ${({ disabled, bgColor }) => getBackgroundColor(bgColor, disabled)};
   ${({ borderless, disabled }) => !borderless && `border: 1px solid ${disabled ? theme.colors.silverLight : theme.colors.silver};`};
   border-radius: ${theme.borderRadius.s};
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: ${theme.spacing.s};
+  gap: ${theme.spacing.xxs};
   box-sizing: border-box;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   padding: ${({ borderless }) => `${theme.spacing.xxs} ${borderless ? 0 : theme.spacing.xs}`};

@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Eye, Target } from '@phosphor-icons/react';
+import {
+  Coin, Eye, FireSimple, Target,
+} from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
@@ -24,6 +26,9 @@ const CompactFixtureResult = ({
 }: CompactFixtureResultProps) => {
   const { user } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult);
+  const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
 
   const getClubAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
@@ -72,9 +77,11 @@ const CompactFixtureResult = ({
         <ButtonsAndPointsWrapper>
           {predictions && (
           <PointsTag>
-            <Target size={16} color={theme.colors.silverDarker} />
+            {oddsBonusPointsAwarded && (
+              <FireSimple size={16} color={theme.colors.silverDarker} />
+            )}
             <NoWrapTypography variant="s" color={theme.colors.silverDarker}>
-              {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '?'}
+              {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
               {' '}
               p
             </NoWrapTypography>

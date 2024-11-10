@@ -58,13 +58,15 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
           </GoalScorersContainer>
         )}
         <PredictionsContainer>
-          {predictions?.map((prediction) => (
+          {predictions && predictions.length > 0 ? predictions.map((prediction) => (
             gameHasFinished ? (
               <PredictionScoreCard prediction={prediction} fixture={fixture ?? undefined} />
             ) : (
               <SimpleFixturePredictionCard prediction={prediction} fixture={fixture} />
             )
-          ))}
+          )) : (
+            <NormalTypography variant="m" color={theme.colors.silverDark}>Ingen tippade 😔</NormalTypography>
+          )}
         </PredictionsContainer>
       </Section>
     </Modal>
@@ -80,7 +82,7 @@ const PredictionsContainer = styled.div`
   margin-bottom: ${theme.spacing.s};
 
   @media ${devices.tablet} {
-    gap: ${theme.spacing.s};
+    gap: ${theme.spacing.xs};
   }
 `;
 

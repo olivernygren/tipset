@@ -217,6 +217,14 @@ const CorrectPredictionsModal = ({
     return 0;
   };
 
+  const handleCalculateEveryonesPoints = () => {
+    ongoingGameWeek?.games.predictions.forEach((prediction) => {
+      if (prediction.fixtureId === gameId) {
+        handleCalculatePoints(prediction);
+      }
+    });
+  };
+
   const handleCalculatePoints = (prediction: Prediction) => {
     if (!prediction || finalResult.homeGoals === '' || finalResult.awayGoals === '') {
       return;
@@ -399,34 +407,34 @@ const CorrectPredictionsModal = ({
                   </ResultInputContainer>
                 </FixtureResultWrapper>
                 {fixture.shouldPredictGoalScorer && (
-                <>
-                  <FixtureResultWrapper>
-                    <NormalTypography variant="m">Målgörare</NormalTypography>
-                    <SelectImitation
-                      value={goalScorers[0]}
-                      onClick={() => setShowSelectGoalScorerModal(true)}
-                      placeholder="Välj målgörare"
-                      fullWidth={isMobile}
-                    />
-                  </FixtureResultWrapper>
-                  {goalScorers.length > 0 && (
-                  <Section gap={isMobile ? 'xxxs' : 'xxs'}>
-                    {goalScorers.map((goalScorer) => (
-                      <GoalScorerContainer>
-                        <NormalTypography variant="m">
-                          {`⚽️ ${goalScorer}`}
-                        </NormalTypography>
-                        <IconButton
-                          icon={<XCircle size={24} weight="fill" />}
-                          onClick={() => setGoalScorers(goalScorers.filter((scorer) => scorer !== goalScorer))}
-                          title="Ta bort målgörare"
-                          colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                        />
-                      </GoalScorerContainer>
-                    ))}
-                  </Section>
-                  )}
-                </>
+                  <>
+                    <FixtureResultWrapper>
+                      <NormalTypography variant="m">Målgörare</NormalTypography>
+                      <SelectImitation
+                        value={goalScorers[0]}
+                        onClick={() => setShowSelectGoalScorerModal(true)}
+                        placeholder="Välj målgörare"
+                        fullWidth={isMobile}
+                      />
+                    </FixtureResultWrapper>
+                    {goalScorers.length > 0 && (
+                    <Section gap={isMobile ? 'xxxs' : 'xxs'}>
+                      {goalScorers.map((goalScorer) => (
+                        <GoalScorerContainer>
+                          <NormalTypography variant="m">
+                            {`⚽️ ${goalScorer}`}
+                          </NormalTypography>
+                          <IconButton
+                            icon={<XCircle size={24} weight="fill" />}
+                            onClick={() => setGoalScorers(goalScorers.filter((scorer) => scorer !== goalScorer))}
+                            title="Ta bort målgörare"
+                            colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                          />
+                        </GoalScorerContainer>
+                      ))}
+                    </Section>
+                    )}
+                  </>
                 )}
               </Section>
             ))}
@@ -437,9 +445,8 @@ const CorrectPredictionsModal = ({
               .map((prediction) => (
                 <MobilePredictionCard
                   key={prediction.userId}
+                  fixture={ongoingGameWeek.games.fixtures.find((f) => f.id === gameId)}
                   prediction={prediction}
-                  finalResult={finalResult}
-                  onCalculatePoints={handleCalculatePoints}
                   points={getPointsValue(prediction.userId, prediction)}
                   hasPredictedResult={hasPredictedResult(prediction)}
                   oddsBonus={getOddsBonusPoints(prediction)}
@@ -475,17 +482,6 @@ const CorrectPredictionsModal = ({
                       <NormalTypography variant="m">{getOddsBonusPoints(prediction)}</NormalTypography>
                       <PointsCell>
                         <NormalTypography variant="m">{getPointsValue(prediction.userId, prediction)}</NormalTypography>
-                        <IconButton
-                          icon={<Calculator size={24} color={theme.colors.primary} />}
-                          onClick={() => handleCalculatePoints(prediction)}
-                          colors={{
-                            normal: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primary,
-                            hover: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDark,
-                            active: (!prediction.points && (finalResult.homeGoals === '' || finalResult.awayGoals === '')) ? theme.colors.silverDark : theme.colors.primaryDarker,
-                          }}
-                          title="Räkna ut poäng"
-                          disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
-                        />
                       </PointsCell>
                     </TableRow>
                   ))}
@@ -493,7 +489,16 @@ const CorrectPredictionsModal = ({
             </>
           )}
         </Section>
-        <Section alignItems="flex-end">
+        <Section justifyContent="flex-end" gap="xs" flexDirection={isMobile ? 'column' : 'row'}>
+          <Button
+            icon={<Calculator size={24} color={finalResult.homeGoals === '' || finalResult.awayGoals === '' ? theme.colors.silverLight : theme.colors.primary} />}
+            variant="secondary"
+            onClick={handleCalculateEveryonesPoints}
+            disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
+            fullWidth={isMobile}
+          >
+            Beräkna poäng
+          </Button>
           <Button
             onClick={handleSaveCorrectedPredictions}
             loading={savingLoading}

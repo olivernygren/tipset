@@ -28,7 +28,7 @@ const TextButton = ({
     size={size}
     noPadding={noPadding}
     whileHover={{
-      scale: 1.02,
+      scale: disabled ? 1 : 1.02,
     }}
   >
     {icon}
@@ -37,7 +37,7 @@ const TextButton = ({
         <SpinnerGap size={24} color={theme.colors[color] || theme.colors.primary} />
       </RotationalSpinner>
     ) : (
-      <EmphasisTypography variant="m" color={theme.colors[color] || theme.colors.primary} align="center">
+      <EmphasisTypography variant="m" color={disabled ? theme.colors.silver : (theme.colors[color] || theme.colors.primary)} align="center">
         {children}
       </EmphasisTypography>
     )}

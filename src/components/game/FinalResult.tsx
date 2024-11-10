@@ -157,7 +157,7 @@ const KickOffTime = styled.div`
   background-color: ${theme.colors.red};
 
   position: absolute;
-  left: ${theme.spacing.xs};
+  left: ${theme.spacing.xxxs};
   top: 50%;
   transform: translateY(-50%);
   

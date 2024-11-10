@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ChartBar, MapPin } from '@phosphor-icons/react';
+import { ChartBar, MapPin, PlusCircle } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { ArsenalPlayers, Player } from '../../utils/Players';
-import { AvatarSize } from '../avatar/Avatar';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 import { devices, theme } from '../../theme';
 import { Team } from '../../utils/Team';
 import { Divider } from '../Divider';
@@ -116,6 +116,13 @@ const GamePredictor = ({
   };
 
   const getTextColor = () => (hasPredicted ? theme.colors.white : theme.colors.textDefault);
+
+  const getGoalScorerIconButtonColor = () => {
+    if (kickoffTimeHasPassed) {
+      return theme.colors.silverLight;
+    }
+    return theme.colors.gold;
+  };
 
   const handleInputChange = (team: 'home' | 'away', value: string) => {
     if (value !== '' && !/^[0-9]$/.test(value)) {
@@ -292,14 +299,34 @@ const GamePredictor = ({
               <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
             </Section>
           )}
-          {game.shouldPredictGoalScorer && (
-            <SelectImitation
-              value={predictedPlayerToScore?.name || ''}
-              onClick={() => setIsSelectGoalScorerModalOpen(true)}
-              disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
-              placeholder="Välj målskytt"
-            />
-          )}
+          <GoalScorer>
+            {game.shouldPredictGoalScorer && (
+              predictedPlayerToScore ? (
+                <AvatarWrapper
+                  disabled={kickoffTimeHasPassed}
+                  onClick={kickoffTimeHasPassed ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
+                >
+                  <Avatar
+                    src={predictedPlayerToScore.picture ?? ''}
+                    alt={predictedPlayerToScore.name}
+                    size={AvatarSize.M}
+                    objectFit="cover"
+                    showBorder
+                  />
+                </AvatarWrapper>
+              ) : (
+                <IconButton
+                  icon={<PlusCircle color={undefined} size={36} weight="fill" />}
+                  colors={{
+                    normal: theme.colors.primary,
+                    disabled: theme.colors.silverLight,
+                  }}
+                  onClick={() => setIsSelectGoalScorerModalOpen(true)}
+                  disabled={!game.shouldPredictGoalScorer || kickoffTimeHasPassed}
+                />
+              )
+            )}
+          </GoalScorer>
         </GoalScorerSection>
         {!kickoffTimeHasPassed && (
           <SaveButtonSection hasPredicted={hasPredicted}>
@@ -416,13 +443,13 @@ const GoalScorerSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${theme.spacing.s} ${theme.spacing.xs};
+  padding: ${theme.spacing.xxxs} ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
   gap: ${theme.spacing.xs};
 
   @media ${devices.tablet} {
-    padding: ${theme.spacing.s};
+    padding: ${theme.spacing.xxxs} ${theme.spacing.s};
   }
 `;
 
@@ -462,18 +489,15 @@ const TagsSection = styled.div`
 `;
 
 const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
-  /* background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primaryFade)}; */
   padding: ${theme.spacing.xs} 0;
   border-radius: ${theme.borderRadius.s};
-  /* display: flex;
-  justify-content: space-between; */
   align-items: center;
   display: grid;
   grid-template-columns: 4fr 3fr 4fr;
   gap: ${theme.spacing.s};
   width: 100%;
   box-sizing: border-box;
-  `;
+`;
 
 const OddsWrapper = styled.div`
   display: flex;
@@ -483,6 +507,19 @@ const OddsWrapper = styled.div`
   display: flex;
   width: 100%;
   box-sizing: border-box;
+`;
+
+const GoalScorer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxs};
+  `;
+
+const AvatarWrapper = styled.div<{ disabled?: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
 export default GamePredictor;

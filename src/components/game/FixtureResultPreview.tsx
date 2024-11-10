@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Eye, Target } from '@phosphor-icons/react';
+import { Eye, FireSimple } from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
@@ -29,6 +29,7 @@ const FixtureResultPreview = ({
   const isTablet = useResizeListener(DeviceSizes.TABLET);
 
   const useShortTeamNames = isTablet;
+  const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -90,30 +91,32 @@ const FixtureResultPreview = ({
         <Section flexDirection="row" alignItems="center" justifyContent="flex-end" fitContent>
           {predictions && (
             <PointsContainer>
-              <Target size={16} color={theme.colors.silverDarker} />
+              {oddsBonusPointsAwarded && (
+                <FireSimple size={16} color={theme.colors.silverDarker} />
+              )}
               <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>
-                {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '?'}
+                {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
                 {' '}
                 p
               </NoWrapTypography>
             </PointsContainer>
           )}
-          {predictions && predictions.length > 0 && (
-            isMobile ? (
-              <MobileButtonContainer>
-                <IconButton
-                  icon={<Eye size={24} />}
-                  onClick={handleOpenModal}
-                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                />
-              </MobileButtonContainer>
-            ) : (
-              <TextButton
+          {isMobile ? (
+            <MobileButtonContainer>
+              <IconButton
+                icon={<Eye size={24} />}
                 onClick={handleOpenModal}
-              >
-                Se allas tips
-              </TextButton>
-            )
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                disabled={!predictions || predictions.length === 0}
+              />
+            </MobileButtonContainer>
+          ) : (
+            <TextButton
+              disabled={!predictions || predictions.length === 0}
+              onClick={handleOpenModal}
+            >
+              Se allas tips
+            </TextButton>
           )}
         </Section>
       </FixtureContainer>

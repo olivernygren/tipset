@@ -58,7 +58,13 @@ const UpcomingFixturePreview = ({
           {getTeamAvatar(fixture.homeTeam)}
         </TeamContainer>
         <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>
-          {canViewPredictions ? 'LIVE' : getKickoffTime(fixture.kickOffTime)}
+          {canViewPredictions ? (
+            <IconButton
+              icon={<Eye size={24} />}
+              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
+              onClick={onShowPredictionsClick || (() => {})}
+            />
+          ) : getKickoffTime(fixture.kickOffTime)}
         </NormalTypography>
         <TeamContainer>
           {getTeamAvatar(fixture.awayTeam)}
@@ -67,15 +73,6 @@ const UpcomingFixturePreview = ({
           </NormalTypography>
         </TeamContainer>
       </Teams>
-      {canViewPredictions && (
-        <Absolute>
-          <IconButton
-            icon={<Eye size={24} />}
-            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
-            onClick={onShowPredictionsClick || (() => {})}
-          />
-        </Absolute>
-      )}
     </Container>
   );
 };
@@ -83,7 +80,6 @@ const UpcomingFixturePreview = ({
 const Container = styled.div<{ canViewPredictions?: boolean }>`
   display: flex;
   align-items: center;
-  /* justify-content: ${({ canViewPredictions }) => (canViewPredictions ? 'flex-start' : 'center')}; */
   justify-content: center;
   background-color: ${theme.colors.silverLighter};
   width: 100%;
@@ -91,20 +87,18 @@ const Container = styled.div<{ canViewPredictions?: boolean }>`
   position: relative;
   padding: ${theme.spacing.xs} 0 ${theme.spacing.xs} ${theme.spacing.xs};
   
-  ${({ canViewPredictions }) => canViewPredictions && css`
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    &:hover {
-      background-color: ${theme.colors.silverLight};
-    }
-  `}
-
-  /* @media ${devices.mobileL} {
-    justify-content: center;
-  } */
-  
   @media ${devices.tablet} {
     padding: ${theme.spacing.xxxs} 0;
+  }
+
+  @media ${devices.laptop} {
+    ${({ canViewPredictions }) => canViewPredictions && css`
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      &:hover {
+        background-color: ${theme.colors.silverLight};
+      }
+    `}
   }
 `;
 
@@ -127,10 +121,15 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
   gap: ${theme.spacing.xxxs};
   width: fit-content;
   white-space: nowrap;
+  ${({ isHomeTeam }) => isHomeTeam && css`
+    justify-content: flex-end;
+    margin-left: auto;
+  `}
   
-  @media ${devices.mobileL} {
-    ${({ isHomeTeam }) => isHomeTeam && 'margin-left: auto;'}
-  }
+  /* @media ${devices.mobileL} {
+    ${({ isHomeTeam }) => isHomeTeam && css`
+    `}
+  } */
 `;
 
 const Absolute = styled.div`

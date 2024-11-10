@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Coins,
   Info,
   ListChecks,
   PlusCircle, Target, XCircle,
@@ -708,7 +709,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     key={index}
                     hidePredictions
                     onClick={() => handlePreFillFixtureData(fixture)}
-                    isCreationMode
                   />
                   <IconButton
                     icon={<XCircle size={24} weight="fill" />}
@@ -933,7 +933,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       </EmphasisTypography>
                     </Section>
                     <RoundPointsContainer>
-                      <Target size={16} color={theme.colors.textDefault} />
                       <EmphasisTypography variant="m" color={theme.colors.textDefault}>
                         {gameWeek.games.predictions.filter((p) => p.userId === user?.documentId).reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0)}
                         {' '}
@@ -1117,7 +1116,7 @@ const RoundPointsContainer = styled.div`
   justify-content: center;
   background-color: ${theme.colors.gold};
   border-radius: 0 ${theme.borderRadius.m} 0 ${theme.borderRadius.xl};
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs} ${theme.spacing.xxs} ${theme.spacing.s};
 `;
 
 const OngoingGameWeekHeader = styled.div`

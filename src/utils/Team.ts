@@ -706,7 +706,7 @@ export const Teams = {
     },
     {
       name: 'Lecce',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/US-Lecce-2023.svg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/US_Lecce_Logo.png',
       stadium: 'Stadio Via del Mare',
       country: CountryEnum.ITALY,
     },
@@ -1147,7 +1147,7 @@ export const Teams = {
     {
       name: 'Crvena Zvezda',
       shortName: 'Red Star',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Grb-fk-crvena-zvezda.svg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/15/FK_Crvena_Zvezda_Logo.svg',
       stadium: 'Rajko Mitić Stadium',
       country: CountryEnum.SERBIA,
     },

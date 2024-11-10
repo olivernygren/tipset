@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Check, Eye } from '@phosphor-icons/react';
+import { Check, CheckFat, CheckSquare } from '@phosphor-icons/react';
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { Section } from '../section/Section';
 import { devices, theme } from '../../theme';
@@ -10,8 +10,8 @@ import NationAvatar from '../avatar/NationAvatar';
 import { NormalTypography } from '../typography/Typography';
 import TextButton from '../buttons/TextButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
-import IconButton from '../buttons/IconButton';
 import { Team } from '../../utils/Team';
+import IconButton from '../buttons/IconButton';
 
 interface FixturePreviewProps {
   fixture: Fixture;
@@ -19,14 +19,12 @@ interface FixturePreviewProps {
   hasBeenCorrected?: boolean;
   onShowPredictionsClick?: () => void;
   onClick?: () => void;
-  simple?: boolean;
   isCorrectionMode?: boolean;
-  isCreationMode?: boolean;
   useShortNames?: boolean;
 }
 
 const CreateAndCorrectFixturePreview = ({
-  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, simple, isCorrectionMode, isCreationMode, useShortNames, onClick,
+  fixture, hidePredictions, hasBeenCorrected, onShowPredictionsClick, isCorrectionMode, useShortNames, onClick,
 }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -36,6 +34,8 @@ const CreateAndCorrectFixturePreview = ({
     const minutes = date.getMinutes();
     return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   };
+
+  const kickoffHasPassed = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
 
   const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
@@ -52,7 +52,7 @@ const CreateAndCorrectFixturePreview = ({
   ));
 
   return (
-    <Container>
+    <Container onClick={onClick}>
       <Teams showPrediction={!hidePredictions}>
         <TeamContainer>
           <NormalTypography variant={isMobile ? 's' : 'm'}>
@@ -73,14 +73,28 @@ const CreateAndCorrectFixturePreview = ({
       <ButtonsContainer>
         {isCorrectionMode && hasBeenCorrected && (
           <Section flexDirection="row" alignItems="center" gap="xxs" fitContent>
-            <NormalTypography variant="m" color={theme.colors.silverDark}>Rättad</NormalTypography>
-            <Check size={16} color={theme.colors.silverDark} />
+            {isMobile ? (
+              <CheckSquare size={16} color={theme.colors.silverDark} weight="fill" />
+            ) : (
+              <>
+                <NormalTypography variant="m" color={theme.colors.silverDark}>Rättad</NormalTypography>
+                <Check size={16} color={theme.colors.silverDark} />
+              </>
+            )}
           </Section>
         )}
-        {isCorrectionMode && (
-        <TextButton color="primary" onClick={onShowPredictionsClick}>
-          {hasBeenCorrected ? 'Rätta igen' : 'Rätta'}
-        </TextButton>
+        {isCorrectionMode && kickoffHasPassed && (
+          isMobile ? (
+            <IconButton
+              icon={<CheckFat size={20} weight="fill" />}
+              colors={{ normal: theme.colors.primary }}
+              onClick={onShowPredictionsClick || (() => {})}
+            />
+          ) : (
+            <TextButton color="primary" onClick={onShowPredictionsClick} noPadding>
+              {hasBeenCorrected ? 'Rätta igen' : 'Rätta'}
+            </TextButton>
+          )
         )}
       </ButtonsContainer>
     </Container>
@@ -89,6 +103,7 @@ const CreateAndCorrectFixturePreview = ({
 
 const Container = styled.div`
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   border-radius: ${theme.borderRadius.m};
@@ -97,7 +112,8 @@ const Container = styled.div`
   box-sizing: border-box;
   position: relative;
   padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
-  
+  cursor: pointer;
+
   @media ${devices.tablet} {
     padding: 0 0 0 ${theme.spacing.s};
   }
@@ -133,7 +149,13 @@ const TeamContainer = styled.div`
 const ButtonsContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.xxxs};
+  padding-right: ${theme.spacing.xxxs};
+  
+  @media ${devices.tablet} {
+    gap: ${theme.spacing.xs};
+    padding-right: ${theme.spacing.xs};
+  }
 `;
 
 export default CreateAndCorrectFixturePreview;
