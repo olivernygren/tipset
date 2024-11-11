@@ -77,8 +77,15 @@ const CompactFixtureResult = ({
         <ButtonsAndPointsWrapper>
           {predictions && (
           <PointsTag>
-            {oddsBonusPointsAwarded && (
-              <FireSimple size={16} color={theme.colors.silverDarker} />
+            {(oddsBonusPointsAwarded || correctResultPredicted) && (
+              <PointsIcons>
+                {oddsBonusPointsAwarded && (
+                  <FireSimple size={16} color={theme.colors.silverDarker} />
+                )}
+                {correctResultPredicted && (
+                  <Target size={16} color={theme.colors.silverDarker} />
+                )}
+              </PointsIcons>
             )}
             <NoWrapTypography variant="s" color={theme.colors.silverDarker}>
               {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
@@ -180,6 +187,12 @@ const NoWrapTypography = styled(NormalTypography)`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const PointsIcons = styled.div`
+  display: flex;
+  gap: 2px;
+  align-items: center;
 `;
 
 export default CompactFixtureResult;

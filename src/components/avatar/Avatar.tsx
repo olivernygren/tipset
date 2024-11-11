@@ -106,7 +106,7 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  border: ${({ showBorder, customBorderColor, size }) => (showBorder ? `${size === AvatarSize.XS ? '1px' : '2px'} solid ${customBorderColor || theme.colors.silver}` : 'none')};
+  border: ${({ showBorder, customBorderColor, size }) => (showBorder ? `${size === AvatarSize.XS || size === AvatarSize.S ? '1px' : '2px'} solid ${customBorderColor || theme.colors.silver}` : 'none')};
   padding: ${({ objectFit, size }) => getAvatarPadding(objectFit, size)};
   margin: ${({ objectFit, size }) => getAvatarMargin(objectFit, size)};
   overflow: hidden;

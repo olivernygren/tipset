@@ -108,6 +108,7 @@ export interface PlayerRating {
   goals: number;
   assists: number;
   ratings: Array<Rating>;
+  team: string;
 }
 
 export interface Rating {
@@ -124,6 +125,7 @@ export interface PlayerRatingInput {
   goals: number;
   assists: number;
   ratings: Array<RatingInput>;
+  team: string;
 }
 
 export interface RatingInput {

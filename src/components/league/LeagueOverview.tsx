@@ -142,10 +142,10 @@ const LeagueOverview = ({
             {`${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
           </NormalTypography>
         </Section>
-        {!isMobileDevice && league.gameWeeks && league.gameWeeks.length > 1 && (
+        {!isMobileDevice && (
           <CenteredGridItem>
             <NormalTypography variant="m" color={theme.colors.textLight}>
-              {`${getUserLatestGameWeekTotalPoints(place.userId) > 0 ? '+' : '±'}${getUserLatestGameWeekTotalPoints(place.userId)}`}
+              {league.gameWeeks && league.gameWeeks.length > 0 ? `${getUserLatestGameWeekTotalPoints(place.userId) > 0 ? '+' : '±'}${getUserLatestGameWeekTotalPoints(place.userId)}` : '-'}
             </NormalTypography>
           </CenteredGridItem>
         )}
@@ -254,7 +254,10 @@ const LeagueOverview = ({
             {league.standings && league.standings.length > 0 ? (
               <LeagueStandings>
                 <LeagueStandingsHeader>
-                  <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
+                  <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
+                    <EmphasisTypography variant="s" color={theme.colors.textLight}>#</EmphasisTypography>
+                    <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
+                  </Section>
                   {!isMobileDevice && (
                     <CenteredGridItem>
                       <TrendUp size={20} color={theme.colors.textLight} />

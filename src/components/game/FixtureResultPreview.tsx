@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Eye, FireSimple } from '@phosphor-icons/react';
+import { Eye, FireSimple, Target } from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
@@ -30,6 +30,7 @@ const FixtureResultPreview = ({
 
   const useShortTeamNames = isTablet;
   const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
+  const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -88,11 +89,22 @@ const FixtureResultPreview = ({
             </NormalTypography>
           </TeamContainer>
         </Teams>
-        <Section flexDirection="row" alignItems="center" justifyContent="flex-end" fitContent>
+        <Section
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="flex-end"
+        >
           {predictions && (
             <PointsContainer>
-              {oddsBonusPointsAwarded && (
-                <FireSimple size={16} color={theme.colors.silverDarker} />
+              {(oddsBonusPointsAwarded || correctResultPredicted) && (
+                <PointsIcons>
+                  {oddsBonusPointsAwarded && (
+                    <FireSimple size={16} color={theme.colors.silverDarker} />
+                  )}
+                  {correctResultPredicted && (
+                    <Target size={16} color={theme.colors.silverDarker} />
+                  )}
+                </PointsIcons>
               )}
               <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>
                 {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
@@ -131,11 +143,23 @@ const FixtureResultPreview = ({
   );
 };
 
+const FixtureContainer = styled.div<{ showBorder?: boolean }>`
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  height: fit-content;
+  background-color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.m};
+  width: 100%;
+  box-sizing: border-box;
+  border: ${({ showBorder }) => (showBorder ? `1px solid ${theme.colors.silver}` : 'none')};
+  overflow: hidden;
+  position: relative;
+`;
+
 const FullTimeIndicator = styled.div<{ compact?: boolean }>`
   height: fit-content;
   width: fit-content;
   margin: auto ${theme.spacing.xs};
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -178,7 +202,7 @@ const Teams = styled.div<{ compact?: boolean }>`
   align-items: ${({ compact }) => (compact ? 'flex-start' : 'center')};
   flex-direction: ${({ compact }) => (compact ? 'column' : 'row')};
   justify-content: center;
-  flex: 1;
+  width: 100%;
   
   ${({ compact }) => compact && css`
     width: fit-content;
@@ -198,18 +222,6 @@ const Teams = styled.div<{ compact?: boolean }>`
       }
     `}
   }
-`;
-
-const FixtureContainer = styled.div<{ showBorder?: boolean }>`
-  display: flex;
-  height: fit-content;
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.m};
-  width: 100%;
-  box-sizing: border-box;
-  border: ${({ showBorder }) => (showBorder ? `1px solid ${theme.colors.silver}` : 'none')};
-  overflow: hidden;
-  position: relative;
 `;
 
 const TeamContainer = styled.div<{ compact?: boolean }>`
@@ -248,6 +260,12 @@ const NoWrapTypography = styled(NormalTypography)`
 
 const MobileButtonContainer = styled.div`
   padding: 0 ${theme.spacing.xxs};
+`;
+
+const PointsIcons = styled.div`
+  display: flex;
+  gap: 2px;
+  align-items: center;
 `;
 
 export default FixtureResultPreview;

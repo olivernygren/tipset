@@ -533,8 +533,10 @@ const MobileTabsButton = styled.div`
 `;
 
 const MobileMenuIcon = styled.div<{ isOpen: boolean }>`
-  transition: transform 0.2s;
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+  > svg {
+    transition: transform 0.2s;
+    transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+  }
 `;
 
 const MobileTabs = styled.div`

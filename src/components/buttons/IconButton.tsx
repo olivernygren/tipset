@@ -52,6 +52,7 @@ const IconButton = ({
     }}
     whileTap={{
       backgroundColor: backgroundColor || 'rgba(0, 0, 0, 0)',
+      scale: disabled ? 1 : 0.96,
     }}
   >
     {icon}

@@ -39,6 +39,30 @@ const PlayerRatingModal = ({
   const [allPlayerRatings, setAllPlayerRatings] = useState<Array<Array<Rating>>>([[]]);
 
   useEffect(() => {
+    const hasRatingForCurrentGame = playerRatingObject?.ratings.some((rating) => {
+      const ratingDate = new Date(rating.date);
+      return ratingDate.getDate() === gameDate?.getDate()
+         && ratingDate.getMonth() === gameDate?.getMonth()
+         && ratingDate.getFullYear() === gameDate?.getFullYear()
+         && rating.opponent === opponent?.name;
+    });
+
+    if (hasRatingForCurrentGame) {
+      const ratingForCurrentGame = playerRatingObject?.ratings.find((rating) => {
+        const ratingDate = new Date(rating.date);
+        return ratingDate.getDate() === gameDate?.getDate()
+           && ratingDate.getMonth() === gameDate?.getMonth()
+           && ratingDate.getFullYear() === gameDate?.getFullYear()
+           && rating.opponent === opponent?.name;
+      });
+
+      if (ratingForCurrentGame) {
+        setRating(ratingForCurrentGame.rating);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const getPlayerRatings = () => {
       if (!playerRatingObject || !playerRatingObject.ratings || playerRatingObject.ratings.length === 0) return [];
 
@@ -86,6 +110,7 @@ const PlayerRatingModal = ({
           ],
           goals: goalsScored,
           assists,
+          team: 'Arsenal',
         };
 
         await addDoc(collection(db, CollectionEnum.PLAYER_RATINGS), newPlayerRatingObject);
@@ -134,6 +159,7 @@ const PlayerRatingModal = ({
           ],
           goals: playerRatingObject.goals + goalsScored,
           assists: playerRatingObject.assists + assists,
+          team: playerRatingObject.team ?? 'Arsenal',
         };
 
         await updateDoc(doc(db, CollectionEnum.PLAYER_RATINGS, playerRatingObject.documentId), {

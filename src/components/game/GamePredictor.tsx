@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChartBar, MapPin, PlusCircle } from '@phosphor-icons/react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
@@ -291,7 +291,13 @@ const GamePredictor = ({
           </>
         )}
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
-        <GoalScorerSection shouldPredictGoalScorer={game.shouldPredictGoalScorer}>
+        <GoalScorerSection
+          shouldPredictGoalScorer={game.shouldPredictGoalScorer}
+          disabled={kickoffTimeHasPassed}
+          onClick={kickoffTimeHasPassed ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
+          hasPredicted={hasPredicted}
+          hasChosen={predictedPlayerToScore !== undefined}
+        >
           {game.shouldPredictGoalScorer ? (
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
           ) : (
@@ -302,10 +308,7 @@ const GamePredictor = ({
           {game.shouldPredictGoalScorer && (
             <GoalScorer>
               {predictedPlayerToScore ? (
-                <AvatarWrapper
-                  disabled={kickoffTimeHasPassed}
-                  onClick={kickoffTimeHasPassed ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
-                >
+                <AvatarWrapper>
                   <Avatar
                     src={predictedPlayerToScore.picture ?? ''}
                     alt={predictedPlayerToScore.name}
@@ -315,15 +318,7 @@ const GamePredictor = ({
                   />
                 </AvatarWrapper>
               ) : (
-                <IconButton
-                  icon={<PlusCircle color={undefined} size={36} weight="fill" />}
-                  colors={{
-                    normal: theme.colors.primary,
-                    disabled: theme.colors.silverLight,
-                  }}
-                  onClick={() => setIsSelectGoalScorerModalOpen(true)}
-                  disabled={kickoffTimeHasPassed}
-                />
+                <PlusCircle color={kickoffTimeHasPassed ? theme.colors.silverLight : theme.colors.primary} size={36} weight="fill" />
               )}
             </GoalScorer>
           )}
@@ -439,17 +434,27 @@ const AvatarAndTeamName = styled.div`
   margin: 0 auto;
 `;
 
-const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean }>`
+const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabled?: boolean, hasPredicted?: boolean, hasChosen?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${({ shouldPredictGoalScorer }) => (shouldPredictGoalScorer ? theme.spacing.xxxs : theme.spacing.xs)} ${theme.spacing.xs};
+  padding: 0 ${({ hasChosen }) => (hasChosen ? theme.spacing.xxxs : theme.spacing.xs)} 0 ${theme.spacing.xs};
   width: 100%;
+  height: 56px;
   box-sizing: border-box;
   gap: ${theme.spacing.xs};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  transition: all 0.2s ease;
+  background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primary : theme.colors.white)};
+
+  ${({ shouldPredictGoalScorer, disabled, hasChosen }) => shouldPredictGoalScorer && !disabled && css`
+    &:hover {
+      background-color: ${hasChosen ? theme.colors.primaryLight : theme.colors.primaryFade};
+    }
+  `}
 
   @media ${devices.tablet} {
-    padding: ${({ shouldPredictGoalScorer }) => (shouldPredictGoalScorer ? theme.spacing.xxxs : theme.spacing.s)} ${theme.spacing.s};
+    padding: 0 ${({ hasChosen }) => (hasChosen ? theme.spacing.xxs : theme.spacing.s)} 0 ${theme.spacing.s};
   }
 `;
 
@@ -513,13 +518,12 @@ const GoalScorer = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xxs};
-  `;
+`;
 
-const AvatarWrapper = styled.div<{ disabled?: boolean }>`
+const AvatarWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
 export default GamePredictor;
