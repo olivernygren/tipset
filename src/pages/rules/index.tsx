@@ -82,7 +82,7 @@ const RulesPage = () => {
         <Divider color={theme.colors.silver} />
         <Section gap="s">
           <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
-          <NormalTypography variant="m">I varje liga kan du följa poängställningen i en tabell. Tabellen sorteras efter antal poäng. Skulle två deltagare ha samma antal poäng sorteras tabellen efter antal korrekta resultat som deltageren tippat. Du som tippar flest antal korrekta resultat kan alltså på detta sätt ha en fördel.</NormalTypography>
+          <NormalTypography variant="m">I varje liga kan du följa poängställningen i en tabell. Tabellen sorteras efter antal poäng. Skulle två deltagare ha samma antal poäng sorteras tabellen efter antal korrekta resultat som deltageren tippat, därefter sorteras tabellen efter antal oddsbonuspoäng om det fortfarande är helt lika ställt. Du som tippar flest antal korrekta resultat och sätter fler högoddsare kan alltså på detta sätt ha en fördel.</NormalTypography>
         </Section>
         <Divider color={theme.colors.silver} />
         <Section gap="s">
