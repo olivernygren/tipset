@@ -407,6 +407,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
+    mayBeInjured: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
@@ -491,6 +492,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/bukayo-saka.png',
+    mayBeInjured: true,
   },
   {
     id: 'ehfiehre923rh4or98hotw9',

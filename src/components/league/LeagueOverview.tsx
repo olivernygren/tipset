@@ -123,8 +123,9 @@ const LeagueOverview = ({
   const getUserLatestGameWeekTotalPoints = (userId: string) => {
     if (!league || !league.gameWeeks) return 0;
     if (!currentGameWeek && (!league.gameWeeks || league.gameWeeks.length < 2)) return 0;
-    const latestGameWeek = currentGameWeek || league.gameWeeks[league.gameWeeks.length - 1];
-    const userPredictions = latestGameWeek.games.predictions.filter((prediction) => prediction.userId === userId);
+    const previousGameWeek = currentGameWeek ? league.gameWeeks[league.gameWeeks.length - 2] : league.gameWeeks[league.gameWeeks.length - 1];
+    const userPredictions = previousGameWeek.games.predictions.filter((prediction) => prediction.userId === userId);
+
     return userPredictions.reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0);
   };
 
