@@ -272,6 +272,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/ben-white.png',
+    isInjured: true,
   },
   {
     id: 'jdb38fg9fhwwh9wfhw0fe',
@@ -284,7 +285,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.JAPAN,
     picture: '/images/players/takehiro-tomiyasu.png',
-    isInjured: true,
+    mayBeInjured: true,
   },
   {
     id: 'fhwefh9hrrh94ofof',
@@ -541,6 +542,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 29,
     country: CountryEnum.BELGIUM,
     picture: '/images/players/leandro-trossard.png',
+    mayBeInjured: true,
   },
   {
     id: '30jtgeifnqorhgwowjj9d',
