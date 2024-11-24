@@ -1063,6 +1063,13 @@ export const Teams = {
       stadium: 'Estádio Municipal de Braga',
       country: CountryEnum.PORTUGAL,
     },
+    {
+      name: 'Amarante FC',
+      shortName: 'Amarante',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e2/Amarante_FC.png',
+      stadium: 'Estádio Municipal de Amarante',
+      country: CountryEnum.PORTUGAL,
+    },
   ],
   [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
     {
