@@ -86,15 +86,15 @@ const FixtureContainer = styled.div`
   position: relative;
   padding: 0 ${theme.spacing.xs};
   justify-content: center;
+  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
+  background-color: ${theme.colors.silverBleach};
 `;
 
 const Teams = styled.div`
-  /* display: flex; */
   gap: ${theme.spacing.xxs};
   height: 52px;
   align-items: center;
   justify-content: center;
-  /* flex: 1; */
 
   display: grid;
   grid-template-columns: 1fr auto 1fr;

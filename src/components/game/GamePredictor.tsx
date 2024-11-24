@@ -294,7 +294,7 @@ const GamePredictor = ({
         <GoalScorerSection
           shouldPredictGoalScorer={game.shouldPredictGoalScorer}
           disabled={kickoffTimeHasPassed}
-          onClick={kickoffTimeHasPassed ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
+          onClick={kickoffTimeHasPassed || !game.shouldPredictGoalScorer ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
           hasPredicted={hasPredicted}
           hasChosen={predictedPlayerToScore !== undefined}
         >
@@ -443,7 +443,7 @@ const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabl
   height: 56px;
   box-sizing: border-box;
   gap: ${theme.spacing.xs};
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ disabled, shouldPredictGoalScorer }) => (disabled || !shouldPredictGoalScorer ? 'not-allowed' : 'pointer')};
   transition: all 0.2s ease;
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primary : theme.colors.white)};
 

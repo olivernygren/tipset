@@ -2,8 +2,9 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
-import { Player } from './Players';
+import { GeneralPositionEnum, Player } from './Players';
 import { TournamentsEnum } from './Team';
+import { theme } from '../theme';
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;
@@ -132,5 +133,20 @@ export const getIsBottomOfLeague = (position: number, tournament: TournamentsEnu
       return position >= 36;
     default:
       return false;
+  }
+};
+
+export const getPlayerPositionColor = (position: GeneralPositionEnum) => {
+  console.log(position);
+
+  switch (position) {
+    case GeneralPositionEnum.FW:
+      return theme.colors.blue;
+    case GeneralPositionEnum.MF:
+      return theme.colors.primary;
+    case GeneralPositionEnum.DF:
+      return theme.colors.red;
+    default:
+      return theme.colors.gold;
   }
 };

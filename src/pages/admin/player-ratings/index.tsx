@@ -82,13 +82,13 @@ const PlayerRatingsPage = () => {
         <PlayerInfoContainer>
           <AvatarContainer>
             {player.picture && (
-            <Avatar
-              src={player.picture}
-              alt={player.name}
-              size={AvatarSize.M}
-              objectFit="cover"
-              showBorder
-            />
+              <Avatar
+                src={player.picture}
+                alt={player.name}
+                size={AvatarSize.M}
+                objectFit="cover"
+                showBorder
+              />
             )}
             <NationAvatarContainer>
               {player.country && (

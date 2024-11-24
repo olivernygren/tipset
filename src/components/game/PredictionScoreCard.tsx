@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import {
+  CaretDown, CaretUp, FireSimple, SoccerBall, Target,
+} from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
-import UserName from '../typography/UserName';
-import { Section } from '../section/Section';
-import { getGeneralPositionShorthand } from '../../utils/helpers';
+import { UserProfilePicture } from '../typography/UserName';
 import { Divider } from '../Divider';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
+import IconButton from '../buttons/IconButton';
+import { Team } from '../../utils/Team';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import { Section } from '../section/Section';
+import { getGeneralPositionShorthand } from '../../utils/helpers';
 
 interface PredictionScoreCardProps {
   prediction: Prediction;
@@ -19,6 +24,12 @@ interface PredictionScoreCardProps {
 
 const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  const oddsBonusPointsAwarded = Boolean(prediction.points?.oddsBonus);
+  const correctResultPredicted = Boolean(prediction.points?.correctResult);
+  const correctGoalScorerPredicted = Boolean(prediction.points?.correctGoalScorer);
 
   const getOddsForPredictedOutcome = () => {
     let predictedOutcome;
@@ -57,72 +68,92 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
     return (
-      <>
-        <TableRow>
-          <NormalTypography variant="s" color={theme.colors.white}>{label}</NormalTypography>
-          <EmphasisTypography variant="m" color={theme.colors.gold}>
-            {points}
-            {' '}
-            p
-          </EmphasisTypography>
-        </TableRow>
-        <Divider color={theme.colors.primary} className="divider" />
-      </>
+      <TableRow topBorder={label !== 'Korrekt utfall (1X2)'}>
+        <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
+        <EmphasisTypography variant="m" color={theme.colors.primary}>
+          {points}
+          {' '}
+          p
+        </EmphasisTypography>
+      </TableRow>
     );
   };
 
-  const getLogo = (teamType: TeamType, logoUrl: string) => {
-    if (!fixture) return null;
-
-    if (teamType === TeamType.CLUBS) {
-      return <ClubAvatar logoUrl={logoUrl} clubName={fixture.homeTeam.name} size={AvatarSize.L} showBorder isDarkMode />;
-    }
-    return <NationAvatar flagUrl={logoUrl} nationName={fixture.homeTeam.name} size={AvatarSize.L} />;
-  };
+  const getAvatar = (team: Team) => ((fixture && fixture.teamType) === TeamType.CLUBS ? (
+    <ClubAvatar
+      logoUrl={team.logoUrl}
+      clubName={team.name}
+      size={AvatarSize.S}
+    />
+  ) : (
+    <NationAvatar
+      flagUrl={team.logoUrl}
+      nationName={team.name}
+      size={AvatarSize.S}
+    />
+  ));
 
   return (
-    <Card>
-      <HeadingsTypography variant={isMobile ? 'h5' : 'h3'} color={theme.colors.white}>
-        {prediction.username ? (
-          prediction.username
-        ) : (
-          <UserName userId={prediction.userId} />
-        )}
-      </HeadingsTypography>
-      <PointsContainer>
-        <HeadingsTypography variant={isMobile ? 'h2' : 'h1'} color={theme.colors.gold}>
-          {prediction.points?.total ?? '?'}
-        </HeadingsTypography>
-      </PointsContainer>
-      <Section gap="s" padding={`${theme.spacing.s} 0`} alignItems="center">
-        <Section flexDirection="row" alignItems="center" gap="s" fitContent>
-          {fixture && getLogo(fixture.teamType, fixture.homeTeam.logoUrl)}
-          <HeadingsTypography variant="h2" color={theme.colors.white}>
-            {prediction.homeGoals}
-            {' '}
-            -
-            {' '}
-            {prediction.awayGoals}
+    <Card isExpanded={isExpanded}>
+      <MainContent>
+        <UserInfo>
+          {!isMobile && (
+            <UserProfilePicture userId={prediction.userId} size={AvatarSize.M} />
+          )}
+          <EmphasisTypography variant="m">{prediction.username}</EmphasisTypography>
+        </UserInfo>
+        <PointsBadges>
+          {!isMobile && (oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) && (
+          <>
+            {oddsBonusPointsAwarded && (
+              <PointsBadge>
+                <FireSimple size={20} color={theme.colors.primaryDark} />
+              </PointsBadge>
+            )}
+            {correctResultPredicted && (
+              <PointsBadge>
+                <Target size={20} color={theme.colors.primaryDark} />
+              </PointsBadge>
+            )}
+            {correctGoalScorerPredicted && (
+              <PointsBadge>
+                <SoccerBall size={20} color={theme.colors.primaryDark} weight="fill" />
+              </PointsBadge>
+            )}
+          </>
+          )}
+        </PointsBadges>
+        <PointsContainer>
+          <HeadingsTypography variant={isMobile ? 'h6' : 'h5'} color={theme.colors.white}>
+            {`${prediction.points?.total ?? '?'} p`}
           </HeadingsTypography>
-          {fixture && getLogo(fixture.teamType, fixture.awayTeam.logoUrl)}
-        </Section>
-        {prediction.goalScorer && (
-          <EmphasisTypography variant="m" color={theme.colors.white}>
-            {prediction.goalScorer?.name}
-            {' '}
-            {getGeneralPositionShorthand(prediction.goalScorer.position.general)}
-          </EmphasisTypography>
-        )}
-      </Section>
-      <Divider color={theme.colors.primaryDark} />
-      <HeadingsTypography variant="h6" color={theme.colors.white}>Poängfördelning</HeadingsTypography>
+        </PointsContainer>
+        <IconButton
+          icon={isExpanded ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
+          colors={{ normal: theme.colors.textDefault }}
+          onClick={() => setIsExpanded(!isExpanded)}
+        />
+      </MainContent>
       {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
         <Section
-          backgroundColor={theme.colors.primaryDark}
-          borderRadius={theme.borderRadius.s}
-          padding={`${theme.spacing.xxs} ${theme.spacing.xs}`}
-          gap="xxs"
+          alignItems="center"
+          padding={isMobile ? `${theme.spacing.xxxs} 0 ${theme.spacing.xxs} 0` : `0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs}`}
+          gap="xs"
         >
+          {fixture && (
+          <PredictionContainer>
+            <HeadingsTypography variant="h6" color={theme.colors.textDefault}>
+              Tippade:
+            </HeadingsTypography>
+            <PredictionResult>
+              {getAvatar(fixture.homeTeam)}
+              <NormalTypography variant="m">{prediction.homeGoals}</NormalTypography>
+              <NormalTypography variant="m">-</NormalTypography>
+              <NormalTypography variant="m">{prediction.awayGoals}</NormalTypography>
+              {getAvatar(fixture.awayTeam)}
+            </PredictionResult>
+          </PredictionContainer>
+          )}
           {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
           {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
           {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
@@ -136,52 +167,115 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           )}
         </Section>
       ) : (
-        <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.white}>Inga poäng</NormalTypography>
+        <Section padding={`0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs}`}>
+          <NormalTypography variant="m" color={theme.colors.silverDark}>Inga poäng</NormalTypography>
+        </Section>
+      )}
+      {!prediction && (
+        <NormalTypography variant="m" color={theme.colors.silverDark}>Inget resultat tippades</NormalTypography>
       )}
     </Card>
   );
 };
 
-const Card = styled.div`
+const Card = styled.div<{ isExpanded: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xs};
-  padding: ${theme.spacing.s};
+  gap: ${theme.spacing.s};
+  border: 1px solid ${theme.colors.silverLight};
+  background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
-  background-color: ${theme.colors.primary};
-  position: relative;
+  padding: ${theme.spacing.xs} ${theme.spacing.xs};
+  cursor: pointer;
+  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
+  max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '32px')};
   overflow: hidden;
-
-  .divider:last-of-type {
-    display: none;
+  transition: max-height 0.3s ease;
+  
+  @media ${devices.tablet} {
+    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '52px')};
+    padding: ${theme.spacing.xxs} ${theme.spacing.s} ${theme.spacing.xxs} ${theme.spacing.xxs};
   }
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+
+  @media ${devices.tablet} {
+    gap: ${theme.spacing.s};
+  }
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxxs};
+  flex: 1;
+  box-sizing: border-box;
 `;
 
 const PointsContainer = styled.div`
-  height: 70px;
-  width: 70px;
-  border-radius: 50%;
-  background-color: ${theme.colors.primaryDark};
-  position: absolute;
-  top: -10px;
-  right: -10px;
+  height: 32px;
+  border-radius: 16px;
+  background-color: ${theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
   
   @media ${devices.tablet} {
-    height: 80px;
-    width: 80px;
+    height: 36px;
+    border-radius: 18px;
+    padding: 0 ${theme.spacing.xs};
   }
 `;
 
-const TableRow = styled.div`
+const PointsBadges = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+`;
+
+const PointsBadge = styled.div`
+  height: 30px;
+  border-radius: 15px;
+  background-color: ${theme.colors.primaryBleach};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 ${theme.spacing.xxs};
+`;
+
+const TableRow = styled.div<{ topBorder?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
+  ${({ topBorder }) => topBorder && `border-top: 1px solid ${theme.colors.silverLight};`}
+  padding-top: ${theme.spacing.xs};
+`;
+
+const PredictionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: ${theme.colors.white};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xs};
+  border: 1px solid ${theme.colors.silverLight};
+  border-radius: ${theme.borderRadius.s};
+`;
+
+const PredictionResult = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  align-items: center;
 `;
 
 export default PredictionScoreCard;
