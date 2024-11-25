@@ -7,7 +7,6 @@ import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { UserProfilePicture } from '../typography/UserName';
-import { Divider } from '../Divider';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
@@ -68,7 +67,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
     return (
-      <TableRow topBorder={label !== 'Korrekt utfall (1X2)'}>
+      <TableRow topBorder>
         <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
         <EmphasisTypography variant="m" color={theme.colors.primary}>
           {points}
@@ -134,43 +133,45 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           onClick={() => setIsExpanded(!isExpanded)}
         />
       </MainContent>
-      {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
-        <Section
-          alignItems="center"
-          padding={isMobile ? `${theme.spacing.xxxs} 0 ${theme.spacing.xxs} 0` : `0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs}`}
-          gap="xs"
-        >
-          {fixture && (
-          <PredictionContainer>
-            <HeadingsTypography variant="h6" color={theme.colors.textDefault}>
-              Tippade:
-            </HeadingsTypography>
-            <PredictionResult>
-              {getAvatar(fixture.homeTeam)}
-              <NormalTypography variant="m">{prediction.homeGoals}</NormalTypography>
-              <NormalTypography variant="m">-</NormalTypography>
-              <NormalTypography variant="m">{prediction.awayGoals}</NormalTypography>
-              {getAvatar(fixture.awayTeam)}
-            </PredictionResult>
-          </PredictionContainer>
-          )}
-          {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
-          {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
-          {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
-          {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
-          {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
-          {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
-          {prediction.goalScorer && (
-            <>
-              {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
-            </>
-          )}
-        </Section>
-      ) : (
-        <Section padding={`0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs}`}>
-          <NormalTypography variant="m" color={theme.colors.silverDark}>Inga poäng</NormalTypography>
-        </Section>
-      )}
+      <Section
+        alignItems="center"
+        padding={isMobile ? `${theme.spacing.xxxs} 0 ${theme.spacing.xxs} 0` : `0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs}`}
+        gap="xs"
+      >
+        {fixture && (
+        <PredictionContainer>
+          <HeadingsTypography variant="h6" color={theme.colors.textDefault}>
+            Tippade:
+          </HeadingsTypography>
+          <PredictionResult>
+            {getAvatar(fixture.homeTeam)}
+            <NormalTypography variant="m">{prediction.homeGoals}</NormalTypography>
+            <NormalTypography variant="m">-</NormalTypography>
+            <NormalTypography variant="m">{prediction.awayGoals}</NormalTypography>
+            {getAvatar(fixture.awayTeam)}
+          </PredictionResult>
+        </PredictionContainer>
+        )}
+        {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
+          <>
+            {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
+            {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
+            {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
+            {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
+            {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
+            {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
+            {prediction.goalScorer && (
+              <>
+                {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
+              </>
+            )}
+          </>
+        ) : (
+          <Section padding={`0 ${theme.spacing.xxs}`}>
+            <NormalTypography variant="m" color={theme.colors.silverDark}>Inga poäng</NormalTypography>
+          </Section>
+        )}
+      </Section>
       {!prediction && (
         <NormalTypography variant="m" color={theme.colors.silverDark}>Inget resultat tippades</NormalTypography>
       )}
