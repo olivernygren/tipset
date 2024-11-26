@@ -17,6 +17,7 @@ const NationAvatar = ({
     alt={`${nationName} logo`}
     showBorder
     objectFit="cover"
+    title={nationName}
     isDarkMode={isDarkMode}
   />
 );

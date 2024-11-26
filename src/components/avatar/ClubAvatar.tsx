@@ -17,6 +17,7 @@ const ClubAvatar = ({
     src={logoUrl}
     size={size}
     alt={`${clubName} logo`}
+    title={clubName}
     showBorder={showBorder}
     isDarkMode={isDarkMode}
     noPadding={noPadding}

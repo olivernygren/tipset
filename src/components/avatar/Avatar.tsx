@@ -31,6 +31,7 @@ interface AvatarProps {
   isDarkMode?: boolean;
   noPadding?: boolean;
   opacity?: number;
+  title?: string;
 }
 
 interface StyledAvatarProps {
@@ -44,9 +45,10 @@ interface StyledAvatarProps {
 }
 
 const Avatar = ({
-  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false, opacity = 1,
+  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false, opacity = 1, title,
 }: AvatarProps) => (
   <StyledAvatar
+    title={title}
     size={size}
     showBorder={showBorder}
     customBorderColor={customBorderColor}

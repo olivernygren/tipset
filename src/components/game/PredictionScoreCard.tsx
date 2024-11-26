@@ -139,21 +139,52 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
         gap="xs"
       >
         {fixture && (
-        <PredictionContainer>
-          <HeadingsTypography variant="h6" color={theme.colors.textDefault}>
-            Tippade:
-          </HeadingsTypography>
-          <PredictionResult>
-            {getAvatar(fixture.homeTeam)}
-            <NormalTypography variant="m">{prediction.homeGoals}</NormalTypography>
-            <NormalTypography variant="m">-</NormalTypography>
-            <NormalTypography variant="m">{prediction.awayGoals}</NormalTypography>
-            {getAvatar(fixture.awayTeam)}
-          </PredictionResult>
-        </PredictionContainer>
+          <PredictionContainer>
+            <HeadingsTypography variant="h6" color={theme.colors.textDefault}>
+              Tippade:
+            </HeadingsTypography>
+            {!isMobile && fixture.shouldPredictGoalScorer && (
+              <PredictedGoalScorer>
+                {prediction.goalScorer ? (
+                  <>
+                    <SoccerBall size={16} color={theme.colors.silverDark} weight="fill" />
+                    <NormalTypography variant="s" color={theme.colors.silverDark}>{prediction.goalScorer?.name}</NormalTypography>
+                    <NormalTypography variant="s" color={theme.colors.silverDark}>{`(${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`}</NormalTypography>
+                  </>
+                ) : (
+                  <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen målskytt tippad</NormalTypography>
+                )}
+              </PredictedGoalScorer>
+            )}
+            <PredictionResult>
+              {getAvatar(fixture.homeTeam)}
+              <NormalTypography variant="m">{prediction.homeGoals}</NormalTypography>
+              <NormalTypography variant="m">-</NormalTypography>
+              <NormalTypography variant="m">{prediction.awayGoals}</NormalTypography>
+              {getAvatar(fixture.awayTeam)}
+            </PredictionResult>
+          </PredictionContainer>
+        )}
+        {isMobile && fixture && fixture.shouldPredictGoalScorer && (
+          <PredictedGoalScorerSection>
+            <EmphasisTypography variant="s" color={theme.colors.textDefault}>Målskytt:</EmphasisTypography>
+            <PredictedGoalScorer>
+              {prediction.goalScorer ? (
+                <>
+                  <SoccerBall size={16} color={theme.colors.silverDark} weight="fill" />
+                  <NormalTypography variant="s" color={theme.colors.silverDark}>{prediction.goalScorer?.name}</NormalTypography>
+                </>
+              ) : (
+                <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen målskytt tippad</NormalTypography>
+              )}
+            </PredictedGoalScorer>
+          </PredictedGoalScorerSection>
         )}
         {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
           <>
+            <Section padding={`${theme.spacing.xxs} 0 ${theme.spacing.xxxs} 0`}>
+              <EmphasisTypography variant="m" color={theme.colors.primaryDark}>Poängfördelning</EmphasisTypography>
+            </Section>
             {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
             {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
             {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
@@ -271,9 +302,28 @@ const PredictionContainer = styled.div`
   padding: ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xs};
   border: 1px solid ${theme.colors.silverLight};
   border-radius: ${theme.borderRadius.s};
+
+  ${HeadingsTypography} {
+    flex: 1;
+  }
 `;
 
 const PredictionResult = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  align-items: center;
+`;
+
+const PredictedGoalScorerSection = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const PredictedGoalScorer = styled.div`
   display: flex;
   gap: ${theme.spacing.xxxs};
   align-items: center;

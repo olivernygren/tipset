@@ -313,6 +313,7 @@ const GamePredictor = ({
                     src={predictedPlayerToScore.picture ?? ''}
                     alt={predictedPlayerToScore.name}
                     size={AvatarSize.M}
+                    title={predictedPlayerToScore.name}
                     objectFit="cover"
                     showBorder
                   />
