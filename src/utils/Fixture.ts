@@ -107,6 +107,7 @@ export interface TeamFixturePreviewStats {
     result: FixtureResult;
     opponent: string;
   };
+  insights?: Array<string>;
 }
 
 export interface FixturePreviewStats {

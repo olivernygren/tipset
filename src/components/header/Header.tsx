@@ -45,8 +45,9 @@ const Header = () => {
         {isMobileMenuOpen && <GlobalStyle />}
         <Content>
           <InvisibleLink href="/">
+            {/* TODO: Change size after christmas */}
             <LogoImageContainer>
-              <img src="/images/logo.svg" alt="logo" />
+              <img src="/images/LogoChristmas.svg" alt="logo" />
             </LogoImageContainer>
           </InvisibleLink>
           {isTablet ? (
@@ -173,7 +174,9 @@ const InvisibleLink = styled.a`
 `;
 
 const LogoImageContainer = styled.div`
-  height: 50px;
+  // height: 50px;
+  height: 60px;
+  margin-bottom: 5px;
   width: fit-content;
   > img {
     height: 100%;
