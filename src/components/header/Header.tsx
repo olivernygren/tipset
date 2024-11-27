@@ -46,7 +46,7 @@ const Header = () => {
         <Content>
           <InvisibleLink href="/">
             <LogoImageContainer>
-              <img src="/images/logo.svg" alt="logo" />
+              <img src="/images/LogoChristmas.svg" alt="logo" />
             </LogoImageContainer>
           </InvisibleLink>
           {isTablet ? (
@@ -173,7 +173,7 @@ const InvisibleLink = styled.a`
 `;
 
 const LogoImageContainer = styled.div`
-  height: 50px;
+  height: 60px;
   width: fit-content;
   > img {
     height: 100%;

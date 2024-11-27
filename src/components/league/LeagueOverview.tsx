@@ -122,9 +122,13 @@ const LeagueOverview = ({
 
   const getUserLatestGameWeekTotalPoints = (userId: string) => {
     if (!league || !league.gameWeeks) return 0;
-    if (!currentGameWeek && (!league.gameWeeks || league.gameWeeks.length < 2)) return 0;
-    const currentGameWeekHasStarted = currentGameWeek && currentGameWeek.games.predictions.some((g) => g.points !== undefined);
+
     const previousGameWeek = currentGameWeek ? league.gameWeeks[league.gameWeeks.length - 2] : league.gameWeeks[league.gameWeeks.length - 1];
+    const currentGameWeekHasStarted = currentGameWeek && currentGameWeek.games.predictions.some((g) => g.points !== undefined);
+    const pointsHaveBeenAwarded = currentGameWeekHasStarted || (previousGameWeek && previousGameWeek.games.predictions.some((g) => g.points !== undefined));
+
+    if (!currentGameWeek && (!league.gameWeeks || !league.gameWeeks.length || (!pointsHaveBeenAwarded && league.gameWeeks.length === 1))) return 0;
+
     const gameWeek = currentGameWeekHasStarted ? currentGameWeek : previousGameWeek;
     const userPredictions = gameWeek.games.predictions.filter((prediction) => prediction.userId === userId);
 

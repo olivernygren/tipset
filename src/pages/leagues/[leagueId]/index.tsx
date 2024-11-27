@@ -7,7 +7,7 @@ import {
   ArrowLeft, CaretDown, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
   X,
 } from '@phosphor-icons/react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import Page from '../../../components/Page';
 import { auth, db } from '../../../config/firebase';
@@ -370,6 +370,9 @@ const PredictionLeaguePage = () => {
                 </MobileTabs>
               ) : (
                 <TabsContainer>
+                  <SantaImage>
+                    <img src="/images/Santa-With-Text.svg" alt="santa" />
+                  </SantaImage>
                   {tabs.map((tab) => (
                     <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
                       {getTabIcon(tab, activeTab === tab)}
@@ -486,7 +489,33 @@ const TabsContainer = styled.div`
   border-radius: ${theme.borderRadius.m};
   width: 100%;
   box-sizing: border-box;
-  overflow-x: auto;
+  position: relative;
+`;
+
+const SantaImage = styled.div`
+  display: none;
+
+  @media ${devices.laptop} {
+    display: block;
+    position: absolute;
+    bottom: 0px;
+    right: 50px;
+    height: 100px;
+    animation: fadeIn 0.5s ease;
+    
+    > img {
+      width: 100%;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
 `;
 
 const Tab = styled(motion.div)<{ active?: boolean }>`

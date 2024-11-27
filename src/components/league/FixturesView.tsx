@@ -225,28 +225,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     return league.gameWeeks.length + 1;
   };
 
-  // const getOptionItem = (team: Team): OptionItem => ({
-  //   value: team.name,
-  //   label: team.name,
-  //   additionalOptions: team,
-  // });
-
-  // const getOptionGroups = () => {
-  //   const filteredEntries = Object.entries(Teams).filter(([league]) => (teamType === TeamType.CLUBS ? league !== 'Landslag' : league === 'Landslag'));
-
-  //   const placeholderObj = {
-  //     label: '-',
-  //     options: [{ value: 'Välj lag', label: 'Välj lag' }],
-  //   };
-
-  //   const teams = filteredEntries.map(([league, teams]) => ({
-  //     label: league,
-  //     options: teams.sort((a, b) => a.name.localeCompare(b.name)).map(getOptionItem),
-  //   }));
-
-  //   return [placeholderObj, ...teams];
-  // };
-
   const handleSelectTeam = (team: Team | undefined, isHomeTeam: boolean) => {
     if (!team) return;
 
@@ -840,13 +818,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       size="l"
                     />
                     {(isCreator || hasAdminRights) && (
-                    <>
-                      {/* <IconButton
-                        icon={<PencilSimple size={24} />}
-                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                        onClick={() => setEditGameWeekViewOpen(true)}
-                        /> */}
-                      {ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
+                      ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
                         showCorrectGameWeekContent ? (
                           <IconButton
                             icon={<XCircle size={24} />}
@@ -863,8 +835,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             Rätta
                           </Button>
                         )
-                      )}
-                    </>
+                      )
                     )}
                   </Section>
                 </Section>

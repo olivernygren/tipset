@@ -162,7 +162,7 @@ const TableRow = styled.div`
   border-radius: ${theme.borderRadius.s};
   width: 100%;
   box-sizing: border-box;
-  min-height: 36px;
+  min-height: 42px;
 
   @media ${devices.tablet} {
     grid-template-columns: 1fr 1fr 1fr auto;
@@ -171,7 +171,7 @@ const TableRow = styled.div`
 
 const EmptyCell = styled.div`
   width: 32px;
-  height: 32px;
+  height: 2px;
 `;
 
 const NoWrapTypography = styled(EmphasisTypography)`
