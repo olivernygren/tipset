@@ -79,7 +79,7 @@ const Header = () => {
                   <LoggedInUser>
                     {user?.profilePicture && <Avatar src={`/images/${user?.profilePicture}.png`} alt="avatar" size={AvatarSize.M} showBorder objectFit="cover" />}
                     {/* <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography> */}
-                    <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}` ?? '?'}</EmphasisTypography>
+                    <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}`}</EmphasisTypography>
                   </LoggedInUser>
                 )}
                 {isSignedIn && (
