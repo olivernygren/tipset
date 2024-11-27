@@ -1,6 +1,6 @@
 /* eslint-disable guard-for-in */
 
-import { te } from 'date-fns/locale';
+import { theme } from '../theme';
 import { CountryEnum } from './Players';
 
 /* eslint-disable no-restricted-syntax */
@@ -142,6 +142,14 @@ export const getFlagUrlByCountryName = (countryName: string): string => {
   return country?.logoUrl || '';
 };
 
+export const getTeamPrimaryColorByName = (teamName: string): string => {
+  for (const league in Teams) {
+    const team = Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
+    if (team && (team as any).teamPrimaryColor) return (team as any).teamPrimaryColor || theme.colors.black;
+  }
+  return '';
+};
+
 export const Teams = {
   [LeagueEnum.PREMIER_LEAGUE]: [
     {
@@ -149,7 +157,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',
       stadium: 'Emirates Stadium',
       country: CountryEnum.ENGLAND,
-      teamPrimaryColor: '#EF0107',
+      teamPrimaryColor: '#E40514',
     },
     {
       name: 'Chelsea',
@@ -428,7 +436,7 @@ export const Teams = {
     {
       name: 'Östers IF',
       shortName: 'Öster',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Vasteras_SK_logo.svg',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b3/Osters_IF_logo.svg',
       stadium: 'Myresjöhus Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#dc362e',
@@ -625,6 +633,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/4e/RC_Deportivo_La_Coru%C3%B1a_logo.svg',
       stadium: 'Riazor',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#56105d',
     },
     {
       name: 'Sporting Gijón',
@@ -632,6 +641,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/48/Real_Sporting_de_Gijon.svg',
       stadium: 'El Molinón',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#e10012',
     },
     {
       name: 'Málaga CF',
@@ -639,6 +649,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6d/M%C3%A1laga_CF.svg',
       stadium: 'La Rosaleda',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#00529f',
     },
     {
       name: 'Real Oviedo',
@@ -646,6 +657,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6e/Real_Oviedo_logo.svg',
       stadium: 'Carlos Tartiere',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#054aa2',
     },
     {
       name: 'Racing Santander',
@@ -653,6 +665,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f5/Racing_de_Santander_logo.svg',
       stadium: 'El Sardinero',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#2c9a29',
     },
     {
       name: 'CD Tenerife',
@@ -660,6 +673,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f9/CD_Tenerife_logo.svg',
       stadium: 'Heliodoro Rodríguez López',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#0e339d',
     },
     {
       name: 'Real Zaragoza',
@@ -667,6 +681,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/69/Real_Zaragoza_logo.svg',
       stadium: 'La Romareda',
       country: CountryEnum.SPAIN,
+      teamPrimaryColor: '#fe000a',
     },
   ],
   [LeagueEnum.SERIE_A]: [
@@ -675,90 +690,105 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Juventus_FC_-_pictogram_black_%28Italy%2C_2017%29.svg',
       stadium: 'Allianz Stadium',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#000000',
     },
     {
       name: 'Inter',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
       stadium: 'Giuseppe Meazza',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#01229c',
     },
     {
       name: 'AC Milan',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg',
       stadium: 'San Siro',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#e3032a',
     },
     {
       name: 'AS Roma',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg',
       stadium: 'Stadio Olimpico',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#8f1e2c',
     },
     {
       name: 'Napoli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SSC_Napoli_2007.svg',
       stadium: 'Stadio Diego Armando Maradona',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#007dc3',
     },
     {
       name: 'Lazio',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/S.S._Lazio_badge.svg',
       stadium: 'Stadio Olimpico',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#87d9f8',
     },
     {
       name: 'Fiorentina',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg',
       stadium: 'Stadio Artemio Franchi',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#61318c',
     },
     {
       name: 'Atalanta',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/66/AtalantaBC.svg',
       stadium: 'Gewiss Stadium',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#275baf',
     },
     {
       name: 'Bologna',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg',
       stadium: 'Stadio Renato Dall\'Ara',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#a0182e',
     },
     {
       name: 'Genoa',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2c/Genoa_CFC_crest.svg',
       stadium: 'Stadio Luigi Ferraris',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#00213c',
     },
     {
       name: 'Udinese',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Udinese_Calcio_logo.svg',
       stadium: 'Dacia Arena',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#000000',
     },
     {
       name: 'Parma',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg',
       stadium: 'Stadio Ennio Tardini',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#f1c516',
     },
     {
       name: 'Torino',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/Torino_FC_Logo.svg',
       stadium: 'Stadio Olimpico Grande Torino',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#8a1912',
     },
     {
       name: 'Empoli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Empoli_FC.png',
       stadium: 'Stadio Carlo Castellani',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#005ea7',
     },
     {
       name: 'Monza',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/AC_Monza_logo_%282021%29.svg',
       stadium: 'Stadio Brianteo',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#ee0e35',
     },
     {
       name: 'Hellas Verona',
@@ -766,24 +796,28 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/Hellas_Verona_FC_logo_%282020%29.svg',
       stadium: 'Stadio Marcantonio Bentegodi',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#ffd100',
     },
     {
       name: 'Cagliari',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/61/Cagliari_Calcio_1920.svg',
       stadium: 'Unipol Domus',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#011d40',
     },
     {
       name: 'Venezia',
       logoUrl: 'https://shop.veneziafc.it/cdn/shop/files/logo_veneziafc.svg?v=1720436518&width=120',
       stadium: 'Stadio Pierluigi Penzo',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#fd7f18',
     },
     {
       name: 'Lecce',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/US_Lecce_Logo.png',
       stadium: 'Stadio Via del Mare',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#012857',
     },
     {
       name: 'Como 1907',
@@ -791,6 +825,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
       stadium: 'Stadio Giuseppe Sinigaglia',
       country: CountryEnum.ITALY,
+      teamPrimaryColor: '#083f69',
     },
   ],
   [LeagueEnum.BUNDESLIGA]: [
@@ -800,6 +835,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg',
       stadium: 'Allianz Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#ed0137',
     },
     {
       name: 'Borussia Dortmund',
@@ -807,6 +843,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
       stadium: 'Signal Iduna Park',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#ffd900',
     },
     {
       name: 'RB Leipzig',
@@ -814,6 +851,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg',
       stadium: 'Red Bull Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#d50000',
     },
     {
       name: 'Bayer Leverkusen',
@@ -821,6 +859,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg',
       stadium: 'BayArena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#d50000',
     },
     {
       name: 'Eintracht Frankfurt',
@@ -828,6 +867,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
       stadium: 'Deutsche Bank Park',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#e0000c',
     },
     {
       name: 'VfB Stuttgart',
@@ -835,6 +875,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/VfB_Stuttgart_1893_Logo.svg',
       stadium: 'Mercedes-Benz Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#fddd02',
     },
     {
       name: 'Mönchengladbach',
@@ -842,6 +883,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Borussia_M%C3%B6nchengladbach_logo.svg',
       stadium: 'Borussia-Park',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#1a191a',
     },
     {
       name: 'VfL Bochum',
@@ -849,12 +891,14 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/VfL_Bochum_logo.svg',
       stadium: 'Vonovia Ruhrstadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#005ba5',
     },
     {
       name: 'Hoffenheim',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Logo_TSG_Hoffenheim.svg',
       stadium: 'PreZero Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#1060b6',
     },
     {
       name: 'Holstein Kiel',
@@ -862,6 +906,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Holstein_Kiel_Logo.svg',
       stadium: 'Holstein-Stadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#04569d',
     },
     {
       name: 'Mainz 05',
@@ -869,6 +914,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_Mainz_05.svg',
       stadium: 'Opel Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#e6001f',
     },
     {
       name: 'Union Berlin',
@@ -876,18 +922,21 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/44/1._FC_Union_Berlin_Logo.svg',
       stadium: 'Stadion An der Alten Försterei',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#ec121d',
     },
     {
       name: 'Freiburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6d/SC_Freiburg_logo.svg',
       stadium: 'Schwarzwald-Stadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#000000',
     },
     {
       name: 'Augsburg',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c5/FC_Augsburg_logo.svg',
       stadium: 'WWK Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#ed1c24',
     },
     {
       name: 'Werder Bremen',
@@ -895,6 +944,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/be/SV-Werder-Bremen-Logo.svg',
       stadium: 'Weserstadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#179151',
     },
     {
       name: 'VfL Wolfsburg',
@@ -902,18 +952,21 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/VfL_Wolfsburg_Logo.svg',
       stadium: 'Volkswagen Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#50a803',
     },
     {
       name: 'St. Pauli',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/8f/FC_St._Pauli_logo_%282018%29.svg',
       stadium: 'Millerntor-Stadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#624737',
     },
     {
       name: 'Heidenheim',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/1._FC_Heidenheim_1846.svg',
       stadium: 'Voith-Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#e10012',
     },
   ],
   [LeagueEnum.BUNDESLIGA_2]: [
@@ -923,6 +976,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Hamburger_SV_logo.svg',
       stadium: 'Volksparkstadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#195bb4',
     },
     {
       name: 'Schalke 04',
@@ -930,6 +984,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/FC_Schalke_04_Logo.svg',
       stadium: 'Veltins-Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#01499d',
     },
     {
       name: '1. FC Köln',
@@ -937,12 +992,14 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/01/1._FC_Koeln_Logo_2014%E2%80%93.svg',
       stadium: 'RheinEnergieStadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#d7000d',
     },
     {
       name: 'Düsseldorf',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Fortuna_D%C3%BCsseldorf.png',
       stadium: 'Merkur Spiel-Arena',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#f80000',
     },
     {
       name: 'Hertha Berlin',
@@ -950,6 +1007,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Hertha_BSC_Logo_2012.svg',
       stadium: 'Olympiastadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#004892',
     },
     {
       name: 'Hannover 96',
@@ -957,6 +1015,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Hannover_96_Logo.svg',
       stadium: 'Niedersachsenstadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#069e2e',
     },
     {
       name: '1. FC Nürnberg',
@@ -964,6 +1023,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/1._FC_N%C3%BCrnberg_logo.svg',
       stadium: 'Max-Morlock-Stadion',
       country: CountryEnum.GERMANY,
+      teamPrimaryColor: '#ab081e',
     },
   ],
   [LeagueEnum.LIGUE_1]: [
@@ -973,24 +1033,28 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
       stadium: 'Parc des Princes',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#004170',
     },
     {
       name: 'Lyon',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/1c/Olympique_Lyonnais_logo.svg',
       stadium: 'Groupama Stadium',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#0b3d91',
     },
     {
       name: 'Marseille',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg',
       stadium: 'Stade Vélodrome',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#0597d9',
     },
     {
       name: 'AS Monaco',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
       stadium: 'Stade Louis II',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#e30613',
     },
     {
       name: 'Stade Brestois',
@@ -998,6 +1062,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/Stade_Brestois_29_logo.svg',
       stadium: 'Stade Francis-Le Blé',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#e30613',
     },
     {
       name: 'LOSC Lille',
@@ -1005,6 +1070,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/3/3f/Lille_OSC_2018_logo.svg',
       stadium: 'Stade Pierre-Mauroy',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#e1170e',
     },
     {
       name: 'Stade Rennais',
@@ -1012,18 +1078,21 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Stade_Rennais_FC.svg',
       stadium: 'Roazhon Park',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#000000',
     },
     {
       name: 'OGC Nice',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/OGC_Nice_logo.svg',
       stadium: 'Allianz Riviera',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#ee1620',
     },
     {
       name: 'Montpellier',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a8/Montpellier_HSC_logo.svg',
       stadium: 'Stade de la Mosson',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#d97042',
     },
     {
       name: 'Angers SCO',
@@ -1031,6 +1100,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d4/Angers_SCO_logo.svg',
       stadium: 'Stade Raymond Kopa',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#c7a77c',
     },
     {
       name: 'AJ Auxerre',
@@ -1038,24 +1108,28 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/5/51/AJAuxerreLogo.svg',
       stadium: 'Stade de l\'Abbé-Deschamps',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#0b3d91',
     },
     {
       name: 'Le Havre',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fc/Le_Havre_AC_logo.svg',
       stadium: 'Stade Océane',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#79bde8',
     },
     {
       name: 'RC Lens',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cc/RC_Lens_logo.svg',
       stadium: 'Stade Bollaert-Delelis',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#fcd116',
     },
     {
       name: 'Nantes',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Logo_FC_Nantes_%28avec_fond%29_-_2019.svg',
       stadium: 'Stade de la Beaujoire',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#fddd02',
     },
     {
       name: 'Stade de Reims',
@@ -1063,6 +1137,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/19/Stade_de_Reims_logo.svg',
       stadium: 'Stade Auguste-Delaune',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#d50000',
     },
     {
       name: 'Toulouse FC',
@@ -1070,6 +1145,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/63/Toulouse_FC_2018_logo.svg',
       stadium: 'Stadium de Toulouse',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#695089',
     },
     {
       name: 'Saint-Étienne',
@@ -1077,6 +1153,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/2/25/AS_Saint-%C3%89tienne_logo.svg',
       stadium: 'Stade Geoffroy-Guichard',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#009e60',
     },
     {
       name: 'RC Strasbourg',
@@ -1084,6 +1161,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/80/Racing_Club_de_Strasbourg_logo.svg',
       stadium: 'Stade de la Meinau',
       country: CountryEnum.FRANCE,
+      teamPrimaryColor: '#00a0e4',
     },
   ],
   [LeagueEnum.EREDIVISIE]: [
@@ -1092,18 +1170,21 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg',
       stadium: 'Johan Cruyff Arena',
       country: CountryEnum.NETHERLANDS,
+      teamPrimaryColor: '#d3122e',
     },
     {
       name: 'PSV',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
       stadium: 'Philips Stadion',
       country: CountryEnum.NETHERLANDS,
+      teamPrimaryColor: '#ec1b24',
     },
     {
       name: 'Feyenoord',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Feyenoord_logo_since_2009.svg',
       stadium: 'De Kuip',
       country: CountryEnum.NETHERLANDS,
+      teamPrimaryColor: '#ff1710',
     },
     {
       name: 'FC Twente',
@@ -1111,6 +1192,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e3/FC_Twente.svg',
       stadium: 'De Grolsch Veste',
       country: CountryEnum.NETHERLANDS,
+      teamPrimaryColor: '#e70011',
     },
   ],
   [LeagueEnum.PRIMEIRA_LIGA]: [
@@ -1119,24 +1201,28 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg',
       stadium: 'Estádio do Dragão',
       country: CountryEnum.PORTUGAL,
+      teamPrimaryColor: '#00529f',
     },
     {
       name: 'Benfica',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg',
       stadium: 'Estádio da Luz',
       country: CountryEnum.PORTUGAL,
+      teamPrimaryColor: '#ff0000',
     },
     {
       name: 'Sporting CP',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg',
       stadium: 'Estádio José Alvalade',
       country: CountryEnum.PORTUGAL,
+      teamPrimaryColor: '#078156',
     },
     {
       name: 'SC Braga',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/79/S.C._Braga_logo.svg',
       stadium: 'Estádio Municipal de Braga',
       country: CountryEnum.PORTUGAL,
+      teamPrimaryColor: '#c9261c',
     },
     {
       name: 'Amarante FC',
@@ -1144,6 +1230,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e2/Amarante_FC.png',
       stadium: 'Estádio Municipal de Amarante',
       country: CountryEnum.PORTUGAL,
+      teamPrimaryColor: '#000000',
     },
   ],
   [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
@@ -1152,6 +1239,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Club_Brugge_KV_logo.svg',
       stadium: 'Jan Breydel Stadium',
       country: CountryEnum.BELGIUM,
+      teamPrimaryColor: '#0d5eaf',
     },
   ],
   [LeagueEnum.UKRAINIAN_PREMIER_LEAGUE]: [
@@ -1160,6 +1248,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a1/FC_Shakhtar_Donetsk.svg',
       stadium: 'Volksparkstadion',
       country: CountryEnum.UKRAINE,
+      teamPrimaryColor: '#ed6a01',
     },
     {
       name: 'FK Kolos Kovalivka',
@@ -1167,6 +1256,7 @@ export const Teams = {
       stadium: 'Kolos Stadium',
       country: CountryEnum.UKRAINE,
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/31/FCKolos2018.svg',
+      teamPrimaryColor: '#000000',
     },
   ],
   [LeagueEnum.SCOTTISH_PREMIERSHIP]: [
@@ -1175,6 +1265,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/71/Celtic_FC_crest.svg',
       stadium: 'Celtic Park',
       country: CountryEnum.SCOTLAND,
+      teamPrimaryColor: '#008848',
     },
   ],
   [LeagueEnum.AUSTRIAN_BUNDESLIGA]: [
@@ -1184,12 +1275,14 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/7/77/FC_Red_Bull_Salzburg_logo.svg',
       stadium: 'Red Bull Arena',
       country: CountryEnum.AUSTRIA,
+      teamPrimaryColor: '#d50000',
     },
     {
       name: 'Sturm Graz',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/91/SK_Sturm_Graz_logo.svg',
       stadium: 'Merkur Arena',
       country: CountryEnum.AUSTRIA,
+      teamPrimaryColor: '#000000',
     },
   ],
   [LeagueEnum.SWISS_SUPER_LEAGUE]: [
@@ -1198,6 +1291,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/6/6b/BSC_Young_Boys_logo.svg',
       stadium: 'Wankdorf Stadium',
       country: CountryEnum.SWITZERLAND,
+      teamPrimaryColor: '#f9e300',
     },
   ],
   [LeagueEnum.CZECH_FIRST_LEAGUE]: [
@@ -1206,6 +1300,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/AC-Sparta-LOGO2021.svg',
       stadium: 'epet ARENA',
       country: CountryEnum.CZECH_REPUBLIC,
+      teamPrimaryColor: '#b8282e',
     },
   ],
   [LeagueEnum.CROATIAN_FIRST_FOOTBALL_LEAGUE]: [
@@ -1214,6 +1309,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Dinamo_Zagreb_logo.png',
       stadium: 'Stadion Maksimir',
       country: CountryEnum.CROATIA,
+      teamPrimaryColor: '#0047ab',
     },
   ],
   [LeagueEnum.SLOVAK_1_LIGA]: [
@@ -1223,6 +1319,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/01/SK_Slovan_Bratislava_logo.svg',
       stadium: 'Tehelné pole',
       country: CountryEnum.SLOVAKIA,
+      teamPrimaryColor: '#2db1e7',
     },
   ],
   [LeagueEnum.SERBIAN_SUPER_LIGA]: [
@@ -1232,6 +1329,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/15/FK_Crvena_Zvezda_Logo.svg',
       stadium: 'Rajko Mitić Stadium',
       country: CountryEnum.SERBIA,
+      teamPrimaryColor: '#d50000',
     },
   ],
   [LeagueEnum.AZERBAIJAN_PREMIER_LEAGUE]: [
@@ -1240,6 +1338,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d3/Qaraba%C4%9F_FK_logo.png',
       stadium: 'Azersun Arena',
       country: CountryEnum.AZERBAIJAN,
+      teamPrimaryColor: '#1b1059',
     },
   ],
   [LeagueEnum.NATIONS]: [
