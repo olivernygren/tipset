@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-  Check, PencilSimple, XCircle,
+  Check, PencilSimple, PlusCircle, XCircle,
 } from '@phosphor-icons/react';
 import { doc, updateDoc } from 'firebase/firestore';
+import { motion } from 'framer-motion';
+import { set } from 'date-fns';
 import {
   Fixture, FixtureOdds, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult, TeamType,
 } from '../../utils/Fixture';
@@ -14,7 +16,9 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import FormIcon, { getOutcomeBackgroundColor } from '../form/FormIcon';
-import { getTeamByName, Team, TournamentsEnum } from '../../utils/Team';
+import {
+  getTeamByName, getTeamPrimaryColorByName, Team, TournamentsEnum,
+} from '../../utils/Team';
 import Button from '../buttons/Button';
 import SelectImitation from '../input/SelectImitation';
 import SelectTeamModal from './SelectTeamModal';
@@ -31,6 +35,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import Textarea from '../textarea/Textarea';
 import { getIsBottomOfLeague } from '../../utils/helpers';
 import MockedStandingsRow from '../stats/MockedStandingsRow';
+import TextButton from '../buttons/TextButton';
 
 interface FixtureStatsModalProps {
   fixture: Fixture;
@@ -50,7 +55,7 @@ const FixtureStatsModal = ({
   const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
   const [includeLastFixture, setIncludeLastFixture] = useState<boolean>(false);
   const [includeStandings, setIncludeStandings] = useState<boolean>(false);
-  const [includeAnalysis, setIncludeAnalysis] = useState<boolean>(false);
+  const [includeInsights, setIncludeInsights] = useState<boolean>(false);
   const [includeOdds, setIncludeOdds] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [mobileSelectedTeam, setMobileSelectedTeam] = useState<'home' | 'away'>('home');
@@ -83,13 +88,18 @@ const FixtureStatsModal = ({
   });
   const [homeTeamLastFixtureOutcome, setHomeTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.homeTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
   const [awayTeamLastFixtureOutcome, setAwayTeamLastFixtureOutcome] = useState<FixtureOutcomeEnum>(fixture.previewStats?.awayTeam.lastFixture?.outcome ?? FixtureOutcomeEnum.NONE);
-  const [editAnalysisValue, setEditAnalysisValue] = useState(fixture.previewStats?.analysis ?? '');
   const [odds, setOdds] = useState<FixtureOdds>({ homeWin: fixture.odds?.homeWin.toString() ?? '', draw: fixture.odds?.draw.toString() ?? '', awayWin: fixture.odds?.awayWin.toString() ?? '' });
+  const [homeTeamInsights, setHomeTeamInsights] = useState<Array<string>>(fixture.previewStats?.homeTeam?.insights ?? []);
+  const [awayTeamInsights, setAwayTeamInsights] = useState<Array<string>>(fixture.previewStats?.awayTeam?.insights ?? []);
+  const [editHomeTeamInsightsValue, setEditHomeTeamInsightsValue] = useState<string>('');
+  const [editAwayTeamInsightsValue, setEditAwayTeamInsightsValue] = useState<string>('');
+  const [createNewHomeTeamInsight, setCreateNewHomeTeamInsight] = useState(false);
+  const [createNewAwayTeamInsight, setCreateNewAwayTeamInsight] = useState(false);
 
   const canEdit = isLeagueCreator && isEditMode;
   const fixtureHasStandings = Boolean(fixture.previewStats && fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints);
   const fixtureHasForm = fixture.previewStats && fixture.previewStats?.homeTeam.form && fixture.previewStats?.awayTeam.form;
-  const fixtureHasAnalysis = fixture.previewStats && fixture.previewStats.analysis;
+  const fixtureHasInsights = fixture.previewStats && (fixture.previewStats.homeTeam.insights || fixture.previewStats.awayTeam.insights);
   const fixtureHasOdds = fixture.odds && fixture.odds.homeWin && fixture.odds.draw && fixture.odds.awayWin;
 
   const handleSaveStats = async () => {
@@ -102,6 +112,7 @@ const FixtureStatsModal = ({
         form: editFormValue.homeTeam,
         ...(includeStandings && { standingsPosition: editStandingsPositionValue.homeTeam }),
         ...(includeStandings && { standingsPoints: editStandingsPositionPoints.homeTeam }),
+        ...(includeInsights && { insights: homeTeamInsights }),
         ...(includeLastFixture && {
           lastFixture: {
             opponent: editLastFixtureOpponents.homeTeamOpponent?.name ?? '',
@@ -115,6 +126,7 @@ const FixtureStatsModal = ({
         form: editFormValue.awayTeam,
         ...(includeStandings && { standingsPosition: editStandingsPositionValue.awayTeam }),
         ...(includeStandings && { standingsPoints: editStandingsPositionPoints.awayTeam }),
+        ...(includeInsights && { insights: awayTeamInsights }),
         ...(includeLastFixture && {
           lastFixture: {
             opponent: editLastFixtureOpponents.awayTeamOpponent?.name ?? '',
@@ -123,7 +135,6 @@ const FixtureStatsModal = ({
           },
         }),
       },
-      ...(includeAnalysis && { analysis: editAnalysisValue }),
     };
 
     const updatedFixture: Fixture = {
@@ -181,10 +192,6 @@ const FixtureStatsModal = ({
   };
 
   const handleUpdateLastFixtureGoalsInput = (team: 'home' | 'away', lastFixtureTeam: 'home' | 'away', value: string) => {
-    // if (value !== '' && !/^[0-9]$/.test(value)) {
-    //   return;
-    // }
-
     const parsedValue = value === '' ? 0 : parseInt(value);
 
     if (team === 'home') {
@@ -205,13 +212,13 @@ const FixtureStatsModal = ({
   const handleSetEditMode = () => {
     const fixtureSavedWithLastFixture = Boolean(fixture.previewStats?.homeTeam.lastFixture?.opponent || fixture.previewStats?.awayTeam.lastFixture?.opponent) && Boolean(fixture.previewStats?.lastUpdated);
     const fixtureSavedWithStandings = Boolean(fixture.previewStats?.homeTeam.standingsPosition && fixture.previewStats?.awayTeam.standingsPosition && fixture.previewStats?.homeTeam.standingsPoints && fixture.previewStats?.awayTeam.standingsPoints) && Boolean(fixture.previewStats?.lastUpdated);
-    const fixtureSavedWithAnalysis = Boolean(fixture.previewStats?.analysis);
+    const fixtureSavedWithInsights = Boolean(fixture.previewStats?.homeTeam.insights || fixture.previewStats?.awayTeam.insights);
     const fixtureSavedWithOdds = Boolean(fixture.odds?.homeWin && fixture.odds?.draw && fixture.odds?.awayWin);
 
     setIsEditMode(!isEditMode);
     setIncludeLastFixture(fixtureSavedWithLastFixture);
     setIncludeStandings(fixtureSavedWithStandings);
-    setIncludeAnalysis(fixtureSavedWithAnalysis);
+    setIncludeInsights(fixtureSavedWithInsights);
     setIncludeOdds(fixtureSavedWithOdds);
   };
 
@@ -247,7 +254,11 @@ const FixtureStatsModal = ({
     }
 
     if (!lastFixture) {
-      return <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match tillgänglig</NormalTypography>;
+      return (
+        <Section padding={`${theme.spacing.xxs} 0`} alignItems="center">
+          <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen match tillgänglig</NormalTypography>
+        </Section>
+      );
     }
 
     return (
@@ -306,6 +317,20 @@ const FixtureStatsModal = ({
       ...oldstate,
       [type]: value,
     }));
+  };
+
+  const handleAddInsight = (isHomeTeam: boolean) => {
+    const insight = isHomeTeam ? editHomeTeamInsightsValue : editAwayTeamInsightsValue;
+
+    if (isHomeTeam) {
+      setHomeTeamInsights((oldstate) => [...oldstate, insight]);
+      setEditHomeTeamInsightsValue('');
+      setCreateNewHomeTeamInsight(false);
+    } else {
+      setAwayTeamInsights((oldstate) => [...oldstate, insight]);
+      setEditAwayTeamInsightsValue('');
+      setCreateNewAwayTeamInsight(false);
+    }
   };
 
   const getLastFixtureResultEdit = (isHomeTeam: boolean) => {
@@ -443,9 +468,9 @@ const FixtureStatsModal = ({
                     onChange={() => setIncludeLastFixture(!includeLastFixture)}
                   />
                   <Checkbox
-                    label="Inkludera analys"
-                    checked={includeAnalysis}
-                    onChange={() => setIncludeAnalysis(!includeAnalysis)}
+                    label="Inkludera insikter"
+                    checked={includeInsights}
+                    onChange={() => setIncludeInsights(!includeInsights)}
                   />
                 </Section>
               )}
@@ -607,23 +632,60 @@ const FixtureStatsModal = ({
                 )}
               </MobileSection>
             )}
-            {(fixtureHasAnalysis || (canEdit && includeAnalysis)) && (
+            {(fixtureHasInsights || (canEdit && includeInsights)) && (
               <MobileSection>
                 <HeadingsTypography variant="h6">
-                  Analys
+                  Insikter
                 </HeadingsTypography>
-                {canEdit ? (
-                  <Textarea
-                    value={editAnalysisValue}
-                    onChange={(e) => setEditAnalysisValue(e.target.value)}
-                    placeholder="Analys"
-                    customHeight="200px"
-                    fullWidth
-                  />
-                ) : (
-                  <Section padding={theme.spacing.s} backgroundColor={theme.colors.silverLighter} borderRadius={theme.borderRadius.s}>
-                    <NormalTypography variant="s">{fixture.previewStats?.analysis}</NormalTypography>
+                {canEdit && isEditMode && (
+                  <Section gap="xxs">
+                    {(mobileSelectedTeam === 'home' && createNewHomeTeamInsight) || (mobileSelectedTeam === 'away' && createNewAwayTeamInsight) ? (
+                      <>
+                        <InsightCard isEditing>
+                          <InsightCardColorStripe color={getTeamPrimaryColorByName(mobileSelectedTeam === 'home' ? fixture.homeTeam.name : fixture.awayTeam.name)} />
+                          <Textarea
+                            value={mobileSelectedTeam === 'home' ? editHomeTeamInsightsValue : editAwayTeamInsightsValue}
+                            onChange={mobileSelectedTeam === 'home' ? (e) => setEditHomeTeamInsightsValue(e.currentTarget.value) : (e) => setEditAwayTeamInsightsValue(e.currentTarget.value)}
+                            placeholder="Skriv..."
+                            fullWidth
+                            noBorder
+                            customPadding={`${theme.spacing.xxxs} 0`}
+                            customHeight="50px"
+                            backgroundColor={theme.colors.silverBleach}
+                          />
+                        </InsightCard>
+                        <TextButton noPadding onClick={() => handleAddInsight(mobileSelectedTeam === 'home')}>
+                          Lägg till
+                        </TextButton>
+                      </>
+                    ) : (
+                      <AddInsightBlock
+                        whileHover={{ scale: 1.02, backgroundColor: theme.colors.silverLight }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={mobileSelectedTeam === 'home' ? () => setCreateNewHomeTeamInsight(true) : () => setCreateNewAwayTeamInsight(true)}
+                      >
+                        <PlusCircle size={24} color={theme.colors.textDefault} />
+                        <NormalTypography variant="m">Lägg till</NormalTypography>
+                      </AddInsightBlock>
+                    )}
                   </Section>
+                )}
+                {((mobileSelectedTeam === 'home' && homeTeamInsights.length > 0) || (mobileSelectedTeam === 'away' && awayTeamInsights.length > 0)) && (
+                  <InsightsList>
+                    {(mobileSelectedTeam === 'home' ? homeTeamInsights : awayTeamInsights).map((insight, index) => (
+                      <InsightCard key={index}>
+                        <InsightCardColorStripe color={getTeamPrimaryColorByName(mobileSelectedTeam === 'home' ? fixture.homeTeam.name : fixture.awayTeam.name)} />
+                        <NormalTypography variant="s">{insight}</NormalTypography>
+                        {canEdit && isEditMode && (
+                          <IconButton
+                            icon={<XCircle size={20} weight="fill" />}
+                            colors={{ normal: theme.colors.red }}
+                            onClick={mobileSelectedTeam === 'home' ? () => setHomeTeamInsights((oldstate) => oldstate.filter((i) => i !== insight)) : () => setAwayTeamInsights((oldstate) => oldstate.filter((i) => i !== insight))}
+                          />
+                        )}
+                      </InsightCard>
+                    ))}
+                  </InsightsList>
                 )}
               </MobileSection>
             )}
@@ -682,9 +744,9 @@ const FixtureStatsModal = ({
                   onChange={() => setIncludeLastFixture(!includeLastFixture)}
                 />
                 <Checkbox
-                  label="Inkludera analys"
-                  checked={includeAnalysis}
-                  onChange={() => setIncludeAnalysis(!includeAnalysis)}
+                  label="Inkludera insikter"
+                  checked={includeInsights}
+                  onChange={() => setIncludeInsights(!includeInsights)}
                 />
                 <Checkbox
                   label="Inkludera odds"
@@ -917,28 +979,120 @@ const FixtureStatsModal = ({
               </TableCell>
             </TableRow>
           )}
-          {(fixtureHasAnalysis || (canEdit && includeAnalysis)) && (
-            <TableRow isDoubleColSpan>
+          {(fixtureHasInsights || (canEdit && includeInsights)) && (
+            <TableRow>
               <TableCell>
                 <FlexColumn>
-                  <EmphasisTypography variant="m">Analys</EmphasisTypography>
+                  <EmphasisTypography variant="m">Insikter</EmphasisTypography>
                 </FlexColumn>
               </TableCell>
-              <TableCell>
-                {canEdit ? (
-                  <Textarea
-                    value={editAnalysisValue}
-                    onChange={(e) => setEditAnalysisValue(e.target.value)}
-                    customPadding={`${theme.spacing.xxs} 0`}
-                    placeholder="Analys"
-                    fullWidth
-                    noBorder
-                  />
-                ) : (
-                  <Section padding={`${theme.spacing.xxs} 0`}>
-                    <NormalTypography variant="s">{fixture.previewStats?.analysis}</NormalTypography>
-                  </Section>
-                )}
+              <TableCell alignTop>
+                <Section>
+                  {canEdit && isEditMode && (
+                    <Section gap="xxs" padding={`${theme.spacing.xxs} 0`}>
+                      {createNewHomeTeamInsight ? (
+                        <>
+                          <InsightCard isEditing>
+                            <InsightCardColorStripe color={getTeamPrimaryColorByName(fixture.homeTeam.name)} />
+                            <Textarea
+                              value={editHomeTeamInsightsValue}
+                              onChange={(e) => setEditHomeTeamInsightsValue(e.currentTarget.value)}
+                              placeholder="Skriv..."
+                              fullWidth
+                              noBorder
+                              customPadding={`${theme.spacing.xxxs} 0`}
+                              customHeight="50px"
+                              backgroundColor={theme.colors.silverBleach}
+                            />
+                          </InsightCard>
+                          <TextButton noPadding onClick={() => handleAddInsight(true)}>
+                            Lägg till
+                          </TextButton>
+                        </>
+                      ) : (
+                        <AddInsightBlock
+                          whileHover={{ scale: 1.02, backgroundColor: theme.colors.silverLight }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setCreateNewHomeTeamInsight(true)}
+                        >
+                          <PlusCircle size={24} color={theme.colors.textDefault} />
+                          <NormalTypography variant="m">Lägg till</NormalTypography>
+                        </AddInsightBlock>
+                      )}
+                    </Section>
+                  )}
+                  {homeTeamInsights.length > 0 && (
+                    <InsightsList>
+                      {homeTeamInsights.map((insight, index) => (
+                        <InsightCard key={index}>
+                          <InsightCardColorStripe color={getTeamPrimaryColorByName(fixture.homeTeam.name)} />
+                          <NormalTypography variant="s">{insight}</NormalTypography>
+                          {canEdit && isEditMode && (
+                            <IconButton
+                              icon={<XCircle size={20} weight="fill" />}
+                              colors={{ normal: theme.colors.red }}
+                              onClick={() => setHomeTeamInsights((oldstate) => oldstate.filter((i) => i !== insight))}
+                            />
+                          )}
+                        </InsightCard>
+                      ))}
+                    </InsightsList>
+                  )}
+                </Section>
+              </TableCell>
+              <TableCell alignTop>
+                <Section>
+                  {canEdit && isEditMode && (
+                    <Section gap="xxs" padding={`${theme.spacing.xxs} 0`}>
+                      {createNewAwayTeamInsight ? (
+                        <>
+                          <InsightCard isEditing>
+                            <InsightCardColorStripe color={getTeamPrimaryColorByName(fixture.awayTeam.name)} />
+                            <Textarea
+                              value={editAwayTeamInsightsValue}
+                              onChange={(e) => setEditAwayTeamInsightsValue(e.currentTarget.value)}
+                              placeholder="Skriv..."
+                              fullWidth
+                              noBorder
+                              customPadding={`${theme.spacing.xxxs} 0`}
+                              customHeight="50px"
+                              backgroundColor={theme.colors.silverBleach}
+                            />
+                          </InsightCard>
+                          <TextButton noPadding onClick={() => handleAddInsight(false)}>
+                            Lägg till
+                          </TextButton>
+                        </>
+                      ) : (
+                        <AddInsightBlock
+                          whileHover={{ scale: 1.02, backgroundColor: theme.colors.silverLight }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setCreateNewAwayTeamInsight(true)}
+                        >
+                          <PlusCircle size={24} color={theme.colors.textDefault} />
+                          <NormalTypography variant="m">Lägg till</NormalTypography>
+                        </AddInsightBlock>
+                      )}
+                    </Section>
+                  )}
+                  {awayTeamInsights.length > 0 && (
+                    <InsightsList>
+                      {awayTeamInsights.map((insight, index) => (
+                        <InsightCard key={index}>
+                          <InsightCardColorStripe color={getTeamPrimaryColorByName(fixture.awayTeam.name)} />
+                          <NormalTypography variant="s">{insight}</NormalTypography>
+                          {canEdit && isEditMode && (
+                            <IconButton
+                              icon={<XCircle size={20} weight="fill" />}
+                              colors={{ normal: theme.colors.red }}
+                              onClick={() => setAwayTeamInsights((oldstate) => oldstate.filter((i) => i !== insight))}
+                            />
+                          )}
+                        </InsightCard>
+                      ))}
+                    </InsightsList>
+                  )}
+                </Section>
               </TableCell>
             </TableRow>
           )}
@@ -1036,14 +1190,14 @@ const LastUpdatedContainer = styled.div`
   border-bottom: 1px solid ${theme.colors.silverLight};
 `;
 
-const TableCell = styled.div`
+const TableCell = styled.div<{ alignTop?: boolean }>`
   display: flex;
-  align-items: center;
+  align-items: ${({ alignTop }) => (alignTop ? 'flex-start' : 'center')};
   gap: ${theme.spacing.xxs};
   padding: ${theme.spacing.xxxs} ${theme.spacing.s};
   flex: 1;
   height: 100%;
-  border-right: 1px solid ${theme.colors.silverLight}; /* Add right border */
+  border-right: 1px solid ${theme.colors.silverLight};
   box-sizing: border-box;
   
   &:last-child {
@@ -1189,6 +1343,62 @@ const StandingsPosition = styled.div`
   border-radius: ${theme.borderRadius.xs};
   width: 24px;
   height: 24px;
+`;
+
+const AddInsightBlock = styled(motion.div)`
+  background-color: ${theme.colors.silverLighter};
+  padding: ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.m};
+  border: 1px dashed ${theme.colors.silverLight};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  cursor: pointer;
+  box-sizing: border-box;
+`;
+
+const InsightCard = styled.div<{ isEditing?: boolean }>`
+  background-color: ${theme.colors.silverBleach};
+  position: relative;
+  ${({ isEditing }) => (isEditing ? css`
+    padding: 6px ${theme.spacing.xxxs} ${theme.spacing.xxxs} ${theme.spacing.s};
+    ` : css`
+    padding: ${theme.spacing.xxs} ${theme.spacing.xs} ${theme.spacing.xxs} ${theme.spacing.s};
+  `)}
+  border-radius: ${theme.borderRadius.s};
+  border: 1px solid ${theme.colors.silverLight};
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  align-items: center;
+
+  ${NormalTypography} {
+    flex: 1;
+  }
+`;
+
+const InsightCardColorStripe = styled.div<{ color: string }>`
+  background-color: ${({ color }) => color};
+  width: 6px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top-left-radius: ${theme.borderRadius.s};
+  border-bottom-left-radius: ${theme.borderRadius.s};
+  box-shadow: 1px 0px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const InsightsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  box-sizing: border-box;
+  padding: ${theme.spacing.xs} 0;
 `;
 
 export default FixtureStatsModal;

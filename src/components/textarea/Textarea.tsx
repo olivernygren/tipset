@@ -17,12 +17,12 @@ interface TextareaProps {
   textAlign?: 'left' | 'center' | 'right';
   fontSize?: string;
   fontWeight?: string;
-  compact?: boolean;
   label?: string;
   customPadding?: string;
   noBorder?: boolean;
   autoFocus?: boolean;
   customHeight?: string;
+  backgroundColor?: string;
 }
 
 interface StyledTextareaProps {
@@ -35,10 +35,11 @@ interface StyledTextareaProps {
   customPadding?: string;
   noBorder?: boolean;
   customHeight?: string;
+  backgroundColor?: string;
 }
 
 const Textarea = ({
-  value, onChange, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight,
+  value, onChange, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight, backgroundColor,
 }: TextareaProps) => (
   <Section gap="xxxs">
     {label && (
@@ -58,11 +59,11 @@ const Textarea = ({
       textAlign={textAlign}
       fontSize={fontSize}
       fontWeight={fontWeight}
-      compact={compact}
       customPadding={customPadding}
       noBorder={noBorder}
       autoFocus={autoFocus}
       customHeight={customHeight}
+      backgroundColor={backgroundColor}
     />
     {maxLength && !maxLengthInvisible && (
       <NormalTypography variant="s" color={theme.colors.textLight}>
@@ -78,6 +79,7 @@ const Textarea = ({
 );
 
 const StyledTextarea = styled.textarea<StyledTextareaProps>`
+  background-color: ${({ backgroundColor }) => backgroundColor || theme.colors.white};
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   max-width: ${({ maxWidth }) => maxWidth || 'unset'};
   padding: ${({ customPadding }) => customPadding || `${theme.spacing.xxs} ${theme.spacing.xs}`};
