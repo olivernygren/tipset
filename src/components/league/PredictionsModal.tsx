@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import Modal from '../modal/Modal';
 import { Fixture, Prediction } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
@@ -49,7 +49,7 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
             )}
           </AvatarContainer>
         )}
-        <NormalTypography variant="m">{playerObj?.name ?? '?'}</NormalTypography>
+        <NormalTypography variant="m" align={isMobile ? 'left' : 'center'}>{playerObj?.name ?? '?'}</NormalTypography>
         {isMobile && (
           <MobilePlayerPositionTag bgColor={positionColor}>
             <NormalTypography variant="xs" color={theme.colors.white}>{getGeneralPositionShorthand(playerObj?.position.general ?? '?')}</NormalTypography>
@@ -80,7 +80,7 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
           )
         )}
         {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
-          <GoalScorersContainer>
+          <GoalScorersContainer desktopColumn={fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length < 5}>
             <HeadingsTypography variant="h5">Målskyttar</HeadingsTypography>
               {fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length > 0 ? (
                 <GoalScorers>
@@ -122,16 +122,18 @@ const PredictionsContainer = styled.div`
   flex-direction: column;
 `;
 
-const GoalScorersContainer = styled.div`
+const GoalScorersContainer = styled.div<{ desktopColumn?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xs};
   width: 100%;
 
   @media ${devices.tablet} {
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
+    ${({ desktopColumn }) => desktopColumn && css`
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+    `}
     gap: ${theme.spacing.xs};
     border: 1px solid ${theme.colors.silverLight};
     border-radius: ${theme.borderRadius.m};

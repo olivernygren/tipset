@@ -218,7 +218,7 @@ const Card = styled.div<{ isExpanded: boolean }>`
   background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
   padding: ${theme.spacing.xs} ${theme.spacing.xs};
-  cursor: pointer;
+  /* cursor: pointer; */
   box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
   max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '32px')};
   overflow: hidden;
