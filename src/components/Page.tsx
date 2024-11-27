@@ -31,11 +31,27 @@ const Root = styled.div<{ fullWidthMobile?: boolean }>`
   @media ${devices.tablet} {
     padding: ${theme.spacing.l};
   }
+
+  /* &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/snow-falling.gif');
+    background-size: contain;
+    background-repeat: repeat;
+    background-position: center;
+    opacity: 0.2;
+    z-index: 0;
+  } */
 `;
 
 const Content = styled.div`
   max-width: 1200px;
   margin: 0 auto;
+  z-index: 1;
 `;
 
 export default Page;
