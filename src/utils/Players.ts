@@ -370,7 +370,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1997-06-05'),
     country: CountryEnum.SCOTLAND,
     picture: '/images/players/kieran-tierney.png',
-    mayBeInjured: true,
   },
   {
     id: '248tgegh0rhq3rijw3ogt0ert',
@@ -407,7 +406,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
-    mayBeInjured: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
