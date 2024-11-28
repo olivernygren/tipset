@@ -15,7 +15,6 @@ import NationAvatar from '../avatar/NationAvatar';
 import GoalsInput from './GoalsInput';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
-import SelectImitation from '../input/SelectImitation';
 import GoalScorerModal from './GoalScorerModal';
 import IconButton from '../buttons/IconButton';
 import Tag from '../tag/Tag';
@@ -47,6 +46,9 @@ const GamePredictor = ({
   const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
+  const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
+  const hasPredictedDraw = homeGoals !== '' && awayGoals !== '' && homeGoals === awayGoals;
+  const hasPredictedAwayWin = homeGoals !== '' && awayGoals !== '' && homeGoals < awayGoals;
 
   const handleIncreaseGoals = (team: 'home' | 'away') => {
     if (new Date(game.kickOffTime) < new Date()) {
@@ -117,12 +119,39 @@ const GamePredictor = ({
 
   const getTextColor = () => (hasPredicted ? theme.colors.white : theme.colors.textDefault);
 
-  const getGoalScorerIconButtonColor = () => {
-    if (kickoffTimeHasPassed) {
-      return theme.colors.silverLight;
-    }
-    return theme.colors.gold;
-  };
+  // const getPotentialOddsBonusPoints = () => {
+  //   if (game.odds && homeGoals !== '' && awayGoals !== '') {
+  //     const homeWinOdds = parseFloat(game.odds.homeWin);
+  //     const drawOdds = parseFloat(game.odds.draw);
+  //     const awayWinOdds = parseFloat(game.odds.awayWin);
+
+  //     const getBonusPointsFromOdds = (odds: number): number => {
+  //       if (odds >= 1 && odds <= 2.99) return 0;
+  //       if (odds >= 3.0 && odds <= 3.99) return 1;
+  //       if (odds >= 4.0 && odds <= 5.99) return 2;
+  //       if (odds >= 6.0 && odds <= 9.99) return 3;
+  //       if (odds >= 10) return 5;
+  //       return 0;
+  //     };
+
+  //     const homeWinPredicted = homeGoals > awayGoals;
+  //     const drawPredicted = homeGoals === awayGoals;
+  //     const awayWinPredicted = homeGoals < awayGoals;
+
+  //     if (homeWinPredicted && homeWinOdds) {
+  //       return getBonusPointsFromOdds(homeWinOdds);
+  //     }
+  //     if (drawPredicted && drawOdds) {
+  //       return getBonusPointsFromOdds(drawOdds);
+  //     }
+  //     if (awayWinPredicted && awayWinOdds) {
+  //       return getBonusPointsFromOdds(awayWinOdds);
+  //     }
+
+  //     return 0;
+  //   }
+  //   return 0;
+  // };
 
   const handleInputChange = (team: 'home' | 'away', value: string) => {
     if (value !== '' && !/^[0-9]$/.test(value)) {
@@ -146,6 +175,17 @@ const GamePredictor = ({
     onPlayerPredictionUpdate(gameNumber, player);
   };
 
+  const getGoalScorerIconButtonColor = () => {
+    if (kickoffTimeHasPassed) {
+      if (hasPredicted) {
+        return theme.colors.primaryDark;
+      }
+      return theme.colors.silverLight;
+    }
+    if (hasPredicted && !predictedPlayerToScore) return theme.colors.gold;
+    return theme.colors.primary;
+  };
+
   const getTeam = (team: Team, isAwayTeam: boolean) => {
     const { name, shortName } = team;
     const logoUrl = team.logoUrl ?? team.relativeLogoUrl;
@@ -158,16 +198,16 @@ const GamePredictor = ({
             <ClubAvatar
               clubName={displayName}
               logoUrl={logoUrl}
-              size={isMobile ? AvatarSize.L : AvatarSize.L}
-              showBorder={hasPredicted}
-              isDarkMode={hasPredicted}
+              size={isMobile ? AvatarSize.L : AvatarSize.XL}
+              // showBorder={hasPredicted}
+              // isDarkMode={hasPredicted}
             />
           ) : (
             <NationAvatar
               nationName={name}
               flagUrl={logoUrl}
-              size={isMobile ? AvatarSize.L : AvatarSize.L}
-              isDarkMode={hasPredicted}
+              size={isMobile ? AvatarSize.L : AvatarSize.XL}
+              // isDarkMode={hasPredicted}
             />
           )}
           <TeamName variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault} align="center">
@@ -275,18 +315,23 @@ const GamePredictor = ({
           <>
             <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
             <OddsContainer hasPredicted={hasPredicted}>
-              <OddsWrapper>
+              <OddsWrapper hasPredictedThisOutcome={hasPredictedHomeWin}>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
               </OddsWrapper>
-              <OddsWrapper>
+              <OddsWrapper hasPredictedThisOutcome={hasPredictedDraw}>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
               </OddsWrapper>
-              <OddsWrapper>
+              <OddsWrapper hasPredictedThisOutcome={hasPredictedAwayWin}>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
                 <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
               </OddsWrapper>
+              {/* {homeGoals !== '' && awayGoals !== '' && (
+                <PotentialOddsBonusPoints hasPredicted={hasPredicted}>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primaryDark}>{`OB: ${getPotentialOddsBonusPoints()}`}</NormalTypography>
+                </PotentialOddsBonusPoints>
+              )} */}
             </OddsContainer>
           </>
         )}
@@ -319,7 +364,7 @@ const GamePredictor = ({
                   />
                 </AvatarWrapper>
               ) : (
-                <PlusCircle color={kickoffTimeHasPassed ? theme.colors.silverLight : theme.colors.primary} size={36} weight="fill" />
+                <PlusCircle color={getGoalScorerIconButtonColor()} size={36} weight="fill" />
               )}
             </GoalScorer>
           )}
@@ -390,6 +435,7 @@ const GameWrapper = styled.div`
   box-sizing: border-box;
   margin: auto 0;
   padding: ${theme.spacing.s} 0 ${theme.spacing.s} 0;
+  position: relative;
   
   @media ${devices.tablet} {
     gap: ${theme.spacing.s};
@@ -400,6 +446,7 @@ const GoalInputWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xs};
+  position: relative;
 
   @media ${devices.tablet} {
     gap: ${theme.spacing.s};
@@ -435,6 +482,15 @@ const AvatarAndTeamName = styled.div`
   margin: 0 auto;
 `;
 
+const getGoalScorerHoverColor = (disabled?: boolean, shouldPredictGoalScorer?: boolean, hasPredicted?: boolean) => {
+  if (hasPredicted) {
+    if (disabled) return theme.colors.primary;
+    return theme.colors.primaryDark;
+  }
+  if (disabled) return theme.colors.white;
+  return theme.colors.primaryBleach;
+};
+
 const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabled?: boolean, hasPredicted?: boolean, hasChosen?: boolean }>`
   display: flex;
   justify-content: space-between;
@@ -448,9 +504,11 @@ const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabl
   transition: all 0.2s ease;
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primary : theme.colors.white)};
 
-  ${({ shouldPredictGoalScorer, disabled, hasChosen }) => shouldPredictGoalScorer && !disabled && css`
+  ${({
+    shouldPredictGoalScorer, disabled, hasPredicted,
+  }) => shouldPredictGoalScorer && !disabled && css`
     &:hover {
-      background-color: ${hasChosen ? theme.colors.primaryLight : theme.colors.primaryFade};
+      background-color: ${getGoalScorerHoverColor(disabled, shouldPredictGoalScorer, hasPredicted)};
     }
   `}
 
@@ -503,9 +561,10 @@ const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
   gap: ${theme.spacing.s};
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 `;
 
-const OddsWrapper = styled.div`
+const OddsWrapper = styled.div<{ hasPredictedThisOutcome?: boolean }>`
   display: flex;
   gap: ${theme.spacing.xxs};
   align-items: center;
@@ -513,6 +572,12 @@ const OddsWrapper = styled.div`
   display: flex;
   width: 100%;
   box-sizing: border-box;
+
+  ${({ hasPredictedThisOutcome }) => hasPredictedThisOutcome && css`
+    /* ${NormalTypography} {
+      text-decoration: underline;
+    } */
+  `};
 `;
 
 const GoalScorer = styled.div`
@@ -525,6 +590,19 @@ const AvatarWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const PotentialOddsBonusPoints = styled.div<{ hasPredicted?: boolean }>`
+  /* position: absolute;
+  top: -26px;
+  right: 0; */
+  /* transform: translateX(-50%); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach)};
+  padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
+  border-radius: ${theme.borderRadius.s};
 `;
 
 export default GamePredictor;

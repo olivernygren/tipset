@@ -73,7 +73,7 @@ const getAvatarSize = (size: AvatarSize) => {
     case AvatarSize.L:
       return '48px';
     case AvatarSize.XL:
-      return '64px';
+      return '58px';
     default:
       return '32px';
   }
