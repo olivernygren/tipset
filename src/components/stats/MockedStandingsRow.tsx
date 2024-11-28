@@ -6,11 +6,12 @@ import { EmphasisTypography } from '../typography/Typography';
 interface MockedStandingsRowProps {
   position: number;
   type: 'full' | 'bottom' | 'top';
+  backgroundColor?: 'white' | 'silver';
 }
 
-const MockedStandingsRow = ({ position, type }: MockedStandingsRowProps) => (
+const MockedStandingsRow = ({ position, type, backgroundColor = 'white' }: MockedStandingsRowProps) => (
   <StandingsRow>
-    <FadeOverlay itemType={type} />
+    <FadeOverlay itemType={type} backgroundColor={backgroundColor} />
     <StandingsPosition>
       <EmphasisTypography variant="s" color={theme.colors.primaryDark}>{position}</EmphasisTypography>
     </StandingsPosition>
@@ -68,16 +69,15 @@ const StandingMockPoints = styled.div`
   margin-left: auto;
 `;
 
-const FadeOverlay = styled.div<{ itemType: 'top' | 'bottom' | 'full' }>`
+const FadeOverlay = styled.div<{ itemType: 'top' | 'bottom' | 'full', backgroundColor?: 'white' | 'silver' }>`
   position: absolute;
   inset: 0;
   z-index: 1;
-  ${({ itemType }) => itemType !== 'full' && css`
-
-  background: linear-gradient(
-    to ${itemType === 'top' ? 'bottom' : 'top'},
-    ${theme.colors.white} 0%,
-    transparent 90%
+  ${({ itemType, backgroundColor }) => itemType !== 'full' && css`
+    background: linear-gradient(
+      to ${itemType === 'top' ? 'bottom' : 'top'},
+      ${backgroundColor === 'silver' ? theme.colors.silverBleach : theme.colors.white} 0%,
+      transparent 90%
     );
   `}
 `;

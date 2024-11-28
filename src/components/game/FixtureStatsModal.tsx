@@ -5,7 +5,6 @@ import {
 } from '@phosphor-icons/react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { motion } from 'framer-motion';
-import { set } from 'date-fns';
 import {
   Fixture, FixtureOdds, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult, TeamType,
 } from '../../utils/Fixture';
@@ -301,10 +300,6 @@ const FixtureStatsModal = ({
     const date = new Date(lastUpdated);
     const day = date.getDate();
     const month = date.toLocaleDateString('sv-SE', { month: 'long' }).replace('.', '');
-    // const hours = date.getHours().toString().padStart(2, '0');
-    // const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    // const formattedDate = `${day} ${month} ${hours}:${minutes}`;
     const formattedDate = `${day} ${month}`;
 
     return (
@@ -730,9 +725,18 @@ const FixtureStatsModal = ({
       >
         <Layout isEditMode={isEditMode}>
           <LastUpdatedContainer>
-            {getLastUpdatedDate()}
+            <Section flexDirection="row" alignItems="center" justifyContent="space-between">
+              {getLastUpdatedDate()}
+              {isLeagueCreator && (
+                <IconButton
+                  icon={isEditMode ? <XCircle size={24} weight="fill" /> : <PencilSimple size={24} />}
+                  onClick={() => handleSetEditMode()}
+                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                />
+              )}
+            </Section>
             {canEdit && (
-              <Section gap="xxs" padding={`${theme.spacing.xs} 0 0 0`}>
+              <Section gap="xs" padding={`${theme.spacing.xs} 0 0 0`} flexDirection="row">
                 <Checkbox
                   label="Inkludera tabellplacering"
                   checked={includeStandings}
@@ -760,13 +764,6 @@ const FixtureStatsModal = ({
             <TableCell>
               <Section flexDirection="row" alignItems="center" justifyContent="space-between">
                 <HeadingsTypography variant="h6">Lag</HeadingsTypography>
-                {isLeagueCreator && (
-                  <IconButton
-                    icon={isEditMode ? <XCircle size={24} weight="fill" /> : <PencilSimple size={24} />}
-                    onClick={() => handleSetEditMode()}
-                    colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                  />
-                )}
               </Section>
             </TableCell>
             <TableCell>

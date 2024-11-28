@@ -1,4 +1,0 @@
-TODO
-
-Wishlist
-- It would be fun to be able to select an avatar for your profile, from a select few images. Images just contain links to an external webiste. Avatar image string is stored on user object

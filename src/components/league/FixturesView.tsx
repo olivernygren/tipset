@@ -49,6 +49,7 @@ import TextButton from '../buttons/TextButton';
 import Modal from '../modal/Modal';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import PredictionsModal from './PredictionsModal';
+import NewFixtureStatsModal from '../game/NewFixtureStatsModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -964,7 +965,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         />
       )}
       {isStatsModalOpen && (
-        <FixtureStatsModal
+        <NewFixtureStatsModal
           fixture={isStatsModalOpen}
           onClose={() => setIsStatsModalOpen(null)}
           isLeagueCreator={isCreator}

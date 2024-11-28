@@ -8,6 +8,8 @@ export enum AvatarSize {
   M = 'medium',
   L = 'large',
   XL = 'xlarge',
+  XXL = 'xxlarge',
+  XXXL = 'xxxlarge',
 }
 
 export enum ProfilePictureEnum {
@@ -74,6 +76,10 @@ const getAvatarSize = (size: AvatarSize) => {
       return '48px';
     case AvatarSize.XL:
       return '58px';
+    case AvatarSize.XXL:
+      return '72px';
+    case AvatarSize.XXXL:
+      return '128px';
     default:
       return '32px';
   }

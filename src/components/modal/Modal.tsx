@@ -1,14 +1,14 @@
 import React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { X } from '@phosphor-icons/react';
-import { motion } from 'framer-motion';
 import { devices, theme } from '../../theme';
-import { HeadingsTypography } from '../typography/Typography';
+import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 import IconButton from '../buttons/IconButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface ModalProps {
   title?: string;
+  disclaimer?: string;
   children: React.ReactNode;
   onClose: () => void;
   size?: 's' | 'm' | 'l';
@@ -19,11 +19,9 @@ interface ModalProps {
 }
 
 const Modal = ({
-  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet, noPadding, mobileFullScreen,
+  title, children, onClose, size = 'm', headerDivider, mobileBottomSheet, noPadding, mobileFullScreen, disclaimer,
 }: ModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
-
-  const useMobileAnimation = isMobile && mobileBottomSheet;
 
   const getModalWidth = () => {
     if (mobileBottomSheet && isMobile) {
@@ -45,9 +43,6 @@ const Modal = ({
   return (
     <>
       <Backdrop
-        // initial={{ opacity: 0 }}
-        // animate={{ opacity: 1 }}
-        // exit={{ opacity: 0 }}
         mobileBottomSheet={mobileBottomSheet}
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) {
@@ -57,15 +52,12 @@ const Modal = ({
       >
         <ModalContainer
           width={getModalWidth()}
-          // initial={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
-          // animate={{ opacity: 1, scale: 1, y: '0%' }}
-          // exit={{ opacity: useMobileAnimation ? 1 : 0, scale: useMobileAnimation ? 1 : 0.92, y: useMobileAnimation ? '-100%' : '0%' }}
-          // transition={{ duration: 0.25 }}
           mobileBottomSheet={mobileBottomSheet}
           mobileFullScreen={mobileFullScreen}
         >
           <Header headerDivider={headerDivider}>
             {title && <HeadingsTypography variant="h3">{title}</HeadingsTypography>}
+            {disclaimer && <NormalTypography variant="s" color={theme.colors.silverDark}>{disclaimer}</NormalTypography>}
             <IconButton
               icon={<X size={24} />}
               colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.textDefault }}
@@ -179,10 +171,15 @@ const ModalContent = styled.div<{ headerDivider?: boolean, noPadding?: boolean }
 const Header = styled.div<{ headerDivider?: boolean }>`
   display: flex;
   justify-content: space-between;
+  gap: ${theme.spacing.s};
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   padding: ${theme.spacing.l} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
+
+  ${HeadingsTypography} {
+    flex: 1;
+  }
   
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};
