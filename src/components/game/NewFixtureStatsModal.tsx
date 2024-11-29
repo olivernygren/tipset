@@ -235,7 +235,6 @@ const NewFixtureStatsModal = ({
         <EditFixtureStatsModalContent
           fixture={fixture}
           onCloseEditView={() => setShowEditView(false)}
-          isLeagueCreator={isLeagueCreator}
           league={league}
           ongoingGameWeek={ongoingGameWeek}
           refetchLeague={refetchLeague}
