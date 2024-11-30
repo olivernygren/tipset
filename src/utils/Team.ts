@@ -172,7 +172,7 @@ export const Teams = {
       darkModeLogoUrl: 'https://mahonpointsc.ie/wp-content/uploads/2021/09/Liverpool-Logo-Final-1.png',
       stadium: 'Anfield',
       country: CountryEnum.ENGLAND,
-      teamPrimaryColor: '#C8102E',
+      teamPrimaryColor: '#d11f2b',
     },
     {
       name: 'Manchester City',

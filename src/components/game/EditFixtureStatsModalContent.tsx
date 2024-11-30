@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { updateDoc, doc } from 'firebase/firestore';
-import { CaretDown } from '@phosphor-icons/react';
+import {
+  CaretDown, Check, CheckCircle, PlusCircle, XCircle,
+} from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
 import {
   Fixture, FixtureOdds, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult,
 } from '../../utils/Fixture';
@@ -10,27 +13,35 @@ import Button from '../buttons/Button';
 import { theme, devices } from '../../theme';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { errorNotify } from '../../utils/toast/toastHelpers';
-import { Team, getTeamByName } from '../../utils/Team';
-import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
+import { Team, getTeamByName, getTeamPrimaryColorByName } from '../../utils/Team';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import FormIcon from '../form/FormIcon';
+import Input from '../input/Input';
+import SelectImitation from '../input/SelectImitation';
+import { Section } from '../section/Section';
+import GoalsInput from './GoalsInput';
+import SelectTeamModal from './SelectTeamModal';
+import IconButton from '../buttons/IconButton';
+import Textarea from '../textarea/Textarea';
+import TextButton from '../buttons/TextButton';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface EditFixtureStatsModalContentProps {
   fixture: Fixture;
   onCloseEditView: () => void;
+  onCloseModal: () => void;
   league: PredictionLeague;
   ongoingGameWeek: LeagueGameWeek | undefined;
   refetchLeague: () => void;
 }
 
 const EditFixtureStatsModalContent = ({
-  fixture, onCloseEditView, league, ongoingGameWeek, refetchLeague,
+  fixture, onCloseEditView, onCloseModal, league, ongoingGameWeek, refetchLeague,
 }: EditFixtureStatsModalContentProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
-  const [includeLastFixture, setIncludeLastFixture] = useState<boolean>(false);
-  const [includeStandings, setIncludeStandings] = useState<boolean>(false);
-  const [includeInsights, setIncludeInsights] = useState<boolean>(false);
-  const [includeOdds, setIncludeOdds] = useState<boolean>(false);
 
   // Dropdown states
   const [isFormExpanded, setIsFormExpanded] = useState<boolean>(false);
@@ -57,6 +68,7 @@ const EditFixtureStatsModalContent = ({
     homeTeamOpponent: fixture.previewStats?.homeTeam.lastFixture?.opponent ? getTeamByName(fixture.previewStats?.homeTeam.lastFixture?.opponent) : undefined,
     awayTeamOpponent: fixture.previewStats?.awayTeam.lastFixture?.opponent ? getTeamByName(fixture.previewStats?.awayTeam.lastFixture?.opponent) : undefined,
   });
+  const [selectLastFixtureOpponentModalOpen, setSelectLastFixtureOpponentModalOpen] = useState<'home' | 'away' | null>(null);
   const [editHomeTeamLastFixtureResult, setEditHomeTeamLastFixtureResult] = useState<FixtureResult>({
     homeTeamGoals: fixture.previewStats?.homeTeam.lastFixture?.result.homeTeamGoals ?? 0,
     awayTeamGoals: fixture.previewStats?.homeTeam.lastFixture?.result.awayTeamGoals ?? 0,
@@ -75,6 +87,11 @@ const EditFixtureStatsModalContent = ({
   const [createNewHomeTeamInsight, setCreateNewHomeTeamInsight] = useState(false);
   const [createNewAwayTeamInsight, setCreateNewAwayTeamInsight] = useState(false);
 
+  const hasAddedStandings = (editStandingsPositionValue.homeTeam !== '' && editStandingsPositionPoints.homeTeam !== '') || (editStandingsPositionValue.awayTeam !== '' && editStandingsPositionPoints.awayTeam !== '');
+  const hasAddedLastFixture = editLastFixtureOpponents.homeTeamOpponent !== undefined || editLastFixtureOpponents.awayTeamOpponent !== undefined;
+  const hasAddedOdds = odds.homeWin !== '' || odds.draw !== '' || odds.awayWin !== '';
+  const hasAddedInsights = homeTeamInsights.length > 0 || awayTeamInsights.length > 0;
+
   const handleSaveStats = async () => {
     if (!ongoingGameWeek) return;
 
@@ -83,10 +100,10 @@ const EditFixtureStatsModalContent = ({
     const previewStats: FixturePreviewStats = {
       homeTeam: {
         form: editFormValue.homeTeam,
-        ...(includeStandings && { standingsPosition: editStandingsPositionValue.homeTeam }),
-        ...(includeStandings && { standingsPoints: editStandingsPositionPoints.homeTeam }),
-        ...(includeInsights && { insights: homeTeamInsights }),
-        ...(includeLastFixture && {
+        ...(hasAddedStandings && { standingsPosition: editStandingsPositionValue.homeTeam }),
+        ...(hasAddedStandings && { standingsPoints: editStandingsPositionPoints.homeTeam }),
+        ...(hasAddedInsights && homeTeamInsights.length > 0 && { insights: homeTeamInsights }),
+        ...(hasAddedLastFixture && {
           lastFixture: {
             opponent: editLastFixtureOpponents.homeTeamOpponent?.name ?? '',
             result: editHomeTeamLastFixtureResult,
@@ -97,10 +114,10 @@ const EditFixtureStatsModalContent = ({
       lastUpdated: new Date().toISOString(),
       awayTeam: {
         form: editFormValue.awayTeam,
-        ...(includeStandings && { standingsPosition: editStandingsPositionValue.awayTeam }),
-        ...(includeStandings && { standingsPoints: editStandingsPositionPoints.awayTeam }),
-        ...(includeInsights && { insights: awayTeamInsights }),
-        ...(includeLastFixture && {
+        ...(hasAddedStandings && { standingsPosition: editStandingsPositionValue.awayTeam }),
+        ...(hasAddedStandings && { standingsPoints: editStandingsPositionPoints.awayTeam }),
+        ...(hasAddedInsights && awayTeamInsights.length > 0 && { insights: awayTeamInsights }),
+        ...(hasAddedLastFixture && {
           lastFixture: {
             opponent: editLastFixtureOpponents.awayTeamOpponent?.name ?? '',
             result: editAwayTeamLastFixtureResult,
@@ -113,7 +130,7 @@ const EditFixtureStatsModalContent = ({
     const updatedFixture: Fixture = {
       ...fixture,
       previewStats,
-      ...(includeOdds && { odds }),
+      ...(hasAddedOdds && { odds }),
     };
 
     const updatedGameWeek: LeagueGameWeek = {
@@ -141,17 +158,54 @@ const EditFixtureStatsModalContent = ({
         gameWeeks: updatedGameWeeks,
       });
       refetchLeague();
+      onCloseEditView();
+      onCloseModal();
+      successNotify('Statistiken har sparats');
     } catch (error) {
       errorNotify('Något gick fel när statistiken skulle sparas');
-      setSaveLoading(false);
     } finally {
       setSaveLoading(false);
-      // if (isMobile) {
-      //   setMobileSelectedTeam(mobileSelectedTeam === 'home' ? 'away' : 'home');
-      // } else {
-      //   onCloseEditView();
-      // }
-      onCloseEditView();
+    }
+  };
+
+  const handleSelectOpponent = (team: Team) => {
+    setEditLastFixtureOpponents((oldstate) => {
+      if (selectLastFixtureOpponentModalOpen === 'home') {
+        return { ...oldstate, homeTeamOpponent: team };
+      }
+      return { ...oldstate, awayTeamOpponent: team };
+    });
+  };
+
+  const handleUpdateLastFixtureGoalsInput = (team: 'home' | 'away', lastFixtureTeam: 'home' | 'away', value: string) => {
+    const parsedValue = value === '' ? 0 : parseInt(value);
+
+    if (team === 'home') {
+      setEditHomeTeamLastFixtureResult((oldstate) => ({
+        ...oldstate,
+        [lastFixtureTeam === 'home' ? 'homeTeamGoals' : 'awayTeamGoals']: parsedValue,
+      }));
+    }
+
+    if (team === 'away') {
+      setEditAwayTeamLastFixtureResult((oldstate) => ({
+        ...oldstate,
+        [lastFixtureTeam === 'home' ? 'homeTeamGoals' : 'awayTeamGoals']: parsedValue,
+      }));
+    }
+  };
+
+  const handleAddInsight = (isHomeTeam: boolean) => {
+    const insight = isHomeTeam ? editHomeTeamInsightsValue : editAwayTeamInsightsValue;
+
+    if (isHomeTeam) {
+      setHomeTeamInsights((oldstate) => [...oldstate, insight]);
+      setEditHomeTeamInsightsValue('');
+      setCreateNewHomeTeamInsight(false);
+    } else {
+      setAwayTeamInsights((oldstate) => [...oldstate, insight]);
+      setEditAwayTeamInsightsValue('');
+      setCreateNewAwayTeamInsight(false);
     }
   };
 
@@ -170,12 +224,12 @@ const EditFixtureStatsModalContent = ({
   );
 
   const getTeamForm = (isHomeTeam: boolean) => {
-    const teamPreviewStats = isHomeTeam ? fixture.previewStats?.homeTeam : fixture.previewStats?.awayTeam;
+    const teamForm = isHomeTeam ? editFormValue.homeTeam : editFormValue.awayTeam;
 
-    return teamPreviewStats?.form.map((outcome, index) => (
+    return teamForm.map((outcome, index) => (
       <FormIconContainer key={`${index}-${outcome}`}>
         {showEditOutcomeMenu.team === (isHomeTeam ? 'home' : 'away') && showEditOutcomeMenu.index === index && (
-          <SelectOutcomeMenu>
+          <SelectOutcomeMenu isVeryLeftItem={index === 0 && isHomeTeam}>
             {Object.values(FixtureOutcomeEnum).map((outcome) => getClickableFormIcon(outcome, index, isHomeTeam))}
           </SelectOutcomeMenu>
         )}
@@ -193,122 +247,335 @@ const EditFixtureStatsModalContent = ({
     ));
   };
 
+  const getStandingsInputs = (isHomeTeam: boolean) => (
+    <StandingsInputsRow>
+      <Input
+        type="number"
+        label="Placering"
+        value={isHomeTeam ? editStandingsPositionValue.homeTeam : editStandingsPositionValue.awayTeam}
+        onChange={(e) => {
+          if (isHomeTeam) {
+            setEditStandingsPositionValue({ ...editStandingsPositionValue, homeTeam: e.currentTarget.value });
+          } else {
+            setEditStandingsPositionValue({ ...editStandingsPositionValue, awayTeam: e.currentTarget.value });
+          }
+        }}
+        noBorder
+        placeholder="Placering"
+        fullWidth
+      />
+      <Input
+        type="number"
+        label="Poäng"
+        value={isHomeTeam ? editStandingsPositionPoints.homeTeam : editStandingsPositionPoints.awayTeam}
+        onChange={(e) => {
+          if (isHomeTeam) {
+            setEditStandingsPositionPoints({ ...editStandingsPositionPoints, homeTeam: e.currentTarget.value });
+          } else {
+            setEditStandingsPositionPoints({ ...editStandingsPositionPoints, awayTeam: e.currentTarget.value });
+          }
+        }}
+        noBorder
+        placeholder="Poäng"
+        fullWidth
+      />
+    </StandingsInputsRow>
+  );
+
+  const getLastFixture = (isHomeTeam: boolean) => {
+    const opponent = isHomeTeam ? editLastFixtureOpponents.homeTeamOpponent : editLastFixtureOpponents.awayTeamOpponent;
+    const result = isHomeTeam ? editHomeTeamLastFixtureResult : editAwayTeamLastFixtureResult;
+    const outcome = isHomeTeam ? homeTeamLastFixtureOutcome : awayTeamLastFixtureOutcome;
+    const setOutcome = isHomeTeam ? setHomeTeamLastFixtureOutcome : setAwayTeamLastFixtureOutcome;
+
+    const handleUpdateGoalsInput = (lastFixtureTeam: 'home' | 'away', value: string) => {
+      handleUpdateLastFixtureGoalsInput(isHomeTeam ? 'home' : 'away', lastFixtureTeam, value);
+    };
+
+    const getGoalsSection = () => (
+      <Section gap="xxs" fitContent>
+        <EmphasisTypography variant="s">Resultat</EmphasisTypography>
+        <Section flexDirection="row" gap="xxs" alignItems="center">
+          <GoalsInput
+            goals={result.homeTeamGoals.toString()}
+            onInputChange={(value) => handleUpdateGoalsInput('home', value)}
+          />
+          <NormalTypography variant="s">–</NormalTypography>
+          <GoalsInput
+            goals={result.awayTeamGoals.toString()}
+            onInputChange={(value) => handleUpdateGoalsInput('away', value)}
+          />
+        </Section>
+      </Section>
+    );
+
+    const getOutcomeSection = () => (
+      <Section gap="xxs" fitContent>
+        <EmphasisTypography variant="s">Utfall</EmphasisTypography>
+        <Section flexDirection="row" gap="xxs" alignItems="flex-start">
+          {Object.values(FixtureOutcomeEnum).map((outcomeValue) => (
+            <Section gap="xxs" fitContent justifyContent="flex-start" key={outcomeValue}>
+              <FormIcon
+                outcome={outcomeValue}
+                onClick={() => setOutcome(outcomeValue)}
+              />
+              {outcomeValue === outcome && (
+                <Check size={16} color={theme.colors.primary} weight="bold" />
+              )}
+            </Section>
+          ))}
+        </Section>
+      </Section>
+    );
+
+    return (
+      <LastFixtureContainer>
+        <SelectImitation
+          value={opponent?.name ?? ''}
+          placeholder="Välj motståndare"
+          onClick={() => setSelectLastFixtureOpponentModalOpen(isHomeTeam ? 'home' : 'away')}
+          fullWidth
+          compact
+          borderless
+        />
+        <LastFixtureResultAndOutcome>
+          {getGoalsSection()}
+          {getOutcomeSection()}
+        </LastFixtureResultAndOutcome>
+      </LastFixtureContainer>
+    );
+  };
+
+  const getInsights = (isHomeTeam: boolean) => {
+    const insights = isHomeTeam ? homeTeamInsights : awayTeamInsights;
+    const team = isHomeTeam ? fixture.homeTeam : fixture.awayTeam;
+    const setInsights = isHomeTeam ? setHomeTeamInsights : setAwayTeamInsights;
+
+    return insights.map((insight, index) => (
+      <InsightCard key={index}>
+        <InsightCardColorStripe color={getTeamPrimaryColorByName(team.name)} />
+        <NormalTypography variant="s">{insight}</NormalTypography>
+        <IconButton
+          icon={<XCircle size={20} weight="fill" />}
+          colors={{ normal: theme.colors.red }}
+          onClick={() => setInsights((oldstate) => oldstate.filter((i) => i !== insight))}
+        />
+      </InsightCard>
+    ));
+  };
+
+  const getAddInsightBlock = (isHomeTeam: boolean) => {
+    const team = isHomeTeam ? fixture.homeTeam : fixture.awayTeam;
+    const isCreatingNewInsight = isHomeTeam ? createNewHomeTeamInsight : createNewAwayTeamInsight;
+    const newInsightValue = isHomeTeam ? editHomeTeamInsightsValue : editAwayTeamInsightsValue;
+    const setEditInsightValue = isHomeTeam ? setEditHomeTeamInsightsValue : setEditAwayTeamInsightsValue;
+    const setCreateNewInsight = isHomeTeam ? setCreateNewHomeTeamInsight : setCreateNewAwayTeamInsight;
+
+    return isCreatingNewInsight ? (
+      <>
+        <InsightCard isEditing>
+          <InsightCardColorStripe color={getTeamPrimaryColorByName(team.name)} />
+          <Textarea
+            value={newInsightValue}
+            onChange={(e) => setEditInsightValue(e.currentTarget.value)}
+            placeholder="Skriv..."
+            fullWidth
+            noBorder
+            customPadding={`${theme.spacing.xxxs} 0`}
+            customHeight="50px"
+            backgroundColor={theme.colors.silverBleach}
+          />
+        </InsightCard>
+        <TextButton noPadding onClick={() => handleAddInsight(isHomeTeam)}>
+          Lägg till
+        </TextButton>
+      </>
+    ) : (
+      <AddInsightBlock
+        whileHover={{ scale: 1.02, backgroundColor: theme.colors.silverLight }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => setCreateNewInsight(true)}
+      >
+        <PlusCircle size={24} color={theme.colors.textDefault} />
+        <NormalTypography variant="m">Lägg till</NormalTypography>
+      </AddInsightBlock>
+    );
+  };
+
+  const getOddsInputs = () => (
+    <>
+      <Input
+        type="text"
+        label={isMobile ? '1' : undefined}
+        value={odds.homeWin}
+        onChange={(e) => setOdds({ ...odds, homeWin: e.currentTarget.value })}
+        noBorder
+        placeholder="1"
+        fullWidth
+        textAlign="center"
+      />
+      <Input
+        type="text"
+        label={isMobile ? 'X' : undefined}
+        value={odds.draw}
+        onChange={(e) => setOdds({ ...odds, draw: e.currentTarget.value })}
+        noBorder
+        placeholder="X"
+        fullWidth
+        textAlign="center"
+      />
+      <Input
+        type="text"
+        label={isMobile ? '2' : undefined}
+        value={odds.awayWin}
+        onChange={(e) => setOdds({ ...odds, awayWin: e.currentTarget.value })}
+        noBorder
+        placeholder="2"
+        fullWidth
+        textAlign="center"
+      />
+    </>
+  );
+
   return (
-    <ModalContent>
-      <DropdownsContainer>
-        <Dropdown isExpanded={isFormExpanded}>
-          <DropdownHeader onClick={() => setIsFormExpanded(!isFormExpanded)}>
-            <EmphasisTypography>Form</EmphasisTypography>
-            <RotatingIcon isExpanded={isFormExpanded}>
-              <CaretDown size={20} color={theme.colors.textDefault} />
-            </RotatingIcon>
-          </DropdownHeader>
-          <DropdownContent>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
-              <FormIcons>
-                {getTeamForm(true)}
-              </FormIcons>
-            </TeamColumn>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
-              <FormIcons>
-                {getTeamForm(false)}
-              </FormIcons>
-            </TeamColumn>
-          </DropdownContent>
-        </Dropdown>
-        <Dropdown isExpanded={isStandingsExpanded}>
-          <DropdownHeader onClick={() => setIsStandingsExpanded(!isStandingsExpanded)}>
-            <EmphasisTypography>Tabellplacering</EmphasisTypography>
-            <RotatingIcon isExpanded={isStandingsExpanded}>
-              <CaretDown size={20} color={theme.colors.textDefault} />
-            </RotatingIcon>
-          </DropdownHeader>
-          <DropdownContent>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
-            </TeamColumn>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
-            </TeamColumn>
-          </DropdownContent>
-        </Dropdown>
-        <Dropdown isExpanded={isLastFixtureExpanded}>
-          <DropdownHeader onClick={() => setIsLastFixtureExpanded(!isLastFixtureExpanded)}>
-            <EmphasisTypography>Senaste matchen</EmphasisTypography>
-            <RotatingIcon isExpanded={isLastFixtureExpanded}>
-              <CaretDown size={20} color={theme.colors.textDefault} />
-            </RotatingIcon>
-          </DropdownHeader>
-          <DropdownContent>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
-            </TeamColumn>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
-            </TeamColumn>
-          </DropdownContent>
-        </Dropdown>
-        <Dropdown isExpanded={isInsightsExpanded}>
-          <DropdownHeader onClick={() => setIsInsightsExpanded(!isInsightsExpanded)}>
-            <EmphasisTypography>Insikter</EmphasisTypography>
-            <RotatingIcon isExpanded={isInsightsExpanded}>
-              <CaretDown size={20} color={theme.colors.textDefault} />
-            </RotatingIcon>
-          </DropdownHeader>
-          <DropdownContent>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
-            </TeamColumn>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
-            </TeamColumn>
-          </DropdownContent>
-        </Dropdown>
-        <Dropdown isExpanded={isOddsExpanded}>
-          <DropdownHeader onClick={() => setIsOddsExpanded(!isOddsExpanded)}>
-            <EmphasisTypography>Odds</EmphasisTypography>
-            <RotatingIcon isExpanded={isOddsExpanded}>
-              <CaretDown size={20} color={theme.colors.textDefault} />
-            </RotatingIcon>
-          </DropdownHeader>
-          <DropdownContent>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
-            </TeamColumn>
-            <TeamColumn>
-              <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
-            </TeamColumn>
-          </DropdownContent>
-        </Dropdown>
-      </DropdownsContainer>
-      <ActionButtonsContainer>
-        <Button
-          variant="secondary"
-          fullWidth
-          onClick={onCloseEditView}
-        >
-          Avbryt
-        </Button>
-        <Button
-          onClick={handleSaveStats}
-          fullWidth
-        >
-          Spara
-        </Button>
-      </ActionButtonsContainer>
-    </ModalContent>
+    <>
+      <ModalContent>
+        <DropdownsContainer>
+          <Dropdown isExpanded={isFormExpanded}>
+            <DropdownHeader onClick={() => setIsFormExpanded(!isFormExpanded)}>
+              <CheckCircle size={24} color={theme.colors.primary} weight="fill" />
+              <EmphasisTypography>Form</EmphasisTypography>
+              <RotatingIcon isExpanded={isFormExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
+                <FormIcons>
+                  {getTeamForm(true)}
+                </FormIcons>
+              </TeamColumn>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
+                <FormIcons>
+                  {getTeamForm(false)}
+                </FormIcons>
+              </TeamColumn>
+            </DropdownContent>
+          </Dropdown>
+          <Dropdown isExpanded={isStandingsExpanded}>
+            <DropdownHeader onClick={() => setIsStandingsExpanded(!isStandingsExpanded)}>
+              {hasAddedStandings && <CheckCircle size={24} color={theme.colors.primary} weight="fill" />}
+              <EmphasisTypography>Tabellplacering</EmphasisTypography>
+              <RotatingIcon isExpanded={isStandingsExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
+                {getStandingsInputs(true)}
+              </TeamColumn>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
+                {getStandingsInputs(false)}
+              </TeamColumn>
+            </DropdownContent>
+          </Dropdown>
+          <Dropdown isExpanded={isLastFixtureExpanded}>
+            <DropdownHeader onClick={() => setIsLastFixtureExpanded(!isLastFixtureExpanded)}>
+              {hasAddedLastFixture && <CheckCircle size={24} color={theme.colors.primary} weight="fill" />}
+              <EmphasisTypography>Senaste matchen</EmphasisTypography>
+              <RotatingIcon isExpanded={isLastFixtureExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
+                {getLastFixture(true)}
+              </TeamColumn>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
+                {getLastFixture(false)}
+              </TeamColumn>
+            </DropdownContent>
+          </Dropdown>
+          <Dropdown isExpanded={isInsightsExpanded}>
+            <DropdownHeader onClick={() => setIsInsightsExpanded(!isInsightsExpanded)}>
+              {hasAddedInsights && <CheckCircle size={24} color={theme.colors.primary} weight="fill" />}
+              <EmphasisTypography>Insikter</EmphasisTypography>
+              <RotatingIcon isExpanded={isInsightsExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
+                <InsightsList>
+                  {getAddInsightBlock(true)}
+                  {getInsights(true)}
+                </InsightsList>
+              </TeamColumn>
+              <TeamColumn>
+                <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
+                <InsightsList>
+                  {getAddInsightBlock(false)}
+                  {getInsights(false)}
+                </InsightsList>
+              </TeamColumn>
+            </DropdownContent>
+          </Dropdown>
+          <Dropdown isExpanded={isOddsExpanded}>
+            <DropdownHeader onClick={() => setIsOddsExpanded(!isOddsExpanded)}>
+              {hasAddedOdds && <CheckCircle size={24} color={theme.colors.primary} weight="fill" />}
+              <EmphasisTypography>Odds</EmphasisTypography>
+              <RotatingIcon isExpanded={isOddsExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              {getOddsInputs()}
+            </DropdownContent>
+          </Dropdown>
+        </DropdownsContainer>
+        <ActionButtonsContainer>
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={onCloseEditView}
+          >
+            Avbryt
+          </Button>
+          <Button
+            onClick={handleSaveStats}
+            fullWidth
+            loading={saveLoading}
+            disabled={saveLoading}
+          >
+            Spara
+          </Button>
+        </ActionButtonsContainer>
+      </ModalContent>
+      {selectLastFixtureOpponentModalOpen && (
+        <SelectTeamModal
+          onClose={() => setSelectLastFixtureOpponentModalOpen(null)}
+          value={selectLastFixtureOpponentModalOpen === 'home' ? editLastFixtureOpponents.homeTeamOpponent : editLastFixtureOpponents.awayTeamOpponent}
+          teamType={fixture.teamType}
+          onSave={(team) => handleSelectOpponent(team)}
+        />
+      )}
+    </>
   );
 };
-
-// Gör dropdown/accordions för varje: Form, senaste match, odds, tabellplacering, insikter
 
 const ModalContent = styled.div`
   display: flex;
   gap: ${theme.spacing.m};
   flex-direction: column;
-  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.m};
+  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m};
+  flex-grow: 1;
 
   @media ${devices.tablet} {
     padding: ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l} ${theme.spacing.l};
@@ -319,6 +586,7 @@ const DropdownsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xs};
+  flex-grow: 1;
 `;
 
 const ActionButtonsContainer = styled.div`
@@ -330,7 +598,6 @@ const ActionButtonsContainer = styled.div`
 const Dropdown = styled.div<{ isExpanded?: boolean }>`
   display: flex;
   flex-direction: column;
-  /* gap: ${theme.spacing.s}; */
   background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
   border: 1px solid ${theme.colors.silverLighter};
@@ -339,14 +606,20 @@ const Dropdown = styled.div<{ isExpanded?: boolean }>`
   transition: max-height 0.3s ease;
   overflow-y: hidden;
   max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
+  position: relative;
+  z-index: 0;
 `;
 
 const DropdownHeader = styled.div`
   display: flex;
-  justify-content: space-between;
+  gap: ${theme.spacing.xs};
   align-items: center;
   cursor: pointer;
   padding: ${theme.spacing.s};
+
+  ${EmphasisTypography} {
+    flex: 1;
+  }
 `;
 
 const RotatingIcon = styled.div<{ isExpanded?: boolean }>`
@@ -358,9 +631,13 @@ const RotatingIcon = styled.div<{ isExpanded?: boolean }>`
 
 const DropdownContent = styled.div`
   display: flex;
-  flex-direction: row;
   gap: ${theme.spacing.m};
+  flex-direction: column;
   padding: ${theme.spacing.xxxs} ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s};
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+  }
 `;
 
 const TeamColumn = styled.div`
@@ -382,11 +659,11 @@ const FormIconContainer = styled.div`
   position: relative;
 `;
 
-const SelectOutcomeMenu = styled.div`
+const SelectOutcomeMenu = styled.div<{ isVeryLeftItem?: boolean }>`
   position: absolute;
   top: -44px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: ${({ isVeryLeftItem }) => (isVeryLeftItem ? '0' : '50%')};
+  transform: ${({ isVeryLeftItem }) => (isVeryLeftItem ? 'translateX(0)' : 'translateX(-50%)')};
   background-color: ${theme.colors.white};
   border: 1px solid ${theme.colors.silverLight};
   border-radius: ${theme.borderRadius.xs};
@@ -395,6 +672,95 @@ const SelectOutcomeMenu = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xxxs};
+`;
+
+const StandingsInputsRow = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const LastFixtureContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xs};
+  width: 100%;
+  box-sizing: border-box;
+  background-color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.m};
+  padding: ${theme.spacing.xs};
+`;
+
+const LastFixtureResultAndOutcome = styled.div`
+  display: flex;
+  gap: ${theme.spacing.m};
+  align-items: flex-start;
+  justify-content: space-between;
+  
+  @media ${devices.mobileL} {
+    justify-content: flex-start;
+  }
+  
+  @media ${devices.tablet} {
+    justify-content: space-between;
+  }
+`;
+
+const AddInsightBlock = styled(motion.div)`
+  background-color: ${theme.colors.silverLight};
+  padding: ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.m};
+  border: 1px dashed ${theme.colors.silver};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  cursor: pointer;
+  box-sizing: border-box;
+`;
+
+const InsightCard = styled.div<{ isEditing?: boolean }>`
+  background-color: ${theme.colors.silverBleach};
+  position: relative;
+  ${({ isEditing }) => (isEditing ? css`
+    padding: 6px ${theme.spacing.xxxs} ${theme.spacing.xxxs} ${theme.spacing.s};
+    ` : css`
+    padding: ${theme.spacing.xxs} ${theme.spacing.xs} ${theme.spacing.xxs} ${theme.spacing.s};
+  `)}
+  border-radius: ${theme.borderRadius.s};
+  border: 1px solid ${theme.colors.silverLight};
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  align-items: center;
+
+  ${NormalTypography} {
+    flex: 1;
+  }
+`;
+
+const InsightCardColorStripe = styled.div<{ color: string }>`
+  background-color: ${({ color }) => color};
+  width: 6px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top-left-radius: ${theme.borderRadius.s};
+  border-bottom-left-radius: ${theme.borderRadius.s};
+  box-shadow: 1px 0px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const InsightsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default EditFixtureStatsModalContent;

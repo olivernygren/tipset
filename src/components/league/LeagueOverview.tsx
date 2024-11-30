@@ -158,13 +158,13 @@ const LeagueOverview = ({
           </CenteredGridItem>
         )}
         <CenteredGridItem>
-          <NormalTypography variant="m" color={theme.colors.textDefault}>
-            {place.correctResults}
+          <NormalTypography variant="m" color={theme.colors.textLight}>
+            {place.oddsBonusPoints ?? 0}
           </NormalTypography>
         </CenteredGridItem>
         <CenteredGridItem>
           <NormalTypography variant="m" color={theme.colors.textDefault}>
-            {place.oddsBonusPoints ?? 0}
+            {place.correctResults}
           </NormalTypography>
         </CenteredGridItem>
         <CenteredGridItem>
@@ -272,10 +272,10 @@ const LeagueOverview = ({
                     </CenteredGridItem>
                   )}
                   <CenteredGridItem>
-                    <Target size={20} color={theme.colors.textLight} />
+                    <FireSimple size={20} color={theme.colors.textLight} />
                   </CenteredGridItem>
                   <CenteredGridItem>
-                    <FireSimple size={20} color={theme.colors.textLight} />
+                    <Target size={20} color={theme.colors.textLight} />
                   </CenteredGridItem>
                   <CenteredGridItem>
                     <EmphasisTypography variant="s" color={theme.colors.textLight} align="center">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>

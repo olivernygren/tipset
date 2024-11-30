@@ -17,6 +17,8 @@ import MockedStandingsRow from '../stats/MockedStandingsRow';
 import { getIsBottomOfLeague } from '../../utils/helpers';
 import Button from '../buttons/Button';
 import EditFixtureStatsModalContent from './EditFixtureStatsModalContent';
+import { Divider } from '../Divider';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface NewFixtureStatsModalProps {
   fixture: Fixture;
@@ -30,6 +32,8 @@ interface NewFixtureStatsModalProps {
 const NewFixtureStatsModal = ({
   fixture, onClose, isLeagueCreator, league, ongoingGameWeek, refetchLeague,
 }: NewFixtureStatsModalProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const [showEditView, setShowEditView] = useState<boolean>(false);
   const [homeTeamInsights] = useState<Array<string>>(fixture.previewStats?.homeTeam?.insights ?? []);
   const [awayTeamInsights] = useState<Array<string>>(fixture.previewStats?.awayTeam?.insights ?? []);
@@ -179,9 +183,9 @@ const NewFixtureStatsModal = ({
       <Card>
         <CardHeader>
           <HeadingsTypography variant="h4" color={theme.colors.textDefault}>{team.name}</HeadingsTypography>
-          <TeamLogo>
-            <img src={team.logoUrl} alt={team.name} style={{ objectFit: 'contain', height: '90px', width: '90px' }} />
-          </TeamLogo>
+          <TeamLogoWrapper>
+            <TeamLogo src={team.logoUrl} alt={team.name} />
+          </TeamLogoWrapper>
         </CardHeader>
         <CardContent>
           <Statistic>
@@ -197,24 +201,33 @@ const NewFixtureStatsModal = ({
             </FormIcons>
           </Statistic>
           {fixtureHasStandings && (
-            <Statistic>
-              <StatisticHeading>
-                <EmphasisTypography variant="m">Tabellplacering</EmphasisTypography>
-                <NormalTypography variant="s" color={theme.colors.silverDark}>{fixture.tournament}</NormalTypography>
-              </StatisticHeading>
-              {getStandings(teamParam === 'home')}
-            </Statistic>
+            <>
+              <Divider />
+              <Statistic>
+                <StatisticHeading>
+                  <EmphasisTypography variant="m">Tabellplacering</EmphasisTypography>
+                  <NormalTypography variant="s" color={theme.colors.silverDark}>{fixture.tournament}</NormalTypography>
+                </StatisticHeading>
+                {getStandings(teamParam === 'home')}
+              </Statistic>
+            </>
           )}
           {fixtureHasLastGame && (
-            <Statistic>
-              {getLastFixtureResult(teamParam === 'home')}
-            </Statistic>
+            <>
+              <Divider />
+              <Statistic>
+                {getLastFixtureResult(teamParam === 'home')}
+              </Statistic>
+            </>
           )}
           {fixtureHasInsights && (
-            <Statistic>
-              <EmphasisTypography variant="m">Insikter</EmphasisTypography>
-              {getTeamInsights(teamParam === 'home')}
-            </Statistic>
+            <>
+              <Divider />
+              <Statistic>
+                <EmphasisTypography variant="m">Insikter</EmphasisTypography>
+                {getTeamInsights(teamParam === 'home')}
+              </Statistic>
+            </>
           )}
         </CardContent>
       </Card>
@@ -225,8 +238,8 @@ const NewFixtureStatsModal = ({
     <Modal
       onClose={onClose}
       size="l"
-      title={showEditView ? 'Redigera statistik och odds' : 'Statistik'}
-      disclaimer={getLastUpdatedDate()}
+      title={showEditView ? 'Redigera statistik' : 'Statistik'}
+      disclaimer={!isMobile ? getLastUpdatedDate() : undefined}
       mobileFullScreen
       headerDivider
       noPadding
@@ -235,6 +248,7 @@ const NewFixtureStatsModal = ({
         <EditFixtureStatsModalContent
           fixture={fixture}
           onCloseEditView={() => setShowEditView(false)}
+          onCloseModal={onClose}
           league={league}
           ongoingGameWeek={ongoingGameWeek}
           refetchLeague={refetchLeague}
@@ -275,6 +289,11 @@ const CardsContainer = styled.div`
   display: flex;
   gap: ${theme.spacing.m};
   width: 100%;
+  flex-direction: column;
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+  }
 `;
 
 const Card = styled.div`
@@ -310,16 +329,30 @@ const StatisticHeading = styled.div`
 const CardContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.m};
+  gap: ${theme.spacing.s};
   padding: ${theme.spacing.s} ${theme.spacing.s};
 `;
 
-const TeamLogo = styled.div`
+const TeamLogoWrapper = styled.div`
   background-color: transparent;
-  position: absolute;
-  top: -${theme.spacing.m};
-  right: ${theme.spacing.s};
-  z-index: 0;
+  
+  @media ${devices.tablet} {
+    position: absolute;
+    right: ${theme.spacing.s};
+    z-index: 0;
+    top: -${theme.spacing.m};
+  }
+`;
+
+const TeamLogo = styled.img`
+  object-fit: contain;
+  height: 36px;
+  width: 36px;
+  
+  @media ${devices.tablet} {
+    height: 90px;
+    width: 90px;
+  }
 `;
 
 const Statistic = styled.div`

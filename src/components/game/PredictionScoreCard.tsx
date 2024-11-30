@@ -66,8 +66,14 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
 
   const getTableRow = (label: string, points: number | undefined) => {
     if (!points || points === 0) return null;
+
+    const isOddsBonus = label.includes('Oddsbonus');
+
     return (
       <TableRow topBorder>
+        {isOddsBonus && (
+          <FireSimple size={20} color={theme.colors.silverDark} />
+        )}
         <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
         <EmphasisTypography variant="m" color={theme.colors.primary}>
           {points}
@@ -186,11 +192,11 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
               <EmphasisTypography variant="m" color={theme.colors.primaryDark}>Poängfördelning</EmphasisTypography>
             </Section>
             {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
-            {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
             {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
             {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
             {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
             {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
+            {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
             {prediction.goalScorer && (
               <>
                 {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
@@ -284,11 +290,15 @@ const TableRow = styled.div<{ topBorder?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.xxs};
   width: 100%;
   box-sizing: border-box;
   ${({ topBorder }) => topBorder && `border-top: 1px solid ${theme.colors.silverLight};`}
   padding-top: ${theme.spacing.xs};
+
+  ${NormalTypography} {
+    flex: 1;
+  }
 `;
 
 const PredictionContainer = styled.div`
