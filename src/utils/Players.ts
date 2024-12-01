@@ -322,6 +322,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-magalhaes.png',
+    mayBeInjured: true,
   },
   {
     id: 'h7fhghgw08hn3gh4b3p0fj309h',
@@ -394,6 +395,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 30,
     country: CountryEnum.GHANA,
     picture: '/images/players/thomas-partey.png',
+    mayBeInjured: true,
   },
   {
     id: '39rj2j10rw9gn9rnwenw2j',
@@ -430,6 +432,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('1996-06-22'),
     country: CountryEnum.SPAIN,
     picture: '/images/players/mikel-merino.png',
+    mayBeInjured: true,
   },
   // {
   //   id: 'jhtb3oirhfbg3oqfwijq2R3H',

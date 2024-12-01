@@ -191,9 +191,6 @@ const GamePredictor = ({
     const logoUrl = (hasPredicted && team.darkModeLogoUrl) ? team.darkModeLogoUrl : team.logoUrl;
     const displayName = (isMobile && shortName) ? shortName : name;
 
-    if (hasPredicted && team.darkModeLogoUrl) console.log('use dark mode logo');
-    if (name === 'Liverpool') console.log(team);
-
     return (
       <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
         <AvatarAndTeamName>
