@@ -85,7 +85,7 @@ const Container = styled.div<{ canViewPredictions?: boolean }>`
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  padding: ${theme.spacing.xs} 0 ${theme.spacing.xs} ${theme.spacing.xs};
+  padding: ${theme.spacing.xs} 0;
   
   @media ${devices.tablet} {
     padding: ${theme.spacing.xxxs} 0;
