@@ -169,7 +169,7 @@ export const Teams = {
     {
       name: 'Liverpool',
       logoUrl: 'https://backend.liverpoolfc.com/sites/default/files/styles/lg/public/2022-07/MicrosoftTeams-image%20%2818%29%20%281%29.webp?itok=mhoZb73-&width=1680',
-      darkModeLogoUrl: 'https://mahonpointsc.ie/wp-content/uploads/2021/09/Liverpool-Logo-Final-1.png',
+      // darkModeLogoUrl: 'https://mahonpointsc.ie/wp-content/uploads/2021/09/Liverpool-Logo-Final-1.png',
       stadium: 'Anfield',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#d11f2b',
