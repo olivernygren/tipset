@@ -291,7 +291,7 @@ export const ArsenalPlayers: Array<Player> = [
     id: 'fhwefh9hrrh94ofof',
     name: ArsenalPlayersEnum.JURRIEN_TIMBER,
     position: {
-      exact: ExactPositionEnum.LB,
+      exact: ExactPositionEnum.RB,
       general: GeneralPositionEnum.DF,
     },
     number: 12,
@@ -360,6 +360,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 27,
     country: CountryEnum.UKRAINE,
     picture: '/images/players/oleksandr-zinchenko.png',
+    isInjured: true,
   },
   {
     id: 'rewfgogengoengoribirg84r',
@@ -408,6 +409,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
+    isSuspended: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
