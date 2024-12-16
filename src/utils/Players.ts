@@ -322,7 +322,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 26,
     country: CountryEnum.BRAZIL,
     picture: '/images/players/gabriel-magalhaes.png',
-    mayBeInjured: true,
   },
   {
     id: 'h7fhghgw08hn3gh4b3p0fj309h',
@@ -335,7 +334,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: getAgeByBirthDate('2002-05-19'),
     country: CountryEnum.ITALY,
     picture: '/images/players/riccardo-calafiori.png',
-    mayBeInjured: true,
+    isInjured: true,
   },
   {
     id: 'g8h9e8g4eg98eg7seg0fegr',
@@ -409,7 +408,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/declan-rice.png',
-    isSuspended: true,
+    mayBeInjured: true,
   },
   {
     id: 'ne3yfr8ehfengw9itohq3',
@@ -582,17 +581,6 @@ export const IFKGoteborgPlayers: Array<Player> = [
     country: CountryEnum.SWEDEN,
   },
   {
-    id: 'gh9rgbberofv34hoigf3goh',
-    name: IFKGoteborgPlayersEnum.JACOB_KARLSTROM,
-    position: {
-      exact: ExactPositionEnum.GK,
-      general: GeneralPositionEnum.GK,
-    },
-    number: 12,
-    age: getAgeByBirthDate('1997-01-09'),
-    country: CountryEnum.NORWAY,
-  },
-  {
     id: 'gnrhwgf94wnfgpff4hgpgo',
     name: IFKGoteborgPlayersEnum.ELIS_BISHESARI,
     position: {
@@ -602,16 +590,5 @@ export const IFKGoteborgPlayers: Array<Player> = [
     number: 25,
     age: getAgeByBirthDate('2005-05-09'),
     country: CountryEnum.SWEDEN,
-  },
-  {
-    id: 'gnrhwgf94wnfgpff4hgpgo',
-    name: IFKGoteborgPlayersEnum.ANDERS_KRISTIANSEN,
-    position: {
-      exact: ExactPositionEnum.GK,
-      general: GeneralPositionEnum.GK,
-    },
-    number: 34,
-    age: getAgeByBirthDate('1990-03-17'),
-    country: CountryEnum.NORWAY,
   },
 ];
