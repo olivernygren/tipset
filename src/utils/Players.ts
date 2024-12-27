@@ -505,6 +505,7 @@ export const ArsenalPlayers: Array<Player> = [
     age: 29,
     country: CountryEnum.ENGLAND,
     picture: '/images/players/raheem-sterling.png',
+    isInjured: true,
   },
   // {
   //   id: '83rtgfjwheg9heo9rowdw',
