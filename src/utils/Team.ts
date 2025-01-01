@@ -49,6 +49,7 @@ export enum TournamentsEnum {
   LA_LIGA = 'La Liga',
   COPA_DEL_REY = 'Copa del Rey',
   SERIE_A = 'Serie A',
+  SUPPERCOPPA_ITALIANA = 'Supercoppa Italiana',
   COPPA_ITALIA = 'Coppa Italia',
   BUNDESLIGA = 'Bundesliga',
   BUNDESLIGA_2 = '2. Bundesliga',
