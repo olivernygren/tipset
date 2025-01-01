@@ -406,7 +406,7 @@ const GridSection = styled.div`
   background-color: ${theme.colors.white};
   padding: ${theme.spacing.m} ${theme.spacing.s};
   border-radius: 0;
-  max-height: 500px;
+  max-height: 800px;
   overflow-y: auto;
   min-height: 240px;
   
