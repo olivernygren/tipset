@@ -50,7 +50,7 @@ const SelectTournamentModal = ({
       case TournamentCountryFiltersEnum.SPAIN:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.LA_LIGA) || tournament.includes(TournamentsEnum.COPA_DEL_REY));
       case TournamentCountryFiltersEnum.ITALY:
-        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.SERIE_A) || tournament.includes(TournamentsEnum.COPPA_ITALIA));
+        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.SERIE_A) || tournament.includes(TournamentsEnum.COPPA_ITALIA) || tournament.includes(TournamentsEnum.SUPPERCOPPA_ITALIANA));
       case TournamentCountryFiltersEnum.GERMANY:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.BUNDESLIGA) || tournament.includes(TournamentsEnum.DFB_POKAL) || tournament.includes(TournamentsEnum.BUNDESLIGA_2));
       case TournamentCountryFiltersEnum.FRANCE:
@@ -90,6 +90,8 @@ const SelectTournamentModal = ({
         return '/images/tournaments/copa-del-rey.png';
       case TournamentsEnum.SERIE_A:
         return '/images/tournaments/serie-a.png';
+      case TournamentsEnum.SUPPERCOPPA_ITALIANA:
+        return '/images/tournaments/supercoppa.png';
       case TournamentsEnum.COPPA_ITALIA:
         return '/images/tournaments/coppa-italia.jpg';
       case TournamentsEnum.BUNDESLIGA:
