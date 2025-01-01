@@ -370,9 +370,6 @@ const PredictionLeaguePage = () => {
                 </MobileTabs>
               ) : (
                 <TabsContainer>
-                  <SantaImage>
-                    <img src="/images/Santa-With-Text.svg" alt="santa" />
-                  </SantaImage>
                   {tabs.map((tab) => (
                     <Tab active={activeTab === tab} onClick={activeTab === tab ? () => {} : () => setActiveTab(tab)}>
                       {getTabIcon(tab, activeTab === tab)}
