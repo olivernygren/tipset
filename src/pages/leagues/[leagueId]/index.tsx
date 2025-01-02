@@ -191,6 +191,23 @@ const PredictionLeaguePage = () => {
     }
   };
 
+  const getCurrentGameWeek = () => {
+    if (!league || !league.gameWeeks) return 'Ingen omgång aktiv';
+
+    const currentGameWeek = [...league.gameWeeks].pop();
+
+    if (!currentGameWeek) return 'Ingen omgång aktiv';
+
+    if (currentGameWeek && currentGameWeek.hasEnded) {
+      return `Omgång ${currentGameWeek.round} (Avslutad)`;
+    }
+
+    const allFixturesInFuture = currentGameWeek?.games.fixtures.every((fixture) => new Date(fixture.kickOffTime) > new Date());
+    const isActive = !currentGameWeek?.hasEnded && !allFixturesInFuture;
+
+    return `Omgång ${currentGameWeek.round} (${isActive ? 'Påbörjad' : 'Kommande'})`;
+  };
+
   const getTabIcon = (tab: LeagueTabs, isActive: boolean) => {
     switch (tab) {
       case LeagueTabs.OVERVIEW:
@@ -205,8 +222,6 @@ const PredictionLeaguePage = () => {
         return null;
     }
   };
-
-  // also add a invitation link to the league in the information section
 
   const getPageContent = () => {
     if (!league) return null;
@@ -299,9 +314,28 @@ const PredictionLeaguePage = () => {
       </BackButtonContainer>
       <PageHeader>
         {initialFetchLoading ? getSkeletonHeader() : (
-          <>
-            <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
-            <Section gap="s" flexDirection="row" alignItems="center" fitContent>
+          <Section alignItems="flex-start" gap="m" flexDirection="row">
+            <Section gap="xs">
+              <Section gap="m" flexDirection="row" alignItems="center">
+                <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
+                {!isMobile && (
+                  <NormalTypography variant="m" color={theme.colors.textLight}>
+                    {`(${league?.participants.length} deltagare)`}
+                  </NormalTypography>
+                )}
+              </Section>
+              {/* {isMobile && (
+                <EmphasisTypography variant="m" color={theme.colors.textDefault} noWrap>
+                  {getCurrentGameWeek()}
+                </EmphasisTypography>
+              )} */}
+            </Section>
+            <Section gap="m" flexDirection="row" alignItems="center" fitContent>
+              {!isMobile && (
+                <EmphasisTypography variant="m" color={theme.colors.textDefault} noWrap>
+                  {getCurrentGameWeek()}
+                </EmphasisTypography>
+              )}
               {(isCreator || hasAdminRights) && (
                 <>
                   <IconButton
@@ -324,7 +358,7 @@ const PredictionLeaguePage = () => {
                 </>
               )}
             </Section>
-          </>
+          </Section>
         )}
       </PageHeader>
       {initialFetchLoading ? getSkeletonLoader() : (

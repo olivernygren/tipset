@@ -511,7 +511,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg',
       stadium: 'Mestalla',
       country: CountryEnum.SPAIN,
-      teamPrimaryColor: '#ef321f',
+      teamPrimaryColor: '#ee3523',
     },
     {
       name: 'Real Sociedad',

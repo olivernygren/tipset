@@ -17,6 +17,7 @@ export interface RootTypographyProps {
   color?: string;
   align?: 'left' | 'center' | 'right';
   as?: string
+  noWrap?: boolean;
 }
 
 const getRegularTypographySize = (variant: RegularTypographyProps['variant']) => {
@@ -59,6 +60,7 @@ const RootTypography = styled.span<RootTypographyProps>`
   color: ${({ color }) => (color || theme.colors.textDefault)};
   cursor: ${({ onClick }) => onClick && 'pointer'};
   text-align: ${({ align }) => align && align};
+  ${({ noWrap }) => noWrap && 'white-space: nowrap;'}
 `;
 
 export const NormalTypography = styled(RootTypography)<RegularTypographyProps>`

@@ -157,6 +157,23 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setGameWeekPredictionStatus(GameWeekPredictionStatus.NOT_ALL_PREDICTED);
   }, [predictionStatuses]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (gameWeekPredictionStatus === GameWeekPredictionStatus.UNSAVED_CHANGES) {
+        const message = 'Du har glömt att spara ditt tips. Är du säker på att du vill lämna sidan?';
+        // eslint-disable-next-line no-param-reassign
+        event.returnValue = message; // Standard for most browsers
+        return message; // For some older browsers
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [gameWeekPredictionStatus]);
+
   const handleCreateGameWeek = async () => {
     if (!league) return;
 
@@ -786,6 +803,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               icon={<PlusCircle size={20} color={theme.colors.white} />}
               onClick={isCreator || hasAdminRights ? () => setShowCreateGameWeekSection(!showCreateGameWeekSection) : () => {}}
               disabled={ongoingGameWeek !== undefined}
+              fullWidth={isMobile}
             >
               Skapa ny omgång
             </Button>
@@ -807,7 +825,12 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                   <Section>
                     <NoWrapTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NoWrapTypography>
                   </Section>
-                  <Section flexDirection="row" alignItems="center" gap={isMobile ? 'xxs' : 'xs'} justifyContent="space-between">
+                  <Section
+                    flexDirection="row"
+                    alignItems="center"
+                    gap={isMobile ? 'xxs' : 'xs'}
+                    justifyContent="space-between"
+                  >
                     <Tag
                       text={`Omgång ${ongoingGameWeek.round}`}
                       textAndIconColor={theme.colors.primaryDark}
@@ -1092,11 +1115,12 @@ const OngoingGameWeekHeader = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.xs};
   width: 100%;
-
+  
   @media ${devices.tablet} {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: ${theme.spacing.xxs};
   }
 `;
 
