@@ -135,7 +135,9 @@ export const getAllNationsObject = (): { [key: string]: Team[] } => {
     }
   }
 
-  return nations;
+  const sortedNations = nations.Landslag.sort((a, b) => a.name.localeCompare(b.name));
+
+  return { Landslag: sortedNations };
 };
 
 export const getFlagUrlByCountryName = (countryName: string): string => {
@@ -1365,7 +1367,8 @@ export const Teams = {
     },
     {
       name: 'Frankrike',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/france/flag-square-500.png',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg',
     },
     {
       name: 'Spanien',
@@ -1373,7 +1376,8 @@ export const Teams = {
     },
     {
       name: 'Italien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/italy/flag-square-500.png',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg',
     },
     {
       name: 'Argentina',
@@ -1385,7 +1389,8 @@ export const Teams = {
     },
     {
       name: 'Skottland',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Flag_of_Scotland.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/scotland/flag-square-500.png',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Flag_of_Scotland.svg',
     },
     {
       name: 'Norge',
@@ -1412,10 +1417,6 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg',
     },
     {
-      name: 'Norge',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
-    },
-    {
       name: 'Österrike',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg',
     },
@@ -1433,7 +1434,8 @@ export const Teams = {
     },
     {
       name: 'Tjeckien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/czech-republic/flag-square-500.png',
     },
     {
       name: 'Kroatien',
@@ -1441,15 +1443,49 @@ export const Teams = {
     },
     {
       name: 'Slovakien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/slovakia/flag-square-500.png',
     },
     {
       name: 'Serbien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg',
+      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/serbia/flag-square-500.png',
     },
     {
       name: 'Azerbajdzjan',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg',
+    },
+    {
+      name: 'Kosovo',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Kosovo.svg',
+    },
+    {
+      name: 'Slovenien',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/slovenia/flag-square-500.png',
+    },
+    {
+      name: 'Montenegro',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/montenegro/flag-square-500.png',
+    },
+    {
+      name: 'Albanien',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/albania/flag-square-500.png',
+    },
+    {
+      name: 'Bosnien och Hercegovina',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/bosnia-and-herzegovina/flag-square-500.png',
+    },
+    {
+      name: 'Nordmakedonien',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/north-macedonia/flag-square-500.png',
+    },
+    {
+      name: 'Bulgarien',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/bulgaria/flag-square-500.png',
+    },
+    {
+      name: 'Uruguay',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/uruguay/flag-square-500.png',
     },
   ],
 };

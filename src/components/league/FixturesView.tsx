@@ -534,6 +534,23 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     );
   };
 
+  const getGameWeeksDates = (fixtureList: Array<Fixture>) => {
+    const dates = fixtureList.map((fixture) => new Date(fixture.kickOffTime));
+    const uniqueDates = Array.from(new Set(dates.map((date) => date.toDateString())));
+    const startDate = new Date(uniqueDates[0]);
+    const endDate = new Date(uniqueDates[uniqueDates.length - 1]);
+    const isSameDay = startDate.toDateString() === endDate.toDateString();
+
+    const startDateFormatted = `${startDate.getDate()} ${startDate.toLocaleString('default', { month: 'short' }).replaceAll('.', '')}`;
+    const endDateFormatted = `${endDate.getDate()} ${endDate.toLocaleString('default', { month: 'short' }).replaceAll('.', '')}`;
+
+    if (isSameDay) {
+      return `(${startDateFormatted})`;
+    }
+
+    return `(${startDateFormatted} - ${endDateFormatted})`;
+  };
+
   const getAddNewFixtureContent = () => (
     <AddFixtureContainer
       initial={{ opacity: 0 }}
@@ -918,10 +935,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     backgroundColor={theme.colors.silverLighter}
                     borderRadius={`${theme.borderRadius.l} ${theme.borderRadius.l} 0 0`}
                   >
-                    <Section padding={theme.spacing.s} fitContent>
+                    <Section padding={theme.spacing.s} fitContent gap={isMobile ? 'xxxs' : 'xs'} alignItems={isMobile ? 'flex-start' : 'center'} flexDirection={isMobile ? 'column' : 'row'}>
                       <EmphasisTypography variant="m" color={theme.colors.textDefault}>
                         {`Omgång ${gameWeek.round}`}
                       </EmphasisTypography>
+                      <NormalTypography variant="s" color={theme.colors.textLight}>
+                        {getGameWeeksDates(gameWeek.games.fixtures)}
+                      </NormalTypography>
                     </Section>
                     <RoundPointsContainer>
                       <EmphasisTypography variant="m" color={theme.colors.textDefault}>
