@@ -122,15 +122,23 @@ const PlayerRatingModal = ({
       }
 
       if (playerRatingObject) {
-        if (playerRatingObject.ratings.some((rating) => new Date(rating.date) === gameDate && rating.opponent === opponent?.name)) {
-          const updatedRatings = playerRatingObject.ratings.map((rating) => {
-            if (new Date(rating.date) === gameDate && rating.opponent === opponent?.name) {
+        const hasRatingForCurrentGame = playerRatingObject.ratings.some((rating) => {
+          const ratingDate = new Date(rating.date);
+          return ratingDate.getDate() === gameDate.getDate()
+             && ratingDate.getMonth() === gameDate.getMonth()
+             && ratingDate.getFullYear() === gameDate.getFullYear()
+             && rating.opponent === opponent?.name;
+        });
+
+        if (hasRatingForCurrentGame) {
+          const updatedRatings = playerRatingObject.ratings.map((r) => {
+            if (hasRatingForCurrentGame) {
               return {
-                ...rating,
+                ...r,
                 rating,
               };
             }
-            return rating;
+            return r;
           });
 
           await updateDoc(doc(db, CollectionEnum.PLAYER_RATINGS, playerRatingObject.documentId), {
@@ -167,7 +175,7 @@ const PlayerRatingModal = ({
         });
 
         onClose();
-        successNotify(`Spelarbetyg uppdaterat för ${player.name}`);
+        successNotify(`Spelarbetyg tillagt för ${player.name}`);
         setLoading(false);
       }
     } catch (error) {

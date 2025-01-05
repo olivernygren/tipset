@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { updateDoc, doc } from 'firebase/firestore';
 import {
-  CaretDown, Check, CheckCircle, PlusCircle, XCircle,
+  CaretDown, Check, CheckCircle, PlusCircle, Sparkle, XCircle,
 } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
 import {
@@ -87,8 +87,13 @@ const EditFixtureStatsModalContent = ({
   const [createNewHomeTeamInsight, setCreateNewHomeTeamInsight] = useState(false);
   const [createNewAwayTeamInsight, setCreateNewAwayTeamInsight] = useState(false);
 
+  const [hasAutoAppliedForm, setHasAutoAppliedForm] = useState({ homeTeam: false, awayTeam: false });
+  const [hasAutoAppliedLastFixture, setHasAutoAppliedLastFixture] = useState({ homeTeam: false, awayTeam: false });
+
   const hasAddedStandings = (editStandingsPositionValue.homeTeam !== '' && editStandingsPositionPoints.homeTeam !== '') || (editStandingsPositionValue.awayTeam !== '' && editStandingsPositionPoints.awayTeam !== '');
   const hasAddedLastFixture = editLastFixtureOpponents.homeTeamOpponent !== undefined || editLastFixtureOpponents.awayTeamOpponent !== undefined;
+  const hasAddedLastFixtureForHomeTeam = editLastFixtureOpponents.homeTeamOpponent !== undefined && homeTeamLastFixtureOutcome !== FixtureOutcomeEnum.NONE;
+  const hasAddedLastFixtureForAwayTeam = editLastFixtureOpponents.awayTeamOpponent !== undefined && awayTeamLastFixtureOutcome !== FixtureOutcomeEnum.NONE;
   const hasAddedOdds = odds.homeWin !== '' || odds.draw !== '' || odds.awayWin !== '';
   const hasAddedInsights = homeTeamInsights.length > 0 || awayTeamInsights.length > 0;
 
@@ -103,7 +108,7 @@ const EditFixtureStatsModalContent = ({
         ...(hasAddedStandings && { standingsPosition: editStandingsPositionValue.homeTeam }),
         ...(hasAddedStandings && { standingsPoints: editStandingsPositionPoints.homeTeam }),
         ...(hasAddedInsights && homeTeamInsights.length > 0 && { insights: homeTeamInsights }),
-        ...(hasAddedLastFixture && {
+        ...(hasAddedLastFixtureForHomeTeam && {
           lastFixture: {
             opponent: editLastFixtureOpponents.homeTeamOpponent?.name ?? '',
             result: editHomeTeamLastFixtureResult,
@@ -117,7 +122,7 @@ const EditFixtureStatsModalContent = ({
         ...(hasAddedStandings && { standingsPosition: editStandingsPositionValue.awayTeam }),
         ...(hasAddedStandings && { standingsPoints: editStandingsPositionPoints.awayTeam }),
         ...(hasAddedInsights && awayTeamInsights.length > 0 && { insights: awayTeamInsights }),
-        ...(hasAddedLastFixture && {
+        ...(hasAddedLastFixtureForAwayTeam && {
           lastFixture: {
             opponent: editLastFixtureOpponents.awayTeamOpponent?.name ?? '',
             result: editAwayTeamLastFixtureResult,
@@ -209,6 +214,77 @@ const EditFixtureStatsModalContent = ({
     }
   };
 
+  const applyAutomaticFormValues = (isHomeTeam: boolean): void => {
+    if (!league.gameWeeks || !ongoingGameWeek || league.gameWeeks.length < 2) return;
+
+    const previousGameWeek = league.gameWeeks.find((gameWeek) => gameWeek.round === ongoingGameWeek.round - 1);
+    if (!previousGameWeek) return;
+
+    const { homeTeam, awayTeam } = fixture;
+
+    const findPreviousFixture = (teamName: string) => previousGameWeek.games.fixtures.find(
+      (fixture) => fixture.homeTeam.name === teamName || fixture.awayTeam.name === teamName,
+    );
+
+    const getFinalResult = (fixture: Fixture, teamName: string): FixtureOutcomeEnum => {
+      const wasHomeTeam = fixture.homeTeam.name === teamName;
+      const homeGoals = fixture.finalResult?.homeTeamGoals ?? 0;
+      const awayGoals = fixture.finalResult?.awayTeamGoals ?? 0;
+
+      if (homeGoals > awayGoals) return wasHomeTeam ? FixtureOutcomeEnum.WIN : FixtureOutcomeEnum.LOSS;
+      if (homeGoals < awayGoals) return wasHomeTeam ? FixtureOutcomeEnum.LOSS : FixtureOutcomeEnum.WIN;
+      return FixtureOutcomeEnum.DRAW;
+    };
+
+    const getForm = (fixture: Fixture, teamName: string): FixtureOutcomeEnum[] => {
+      const wasHomeTeam = fixture.homeTeam.name === teamName;
+      let form = wasHomeTeam ? fixture.previewStats?.homeTeam?.form : fixture.previewStats?.awayTeam?.form;
+      if (form && form.length === 5) {
+        form = form.slice(1); // Remove the first value and shift the other values one step back
+      }
+      const finalResult = getFinalResult(fixture, teamName);
+      form = form ? [...form, finalResult] : [finalResult];
+      while (form.length < 5) {
+        form.unshift(FixtureOutcomeEnum.NONE); // Fill remaining slots with FixtureOutcomeEnum.NONE
+      }
+      return form;
+    };
+
+    const applyFormValues = (team: Team, setForm: (form: FixtureOutcomeEnum[]) => void) => {
+      const teamFixture = findPreviousFixture(team.name);
+      if (teamFixture) {
+        const form = getForm(teamFixture, team.name);
+        setForm(form);
+      }
+    };
+
+    if (isHomeTeam) {
+      applyFormValues(homeTeam, (form) => setEditFormValue((prevState) => ({ ...prevState, homeTeam: form })));
+      setHasAutoAppliedForm({ ...hasAutoAppliedForm, homeTeam: true });
+    } else {
+      applyFormValues(awayTeam, (form) => setEditFormValue((prevState) => ({ ...prevState, awayTeam: form })));
+      setHasAutoAppliedForm({ ...hasAutoAppliedForm, awayTeam: true });
+    }
+  };
+
+  const getHasPreviousGameWeekFormValues = (isHomeTeam: boolean) => {
+    if (!league.gameWeeks || !ongoingGameWeek || league.gameWeeks.length < 2) return false;
+
+    const previousGameWeek = league.gameWeeks.find((gameWeek) => gameWeek.round === ongoingGameWeek.round - 1);
+    if (!previousGameWeek) return false;
+
+    const { homeTeam, awayTeam } = fixture;
+
+    const findPreviousFixture = (teamName: string) => previousGameWeek.games.fixtures.find(
+      (fixture) => fixture.homeTeam.name === teamName || fixture.awayTeam.name === teamName,
+    );
+
+    const homeTeamFixture = findPreviousFixture(homeTeam.name);
+    const awayTeamFixture = findPreviousFixture(awayTeam.name);
+
+    return isHomeTeam ? Boolean(homeTeamFixture) : Boolean(awayTeamFixture);
+  };
+
   const getClickableFormIcon = (outcome: FixtureOutcomeEnum, index: number, isHomeTeam: boolean) => (
     <FormIcon
       key={outcome}
@@ -281,6 +357,79 @@ const EditFixtureStatsModalContent = ({
       />
     </StandingsInputsRow>
   );
+
+  const getHasLastGameWeekFixture = (isHomeTeam: boolean) => {
+    if (!league.gameWeeks || !ongoingGameWeek || league.gameWeeks.length < 2) return false;
+
+    const previousGameWeek = league.gameWeeks.find((gameWeek) => gameWeek.round === ongoingGameWeek.round - 1);
+    if (!previousGameWeek) return false;
+
+    const { homeTeam, awayTeam } = fixture;
+
+    const findPreviousFixture = (teamName: string) => previousGameWeek.games.fixtures.find(
+      (fixture) => fixture.homeTeam.name === teamName || fixture.awayTeam.name === teamName,
+    );
+
+    const homeTeamFixture = findPreviousFixture(homeTeam.name);
+    const awayTeamFixture = findPreviousFixture(awayTeam.name);
+
+    return isHomeTeam ? Boolean(homeTeamFixture) : Boolean(awayTeamFixture);
+  };
+
+  const applyAutomaticLastFixtureValues = (isHomeTeam: boolean) => {
+    if (!league.gameWeeks || !ongoingGameWeek || league.gameWeeks.length < 2) return;
+
+    const previousGameWeek = league.gameWeeks.find((gameWeek) => gameWeek.round === ongoingGameWeek.round - 1);
+    if (!previousGameWeek) return;
+
+    const { homeTeam, awayTeam } = fixture;
+
+    const findPreviousFixture = (teamName: string) => previousGameWeek.games.fixtures.find(
+      (fixture) => fixture.homeTeam.name === teamName || fixture.awayTeam.name === teamName,
+    );
+
+    const getFinalResult = (fixture: Fixture, teamName: string): FixtureOutcomeEnum => {
+      const wasHomeTeam = fixture.homeTeam.name === teamName;
+      const homeGoals = fixture.finalResult?.homeTeamGoals ?? 0;
+      const awayGoals = fixture.finalResult?.awayTeamGoals ?? 0;
+
+      if (homeGoals > awayGoals) return wasHomeTeam ? FixtureOutcomeEnum.WIN : FixtureOutcomeEnum.LOSS;
+      if (homeGoals < awayGoals) return wasHomeTeam ? FixtureOutcomeEnum.LOSS : FixtureOutcomeEnum.WIN;
+      return FixtureOutcomeEnum.DRAW;
+    };
+
+    const applyFixtureValues = (team: Team, setOpponent: (opponent: Team) => void, setResult: (result: { homeTeamGoals: number, awayTeamGoals: number }) => void, setOutcome: (outcome: FixtureOutcomeEnum) => void) => {
+      const teamFixture = findPreviousFixture(team.name);
+      if (teamFixture) {
+        const opponentTeam = teamFixture.homeTeam.name === team.name ? teamFixture.awayTeam : teamFixture.homeTeam;
+        const opponent = getTeamByName(opponentTeam.name)!;
+        setOpponent(opponent);
+        setResult({
+          homeTeamGoals: teamFixture.finalResult?.homeTeamGoals ?? 0,
+          awayTeamGoals: teamFixture.finalResult?.awayTeamGoals ?? 0,
+        });
+        setOutcome(getFinalResult(teamFixture, team.name));
+      }
+    };
+
+    if (isHomeTeam) {
+      applyFixtureValues(
+        homeTeam,
+        (opponent) => setEditLastFixtureOpponents((oldstate) => ({ ...oldstate, homeTeamOpponent: opponent })),
+        setEditHomeTeamLastFixtureResult,
+        setHomeTeamLastFixtureOutcome,
+      );
+      setHasAutoAppliedLastFixture({ ...hasAutoAppliedLastFixture, homeTeam: true });
+    } else {
+      applyFixtureValues(
+        awayTeam,
+        (opponent) => setEditLastFixtureOpponents((oldstate) => ({ ...oldstate, awayTeamOpponent: opponent })),
+        setEditAwayTeamLastFixtureResult,
+        setAwayTeamLastFixtureOutcome,
+      );
+      setHasAutoAppliedLastFixture({ ...hasAutoAppliedLastFixture, awayTeam: true });
+    }
+  };
 
   const getLastFixture = (isHomeTeam: boolean) => {
     const opponent = isHomeTeam ? editLastFixtureOpponents.homeTeamOpponent : editLastFixtureOpponents.awayTeamOpponent;
@@ -455,12 +604,22 @@ const EditFixtureStatsModalContent = ({
                 <FormIcons>
                   {getTeamForm(true)}
                 </FormIcons>
+                {getHasPreviousGameWeekFormValues(true) && !hasAutoAppliedForm.homeTeam && (
+                  <TextButton onClick={() => applyAutomaticFormValues(true)} noPadding endIcon={<Sparkle size={16} color={theme.colors.primary} weight="fill" />}>
+                    Lägg till automatiskt
+                  </TextButton>
+                )}
               </TeamColumn>
               <TeamColumn>
                 <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
                 <FormIcons>
                   {getTeamForm(false)}
                 </FormIcons>
+                {getHasPreviousGameWeekFormValues(false) && !hasAutoAppliedForm.awayTeam && (
+                  <TextButton onClick={() => applyAutomaticFormValues(false)} noPadding endIcon={<Sparkle size={16} color={theme.colors.primary} weight="fill" />}>
+                    Lägg till automatiskt
+                  </TextButton>
+                )}
               </TeamColumn>
             </DropdownContent>
           </Dropdown>
@@ -495,10 +654,20 @@ const EditFixtureStatsModalContent = ({
               <TeamColumn>
                 <HeadingsTypography variant="h6">{fixture.homeTeam.name}</HeadingsTypography>
                 {getLastFixture(true)}
+                {getHasLastGameWeekFixture(true) && !hasAutoAppliedLastFixture.homeTeam && (
+                  <TextButton onClick={() => applyAutomaticLastFixtureValues(true)} noPadding endIcon={<Sparkle size={16} color={theme.colors.primary} weight="fill" />}>
+                    Lägg till automatiskt
+                  </TextButton>
+                )}
               </TeamColumn>
               <TeamColumn>
                 <HeadingsTypography variant="h6">{fixture.awayTeam.name}</HeadingsTypography>
                 {getLastFixture(false)}
+                {getHasLastGameWeekFixture(false) && !hasAutoAppliedLastFixture.awayTeam && (
+                  <TextButton onClick={() => applyAutomaticLastFixtureValues(false)} noPadding endIcon={<Sparkle size={16} color={theme.colors.primary} weight="fill" />}>
+                    Lägg till automatiskt
+                  </TextButton>
+                )}
               </TeamColumn>
             </DropdownContent>
           </Dropdown>

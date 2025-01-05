@@ -298,7 +298,6 @@ export const ArsenalPlayers: Array<Player> = [
     age: 22,
     country: CountryEnum.NETHERLANDS,
     picture: '/images/players/jurrien-timber.png',
-    isSuspended: true,
   },
   {
     id: '8f9w8f9w8f9w8f9w8f9w8',
@@ -433,30 +432,6 @@ export const ArsenalPlayers: Array<Player> = [
     picture: '/images/players/mikel-merino.png',
   },
   // {
-  //   id: 'jhtb3oirhfbg3oqfwijq2R3H',
-  //   name: ArsenalPlayersEnum.SALAH_EDDINE_OULAD_MHAND,
-  //   position: {
-  //     exact: ExactPositionEnum.CM,
-  //     general: GeneralPositionEnum.MF,
-  //   },
-  //   number: 59,
-  //   age: getAgeByBirthDate('2003-08-20'),
-  //   country: CountryEnum.NETHERLANDS,
-  //   picture: '/images/players/salah-eddine.png',
-  // },
-  {
-    id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
-    name: ArsenalPlayersEnum.ETHAN_NWANERI,
-    position: {
-      exact: ExactPositionEnum.CAM,
-      general: GeneralPositionEnum.MF,
-    },
-    number: 53,
-    age: getAgeByBirthDate('2007-03-21'),
-    country: CountryEnum.ENGLAND,
-    picture: '/images/players/ethan-nwaneri.png',
-  },
-  // {
   //   id: 'rh27tg9fofh9w4ghnfoif',
   //   name: ArsenalPlayersEnum.FABIO_VIEIRA,
   //   position: {
@@ -479,6 +454,19 @@ export const ArsenalPlayers: Array<Player> = [
     age: 25,
     country: CountryEnum.NORWAY,
     picture: '/images/players/martin-odegaard.png',
+  },
+  {
+    id: 'bdfdsofjuj938g9hrf8qwgfo2gf3i',
+    name: ArsenalPlayersEnum.ETHAN_NWANERI,
+    position: {
+      exact: ExactPositionEnum.RW,
+      general: GeneralPositionEnum.FW,
+    },
+    number: 53,
+    age: getAgeByBirthDate('2007-03-21'),
+    country: CountryEnum.ENGLAND,
+    picture: '/images/players/ethan-nwaneri.png',
+    mayBeInjured: true,
   },
   {
     id: 'cbwgr8h90ejqrjwf8gwrf',

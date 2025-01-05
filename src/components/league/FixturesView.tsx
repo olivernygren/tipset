@@ -94,6 +94,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [newFixtureShouldPredictGoalScorer, setNewFixtureShouldPredictGoalScorer] = useState<boolean>(false);
   const [newFixtureGoalScorerTeam, setNewFixtureGoalScorerTeam] = useState<Array<string> | null>(null);
   const [newFixtureNickname, setNewFixtureNickname] = useState<string>('');
+  const [newFixtureIncludeStats, setNewFixtureIncludeStats] = useState<boolean>(true);
 
   const [predictionStatuses, setPredictionStatuses] = useState<Array<{ fixtureId: string, status: PredictionStatus }>>([]);
   const [gameWeekPredictionStatus, setGameWeekPredictionStatus] = useState<string>('');
@@ -298,6 +299,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       ...(newFixtureShouldPredictGoalScorer && { goalScorerFromTeam: newFixtureGoalScorerTeam }),
       ...(newFixtureNickname && { fixtureNickname: newFixtureNickname }),
       teamType,
+      includeStats: newFixtureIncludeStats,
     };
 
     if (alreadyExistingFixture) {
@@ -631,6 +633,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         label="Smeknamn på match"
         value={newFixtureNickname}
         onChange={(e) => setNewFixtureNickname(e.currentTarget.value)}
+      />
+      <Checkbox
+        label="Inkludera statistik"
+        checked={newFixtureIncludeStats}
+        onChange={() => setNewFixtureIncludeStats(!newFixtureIncludeStats)}
       />
       {(newFixtureHomeTeam?.name === 'Arsenal' || newFixtureAwayTeam?.name === 'Arsenal') && (
         <Checkbox

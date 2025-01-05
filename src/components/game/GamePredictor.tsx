@@ -230,15 +230,17 @@ const GamePredictor = ({
             <NoWrapTypography variant="s" align="center" color={getTextColor()}>{getKickoffTime()}</NoWrapTypography>
             <NormalTypography variant="s" color={getTextColor()}>•</NormalTypography>
             <EllipsisTypography variant="s" align="center" color={getTextColor()}>{game.tournament}</EllipsisTypography>
-            <IconButton
-              icon={<ChartBar size={24} weight="fill" />}
-              colors={{
-                normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
-                hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
-                active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
-              }}
-              onClick={() => onShowStats(game)}
-            />
+            {game.includeStats && (
+              <IconButton
+                icon={<ChartBar size={24} weight="fill" />}
+                colors={{
+                  normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
+                  hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
+                  active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
+                }}
+                onClick={() => onShowStats(game)}
+              />
+            )}
           </Section>
         </>
       );
@@ -253,15 +255,17 @@ const GamePredictor = ({
         <NoWrapTypography variant="s" align="center" color={getTextColor()}>{getKickoffTime()}</NoWrapTypography>
         <NormalTypography variant="s" color={getTextColor()}>•</NormalTypography>
         <EllipsisTypography variant="s" align="center" color={getTextColor()}>{game.tournament}</EllipsisTypography>
-        <IconButton
-          icon={<ChartBar size={24} weight="fill" />}
-          colors={{
-            normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
-            hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
-            active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
-          }}
-          onClick={() => onShowStats(game)}
-        />
+        {game.includeStats && (
+          <IconButton
+            icon={<ChartBar size={24} weight="fill" />}
+            colors={{
+              normal: hasPredicted ? theme.colors.gold : theme.colors.primary,
+              hover: hasPredicted ? theme.colors.gold : theme.colors.primaryDark,
+              active: hasPredicted ? theme.colors.gold : theme.colors.primaryDarker,
+            }}
+            onClick={() => onShowStats(game)}
+          />
+        )}
       </>
     );
   };
@@ -269,7 +273,7 @@ const GamePredictor = ({
   return (
     <>
       <Card hasPredicted={hasPredicted}>
-        <CardHeader>
+        <CardHeader includesStats={game.includeStats}>
           {getCardHeaderContent()}
         </CardHeader>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
@@ -410,7 +414,7 @@ const Card = styled.div<{ hasPredicted?: boolean }>`
   box-sizing: border-box;
 `;
 
-const CardHeader = styled.div`
+const CardHeader = styled.div<{ includesStats?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -423,7 +427,7 @@ const CardHeader = styled.div`
   @media ${devices.tablet} {
     flex-direction: row;
     gap: ${theme.spacing.s};
-    padding: ${theme.spacing.xxs} ${theme.spacing.s};
+    padding: ${({ includesStats }) => (includesStats ? theme.spacing.xxs : theme.spacing.xs)} ${theme.spacing.s};
   }
 `;
 

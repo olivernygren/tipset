@@ -166,6 +166,7 @@ const SelectTournamentModal = ({
             placeholder="Sök turnering"
             compact={isMobile}
             fullWidth
+            autoFocus
           />
           {/* <TextButton
             icon={showFilters ? <XCircle size={24} color={theme.colors.primary} /> : <Funnel size={24} color={theme.colors.primary} />}

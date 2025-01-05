@@ -4,15 +4,18 @@ import {
   deleteDoc, doc, getDoc, updateDoc,
 } from 'firebase/firestore';
 import {
-  ArrowLeft, CaretDown, DotsThree, PencilSimple, SoccerBall, SquaresFour, Trash, UserList,
+  Alarm,
+  ArrowLeft, CaretDown, CheckCircle, DotsThree, PencilSimple, RocketLaunch, SoccerBall, SquaresFour, Trash, UserList,
   X,
 } from '@phosphor-icons/react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { motion } from 'framer-motion';
 import Page from '../../../components/Page';
 import { auth, db } from '../../../config/firebase';
 import { CollectionEnum } from '../../../utils/Firebase';
-import { PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants } from '../../../utils/League';
+import {
+  LeagueGameWeek, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
+} from '../../../utils/League';
 import { withDocumentIdOnObject } from '../../../utils/helpers';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
 import { Section } from '../../../components/section/Section';
@@ -191,21 +194,84 @@ const PredictionLeaguePage = () => {
     }
   };
 
+  const getTimeLeftUntilDeadline = (currentGameWeek?: LeagueGameWeek) => {
+    if (!currentGameWeek) return 'Ingen omgång aktiv';
+
+    const firstFixture = currentGameWeek.games.fixtures[0];
+    const firstFixtureDeadline = new Date(firstFixture.kickOffTime);
+
+    const now = new Date();
+    const difference = firstFixtureDeadline.getTime() - now.getTime();
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (currentGameWeek.hasEnded) {
+      return 'Avslutad';
+    }
+
+    if (difference < 0) {
+      return 'Aktiv';
+    }
+
+    if (days > 0) {
+      if (days === 1) {
+        return `${days} dag kvar`;
+      }
+      return `om ${days} dagar`;
+    }
+
+    if (hours > 0) {
+      return `om ${hours} h ${minutes} min`;
+    }
+
+    if (minutes > 0) {
+      return `om ${minutes} min`;
+    }
+
+    return 'om >1 min';
+  };
+
   const getCurrentGameWeek = () => {
-    if (!league || !league.gameWeeks) return 'Ingen omgång aktiv';
+    let status = '';
+    let round = '';
+
+    if (!league || !league.gameWeeks) {
+      return null;
+    }
 
     const currentGameWeek = [...league.gameWeeks].pop();
 
-    if (!currentGameWeek) return 'Ingen omgång aktiv';
-
-    if (currentGameWeek && currentGameWeek.hasEnded) {
-      return `Omgång ${currentGameWeek.round} (Avslutad)`;
+    if (currentGameWeek) {
+      round = `Omgång ${currentGameWeek.round}`;
     }
 
     const allFixturesInFuture = currentGameWeek?.games.fixtures.every((fixture) => new Date(fixture.kickOffTime) > new Date());
     const isActive = !currentGameWeek?.hasEnded && !allFixturesInFuture;
 
-    return `Omgång ${currentGameWeek.round} (${isActive ? 'Påbörjad' : 'Kommande'})`;
+    status = `(${isActive ? 'Påbörjad' : getTimeLeftUntilDeadline(currentGameWeek)})`;
+
+    const getIcon = () => {
+      if (!currentGameWeek) return null;
+      if (currentGameWeek.hasEnded) return <CheckCircle size={24} color={theme.colors.textLight} weight="fill" />;
+      if (isActive) return <RocketLaunch size={24} color={theme.colors.primary} weight="fill" />;
+      return <Alarm size={24} color={theme.colors.textLight} weight="fill" />;
+    };
+
+    return (
+      <Section flexDirection="row" alignItems="center" gap="xxs" fitContent>
+        {getIcon()}
+        <EmphasisTypography variant="m" color={theme.colors.textDefault} noWrap>
+          {`${round} `}
+        </EmphasisTypography>
+        {status.length > 0 && (
+          <NormalTypography variant="m" color={theme.colors.textDefault} noWrap>
+            {status}
+          </NormalTypography>
+        )}
+      </Section>
+    );
   };
 
   const getTabIcon = (tab: LeagueTabs, isActive: boolean) => {
@@ -318,11 +384,11 @@ const PredictionLeaguePage = () => {
             <Section gap="xs">
               <Section gap="m" flexDirection="row" alignItems="center">
                 <HeadingsTypography variant="h2">{league?.name}</HeadingsTypography>
-                {!isMobile && (
+                {/* {!isMobile && (
                   <NormalTypography variant="m" color={theme.colors.textLight}>
                     {`(${league?.participants.length} deltagare)`}
                   </NormalTypography>
-                )}
+                )} */}
               </Section>
               {/* {isMobile && (
                 <EmphasisTypography variant="m" color={theme.colors.textDefault} noWrap>
@@ -332,9 +398,7 @@ const PredictionLeaguePage = () => {
             </Section>
             <Section gap="m" flexDirection="row" alignItems="center" fitContent>
               {!isMobile && (
-                <EmphasisTypography variant="m" color={theme.colors.textDefault} noWrap>
-                  {getCurrentGameWeek()}
-                </EmphasisTypography>
+                getCurrentGameWeek()
               )}
               {(isCreator || hasAdminRights) && (
                 <>
