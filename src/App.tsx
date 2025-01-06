@@ -20,6 +20,8 @@ import RulesPage from './pages/rules';
 import HowToPlayPage from './pages/how-to-play';
 import ProfilePage from './pages/profile';
 import PlayerRatingsPage from './pages/admin/player-ratings';
+import AdminPlayersPage from './pages/admin/players';
+import PlayersByTeamPage from './pages/admin/players/[teamId]';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -82,7 +84,15 @@ const App = () => {
     },
     {
       pageComponentElement: <PlayerRatingsPage />,
-      path: `/${RoutesEnum.PLAYER_RATINGS}`,
+      path: `/${RoutesEnum.ADMIN_PLAYER_RATINGS}`,
+    },
+    {
+      pageComponentElement: <AdminPlayersPage />,
+      path: `/${RoutesEnum.ADMIN_PLAYERS}`,
+    },
+    {
+      pageComponentElement: <PlayersByTeamPage />,
+      path: `/${RoutesEnum.ADMIN_PLAYERS_TEAM}`,
     },
   ];
 

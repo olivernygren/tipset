@@ -10,12 +10,14 @@ export enum RoutesEnum {
   ADMIN = 'admin',
   ADMIN_LEAGUES = 'admin/leagues',
   ADMIN_USERS = 'admin/users',
-
-  PLAYER_RATINGS = 'player-ratings',
+  ADMIN_PLAYER_RATINGS = 'admin/player-ratings',
+  ADMIN_PLAYERS = 'admin/players',
+  ADMIN_PLAYERS_TEAM = 'admin/players/:teamId',
 }
 
 export enum QueryEnum {
   ADMIN = 'admin',
   LEAGUES = 'leagues',
   USERS = 'users',
+  PLAYERS = 'players',
 }

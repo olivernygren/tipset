@@ -1,10 +1,11 @@
 /* eslint-disable guard-for-in */
 
 import { theme } from '../theme';
-import { CountryEnum } from './Players';
+import { CountryEnum, Player } from './Players';
 
 /* eslint-disable no-restricted-syntax */
 export interface Team {
+  documentId?: string;
   name: string;
   shortName?: string;
   logoUrl: string;
@@ -12,6 +13,7 @@ export interface Team {
   stadium?: string;
   country?: string;
   teamPrimaryColor?: string;
+  players?: Player[];
 }
 
 export enum LeagueEnum {
@@ -48,8 +50,9 @@ export enum TournamentsEnum {
   CHAMPIONSHIP = 'Championship',
   LA_LIGA = 'La Liga',
   COPA_DEL_REY = 'Copa del Rey',
+  SUPERCOPA = 'Supercopa',
   SERIE_A = 'Serie A',
-  SUPPERCOPPA_ITALIANA = 'Supercoppa Italiana',
+  SUPERCOPPA_ITALIANA = 'Supercoppa Italiana',
   COPPA_ITALIA = 'Coppa Italia',
   BUNDESLIGA = 'Bundesliga',
   BUNDESLIGA_2 = '2. Bundesliga',

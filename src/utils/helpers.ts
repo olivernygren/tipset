@@ -2,7 +2,7 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
-import { GeneralPositionEnum, Player } from './Players';
+import { ExactPositionEnum, GeneralPositionEnum, Player } from './Players';
 import { TournamentsEnum } from './Team';
 import { theme } from '../theme';
 
@@ -150,3 +150,20 @@ export const getPlayerPositionColor = (position: GeneralPositionEnum) => {
       return theme.colors.gold;
   }
 };
+
+export const getExactPositionOptions = (generalPosition: GeneralPositionEnum) => {
+  switch (generalPosition) {
+    case GeneralPositionEnum.GK:
+      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.GK);
+    case GeneralPositionEnum.DF:
+      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.CB || position === ExactPositionEnum.LB || position === ExactPositionEnum.RB);
+    case GeneralPositionEnum.MF:
+      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.CM || position === ExactPositionEnum.CDM || position === ExactPositionEnum.CAM || position === ExactPositionEnum.LM || position === ExactPositionEnum.RM);
+    case GeneralPositionEnum.FW:
+      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.ST || position === ExactPositionEnum.LW || position === ExactPositionEnum.RW);
+    default:
+      return Object.values(ExactPositionEnum);
+  }
+};
+
+export const createRandomPlayerId = (): string => Math.random().toString(36).substring(2, 8).toUpperCase();

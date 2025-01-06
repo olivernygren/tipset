@@ -587,31 +587,31 @@ const TabsContainer = styled.div`
   position: relative;
 `;
 
-const SantaImage = styled.div`
-  display: none;
+// const SantaImage = styled.div`
+//   display: none;
 
-  @media ${devices.laptop} {
-    display: block;
-    position: absolute;
-    bottom: 0px;
-    right: 50px;
-    height: 100px;
-    animation: fadeIn 0.5s ease;
-    
-    > img {
-      width: 100%;
-    }
+//   @media ${devices.laptop} {
+//     display: block;
+//     position: absolute;
+//     bottom: 0px;
+//     right: 50px;
+//     height: 100px;
+//     animation: fadeIn 0.5s ease;
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-  }
-`;
+//     > img {
+//       width: 100%;
+//     }
+
+//     @keyframes fadeIn {
+//       from {
+//         opacity: 0;
+//       }
+//       to {
+//         opacity: 1;
+//       }
+//     }
+//   }
+// `;
 
 const Tab = styled(motion.div)<{ active?: boolean }>`
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};

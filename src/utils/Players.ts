@@ -83,6 +83,13 @@ export enum CountryEnum {
   AZERBAIJAN = 'Azerbajdzjan',
 }
 
+export enum PlayerStatusEnum {
+  INJURED = 'INJURED',
+  SUSPENDED = 'SUSPENDED',
+  MAY_BE_INJURED = 'MAY_BE_INJURED',
+  ILL = 'ILL',
+}
+
 export interface Player {
   id: string
   name: string;
@@ -90,13 +97,16 @@ export interface Player {
     exact: ExactPositionEnum;
     general: GeneralPositionEnum;
   };
-  number: number;
-  age: number;
+  number?: number;
+  age?: number;
+  birthDate?: string;
   country: CountryEnum;
   picture?: string;
   isInjured?: boolean;
   mayBeInjured?: boolean;
   isSuspended?: boolean;
+  status?: PlayerStatusEnum;
+  team?: string;
 }
 
 export interface PlayerRating {
