@@ -6,12 +6,11 @@ interface ClubAvatarProps {
   logoUrl: string;
   size: AvatarSize;
   showBorder?: boolean;
-  isDarkMode?: boolean;
   noPadding?: boolean;
 }
 
 const ClubAvatar = ({
-  logoUrl, clubName, size, showBorder, isDarkMode, noPadding,
+  logoUrl, clubName, size, showBorder, noPadding,
 }: ClubAvatarProps) => (
   <Avatar
     src={logoUrl}
@@ -19,7 +18,6 @@ const ClubAvatar = ({
     alt={`${clubName} logo`}
     title={clubName}
     showBorder={showBorder}
-    isDarkMode={isDarkMode}
     noPadding={noPadding}
   />
 );

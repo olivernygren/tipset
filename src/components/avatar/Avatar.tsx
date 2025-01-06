@@ -30,7 +30,8 @@ interface AvatarProps {
   objectFit?: 'cover' | 'contain';
   showBorder?: boolean;
   customBorderColor?: string;
-  isDarkMode?: boolean;
+  customBorderWidth?: number;
+  backgroundColor?: string;
   noPadding?: boolean;
   opacity?: number;
   title?: string;
@@ -40,22 +41,24 @@ interface StyledAvatarProps {
   size: AvatarSize;
   showBorder: boolean;
   customBorderColor?: string;
+  customBorderWidth?: number;
   objectFit: 'cover' | 'contain';
-  isDarkMode?: boolean;
+  backgroundColor?: string;
   noPadding?: boolean;
   opacity?: number;
 }
 
 const Avatar = ({
-  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, isDarkMode, noPadding = false, opacity = 1, title,
+  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, backgroundColor, noPadding = false, opacity = 1, title, customBorderWidth,
 }: AvatarProps) => (
   <StyledAvatar
     title={title}
     size={size}
     showBorder={showBorder}
     customBorderColor={customBorderColor}
+    customBorderWidth={customBorderWidth}
     objectFit={objectFit}
-    isDarkMode={isDarkMode}
+    backgroundColor={backgroundColor}
     noPadding={noPadding}
     className="avatar"
     opacity={opacity}
@@ -110,16 +113,25 @@ const getAvatarMargin = (objectFit: 'cover' | 'contain', size: AvatarSize) => {
   }
 };
 
+const getAvatarBorderWidth = (size: AvatarSize, customBorderWidth?: number) => {
+  if (customBorderWidth) {
+    return customBorderWidth;
+  }
+  return size === AvatarSize.XS || size === AvatarSize.S ? 1 : 2;
+};
+
 const StyledAvatar = styled.div<StyledAvatarProps>`
   display: inline-block;
   width: ${({ size }) => getAvatarSize(size)};
   height: ${({ size }) => getAvatarSize(size)};
-  border: ${({ showBorder, customBorderColor, size }) => (showBorder ? `${size === AvatarSize.XS || size === AvatarSize.S ? '1px' : '2px'} solid ${customBorderColor || theme.colors.silver}` : 'none')};
+  border: ${({
+    showBorder, customBorderColor, size, customBorderWidth,
+  }) => (showBorder ? `${getAvatarBorderWidth(size, customBorderWidth)}px solid ${customBorderColor || theme.colors.silver}` : 'none')};
   padding: ${({ objectFit, size }) => getAvatarPadding(objectFit, size)};
   margin: ${({ objectFit, size }) => getAvatarMargin(objectFit, size)};
   overflow: hidden;
   border-radius: 50%;
-  background-color: ${({ isDarkMode }) => (isDarkMode ? theme.colors.white : 'transparent')};
+  background-color: ${({ backgroundColor }) => (backgroundColor || 'transparent')};
   opacity: ${({ opacity }) => opacity};
 
   ${({ noPadding }) => noPadding && css`

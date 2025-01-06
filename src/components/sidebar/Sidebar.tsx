@@ -19,9 +19,10 @@ const Sidebar = ({ links }: SidebarProps) => (
 );
 
 const StyledSidebar = styled.div`
-  min-height: 100vh;
+  height: calc(100vh - 80px);
   width: 250px;
   border-right: 1px solid ${theme.colors.silverLight};
+  position: relative;
 `;
 
 const LinksContainer = styled.div`
@@ -29,6 +30,9 @@ const LinksContainer = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.xs};
   padding: ${theme.spacing.s};
+  /* position: fixed;
+  left: 0;
+  top: 0px; */
 `;
 
 export default Sidebar;

@@ -21,7 +21,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => (
 );
 
 const AdminPageLayout = styled.div`
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   overflow: hidden;
   display: grid;
   grid-template-columns: auto 1fr;

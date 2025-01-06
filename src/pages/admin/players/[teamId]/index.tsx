@@ -1,15 +1,18 @@
-import { deleteDoc, doc, getDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
+  deleteDoc, doc, getDoc, updateDoc,
+} from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
+import {
+  CheckCircle,
   DotsThree, PencilSimple, Plus, Trash, X,
 } from '@phosphor-icons/react';
 import { db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
-import { withDocumentIdOnObject } from '../../../../utils/helpers';
+import { getGeneralPositionShorthand, getPlayerPositionColor, withDocumentIdOnObject } from '../../../../utils/helpers';
 import { getFlagUrlByCountryName, Team } from '../../../../utils/Team';
 import { theme } from '../../../../theme';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
+import { HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
 import { GeneralPositionEnum, Player } from '../../../../utils/Players';
 import Button from '../../../../components/buttons/Button';
 import ContextMenu from '../../../../components/menu/ContextMenu';
@@ -24,9 +27,7 @@ import { Divider } from '../../../../components/Divider';
 import CreatePlayerModal from '../../../../components/players/CreatePlayerModal';
 import Avatar, { AvatarSize } from '../../../../components/avatar/Avatar';
 import NationAvatar from '../../../../components/avatar/NationAvatar';
-import {
-  getNumberOfAppearancesByMonth, getNumberOfAppearancesString, getPlayerMonthlyRating, getPlayerSeasonRating,
-} from '../../../../utils/playerRatingHelpers';
+import EditPlayerModal from '../../../../components/players/EditPlayerModal';
 
 const PlayersByTeamPage = () => {
   const [team, setTeam] = useState<Team | null>(null);
@@ -42,6 +43,12 @@ const PlayersByTeamPage = () => {
   const [deleteTeamInputValue, setDeleteTeamInputValue] = useState<string>('');
   const [deleteTeamLoading, setDeleteTeamLoading] = useState<boolean>(false);
   const [createPlayerModalOpen, setCreatePlayerModalOpen] = useState<boolean>(false);
+  const [editPlayerModalOpen, setEditPlayerModalOpen] = useState<boolean>(false);
+  const [editPlayer, setEditPlayer] = useState<Player | null>(null);
+  const [deletePlayer, setDeletePlayer] = useState<Player | null>(null);
+  const [isDeletePlayerModalOpen, setIsDeletePlayerModalOpen] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [deletePlayerLoading, setDeletePlayerLoading] = useState<boolean>(false);
 
   const teamIdFromUrl = window.location.pathname.split('/')[3];
 
@@ -85,40 +92,122 @@ const PlayersByTeamPage = () => {
     }
   };
 
+  const handleDeletePlayer = async () => {
+    if (!deletePlayer) {
+      return;
+    }
+
+    setDeletePlayerLoading(true);
+
+    const updatedPlayers = players.filter((player) => player.id !== deletePlayer.id);
+
+    try {
+      const teamDoc = await getDoc(doc(db, CollectionEnum.TEAMS, teamIdFromUrl));
+      const teamData = withDocumentIdOnObject<Team>(teamDoc);
+
+      if (teamData) {
+        const updatedTeam = {
+          ...teamData,
+          players: updatedPlayers,
+        };
+
+        await updateDoc(doc(db, CollectionEnum.TEAMS, teamIdFromUrl), updatedTeam);
+      }
+      setIsDeletePlayerModalOpen(false);
+      setDeletePlayer(null);
+    } catch (error) {
+      errorNotify('Något gick fel');
+    } finally {
+      setDeletePlayerLoading(false);
+      fetchTeamById();
+    }
+  };
+
+  const getPlayerPictureUrl = (player: Player) => {
+    if (player.externalPictureUrl) {
+      return player.externalPictureUrl;
+    }
+    return player.picture ?? '';
+  };
+
   const getPlayer = (player: Player) => (
-    <PlayerItem key={player.id}>
+    <PlayerItem key={player.id} showHoverEffect={!isEditMode}>
       <PlayerInfoContainer>
+        <PlayerPositionTag bgColor={getPlayerPositionColor((player?.position.general ?? '') as GeneralPositionEnum)}>
+          <NormalTypography variant="xs" color={theme.colors.white}>{player?.position.exact ?? '?'}</NormalTypography>
+        </PlayerPositionTag>
         <AvatarContainer>
-          {player.picture && (
-          <Avatar
-            src={player.picture}
-            alt={player.name}
-            size={AvatarSize.M}
-            objectFit="cover"
-            showBorder
-          />
+          {(player.picture || player.externalPictureUrl) && (
+            <Avatar
+              src={getPlayerPictureUrl(player)}
+              alt={player.name}
+              size={AvatarSize.M}
+              objectFit="cover"
+              showBorder
+              customBorderWidth={1}
+              backgroundColor={theme.colors.silverLight}
+            />
           )}
           <NationAvatarContainer>
             {player.country && (
-            <NationAvatar
-              flagUrl={getFlagUrlByCountryName(player.country)}
-              nationName={player.country as string}
-              size={AvatarSize.XS}
-            />
+              <NationAvatar
+                flagUrl={getFlagUrlByCountryName(player.country)}
+                nationName={player.country as string}
+                size={AvatarSize.XS}
+              />
             )}
           </NationAvatarContainer>
         </AvatarContainer>
         <NormalTypography variant="m">{player.name}</NormalTypography>
         <NormalTypography variant="s" color={theme.colors.silverDark}>{`#${player.number}`}</NormalTypography>
       </PlayerInfoContainer>
+      {isEditMode && (
+        <Section gap="xxs" fitContent flexDirection="row">
+          <IconButton
+            icon={<PencilSimple size={20} />}
+            colors={{ normal: theme.colors.textDefault }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditPlayer(player);
+              setEditPlayerModalOpen(true);
+            }}
+          />
+          <IconButton
+            icon={<Trash size={20} />}
+            colors={{ normal: theme.colors.red }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeletePlayer(player);
+              setIsDeletePlayerModalOpen(true);
+            }}
+          />
+        </Section>
+      )}
     </PlayerItem>
+  );
+
+  const getPlayersByPosition = (players: Array<Player>, title: string) => (
+    <PlayersByPositionContainer>
+      <PositionHeading>
+        <HeadingsTypography variant="h5">{title}</HeadingsTypography>
+        <NormalTypography variant="s" color={theme.colors.textLight}>{`(${players.length} st)`}</NormalTypography>
+      </PositionHeading>
+      {players.length > 0 ? players.map((player) => getPlayer(player)) : (
+        <NormalTypography variant="m" color={theme.colors.textLight}>-</NormalTypography>
+      )}
+    </PlayersByPositionContainer>
   );
 
   return (
     <>
       <PageContent>
         <Header>
-          <HeadingsTypography variant="h2" as="h1">{team?.name}</HeadingsTypography>
+          <TeamNameAndLogo>
+            <HeadingsTypography variant="h2" as="h1">{team?.name}</HeadingsTypography>
+            <LogoContainer>
+              {team?.logoUrl && <TeamLogo src={team?.logoUrl} alt={team?.name} />}
+            </LogoContainer>
+          </TeamNameAndLogo>
           <IconButton
             icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
             colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
@@ -146,56 +235,44 @@ const PlayersByTeamPage = () => {
         <Divider />
         <Header>
           <HeadingsTypography variant="h3">Spelare</HeadingsTypography>
-          <Button
-            size="m"
-            icon={<Plus size={20} weight="bold" color={theme.colors.white} />}
-            variant="primary"
-            onClick={() => setCreatePlayerModalOpen(true)}
-          >
-            Lägg till spelare
-          </Button>
+          <Section gap="xs" fitContent flexDirection="row">
+            {isEditMode ? (
+              <Button
+                size="m"
+                icon={<CheckCircle size={20} weight="bold" color={theme.colors.white} />}
+                variant="primary"
+                onClick={() => setIsEditMode(false)}
+              >
+                Slutför
+              </Button>
+            ) : (
+              <Button
+                size="m"
+                icon={<PencilSimple size={20} weight="bold" color={theme.colors.primary} />}
+                variant="secondary"
+                onClick={() => setIsEditMode(true)}
+              >
+                Redigera
+              </Button>
+            )}
+            <Button
+              size="m"
+              icon={<Plus size={20} weight="bold" color={theme.colors.white} />}
+              variant="primary"
+              onClick={() => setCreatePlayerModalOpen(true)}
+              disabled={isEditMode}
+            >
+              Lägg till spelare
+            </Button>
+          </Section>
         </Header>
         {players.length > 0 ? (
-          players.map((player) => (
-            <PlayersContainer key={player.id}>
-              <PlayersByPositionContainer>
-                <PositionHeading>
-                  <HeadingsTypography variant="h5">Målvakter</HeadingsTypography>
-                  {goalKeepers.length > 0 && (
-                    <NormalTypography variant="s" color={theme.colors.textLight}>{`(${goalKeepers.length} st)`}</NormalTypography>
-                  )}
-                </PositionHeading>
-                {goalKeepers.length > 0 ? goalKeepers.map((player) => getPlayer(player)) : <NormalTypography variant="m" color={theme.colors.textLight}>-</NormalTypography>}
-              </PlayersByPositionContainer>
-              <PlayersByPositionContainer>
-                <PositionHeading>
-                  <HeadingsTypography variant="h5">Försvarare</HeadingsTypography>
-                  {goalKeepers.length > 0 && (
-                    <NormalTypography variant="s" color={theme.colors.textLight}>{`(${defenders.length} st)`}</NormalTypography>
-                  )}
-                </PositionHeading>
-                {defenders.length > 0 ? defenders.map((player) => getPlayer(player)) : <NormalTypography variant="m" color={theme.colors.textLight}>-</NormalTypography>}
-              </PlayersByPositionContainer>
-              <PlayersByPositionContainer>
-                <PositionHeading>
-                  <HeadingsTypography variant="h5">Mittfältare</HeadingsTypography>
-                  {goalKeepers.length > 0 && (
-                    <NormalTypography variant="s" color={theme.colors.textLight}>{`(${midfielders.length} st)`}</NormalTypography>
-                  )}
-                </PositionHeading>
-                {midfielders.length > 0 ? midfielders.map((player) => getPlayer(player)) : <NormalTypography variant="m" color={theme.colors.textLight}>-</NormalTypography>}
-              </PlayersByPositionContainer>
-              <PlayersByPositionContainer>
-                <PositionHeading>
-                  <HeadingsTypography variant="h5">Anfallare</HeadingsTypography>
-                  {goalKeepers.length > 0 && (
-                  <NormalTypography variant="s" color={theme.colors.textLight}>{`(${forwards.length} st)`}</NormalTypography>
-                  )}
-                </PositionHeading>
-                {forwards.length > 0 ? forwards.map((player) => getPlayer(player)) : <NormalTypography variant="m" color={theme.colors.textLight}>-</NormalTypography>}
-              </PlayersByPositionContainer>
-            </PlayersContainer>
-          ))
+          <PlayersContainer>
+            {getPlayersByPosition(goalKeepers, 'Målvakter')}
+            {getPlayersByPosition(defenders, 'Försvarare')}
+            {getPlayersByPosition(midfielders, 'Mittfältare')}
+            {getPlayersByPosition(forwards, 'Anfallare')}
+          </PlayersContainer>
         ) : (
           <NormalTypography variant="m" color={theme.colors.textLight}>Inga spelare</NormalTypography>
         )}
@@ -253,6 +330,49 @@ const PlayersByTeamPage = () => {
           refetchPlayers={fetchTeamById}
         />
       )}
+      {editPlayerModalOpen && (
+        <EditPlayerModal
+          onClose={() => setEditPlayerModalOpen(false)}
+          teamId={teamIdFromUrl}
+          refetchPlayers={fetchTeamById}
+          player={editPlayer!}
+        />
+      )}
+      {isDeletePlayerModalOpen && (
+        <Modal
+          title={`Radera ${deletePlayer?.name}`}
+          onClose={() => setIsDeletePlayerModalOpen(false)}
+          size="s"
+        >
+          <Section gap="m">
+            <NormalTypography variant="m">
+              Vill du radera spelaren permanent? Detta kan ej ångras!
+            </NormalTypography>
+            <Section flexDirection="row" gap="xs" alignItems="center">
+              <Button
+                onClick={() => setIsDeletePlayerModalOpen(false)}
+                variant="secondary"
+                fullWidth
+                color="red"
+                textColor={theme.colors.red}
+              >
+                Avbryt
+              </Button>
+              <Button
+                onClick={handleDeletePlayer}
+                variant="primary"
+                fullWidth
+                color="red"
+                icon={<Trash size={20} color="white" weight="fill" />}
+                loading={deletePlayerLoading}
+                disabled={deletePlayerLoading}
+              >
+                {`Radera ${deletePlayer?.name}`}
+              </Button>
+            </Section>
+          </Section>
+        </Modal>
+      )}
       <RootToast />
     </>
   );
@@ -273,15 +393,34 @@ const Header = styled.div`
   position: relative;
 `;
 
+const TeamNameAndLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+`;
+
+const TeamLogo = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
 const PlayersContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
 `;
 
-const PlayerItem = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 110px 110px 110px 110px 96px;
+const PlayerItem = styled.div<{ showHoverEffect: boolean }>`
+  display: flex;
   align-items: center;
   gap: ${theme.spacing.xl};
   padding: 2px ${theme.spacing.xs} 2px ${theme.spacing.xxs};
@@ -294,10 +433,12 @@ const PlayerItem = styled.div`
   cursor: pointer;
   transition: all 0.15s ease;
 
-  &:hover {
-    background-color: ${theme.colors.primaryFade};
-    border-color: ${theme.colors.primaryLighter};
-  }
+  ${({ showHoverEffect }) => showHoverEffect && css`
+    &:hover {
+      background-color: ${theme.colors.primaryFade};
+      border-color: ${theme.colors.primaryLighter};
+    }
+  `}
 `;
 
 const PlayerInfoContainer = styled.div`
@@ -306,7 +447,9 @@ const PlayerInfoContainer = styled.div`
   gap: ${theme.spacing.xxs};
   width: 100%;
   box-sizing: border-box;
-`;
+  flex: 1;
+  padding-left: ${theme.spacing.xxs};
+  `;
 
 const AvatarContainer = styled.div`
   height: fit-content;
@@ -315,6 +458,7 @@ const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: ${theme.spacing.xxxs};
 `;
 
 const NationAvatarContainer = styled.div`
@@ -332,7 +476,16 @@ const PositionHeading = styled.div`
 const PlayersByPositionContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.xxs};
+`;
+
+const PlayerPositionTag = styled.div<{ bgColor: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
+  border-radius: ${theme.borderRadius.l};
+  background-color: ${({ bgColor }) => bgColor};
 `;
 
 export default PlayersByTeamPage;

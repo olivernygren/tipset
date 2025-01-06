@@ -148,6 +148,7 @@ const StyledHeader = styled.header`
   width: 100vw;
   height: 80px;
   box-sizing: border-box;
+  position: sticky;
 
   @media ${devices.laptop} {
     padding: 0 ${theme.spacing.xl};

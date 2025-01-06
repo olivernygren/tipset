@@ -102,6 +102,7 @@ export interface Player {
   birthDate?: string;
   country: CountryEnum;
   picture?: string;
+  externalPictureUrl?: string;
   isInjured?: boolean;
   mayBeInjured?: boolean;
   isSuspended?: boolean;

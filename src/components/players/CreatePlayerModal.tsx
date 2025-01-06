@@ -31,13 +31,14 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
   const [newPlayerGeneralPosition, setNewPlayerGeneralPosition] = useState<GeneralPositionEnum>(GeneralPositionEnum.GK);
   const [newPlayerSpecificPosition, setNewPlayerSpecificPosition] = useState<ExactPositionEnum>(ExactPositionEnum.GK);
   const [newPlayerCustomId, setNewPlayerCustomId] = useState<string>('');
-  const [newPlayerImageTitle, setNewPlayerImageTitle] = useState<string>('');
+  const [newPlayerImageFilePath, setNewPlayerImageFilePath] = useState<string>('');
+  const [newPlayerExternalPictureURL, setNewPlayerExternalPictureURL] = useState<string>('');
   const [newPlayerCountry, setNewPlayerCountry] = useState<string>('');
   const [newPlayerBirthDate, setNewPlayerBirthDate] = useState<Date>(new Date());
   const [newPlayerNumber, setNewPlayerNumber] = useState<number>(1);
   const [createPlayerLoading, setCreatePlayerLoading] = useState<boolean>(false);
 
-  const isValid = newPlayerName && newPlayerImageTitle && newPlayerCountry;
+  const isValid = newPlayerName && (newPlayerImageFilePath || newPlayerExternalPictureURL) && newPlayerCountry;
 
   const handleCreatePlayer = async () => {
     setCreatePlayerLoading(true);
@@ -49,10 +50,11 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
         general: newPlayerGeneralPosition,
         exact: newPlayerSpecificPosition,
       },
-      picture: `/images/players/${newPlayerImageTitle}`,
       country: newPlayerCountry as CountryEnum,
+      ...(newPlayerImageFilePath && { picture: `/images/players/${newPlayerImageFilePath}` }),
       ...(newPlayerBirthDate && { birthDate: newPlayerBirthDate.toISOString() }),
       ...(newPlayerNumber && { number: newPlayerNumber }),
+      ...(newPlayerExternalPictureURL && { externalPictureUrl: newPlayerExternalPictureURL }),
     };
 
     if (!isValid) {
@@ -88,15 +90,22 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
     setNewPlayerGeneralPosition(GeneralPositionEnum.GK);
     setNewPlayerSpecificPosition(ExactPositionEnum.GK);
     setNewPlayerCustomId('');
-    setNewPlayerImageTitle('');
+    setNewPlayerImageFilePath('');
     setNewPlayerCountry('');
     setNewPlayerBirthDate(new Date());
     setNewPlayerNumber(1);
+    setNewPlayerExternalPictureURL('');
+    setCreatePlayerLoading(false);
   };
 
   const handleEditNewPlayerName = (value: string) => {
     setNewPlayerName(value);
-    setNewPlayerImageTitle(`${value.toLowerCase().replace(' ', '-')}.png`);
+    setNewPlayerImageFilePath(`${value.toLowerCase().replace(' ', '-')}.png`);
+  };
+
+  const handleChangeGeneralPosition = (value: string) => {
+    setNewPlayerGeneralPosition(value as GeneralPositionEnum);
+    setNewPlayerSpecificPosition(getExactPositionOptions(value as GeneralPositionEnum)[0]);
   };
 
   return (
@@ -118,7 +127,7 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
             <EmphasisTypography variant="s">Position (generell)</EmphasisTypography>
             <Select
               value={newPlayerGeneralPosition}
-              onChange={(value) => setNewPlayerGeneralPosition(value as GeneralPositionEnum)}
+              onChange={(value) => handleChangeGeneralPosition(value as GeneralPositionEnum)}
               options={Object.values(GeneralPositionEnum).map((position) => ({ value: position, label: position }))}
               fullWidth
             />
@@ -156,12 +165,20 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
             fullWidth
           />
         </Section>
-        <Input
-          label="Filnamn för bild"
-          value={newPlayerImageTitle}
-          onChange={(e) => setNewPlayerImageTitle(e.currentTarget.value)}
-          fullWidth
-        />
+        <Section flexDirection="row" gap="s" alignItems="center">
+          <Input
+            label="Filnamn lokal bild"
+            value={newPlayerImageFilePath}
+            onChange={(e) => setNewPlayerImageFilePath(e.currentTarget.value)}
+            fullWidth
+          />
+          <Input
+            label="Extern bild-URL"
+            value={newPlayerExternalPictureURL}
+            onChange={(e) => setNewPlayerExternalPictureURL(e.currentTarget.value)}
+            fullWidth
+          />
+        </Section>
         <Input
           label="Custom ID (valfritt)"
           value={newPlayerCustomId}

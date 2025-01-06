@@ -199,15 +199,12 @@ const GamePredictor = ({
               clubName={displayName}
               logoUrl={logoUrl}
               size={isMobile ? AvatarSize.L : AvatarSize.XL}
-              // showBorder={hasPredicted}
-              // isDarkMode={hasPredicted}
             />
           ) : (
             <NationAvatar
               nationName={name}
               flagUrl={logoUrl}
               size={isMobile ? AvatarSize.L : AvatarSize.XL}
-              // isDarkMode={hasPredicted}
             />
           )}
           <TeamName variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault} align="center">

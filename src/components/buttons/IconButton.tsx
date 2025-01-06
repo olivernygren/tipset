@@ -5,7 +5,7 @@ import { theme } from '../../theme';
 
 interface ButtonProps {
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick: (event?: any) => void;
   backgroundColor?: string;
   disabled?: boolean;
   colors: {
