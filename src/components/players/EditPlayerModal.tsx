@@ -41,7 +41,7 @@ const EditPlayerModal = ({
 
   const [editPlayerLoading, setEditPlayerLoading] = useState<boolean>(false);
 
-  const isValid = playerName && (playerImageFilePath || playerExternalPictureURL) && playerCountry;
+  const isValid = playerName && playerCountry;
 
   const handleUpdatePlayer = async () => {
     setEditPlayerLoading(true);
@@ -127,7 +127,7 @@ const EditPlayerModal = ({
         borderRadius={theme.borderRadius.m}
       >
         <Avatar
-          src={player.externalPictureUrl ?? player.picture ?? ''}
+          src={player.externalPictureUrl ?? player.picture ?? '/images/players/placeholder-fancy.png'}
           alt={player.name}
           size={AvatarSize.M}
           showBorder

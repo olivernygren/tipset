@@ -38,7 +38,7 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
   const [newPlayerNumber, setNewPlayerNumber] = useState<number>(1);
   const [createPlayerLoading, setCreatePlayerLoading] = useState<boolean>(false);
 
-  const isValid = newPlayerName && (newPlayerImageFilePath || newPlayerExternalPictureURL) && newPlayerCountry;
+  const isValid = newPlayerName && newPlayerCountry;
 
   const handleCreatePlayer = async () => {
     setCreatePlayerLoading(true);

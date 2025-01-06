@@ -516,7 +516,7 @@ export const Teams = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg',
       stadium: 'Mestalla',
       country: CountryEnum.SPAIN,
-      teamPrimaryColor: '#ee3523',
+      teamPrimaryColor: '#ee7836',
     },
     {
       name: 'Real Sociedad',
@@ -1489,6 +1489,18 @@ export const Teams = {
     {
       name: 'Uruguay',
       logoUrl: 'https://cdn.countryflags.com/thumbs/uruguay/flag-square-500.png',
+    },
+    {
+      name: 'Island',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/iceland/flag-square-500.png',
+    },
+    {
+      name: 'Elfenbenskusten',
+      logoUrl: 'https://www.countryflags.com/wp-content/uploads/cote-d-ivoire-flag-png-large.png',
+    },
+    {
+      name: 'Nigeria',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/nigeria/flag-square-500.png',
     },
   ],
 };

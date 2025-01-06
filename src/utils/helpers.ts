@@ -167,3 +167,36 @@ export const getExactPositionOptions = (generalPosition: GeneralPositionEnum) =>
 };
 
 export const createRandomPlayerId = (): string => Math.random().toString(36).substring(2, 8).toUpperCase();
+
+export const getSortedPlayerByPosition = (players: Array<Player>): Array<Player> => {
+  if (!players) {
+    return [];
+  }
+
+  const goalKeepers = players.filter((player) => player.position.general === GeneralPositionEnum.GK);
+
+  const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
+  const midfielders = players.filter((player) => player.position.general === GeneralPositionEnum.MF);
+  const forwards = players.filter((player) => player.position.general === GeneralPositionEnum.FW);
+
+  const defenderOrder = ['RB', 'CB', 'LB'];
+  const midfielderOrder = ['CDM', 'CM', 'RM', 'CAM', 'LM'];
+  const forwardOrder = ['RW', 'ST', 'LW'];
+
+  const sortByExactPosition = (players: Array<Player>, order: Array<string>): Array<Player> => players.sort((a, b) => {
+    const positionComparison = order.indexOf(a.position.exact) - order.indexOf(b.position.exact);
+    if (positionComparison !== 0) {
+      return positionComparison;
+    }
+    if (a.number !== undefined && b.number !== undefined) {
+      return a.number - b.number;
+    }
+    return 0;
+  });
+
+  const sortedDefenders = sortByExactPosition(defenders, defenderOrder);
+  const sortedMidfielders = sortByExactPosition(midfielders, midfielderOrder);
+  const sortedForwards = sortByExactPosition(forwards, forwardOrder);
+
+  return [...goalKeepers, ...sortedDefenders, ...sortedMidfielders, ...sortedForwards];
+};

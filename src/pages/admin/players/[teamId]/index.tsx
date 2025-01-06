@@ -1,5 +1,5 @@
 import {
-  deleteDoc, doc, getDoc, updateDoc,
+  doc, getDoc, updateDoc,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -9,7 +9,7 @@ import {
 } from '@phosphor-icons/react';
 import { db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
-import { getGeneralPositionShorthand, getPlayerPositionColor, withDocumentIdOnObject } from '../../../../utils/helpers';
+import { getPlayerPositionColor, getSortedPlayerByPosition, withDocumentIdOnObject } from '../../../../utils/helpers';
 import { getFlagUrlByCountryName, Team } from '../../../../utils/Team';
 import { theme } from '../../../../theme';
 import { HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
@@ -20,7 +20,6 @@ import ContextMenuOption from '../../../../components/menu/ContextMenuOption';
 import IconButton from '../../../../components/buttons/IconButton';
 import Modal from '../../../../components/modal/Modal';
 import { Section } from '../../../../components/section/Section';
-import Input from '../../../../components/input/Input';
 import { errorNotify } from '../../../../utils/toast/toastHelpers';
 import RootToast from '../../../../components/toast/RootToast';
 import { Divider } from '../../../../components/Divider';
@@ -28,6 +27,8 @@ import CreatePlayerModal from '../../../../components/players/CreatePlayerModal'
 import Avatar, { AvatarSize } from '../../../../components/avatar/Avatar';
 import NationAvatar from '../../../../components/avatar/NationAvatar';
 import EditPlayerModal from '../../../../components/players/EditPlayerModal';
+import DeleteTeamModal from '../../../../components/teams/DeleteTeamModal';
+import EditTeamModal from '../../../../components/teams/EditTeamModal';
 
 const PlayersByTeamPage = () => {
   const [team, setTeam] = useState<Team | null>(null);
@@ -40,8 +41,7 @@ const PlayersByTeamPage = () => {
 
   const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
   const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState<boolean>(false);
-  const [deleteTeamInputValue, setDeleteTeamInputValue] = useState<string>('');
-  const [deleteTeamLoading, setDeleteTeamLoading] = useState<boolean>(false);
+  const [editTeamModalOpen, setEditTeamModalOpen] = useState<boolean>(false);
   const [createPlayerModalOpen, setCreatePlayerModalOpen] = useState<boolean>(false);
   const [editPlayerModalOpen, setEditPlayerModalOpen] = useState<boolean>(false);
   const [editPlayer, setEditPlayer] = useState<Player | null>(null);
@@ -76,19 +76,6 @@ const PlayersByTeamPage = () => {
       if (teamData.players) {
         setPlayers(teamData.players);
       }
-    }
-  };
-
-  const handleDeleteTeam = async () => {
-    setDeleteTeamLoading(true);
-
-    try {
-      await deleteDoc(doc(db, CollectionEnum.TEAMS, teamIdFromUrl));
-      setDeleteTeamModalOpen(false);
-    } catch (e) {
-      errorNotify('Något gick fel, försök igen senare');
-    } finally {
-      setDeleteTeamLoading(false);
     }
   };
 
@@ -127,7 +114,7 @@ const PlayersByTeamPage = () => {
     if (player.externalPictureUrl) {
       return player.externalPictureUrl;
     }
-    return player.picture ?? '';
+    return '/images/placeholder-fancy.png';
   };
 
   const getPlayer = (player: Player) => (
@@ -137,17 +124,15 @@ const PlayersByTeamPage = () => {
           <NormalTypography variant="xs" color={theme.colors.white}>{player?.position.exact ?? '?'}</NormalTypography>
         </PlayerPositionTag>
         <AvatarContainer>
-          {(player.picture || player.externalPictureUrl) && (
-            <Avatar
-              src={getPlayerPictureUrl(player)}
-              alt={player.name}
-              size={AvatarSize.M}
-              objectFit="cover"
-              showBorder
-              customBorderWidth={1}
-              backgroundColor={theme.colors.silverLight}
-            />
-          )}
+          <Avatar
+            src={getPlayerPictureUrl(player)}
+            alt={player.name}
+            size={AvatarSize.M}
+            objectFit="cover"
+            showBorder
+            customBorderWidth={1}
+            backgroundColor={theme.colors.silverLight}
+          />
           <NationAvatarContainer>
             {player.country && (
               <NationAvatar
@@ -219,14 +204,20 @@ const PlayersByTeamPage = () => {
             <ContextMenu positionX="right" positionY="bottom" offsetY={94 + 12} offsetX={0}>
               <ContextMenuOption
                 icon={<PencilSimple size={24} color={theme.colors.textDefault} />}
-                onClick={() => setDeleteTeamModalOpen(true)}
-                label="Redigera"
+                onClick={() => {
+                  setEditTeamModalOpen(true);
+                  setContextMenuOpen(false);
+                }}
+                label="Redigera lag"
                 color={theme.colors.textDefault}
               />
               <ContextMenuOption
                 icon={<Trash size={24} color={theme.colors.red} />}
-                onClick={() => setDeleteTeamModalOpen(true)}
-                label="Radera"
+                onClick={() => {
+                  setDeleteTeamModalOpen(true);
+                  setContextMenuOpen(false);
+                }}
+                label="Radera lag"
                 color={theme.colors.red}
               />
             </ContextMenu>
@@ -234,26 +225,27 @@ const PlayersByTeamPage = () => {
         </Header>
         <Divider />
         <Header>
-          <HeadingsTypography variant="h3">Spelare</HeadingsTypography>
           <Section gap="xs" fitContent flexDirection="row">
-            {isEditMode ? (
-              <Button
-                size="m"
-                icon={<CheckCircle size={20} weight="bold" color={theme.colors.white} />}
-                variant="primary"
-                onClick={() => setIsEditMode(false)}
-              >
-                Slutför
-              </Button>
-            ) : (
-              <Button
-                size="m"
-                icon={<PencilSimple size={20} weight="bold" color={theme.colors.primary} />}
-                variant="secondary"
-                onClick={() => setIsEditMode(true)}
-              >
-                Redigera
-              </Button>
+            {players.length > 0 && (
+              isEditMode ? (
+                <Button
+                  size="m"
+                  icon={<CheckCircle size={20} weight="bold" color={theme.colors.white} />}
+                  variant="primary"
+                  onClick={() => setIsEditMode(false)}
+                >
+                  Slutför
+                </Button>
+              ) : (
+                <Button
+                  size="m"
+                  icon={<PencilSimple size={20} weight="bold" color={theme.colors.primary} />}
+                  variant="secondary"
+                  onClick={() => setIsEditMode(true)}
+                >
+                  Redigera
+                </Button>
+              )
             )}
             <Button
               size="m"
@@ -269,59 +261,26 @@ const PlayersByTeamPage = () => {
         {players.length > 0 ? (
           <PlayersContainer>
             {getPlayersByPosition(goalKeepers, 'Målvakter')}
-            {getPlayersByPosition(defenders, 'Försvarare')}
-            {getPlayersByPosition(midfielders, 'Mittfältare')}
-            {getPlayersByPosition(forwards, 'Anfallare')}
+            {getPlayersByPosition(getSortedPlayerByPosition(defenders), 'Försvarare')}
+            {getPlayersByPosition(getSortedPlayerByPosition(midfielders), 'Mittfältare')}
+            {getPlayersByPosition(getSortedPlayerByPosition(forwards), 'Anfallare')}
           </PlayersContainer>
         ) : (
           <NormalTypography variant="m" color={theme.colors.textLight}>Inga spelare</NormalTypography>
         )}
       </PageContent>
       {deleteTeamModalOpen && (
-        <Modal
-          title="Radera lag"
+        <DeleteTeamModal
           onClose={() => setDeleteTeamModalOpen(false)}
-          size="s"
-        >
-          <Section gap="m">
-            <Section gap="xs">
-              <NormalTypography variant="m">
-                Vill du radera laget permanent? Detta kan ej ångras!
-              </NormalTypography>
-              <NormalTypography variant="m">
-                Fyll i lagets namn för att bekräfta att du vill radera den.
-              </NormalTypography>
-            </Section>
-            <Input
-              value={deleteTeamInputValue}
-              onChange={(e) => setDeleteTeamInputValue(e.target.value)}
-              placeholder={team?.name}
-              fullWidth
-            />
-            <Section flexDirection="row" gap="xs" alignItems="center">
-              <Button
-                onClick={() => setDeleteTeamModalOpen(false)}
-                variant="secondary"
-                fullWidth
-                color="red"
-                textColor={theme.colors.red}
-              >
-                Avbryt
-              </Button>
-              <Button
-                onClick={handleDeleteTeam}
-                variant="primary"
-                fullWidth
-                color="red"
-                disabled={deleteTeamInputValue !== team?.name}
-                icon={<Trash size={20} color="white" weight="fill" />}
-                loading={deleteTeamLoading}
-              >
-                Radera lag
-              </Button>
-            </Section>
-          </Section>
-        </Modal>
+          team={team}
+        />
+      )}
+      {editTeamModalOpen && (
+        <EditTeamModal
+          onClose={() => setEditTeamModalOpen(false)}
+          team={team}
+          refetchTeam={fetchTeamById}
+        />
       )}
       {createPlayerModalOpen && (
         <CreatePlayerModal
