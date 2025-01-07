@@ -37,13 +37,25 @@ const SelectTournamentModal = ({
   const originalTournaments = Object.values(TournamentsEnum);
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  console.log(teamType);
-
   const [tournaments, setTournaments] = useState(originalTournaments);
   const [selectedTournament, setSelectedTournament] = useState<string | undefined>(defaultValue);
   const [searchValue, setSearchValue] = useState('');
 
+  const getNationalTeamTournaments = () => originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.WORLD_CUP)
+      || tournament.includes(TournamentsEnum.WORLD_CUP_QUALIFIERS)
+      || tournament.includes(TournamentsEnum.EUROS)
+      || tournament.includes(TournamentsEnum.EUROS_QUALIFIERS)
+      || tournament.includes(TournamentsEnum.NATIONS_LEAGUE));
+
   const getTournamentsByCountry = (country: TournamentCountryFiltersEnum) => {
+    // if (teamType === TeamType.NATIONS) {
+    //   return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.WORLD_CUP)
+    //   || tournament.includes(TournamentsEnum.WORLD_CUP_QUALIFIERS)
+    //   || tournament.includes(TournamentsEnum.EUROS)
+    //   || tournament.includes(TournamentsEnum.EUROS_QUALIFIERS)
+    //   || tournament.includes(TournamentsEnum.NATIONS_LEAGUE));
+    // }
+
     switch (country) {
       case TournamentCountryFiltersEnum.ENGLAND:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.PREMIER_LEAGUE) || tournament.includes(TournamentsEnum.FA_CUP) || tournament.includes(TournamentsEnum.CARABAO_CUP) || tournament.includes(TournamentsEnum.CHAMPIONSHIP));
@@ -112,13 +124,24 @@ const SelectTournamentModal = ({
         return '/images/tournaments/conference-league.png';
       case TournamentsEnum.ALLSVENSKAN:
         return '/images/tournaments/allsvenskan.webp';
+      case TournamentsEnum.NATIONS_LEAGUE:
+        return '/images/tournaments/nations-league.avif';
+      case TournamentsEnum.WORLD_CUP:
+      case TournamentsEnum.WORLD_CUP_QUALIFIERS:
+        return '/images/tournaments/world-cup.jpg';
+      case TournamentsEnum.EUROS:
+      case TournamentsEnum.EUROS_QUALIFIERS:
+        return '/images/tournaments/euros.webp';
       default:
         return '';
     }
   };
 
   const getTournament = (tournament: string) => (
-    <TournamentItem isSelected={selectedTournament === tournament} onClick={() => setSelectedTournament(tournament)}>
+    <TournamentItem
+      isSelected={selectedTournament === tournament}
+      onClick={() => setSelectedTournament(tournament)}
+    >
       <TournamentInfo>
         <Avatar
           src={getTournamentIcon(tournament)}
@@ -182,7 +205,7 @@ const SelectTournamentModal = ({
       <ModalContent>
         <HeadingsTypography variant="h4">Turneringar</HeadingsTypography>
         <AllTournaments>
-          {searchValue.length < 2 ? Object.values(TournamentCountryFiltersEnum).map((country) => (
+          {teamType === TeamType.CLUBS && searchValue.length < 2 && Object.values(TournamentCountryFiltersEnum).map((country) => (
             <CountrysTournaments>
               <EmphasisTypography variant="m">
                 {country}
@@ -191,7 +214,13 @@ const SelectTournamentModal = ({
                 {getTournamentsByCountry(country).map((tournament) => getTournament(tournament))}
               </TournamentsList>
             </CountrysTournaments>
-          )) : (
+          ))}
+          {teamType === TeamType.NATIONS && searchValue.length < 2 && (
+          <TournamentsList>
+            {getNationalTeamTournaments().map((tournament) => getTournament(tournament))}
+          </TournamentsList>
+          )}
+          {searchValue.length > 1 && (
             <TournamentsList>
               {tournaments.map((tournament) => getTournament(tournament))}
             </TournamentsList>

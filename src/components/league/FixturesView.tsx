@@ -14,20 +14,15 @@ import { Divider } from '../Divider';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { useUser } from '../../context/UserContext';
-import { Team } from '../../utils/Team';
 import {
-  Fixture, FixtureInput, PredictionInput, PredictionStatus, TeamType,
+  Fixture, PredictionInput, PredictionStatus,
 } from '../../utils/Fixture';
 import {
   getLastGameWeek,
-  getPredictionOutcome, getPredictionStatus, getUserPreviousGameWeekPrecitedGoalScorer, hasInvalidTeamName, withDocumentIdOnObject,
+  getPredictionOutcome, getPredictionStatus, getUserPreviousGameWeekPrecitedGoalScorer, withDocumentIdOnObject,
 } from '../../utils/helpers';
-import Input from '../input/Input';
-import Select from '../input/Select';
 import CustomDatePicker from '../input/DatePicker';
-import Checkbox from '../input/Checkbox';
 import GamePredictor from '../game/GamePredictor';
-import { generateRandomID } from '../../utils/firebaseHelpers';
 import { Player } from '../../utils/Players';
 import IconButton from '../buttons/IconButton';
 import CreateAndCorrectFixturePreview from '../game/CreateAndCorrectFixturePreview';
@@ -38,14 +33,12 @@ import RootToast from '../toast/RootToast';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
-import SelectImitation from '../input/SelectImitation';
-import SelectTeamModal from '../game/SelectTeamModal';
-import SelectTournamentModal from '../game/SelectTournamentModal';
 import FixtureStatsModal from '../game/FixtureStatsModal';
 import TextButton from '../buttons/TextButton';
 import Modal from '../modal/Modal';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import PredictionsModal from './PredictionsModal';
+import CreateFixtureModal from '../game/CreateFixtureModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -73,8 +66,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [showPredictionsModalFixtureId, setShowPredictionsModalFixtureId] = useState<string | null>(null);
   const [createGameWeekLoading, setCreateGameWeekLoading] = useState<boolean>(false);
   const [endGameWeekLoading, setEndGameWeekLoading] = useState<boolean>(false);
-  const [selectTeamModalOpen, setSelectTeamModalOpen] = useState<'home' | 'away' | null>(null);
-  const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState(false);
   const [oddsBonusModalOpen, setOddsBonusModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
   const [showFixturePredictionsModal, setShowFixturePredictionsModal] = useState<string | null>(null);
@@ -82,33 +73,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
 
-  const [addFixtureViewOpen, setAddFixtureViewOpen] = useState<boolean>(false);
+  const [isCreateFixtureModalOpen, setIsCreateFixtureModalOpen] = useState<boolean>(false);
   const [editGameWeekViewOpen, setEditGameWeekViewOpen] = useState<boolean>(false);
-
-  const [teamType, setTeamType] = useState<TeamType>(TeamType.CLUBS);
-  const [newFixtureHomeTeam, setNewFixtureHomeTeam] = useState<Team | undefined>();
-  const [newFixtureAwayTeam, setNewFixtureAwayTeam] = useState<Team | undefined>();
-  const [newFixtureStadium, setNewFixtureStadium] = useState<string>('');
-  const [newFixtureTournament, setNewFixtureTournament] = useState<string>('');
-  const [newFixtureKickoffDateTime, setNewFixtureKickoffDateTime] = useState<Date>(new Date());
-  const [newFixtureShouldPredictGoalScorer, setNewFixtureShouldPredictGoalScorer] = useState<boolean>(false);
-  const [newFixtureGoalScorerTeam, setNewFixtureGoalScorerTeam] = useState<Array<string> | null>(null);
-  const [newFixtureNickname, setNewFixtureNickname] = useState<string>('');
-  const [newFixtureIncludeStats, setNewFixtureIncludeStats] = useState<boolean>(true);
+  const [newFixtureToEdit, setNewFixtureToEdit] = useState<Fixture | null>(null);
 
   const [predictionStatuses, setPredictionStatuses] = useState<Array<{ fixtureId: string, status: PredictionStatus }>>([]);
   const [gameWeekPredictionStatus, setGameWeekPredictionStatus] = useState<string>('');
   const [predictionLoading, setPredictionLoading] = useState<string | null>(null);
-
-  const isAddFixtureButtonDisabled = !newFixtureHomeTeam
-  || hasInvalidTeamName(newFixtureHomeTeam?.name)
-  || !newFixtureAwayTeam
-  || hasInvalidTeamName(newFixtureAwayTeam?.name)
-  || newFixtureHomeTeam === newFixtureAwayTeam
-  || !newFixtureStadium
-  || !newFixtureTournament
-  || !newFixtureKickoffDateTime
-  || (newFixtureShouldPredictGoalScorer && (!newFixtureGoalScorerTeam || newFixtureGoalScorerTeam.includes('Välj lag')));
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -229,7 +200,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       refetchLeague();
     } catch (err) {
       setCreateGameWeekError('Något gick fel, försök igen senare');
-      console.log(err);
     }
 
     setCreateGameWeekLoading(false);
@@ -238,84 +208,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const getNewGameWeekRoundNumber = () => {
     if (!league || !league.gameWeeks) return 1;
     return league.gameWeeks.length + 1;
-  };
-
-  const handleSelectTeam = (team: Team | undefined, isHomeTeam: boolean) => {
-    if (!team) return;
-
-    if (isHomeTeam) {
-      setNewFixtureHomeTeam(team);
-      setNewFixtureStadium(team.stadium ?? '');
-    } else {
-      setNewFixtureAwayTeam(team);
-    }
-  };
-
-  const handleUpdateKickoffTime = (date: Date) => {
-    setNewFixtureKickoffDateTime(date);
-  };
-
-  const handleResetNewFixture = () => {
-    setNewFixtureHomeTeam(undefined);
-    setNewFixtureAwayTeam(undefined);
-    setNewFixtureStadium('');
-    setNewFixtureTournament('');
-    setNewFixtureKickoffDateTime(new Date());
-    setNewFixtureShouldPredictGoalScorer(false);
-    setNewFixtureGoalScorerTeam(null);
-    setNewFixtureNickname('');
-  };
-
-  const handleSetGoalScrorerTeam = (selection: string) => {
-    if (selection === 'Välj lag') {
-      setNewFixtureGoalScorerTeam(null);
-      return;
-    }
-    if (selection === 'Båda lagen') {
-      setNewFixtureGoalScorerTeam([newFixtureHomeTeam?.name!, newFixtureAwayTeam?.name!]);
-      return;
-    }
-    setNewFixtureGoalScorerTeam([selection]);
-  };
-
-  const handleAddFixtureToGameWeek = () => {
-    if (!newFixtureHomeTeam || !newFixtureAwayTeam || league.hasEnded) return;
-
-    if (newGameWeekFixtures.length === 24) {
-      errorNotify('Max antal matcher per omgång är 24');
-      return;
-    }
-
-    const alreadyExistingFixture = newGameWeekFixtures.find((f) => f.homeTeam.name === newFixtureHomeTeam.name && f.awayTeam.name === newFixtureAwayTeam.name);
-
-    const newFixtureInput: FixtureInput = {
-      id: alreadyExistingFixture ? alreadyExistingFixture.id : generateRandomID(),
-      homeTeam: newFixtureHomeTeam,
-      awayTeam: newFixtureAwayTeam,
-      stadium: newFixtureStadium,
-      tournament: newFixtureTournament,
-      kickOffTime: new Date(newFixtureKickoffDateTime).toISOString(),
-      shouldPredictGoalScorer: newFixtureShouldPredictGoalScorer,
-      ...(newFixtureShouldPredictGoalScorer && { goalScorerFromTeam: newFixtureGoalScorerTeam }),
-      ...(newFixtureNickname && { fixtureNickname: newFixtureNickname }),
-      teamType,
-      includeStats: newFixtureIncludeStats,
-    };
-
-    if (alreadyExistingFixture) {
-      const updatedFixtures = newGameWeekFixtures.map((f) => {
-        if (f.id === alreadyExistingFixture.id) {
-          return newFixtureInput;
-        }
-        return f;
-      });
-      setNewGameWeekFixtures(updatedFixtures);
-    } else {
-      setNewGameWeekFixtures([...newGameWeekFixtures, { ...newFixtureInput }]);
-    }
-
-    setAddFixtureViewOpen(false);
-    handleResetNewFixture();
   };
 
   const handleUpdatePredictionScoreline = (fixtureId: string) => {
@@ -381,7 +273,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       refetchLeague();
       setShowCorrectGameWeekContent(false);
     } catch (error) {
-      console.error(error);
+      errorNotify('Något gick fel, försök igen senare');
     }
 
     setEndGameWeekLoading(false);
@@ -452,24 +344,23 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       successNotify('Tips sparades');
       refetchLeague();
     } catch (err) {
-      console.log(err);
       errorNotify('Något gick fel, försök igen senare');
     } finally {
       setPredictionLoading(null);
     }
   };
 
-  const handlePreFillFixtureData = (fixture: Fixture) => {
-    setNewFixtureHomeTeam(fixture.homeTeam);
-    setNewFixtureAwayTeam(fixture.awayTeam);
-    setNewFixtureStadium(fixture.stadium);
-    setNewFixtureTournament(fixture.tournament);
-    setNewFixtureKickoffDateTime(new Date(fixture.kickOffTime));
-    setNewFixtureShouldPredictGoalScorer(Boolean(fixture.shouldPredictGoalScorer));
-    setNewFixtureGoalScorerTeam(fixture.goalScorerFromTeam ? fixture.goalScorerFromTeam : null);
-    setNewFixtureNickname(fixture.fixtureNickname ?? '');
-    setAddFixtureViewOpen(true);
-  };
+  // const handlePreFillFixtureData = (fixture: Fixture) => {
+  //   setNewFixtureHomeTeam(fixture.homeTeam);
+  //   setNewFixtureAwayTeam(fixture.awayTeam);
+  //   setNewFixtureStadium(fixture.stadium);
+  //   setNewFixtureTournament(fixture.tournament);
+  //   setNewFixtureKickoffDateTime(new Date(fixture.kickOffTime));
+  //   setNewFixtureShouldPredictGoalScorer(Boolean(fixture.shouldPredictGoalScorer));
+  //   setNewFixtureGoalScorerTeam(fixture.goalScorerFromTeam ? fixture.goalScorerFromTeam : null);
+  //   setNewFixtureNickname(fixture.fixtureNickname ?? '');
+  //   setAddFixtureViewOpen(true);
+  // };
 
   const getNextGameWeekStartDate = () => {
     if (!upcomingGameWeek) return '';
@@ -553,138 +444,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     return `(${startDateFormatted} - ${endDateFormatted})`;
   };
 
-  const getAddNewFixtureContent = () => (
-    <AddFixtureContainer
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <Section flexDirection="row" gap="xs">
-        <TeamTypeSelectorButton
-          isSelected={teamType === TeamType.CLUBS}
-          onClick={() => {
-            setTeamType(TeamType.CLUBS);
-            handleResetNewFixture();
-          }}
-        >
-          <EmphasisTypography variant="m" color={teamType === TeamType.CLUBS ? theme.colors.primary : theme.colors.silver}>Klubblag</EmphasisTypography>
-        </TeamTypeSelectorButton>
-        <TeamTypeSelectorButton
-          isSelected={teamType === TeamType.NATIONS}
-          onClick={() => {
-            setTeamType(TeamType.NATIONS);
-            handleResetNewFixture();
-          }}
-        >
-          <EmphasisTypography variant="m" color={teamType === TeamType.NATIONS ? theme.colors.primary : theme.colors.silver}>Landslag</EmphasisTypography>
-        </TeamTypeSelectorButton>
-      </Section>
-      <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
-        <Section gap="xxs">
-          <EmphasisTypography variant="s">Hemmalag</EmphasisTypography>
-          <SelectImitation
-            value={newFixtureHomeTeam?.name ?? ''}
-            placeholder="Välj lag"
-            onClick={() => setSelectTeamModalOpen('home')}
-            fullWidth
-          />
-        </Section>
-        {!isMobile && (
-          <VersusTypography>
-            <NormalTypography variant="m">vs</NormalTypography>
-          </VersusTypography>
-        )}
-        <Section gap="xxs">
-          <EmphasisTypography variant="s">Bortalag</EmphasisTypography>
-          <SelectImitation
-            value={newFixtureAwayTeam?.name ?? ''}
-            placeholder="Välj lag"
-            onClick={() => setSelectTeamModalOpen('away')}
-            fullWidth
-          />
-        </Section>
-      </Section>
-      <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
-        <Input
-          label="Arena"
-          value={newFixtureStadium}
-          onChange={(e) => setNewFixtureStadium(e.currentTarget.value)}
-          fullWidth
-        />
-        <Section gap="xxs">
-          <EmphasisTypography variant="s">Turnering</EmphasisTypography>
-          <SelectImitation
-            value={newFixtureTournament}
-            placeholder="Välj turnering"
-            onClick={() => setSelectTournamentModalOpen(true)}
-            fullWidth
-          />
-        </Section>
-        <CustomDatePicker
-          label="Avsparkstid"
-          selectedDate={newFixtureKickoffDateTime}
-          onChange={(date) => handleUpdateKickoffTime(date!)}
-          fullWidth
-          minDate={new Date()}
-        />
-      </Section>
-      <Input
-        label="Smeknamn på match"
-        value={newFixtureNickname}
-        onChange={(e) => setNewFixtureNickname(e.currentTarget.value)}
-      />
-      <Checkbox
-        label="Inkludera statistik"
-        checked={newFixtureIncludeStats}
-        onChange={() => setNewFixtureIncludeStats(!newFixtureIncludeStats)}
-      />
-      <Checkbox
-        label="Ska målskytt i matchen tippas?"
-        checked={newFixtureShouldPredictGoalScorer}
-        onChange={() => setNewFixtureShouldPredictGoalScorer(!newFixtureShouldPredictGoalScorer)}
-      />
-      {newFixtureShouldPredictGoalScorer && newFixtureHomeTeam && newFixtureAwayTeam && (
-        <Section gap="xxs">
-          <EmphasisTypography variant="s">Vilket lag ska målskytten tillhöra?</EmphasisTypography>
-          <Select
-            options={[
-              { value: 'Välj lag', label: 'Välj lag' },
-              { value: newFixtureHomeTeam.name, label: newFixtureHomeTeam.name },
-              { value: newFixtureAwayTeam.name, label: newFixtureAwayTeam.name },
-            ]}
-            value={newFixtureGoalScorerTeam ? newFixtureGoalScorerTeam[0] : 'Välj lag'}
-            onChange={(value) => handleSetGoalScrorerTeam(value)}
-            fullWidth={isMobile}
-          />
-        </Section>
-      )}
-      <Section gap="m">
-        <Section flexDirection="row" alignItems="center" gap="xxs">
-          <Button
-            variant="secondary"
-            size="m"
-            onClick={() => {
-              setAddFixtureViewOpen(false);
-              handleResetNewFixture();
-            }}
-          >
-            Avbryt
-          </Button>
-          <Button
-            size="m"
-            onClick={handleAddFixtureToGameWeek}
-            icon={<PlusCircle size={20} color={theme.colors.white} />}
-            disabled={isAddFixtureButtonDisabled}
-            fullWidth={isMobile}
-          >
-            Lägg till match
-          </Button>
-        </Section>
-      </Section>
-    </AddFixtureContainer>
-  );
-
   const getCreateGameWeekContent = () => (
     <CreateGameWeekSection
       initial={{ opacity: 0, y: -20 }}
@@ -723,7 +482,10 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     fixture={fixture}
                     key={index}
                     hidePredictions
-                    onClick={() => handlePreFillFixtureData(fixture)}
+                    onClick={() => {
+                      setNewFixtureToEdit(fixture);
+                      setIsCreateFixtureModalOpen(true);
+                    }}
                   />
                   <IconButton
                     icon={<XCircle size={24} weight="fill" />}
@@ -734,19 +496,12 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               ))
           )}
         </Section>
-        {addFixtureViewOpen ? (
-          <>
-            {newGameWeekFixtures.length > 0 && <Divider />}
-            {getAddNewFixtureContent()}
-          </>
-        ) : (
-          <CreateFixtureCard onClick={() => setAddFixtureViewOpen(true)}>
-            <PlusCircle size={32} color={theme.colors.textDefault} />
-            <NormalTypography variant="l">Lägg till match</NormalTypography>
-          </CreateFixtureCard>
-        )}
+        <CreateFixtureCard onClick={() => setIsCreateFixtureModalOpen(true)}>
+          <PlusCircle size={32} color={theme.colors.textDefault} />
+          <NormalTypography variant="l">Lägg till match</NormalTypography>
+        </CreateFixtureCard>
       </Section>
-      {!addFixtureViewOpen && (
+      {!isCreateFixtureModalOpen && (
         <>
           <Divider />
           {createGameWeekError && (
@@ -764,7 +519,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             <Button
               variant="primary"
               onClick={handleCreateGameWeek}
-              disabled={addFixtureViewOpen || createGameWeekLoading}
+              disabled={isCreateFixtureModalOpen || createGameWeekLoading}
               loading={createGameWeekLoading}
               fullWidth={isMobile}
             >
@@ -993,21 +748,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         </Section>
       </Section>
       <RootToast />
-      {selectTeamModalOpen && (
-        <SelectTeamModal
-          onClose={() => setSelectTeamModalOpen(null)}
-          onSave={(team) => handleSelectTeam(team, selectTeamModalOpen === 'home')}
-          teamType={teamType}
-          isHomeTeam={selectTeamModalOpen === 'home'}
-          value={selectTeamModalOpen === 'home' ? newFixtureHomeTeam : newFixtureAwayTeam}
-        />
-      )}
-      {selectTournamentModalOpen && (
-        <SelectTournamentModal
-          onClose={() => setSelectTournamentModalOpen(false)}
-          onSave={(tournament) => setNewFixtureTournament(tournament)}
-          teamType={teamType}
-          defaultValue={newFixtureTournament}
+      {isCreateFixtureModalOpen && (
+        <CreateFixtureModal
+          onClose={() => setIsCreateFixtureModalOpen(false)}
+          league={league}
+          allNewGameWeekFixtures={newGameWeekFixtures}
+          onUpdateAllNewGameWeekFixtures={setNewGameWeekFixtures}
+          fixture={newFixtureToEdit}
         />
       )}
       {isStatsModalOpen && (
@@ -1065,33 +812,6 @@ const CreateGameWeekSection = styled(motion.div)`
   box-sizing: border-box;
 `;
 
-const AddFixtureContainer = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.m};
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const TeamTypeSelectorButton = styled.div<{ isSelected: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.s};
-  border: 2px solid ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.silver)};
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-
-  :hover {
-    border-color: ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.primaryLight)};
-
-    ${EmphasisTypography} {
-      color: ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.primaryLight)};
-    }
-  }
-`;
-
 const CreateFixtureCard = styled(motion.div)`
   display: flex;
   align-items: center;
@@ -1104,14 +824,6 @@ const CreateFixtureCard = styled(motion.div)`
   box-sizing: border-box;
   border: 1px dashed ${theme.colors.silver};
   cursor: pointer;
-`;
-
-const VersusTypography = styled.div`
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: end;
 `;
 
 const FixturesGrid = styled.div`

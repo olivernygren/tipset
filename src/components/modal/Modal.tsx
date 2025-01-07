@@ -119,11 +119,11 @@ const ModalContainer = styled.div<{ width: string, mobileBottomSheet?: boolean, 
   display: flex;
   flex-direction: column;
   background-color: ${theme.colors.white};
-  max-height: ${({ mobileFullScreen }) => (mobileFullScreen ? '100vh' : '90vh')};
+  max-height: ${({ mobileFullScreen }) => (mobileFullScreen ? '100dvh' : '90vh')};
   height: fit-content;
   width: ${({ width }) => width};
   border-radius: ${({ mobileBottomSheet, mobileFullScreen }) => getBorderRadius(mobileBottomSheet, mobileFullScreen)};
-  ${({ mobileFullScreen }) => mobileFullScreen && 'height: 100vh;'}
+  ${({ mobileFullScreen }) => mobileFullScreen && 'height: 100dvh;'}
   animation: slideIn 0.2s ease;
   
   @media ${devices.tablet} {

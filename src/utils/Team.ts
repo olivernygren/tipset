@@ -62,6 +62,11 @@ export enum TournamentsEnum {
   EUROPA_LEAGUE = 'Europa League',
   CONFERENCE_LEAGUE = 'Conference League',
   ALLSVENSKAN = 'Allsvenskan',
+  EUROS = 'EM',
+  WORLD_CUP = 'VM',
+  NATIONS_LEAGUE = 'Nations League',
+  EUROS_QUALIFIERS = 'EM-kval',
+  WORLD_CUP_QUALIFIERS = 'VM-kval',
 }
 
 export const getTeamByNameAndLeague = (teamName: string, league: string) => Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
@@ -1371,7 +1376,6 @@ export const Teams = {
     {
       name: 'Frankrike',
       logoUrl: 'https://cdn.countryflags.com/thumbs/france/flag-square-500.png',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg',
     },
     {
       name: 'Spanien',
@@ -1380,7 +1384,6 @@ export const Teams = {
     {
       name: 'Italien',
       logoUrl: 'https://cdn.countryflags.com/thumbs/italy/flag-square-500.png',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg',
     },
     {
       name: 'Argentina',
@@ -1393,7 +1396,6 @@ export const Teams = {
     {
       name: 'Skottland',
       logoUrl: 'https://cdn.countryflags.com/thumbs/scotland/flag-square-500.png',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Flag_of_Scotland.svg',
     },
     {
       name: 'Norge',
@@ -1437,7 +1439,6 @@ export const Teams = {
     },
     {
       name: 'Tjeckien',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg',
       logoUrl: 'https://cdn.countryflags.com/thumbs/czech-republic/flag-square-500.png',
     },
     {
@@ -1446,12 +1447,10 @@ export const Teams = {
     },
     {
       name: 'Slovakien',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg',
       logoUrl: 'https://cdn.countryflags.com/thumbs/slovakia/flag-square-500.png',
     },
     {
       name: 'Serbien',
-      // logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg',
       logoUrl: 'https://cdn.countryflags.com/thumbs/serbia/flag-square-500.png',
     },
     {
