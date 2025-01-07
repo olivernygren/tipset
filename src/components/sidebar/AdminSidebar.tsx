@@ -10,7 +10,7 @@ const AdminSidebar = () => {
     { href: `/${RoutesEnum.ADMIN_USERS}`, label: 'Användare', icon: <></> },
     { href: `/${RoutesEnum.ADMIN_LEAGUES}`, label: 'Ligor', icon: <></> },
     { href: `/${RoutesEnum.ADMIN_PLAYER_RATINGS}`, label: 'Spelarbetyg', icon: <></> },
-    { href: `/${RoutesEnum.ADMIN_PLAYERS}`, label: 'Spelare', icon: <></> },
+    { href: `/${RoutesEnum.ADMIN_PLAYERS}`, label: 'Spelare & Lag', icon: <></> },
   ];
 
   return (

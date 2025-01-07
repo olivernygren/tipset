@@ -1502,5 +1502,13 @@ export const Teams = {
       name: 'Nigeria',
       logoUrl: 'https://cdn.countryflags.com/thumbs/nigeria/flag-square-500.png',
     },
+    {
+      name: 'Surinam',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/suriname/flag-square-500.png',
+    },
+    {
+      name: 'Gambia',
+      logoUrl: 'https://cdn.countryflags.com/thumbs/gambia/flag-square-500.png',
+    },
   ],
 };
