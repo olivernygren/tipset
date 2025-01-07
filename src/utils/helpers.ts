@@ -2,7 +2,9 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
-import { ExactPositionEnum, GeneralPositionEnum, Player } from './Players';
+import {
+  ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
+} from './Players';
 import { TournamentsEnum } from './Team';
 import { theme } from '../theme';
 
@@ -137,8 +139,6 @@ export const getIsBottomOfLeague = (position: number, tournament: TournamentsEnu
 };
 
 export const getPlayerPositionColor = (position: GeneralPositionEnum) => {
-  console.log(position);
-
   switch (position) {
     case GeneralPositionEnum.FW:
       return theme.colors.blue;
@@ -199,4 +199,21 @@ export const getSortedPlayerByPosition = (players: Array<Player>): Array<Player>
   const sortedForwards = sortByExactPosition(forwards, forwardOrder);
 
   return [...goalKeepers, ...sortedDefenders, ...sortedMidfielders, ...sortedForwards];
+};
+
+export const getPlayerStatusName = (status: PlayerStatusEnum) => {
+  switch (status) {
+    case PlayerStatusEnum.AVAILABLE:
+      return 'Tillgänglig';
+    case PlayerStatusEnum.INJURED:
+      return 'Skadad';
+    case PlayerStatusEnum.SUSPENDED:
+      return 'Avstängd';
+    case PlayerStatusEnum.MAY_BE_INJURED:
+      return 'Möjligtvis skadad';
+    case PlayerStatusEnum.ILL:
+      return 'Sjuk';
+    default:
+      return '';
+  }
 };

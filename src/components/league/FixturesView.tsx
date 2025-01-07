@@ -639,20 +639,19 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         checked={newFixtureIncludeStats}
         onChange={() => setNewFixtureIncludeStats(!newFixtureIncludeStats)}
       />
-      {(newFixtureHomeTeam?.name === 'Arsenal' || newFixtureAwayTeam?.name === 'Arsenal') && (
-        <Checkbox
-          label="Ska målskytt i matchen tippas?"
-          checked={newFixtureShouldPredictGoalScorer}
-          onChange={() => setNewFixtureShouldPredictGoalScorer(!newFixtureShouldPredictGoalScorer)}
-        />
-      )}
+      <Checkbox
+        label="Ska målskytt i matchen tippas?"
+        checked={newFixtureShouldPredictGoalScorer}
+        onChange={() => setNewFixtureShouldPredictGoalScorer(!newFixtureShouldPredictGoalScorer)}
+      />
       {newFixtureShouldPredictGoalScorer && newFixtureHomeTeam && newFixtureAwayTeam && (
         <Section gap="xxs">
           <EmphasisTypography variant="s">Vilket lag ska målskytten tillhöra?</EmphasisTypography>
           <Select
             options={[
               { value: 'Välj lag', label: 'Välj lag' },
-              { value: 'Arsenal', label: 'Arsenal' },
+              { value: newFixtureHomeTeam.name, label: newFixtureHomeTeam.name },
+              { value: newFixtureAwayTeam.name, label: newFixtureAwayTeam.name },
             ]}
             value={newFixtureGoalScorerTeam ? newFixtureGoalScorerTeam[0] : 'Välj lag'}
             onChange={(value) => handleSetGoalScrorerTeam(value)}
@@ -797,6 +796,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <CorrectPredictionsModal
             onClose={() => setShowPredictionsModalFixtureId(null)}
             gameId={showPredictionsModalFixtureId}
+            fixture={ongoingGameWeek.games.fixtures.find((f) => f.id === showPredictionsModalFixtureId)}
             league={league}
             ongoingGameWeek={ongoingGameWeek}
             refetchLeague={refetchLeague}

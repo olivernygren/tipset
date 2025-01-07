@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import {
+  collection, getDocs, query, where,
+} from 'firebase/firestore';
 import Modal from '../modal/Modal';
 import { Fixture, Prediction } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import PredictionScoreCard from '../game/PredictionScoreCard';
-// eslint-disable-next-line import/no-cycle
-import FixtureResultPreview from '../game/FixtureResultPreview';
 import SimpleFixturePredictionCard from '../cards/SimpleFixturePredictionCard';
-import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import FinalResult from '../game/FinalResult';
-import { ArsenalPlayers, GeneralPositionEnum } from '../../utils/Players';
+import { GeneralPositionEnum, Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
-import { getGeneralPositionShorthand, getPlayerPositionColor } from '../../utils/helpers';
+import {
+  getGeneralPositionShorthand, getPlayerPositionColor, getSortedPlayerByPosition, withDocumentIdOnObject,
+} from '../../utils/helpers';
+import { db } from '../../config/firebase';
+import { CollectionEnum } from '../../utils/Firebase';
+import { Team } from '../../utils/Team';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -22,13 +27,41 @@ interface PredictionsModalProps {
   fixture: Fixture | undefined;
 }
 
-const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalProps) => {
+const PredictionsModal = ({
+  onClose, predictions, fixture,
+}: PredictionsModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const gameHasFinished = fixture && Boolean(fixture.finalResult);
 
+  const [players, setPlayers] = useState<Array<Player>>([]);
+
+  useEffect(() => {
+    if (fixture && fixture.shouldPredictGoalScorer && fixture.goalScorerFromTeam && fixture.goalScorerFromTeam.length > 0) {
+      const playersByTeam = fetchTeamByName(fixture.goalScorerFromTeam[0]);
+      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
+    }
+  }, []);
+
+  const fetchTeamByName = async (teamName: string) => {
+    const teamsRef = collection(db, CollectionEnum.TEAMS);
+    const q = query(teamsRef, where('name', '==', teamName));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const teamDoc = querySnapshot.docs[0];
+      const teamData = withDocumentIdOnObject<Team>(teamDoc);
+
+      if (teamData.players) {
+        return teamData.players;
+      }
+      return [];
+    }
+    return [];
+  };
+
   const getPlayerByName = (name: string) => {
-    const playerObj = ArsenalPlayers.find((player) => player.name === name);
+    const playerObj = players.find((player) => player.name === name);
     const positionColor = getPlayerPositionColor((playerObj?.position.general ?? '') as GeneralPositionEnum);
 
     return (
@@ -36,7 +69,7 @@ const PredictionsModal = ({ onClose, predictions, fixture }: PredictionsModalPro
         {playerObj && playerObj.picture && (
           <AvatarContainer>
             <Avatar
-              src={playerObj.picture}
+              src={playerObj.externalPictureUrl ?? playerObj.picture ?? '/images/placeholder-fancy.png'}
               alt={playerObj.name}
               size={isMobile ? AvatarSize.M : AvatarSize.L}
               objectFit="cover"

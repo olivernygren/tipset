@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Calculator, XCircle } from '@phosphor-icons/react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection, doc, getDoc, getDocs, query, updateDoc, where,
+} from 'firebase/firestore';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
@@ -11,18 +13,18 @@ import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
 import {
   Prediction, FixtureResult, PredictionPoints, TeamType,
+  Fixture,
 } from '../../utils/Fixture';
 import Input from '../input/Input';
 import { Divider } from '../Divider';
 import {
   Player, GeneralPositionEnum,
-  ArsenalPlayers,
 } from '../../utils/Players';
 import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import {
-  defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObject,
+  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import MobilePredictionCard from '../cards/MobilePredictionCard';
@@ -32,10 +34,12 @@ import NationAvatar from '../avatar/NationAvatar';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import SelectImitation from '../input/SelectImitation';
 import GoalScorerModal from '../game/GoalScorerModal';
+import { Team } from '../../utils/Team';
 
 interface PredictionsModalProps {
   onClose: () => void;
   gameId: string;
+  fixture?: Fixture;
   league: PredictionLeague;
   ongoingGameWeek: LeagueGameWeek | undefined;
   refetchLeague: () => void;
@@ -43,7 +47,7 @@ interface PredictionsModalProps {
 }
 
 const CorrectPredictionsModal = ({
-  onClose, gameId, league, ongoingGameWeek, refetchLeague, savedFinalResult,
+  onClose, gameId, league, ongoingGameWeek, refetchLeague, savedFinalResult, fixture,
 }: PredictionsModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -52,6 +56,35 @@ const CorrectPredictionsModal = ({
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
   const [savingLoading, setSavingLoading] = useState<boolean>(false);
   const [showSelectGoalScorerModal, setShowSelectGoalScorerModal] = useState(false);
+  const [players, setPlayers] = useState<Array<Player>>([]);
+
+  useEffect(() => {
+    if (fixture && fixture.shouldPredictGoalScorer && fixture.goalScorerFromTeam && fixture.goalScorerFromTeam.length > 0) {
+      const playersByTeam = fetchTeamByName(fixture.goalScorerFromTeam[0]);
+      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('🔴', players);
+  }, [players]);
+
+  const fetchTeamByName = async (teamName: string) => {
+    const teamsRef = collection(db, CollectionEnum.TEAMS);
+    const q = query(teamsRef, where('name', '==', teamName));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const teamDoc = querySnapshot.docs[0];
+      const teamData = withDocumentIdOnObject<Team>(teamDoc);
+
+      if (teamData.players) {
+        return teamData.players;
+      }
+      return [];
+    }
+    return [];
+  };
 
   const hasPredictedResult = (prediction: Prediction) => prediction.homeGoals !== null && prediction.awayGoals !== null;
 
@@ -511,7 +544,7 @@ const CorrectPredictionsModal = ({
       </Modal>
       {showSelectGoalScorerModal && (
         <GoalScorerModal
-          players={ArsenalPlayers}
+          players={players}
           onClose={() => setShowSelectGoalScorerModal(false)}
           onSave={(players) => handleSelectGoalScorers(players)}
           multiple

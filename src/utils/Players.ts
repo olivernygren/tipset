@@ -84,9 +84,10 @@ export enum CountryEnum {
 }
 
 export enum PlayerStatusEnum {
+  AVAILABLE = 'AVAILABLE',
   INJURED = 'INJURED',
-  SUSPENDED = 'SUSPENDED',
   MAY_BE_INJURED = 'MAY_BE_INJURED',
+  SUSPENDED = 'SUSPENDED',
   ILL = 'ILL',
 }
 

@@ -4,16 +4,21 @@ import {
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
+  Ambulance,
+  ArrowBendDoubleUpRight,
+  Bandaids,
   CheckCircle,
-  DotsThree, PencilSimple, Plus, Trash, X,
+  DotsThree, Engine, PencilSimple, Plus, Rectangle, Trash, Virus, X,
 } from '@phosphor-icons/react';
 import { db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
-import { getPlayerPositionColor, getSortedPlayerByPosition, withDocumentIdOnObject } from '../../../../utils/helpers';
+import {
+  getPlayerPositionColor, getPlayerStatusName, getSortedPlayerByPosition, withDocumentIdOnObject,
+} from '../../../../utils/helpers';
 import { getFlagUrlByCountryName, Team } from '../../../../utils/Team';
 import { theme } from '../../../../theme';
 import { HeadingsTypography, NormalTypography } from '../../../../components/typography/Typography';
-import { GeneralPositionEnum, Player } from '../../../../utils/Players';
+import { GeneralPositionEnum, Player, PlayerStatusEnum } from '../../../../utils/Players';
 import Button from '../../../../components/buttons/Button';
 import ContextMenu from '../../../../components/menu/ContextMenu';
 import ContextMenuOption from '../../../../components/menu/ContextMenuOption';
@@ -29,6 +34,7 @@ import NationAvatar from '../../../../components/avatar/NationAvatar';
 import EditPlayerModal from '../../../../components/players/EditPlayerModal';
 import DeleteTeamModal from '../../../../components/teams/DeleteTeamModal';
 import EditTeamModal from '../../../../components/teams/EditTeamModal';
+import EditPlayerStatusModal from '../../../../components/players/EditPlayerStatusModal';
 
 const PlayersByTeamPage = () => {
   const [team, setTeam] = useState<Team | null>(null);
@@ -45,10 +51,12 @@ const PlayersByTeamPage = () => {
   const [createPlayerModalOpen, setCreatePlayerModalOpen] = useState<boolean>(false);
   const [editPlayerModalOpen, setEditPlayerModalOpen] = useState<boolean>(false);
   const [editPlayer, setEditPlayer] = useState<Player | null>(null);
+  const [editPlayerStatus, setEditPlayerStatus] = useState<Player | null>(null);
   const [deletePlayer, setDeletePlayer] = useState<Player | null>(null);
   const [isDeletePlayerModalOpen, setIsDeletePlayerModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [deletePlayerLoading, setDeletePlayerLoading] = useState<boolean>(false);
+  const [editPlayerStatusModalOpen, setEditPlayerStatusModalOpen] = useState<boolean>(false);
 
   const teamIdFromUrl = window.location.pathname.split('/')[3];
 
@@ -78,6 +86,8 @@ const PlayersByTeamPage = () => {
       }
     }
   };
+
+  // Lägg till funktionalitet för transfer av spelare mellan lag samt att ändra status på spelare (skadad, avstängd etc)
 
   const handleDeletePlayer = async () => {
     if (!deletePlayer) {
@@ -117,6 +127,41 @@ const PlayersByTeamPage = () => {
     return '/images/placeholder-fancy.png';
   };
 
+  const getStatusTagBgColor = (status: PlayerStatusEnum) => {
+    switch (status) {
+      case PlayerStatusEnum.AVAILABLE:
+        return theme.colors.silverLighter;
+      case PlayerStatusEnum.INJURED:
+        return theme.colors.redBleach;
+      case PlayerStatusEnum.SUSPENDED:
+        return theme.colors.silverLighter;
+      case PlayerStatusEnum.MAY_BE_INJURED:
+        return theme.colors.goldBleach;
+      case PlayerStatusEnum.ILL:
+        return theme.colors.primaryBleach;
+      default:
+        return theme.colors.silverLighter;
+    }
+  };
+
+  const getStatusTagIcon = (status: PlayerStatusEnum) => {
+    switch (status) {
+      case PlayerStatusEnum.AVAILABLE:
+        return null;
+        // return <CheckCircle size={20} color={theme.colors.silverDark} weight="fill" />;
+      case PlayerStatusEnum.INJURED:
+        return <Ambulance size={20} color={theme.colors.redDark} weight="fill" />;
+      case PlayerStatusEnum.SUSPENDED:
+        return <Rectangle style={{ transform: 'rotate(90deg)' }} size={20} color={theme.colors.red} weight="fill" />;
+      case PlayerStatusEnum.MAY_BE_INJURED:
+        return <Bandaids size={20} color={theme.colors.goldDark} weight="fill" />;
+      case PlayerStatusEnum.ILL:
+        return <Virus size={20} color={theme.colors.primaryDark} weight="fill" />;
+      default:
+        return <Ambulance size={20} color={theme.colors.red} />;
+    }
+  };
+
   const getPlayer = (player: Player) => (
     <PlayerItem key={player.id} showHoverEffect={!isEditMode}>
       <PlayerInfoContainer>
@@ -146,8 +191,30 @@ const PlayersByTeamPage = () => {
         <NormalTypography variant="m">{player.name}</NormalTypography>
         <NormalTypography variant="s" color={theme.colors.silverDark}>{`#${player.number}`}</NormalTypography>
       </PlayerInfoContainer>
+      {player.status && player.status !== PlayerStatusEnum.AVAILABLE && (
+        <AvailabilityTag bgColor={getStatusTagBgColor(player.status ?? PlayerStatusEnum.AVAILABLE)} className="availability-tag">
+          <NormalTypography variant="s" color={theme.colors.textDefault}>
+            {getPlayerStatusName(player.status ?? PlayerStatusEnum.AVAILABLE)}
+          </NormalTypography>
+          {getStatusTagIcon(player.status ?? PlayerStatusEnum.AVAILABLE)}
+        </AvailabilityTag>
+      )}
       {isEditMode && (
         <Section gap="xxs" fitContent flexDirection="row">
+          <IconButton
+            icon={<Engine size={20} />}
+            colors={{ normal: theme.colors.textDefault }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditPlayerStatus(player);
+              setEditPlayerStatusModalOpen(true);
+            }}
+          />
+          <IconButton
+            icon={<ArrowBendDoubleUpRight size={20} />}
+            colors={{ normal: theme.colors.textDefault }}
+            onClick={(e) => {}}
+          />
           <IconButton
             icon={<PencilSimple size={20} />}
             colors={{ normal: theme.colors.textDefault }}
@@ -332,6 +399,14 @@ const PlayersByTeamPage = () => {
           </Section>
         </Modal>
       )}
+      {editPlayerStatusModalOpen && (
+        <EditPlayerStatusModal
+          onClose={() => setEditPlayerStatusModalOpen(false)}
+          refetchPlayers={fetchTeamById}
+          player={editPlayerStatus}
+          teamId={teamIdFromUrl}
+        />
+      )}
       <RootToast />
     </>
   );
@@ -396,6 +471,10 @@ const PlayerItem = styled.div<{ showHoverEffect: boolean }>`
     &:hover {
       background-color: ${theme.colors.primaryFade};
       border-color: ${theme.colors.primaryLighter};
+/* 
+      .availability-tag {
+        background-color: ${theme.colors.primaryBleach};
+      } */
     }
   `}
 `;
@@ -445,6 +524,17 @@ const PlayerPositionTag = styled.div<{ bgColor: string }>`
   padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.l};
   background-color: ${({ bgColor }) => bgColor};
+`;
+
+const AvailabilityTag = styled.div<{ bgColor: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.m};
+  background-color: ${({ bgColor }) => bgColor};
+  gap: 6px;
+  transition: 0.15s ease;
 `;
 
 export default PlayersByTeamPage;

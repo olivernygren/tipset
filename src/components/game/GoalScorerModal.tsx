@@ -3,12 +3,14 @@ import styled, { css } from 'styled-components';
 import {
   Ambulance,
   Bandaids,
-  CheckCircle, Circle, Football, Funnel, Info, SoccerBall, Square, XCircle,
+  CheckCircle, Circle, Funnel, Info, Rectangle, SoccerBall, Virus, XCircle,
 } from '@phosphor-icons/react';
 import { collection, getDocs } from 'firebase/firestore';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
-import { GeneralPositionEnum, Player, PlayerRating } from '../../utils/Players';
+import {
+  GeneralPositionEnum, Player, PlayerRating, PlayerStatusEnum,
+} from '../../utils/Players';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
@@ -55,17 +57,7 @@ const GoalScorerModal = ({
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
-  const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended;
-
-  useEffect(() => {
-    const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
-    const midfielders = players.filter((player) => player.position.general === GeneralPositionEnum.MF);
-    const forwards = players.filter((player) => player.position.general === GeneralPositionEnum.FW);
-
-    setDefenders(defenders);
-    setMidfielders(midfielders);
-    setForwards(forwards);
-  }, [players]);
+  const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -84,6 +76,16 @@ const GoalScorerModal = ({
 
     fetchRatings();
   }, []);
+
+  useEffect(() => {
+    const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
+    const midfielders = players.filter((player) => player.position.general === GeneralPositionEnum.MF);
+    const forwards = players.filter((player) => player.position.general === GeneralPositionEnum.FW);
+
+    setDefenders(defenders);
+    setMidfielders(midfielders);
+    setForwards(forwards);
+  }, [players]);
 
   const handlePlayerClick = (player: Player) => {
     if (multiple) {
@@ -124,22 +126,22 @@ const GoalScorerModal = ({
   const getPlayer = (player: Player) => (
     <PlayerItem
       key={player.id}
-      hasPlayerPicture={Boolean(player.picture)}
+      hasPlayerPicture
       onClick={() => handlePlayerClick(player)}
       isSelected={isPlayerIsSelected(player)}
       disabled={isPlayerItemDisabled(player)}
     >
       <PlayerInfo>
-        {player.picture && (
-          <Avatar
-            src={player.picture}
-            alt={player.name}
-            size={AvatarSize.M}
-            objectFit="cover"
-            showBorder
-            opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
-          />
-        )}
+        <Avatar
+          src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
+          alt={player.name}
+          size={AvatarSize.M}
+          objectFit="cover"
+          showBorder
+          opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
+          customBorderWidth={1}
+          backgroundColor={theme.colors.silverLight}
+        />
         <NormalTypography variant="m" color={isPlayerItemDisabled(player) ? theme.colors.silver : theme.colors.textDefault}>
           {player.name}
         </NormalTypography>
@@ -147,11 +149,11 @@ const GoalScorerModal = ({
       <IconButtonContainer onClick={(e) => e.stopPropagation()}>
         {isPlayerItemDisabled(player) ? (
           <IconContainer>
-            {player.isInjured && (
+            {(player.status === PlayerStatusEnum.INJURED) && (
               <Ambulance size={24} color={theme.colors.redDark} weight="fill" />
             )}
-            {player.isSuspended && (
-              <Square size={24} color={theme.colors.redDark} weight="fill" />
+            {(player.status === PlayerStatusEnum.SUSPENDED) && (
+              <Rectangle style={{ transform: 'rotate(90deg)' }} size={24} color={theme.colors.redDark} weight="fill" />
             )}
           </IconContainer>
         ) : (
@@ -162,8 +164,11 @@ const GoalScorerModal = ({
               </NormalTypography>
               <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
             </GoalsScored>
-            {player.mayBeInjured && (
+            {(player.status === PlayerStatusEnum.MAY_BE_INJURED) && (
               <Bandaids size={24} color={theme.colors.gold} weight="fill" />
+            )}
+            {(player.status === PlayerStatusEnum.ILL) && (
+              <Virus size={24} color={theme.colors.primaryDark} weight="fill" />
             )}
             <IconButton
               icon={isPlayerIsSelected(player) ? <CheckCircle size={30} weight="fill" /> : <Circle size={30} />}

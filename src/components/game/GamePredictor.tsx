@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChartBar, MapPin, PlusCircle } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
+import {
+  collection, getDocs, query, where,
+} from 'firebase/firestore';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
@@ -18,6 +21,9 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import GoalScorerModal from './GoalScorerModal';
 import IconButton from '../buttons/IconButton';
 import Tag from '../tag/Tag';
+import { db } from '../../config/firebase';
+import { CollectionEnum } from '../../utils/Firebase';
+import { getSortedPlayerByPosition, withDocumentIdOnObject } from '../../utils/helpers';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -44,11 +50,36 @@ const GamePredictor = ({
   const [awayGoals, setAwayGoals] = useState<string>(predictionValue?.awayGoals.toString() ?? '');
   const [predictedPlayerToScore, setPredictedPlayerToScore] = useState<Player | undefined>(predictionValue && predictionValue.goalScorer ? predictionValue.goalScorer : undefined);
   const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
+  const [players, setPlayers] = useState<Array<Player>>([]);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
   const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
   const hasPredictedDraw = homeGoals !== '' && awayGoals !== '' && homeGoals === awayGoals;
   const hasPredictedAwayWin = homeGoals !== '' && awayGoals !== '' && homeGoals < awayGoals;
+
+  useEffect(() => {
+    if (game.shouldPredictGoalScorer && game.goalScorerFromTeam && game.goalScorerFromTeam.length > 0) {
+      const playersByTeam = fetchTeamByName(game.goalScorerFromTeam[0]);
+      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
+    }
+  }, []);
+
+  const fetchTeamByName = async (teamName: string) => {
+    const teamsRef = collection(db, CollectionEnum.TEAMS);
+    const q = query(teamsRef, where('name', '==', teamName));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const teamDoc = querySnapshot.docs[0];
+      const teamData = withDocumentIdOnObject<Team>(teamDoc);
+
+      if (teamData.players) {
+        return teamData.players;
+      }
+      return [];
+    }
+    return [];
+  };
 
   const handleIncreaseGoals = (team: 'home' | 'away') => {
     if (new Date(game.kickOffTime) < new Date()) {
@@ -356,12 +387,14 @@ const GamePredictor = ({
               {predictedPlayerToScore ? (
                 <AvatarWrapper>
                   <Avatar
-                    src={predictedPlayerToScore.picture ?? ''}
+                    src={predictedPlayerToScore.externalPictureUrl ?? predictedPlayerToScore.picture ?? '/images/placeholder-fancy.png'}
                     alt={predictedPlayerToScore.name}
                     size={AvatarSize.M}
                     title={predictedPlayerToScore.name}
                     objectFit="cover"
                     showBorder
+                    customBorderWidth={1}
+                    backgroundColor={theme.colors.silverLight}
                   />
                 </AvatarWrapper>
               ) : (
@@ -388,7 +421,7 @@ const GamePredictor = ({
       </Card>
       {isSelectGoalScorerModalOpen && (
         <GoalScorerModal
-          players={ArsenalPlayers}
+          players={players}
           onSave={(players) => handleUpdatePlayerPrediction(players[0])}
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
           initialSelectedPlayers={[predictedPlayerToScore]}
