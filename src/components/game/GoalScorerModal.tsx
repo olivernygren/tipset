@@ -58,6 +58,7 @@ const GoalScorerModal = ({
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
   const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
+  const playerExistsInRatings = (player: Player) => playerRatings.some((rating) => rating.playerName === player.name);
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -158,12 +159,14 @@ const GoalScorerModal = ({
           </IconContainer>
         ) : (
           <Flex>
-            <GoalsScored>
-              <NormalTypography variant="s" color={theme.colors.silver}>
-                {getGoalsScoredForPlayer(player.name)}
-              </NormalTypography>
-              <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
-            </GoalsScored>
+            {playerExistsInRatings(player) && (
+              <GoalsScored>
+                <NormalTypography variant="s" color={theme.colors.silver}>
+                  {getGoalsScoredForPlayer(player.name)}
+                </NormalTypography>
+                <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
+              </GoalsScored>
+            )}
             {(player.status === PlayerStatusEnum.MAY_BE_INJURED) && (
               <Bandaids size={24} color={theme.colors.gold} weight="fill" />
             )}
