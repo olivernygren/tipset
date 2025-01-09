@@ -452,7 +452,7 @@ export const nationalTeams: Team[] = [
   },
   {
     name: 'Kongo-Kinshasa',
-    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-kinshasa/flag-square-500.png',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-democratic-republic-of-the/flag-square-500.png',
     countryCode: 'COD',
     federation: FederationEnum.AFRICA,
   },
@@ -938,7 +938,7 @@ export const nationalTeams: Team[] = [
   },
   {
     name: 'Kongo-Brazzaville',
-    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-brazzaville/flag-square-500.png',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-republic-of-the/flag-square-500.png',
     countryCode: 'CGO',
     federation: FederationEnum.AFRICA,
   },
@@ -1192,7 +1192,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Tottenham',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/8586.png',
       stadium: 'Tottenham Hotspur Stadium',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#132257',

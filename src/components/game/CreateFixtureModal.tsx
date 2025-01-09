@@ -255,8 +255,8 @@ const CreateFixtureModal = ({
           onClose={() => setShowSelectTeamModal(null)}
           onSave={(team) => handleSelectTeam(team, showSelectTeamModal === 'home')}
           teamType={teamType}
-          isHomeTeam={showSelectTeamModal === 'home'}
           value={showSelectTeamModal === 'home' ? homeTeam : awayTeam}
+          title={showSelectTeamModal === 'home' ? 'Välj hemmalag' : 'Välj bortalag'}
         />
       )}
       {selectTournamentModalOpen && (

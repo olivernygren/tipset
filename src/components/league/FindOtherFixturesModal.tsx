@@ -55,6 +55,21 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
 
       const leagues = withDocumentIdOnObjectsInArray<PredictionLeague>(leaguesSnapshot.docs);
 
+      if (searchType === SearchType.BY_TOURNAMENT) {
+        handleSearchForFixturesByTournament(leagues);
+      } else if (searchType === SearchType.BY_CLUB || searchType === SearchType.BY_NATIONAL_TEAM) {
+        handleSearchForFixturesByTeam(leagues);
+      }
+    } catch (error) {
+      console.error('Error fetching fixtures:', error);
+      errorNotify('Något gick fel vid hämtning av matcher');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleSearchForFixturesByTournament = async (leagues: Array<PredictionLeague>) => {
+    try {
       const filteredLeagues = leagues.filter((league) => league.gameWeeks?.some((gameWeek) => gameWeek.games.fixtures.some((fixture) => fixture.tournament === selectedTournament && new Date(fixture.kickOffTime) > new Date())));
 
       const fixtures: Array<ExternalFixture> = filteredLeagues
@@ -73,10 +88,30 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
 
       setAvailableFixtures(fixtures);
     } catch (error) {
-      console.error('Error fetching fixtures:', error);
       errorNotify('Något gick fel vid hämtning av matcher');
-    } finally {
-      setSearchLoading(false);
+    }
+  };
+
+  const handleSearchForFixturesByTeam = async (leagues: Array<PredictionLeague>) => {
+    try {
+      const filteredLeagues = leagues.filter((league) => league.gameWeeks?.some((gameWeek) => gameWeek.games.fixtures.some((fixture) => (searchType === SearchType.BY_CLUB ? fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name : fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name) && new Date(fixture.kickOffTime) > new Date())));
+      const fixtures: Array<ExternalFixture> = filteredLeagues
+        .map((league) => league.gameWeeks?.map((gameWeek) => gameWeek.games.fixtures.map((fixture) => {
+          if ((searchType === SearchType.BY_CLUB ? fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name : fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name) && new Date(fixture.kickOffTime) > new Date()) {
+            return {
+              fixture,
+              leagueId: league.documentId,
+              leagueName: league.name,
+            };
+          }
+          return undefined;
+        })))
+        .flat(2)
+        .filter((fixture): fixture is ExternalFixture => fixture !== undefined);
+
+      setAvailableFixtures(fixtures);
+    } catch (error) {
+      errorNotify('Något gick fel vid hämtning av matcher');
     }
   };
 
@@ -90,6 +125,13 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
     return `${weekday} ${day} ${month} ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   };
 
+  const handleChangeSearchType = (type: SearchType) => {
+    setSearchType(type);
+    setSelectedTeam(null);
+    setSelectedTournament(null);
+    setAvailableFixtures([]);
+  };
+
   return (
     <>
       <Modal
@@ -98,7 +140,7 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
       >
         <ModalContent>
           <Section flexDirection="row" alignItems="center" gap="s">
-            <SearchTypeItem selected={searchType === SearchType.BY_TOURNAMENT} onClick={() => setSearchType(SearchType.BY_TOURNAMENT)}>
+            <SearchTypeItem selected={searchType === SearchType.BY_TOURNAMENT} onClick={() => handleChangeSearchType(SearchType.BY_TOURNAMENT)}>
               <IconButton
                 icon={searchType === SearchType.BY_TOURNAMENT ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
                 onClick={() => {}}
@@ -108,7 +150,7 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
                 Välj liga
               </EmphasisTypography>
             </SearchTypeItem>
-            <SearchTypeItem selected={searchType === SearchType.BY_CLUB} onClick={() => setSearchType(SearchType.BY_CLUB)}>
+            <SearchTypeItem selected={searchType === SearchType.BY_CLUB} onClick={() => handleChangeSearchType(SearchType.BY_CLUB)}>
               <IconButton
                 icon={searchType === SearchType.BY_CLUB ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
                 onClick={() => {}}
@@ -118,7 +160,7 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
                 Välj klubblag
               </EmphasisTypography>
             </SearchTypeItem>
-            <SearchTypeItem selected={searchType === SearchType.BY_NATIONAL_TEAM} onClick={() => setSearchType(SearchType.BY_NATIONAL_TEAM)}>
+            <SearchTypeItem selected={searchType === SearchType.BY_NATIONAL_TEAM} onClick={() => handleChangeSearchType(SearchType.BY_NATIONAL_TEAM)}>
               <IconButton
                 icon={searchType === SearchType.BY_NATIONAL_TEAM ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
                 onClick={() => {}}
@@ -201,7 +243,6 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
           onClose={() => setShowTeamsModal(false)}
           onSave={(team) => setSelectedTeam(team)}
           teamType={searchType === SearchType.BY_CLUB ? TeamType.CLUBS : TeamType.NATIONS}
-          isHomeTeam
           value={selectedTeam ?? undefined}
         />
       )}

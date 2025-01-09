@@ -284,7 +284,6 @@ const PlayerRatingsPage = () => {
           }}
           value={opponent}
           teamType={TeamType.CLUBS}
-          isHomeTeam={false}
         />
       )}
       {playerModalOpen && (

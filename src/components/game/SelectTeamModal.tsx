@@ -26,11 +26,11 @@ interface SelectTeamModalProps {
   onSave: (team: Team) => void;
   onClose: () => void;
   teamType: TeamType;
-  isHomeTeam?: boolean;
+  title?: string;
 }
 
 const SelectTeamModal = ({
-  value, onSave, onClose, teamType, isHomeTeam,
+  value, onSave, onClose, teamType, title,
 }: SelectTeamModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -39,19 +39,7 @@ const SelectTeamModal = ({
   const [selectedTeam, setSelectedTeam] = useState<Team | undefined>(value);
   const [searchValue, setSearchValue] = useState('');
   // const [showFilters, setShowFilters] = useState(false);
-  const [expandedCountries, setExpandedCountries] = useState<Array<string>>([]); // Object.keys(teams)
-
-  const getHeading = () => {
-    if (isHomeTeam === true) {
-      return 'Välj hemmalag';
-    }
-
-    if (isHomeTeam === false) {
-      return 'Välj bortalag';
-    }
-
-    return 'Välj lag';
-  };
+  const [expandedCountries, setExpandedCountries] = useState<Array<string>>(teamType === TeamType.NATIONS ? ['Landslag'] : []); // Object.keys(teams)
 
   const handleSearch = (value: string) => {
     setExpandedCountries(Object.keys(originalTeams));
@@ -125,7 +113,7 @@ const SelectTeamModal = ({
 
   return (
     <Modal
-      title={getHeading()}
+      title={title || 'Välj lag'}
       onClose={onClose}
       headerDivider
       mobileFullScreen
