@@ -9,7 +9,6 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { Divider } from '../Divider';
-// import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface SimpleFixturePredictionCardProps {
   prediction: Prediction;

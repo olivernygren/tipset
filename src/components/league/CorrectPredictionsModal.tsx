@@ -56,18 +56,25 @@ const CorrectPredictionsModal = ({
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
   const [savingLoading, setSavingLoading] = useState<boolean>(false);
   const [showSelectGoalScorerModal, setShowSelectGoalScorerModal] = useState(false);
-  const [players, setPlayers] = useState<Array<Player>>([]);
+  const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
+  const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
 
   useEffect(() => {
-    if (fixture && fixture.shouldPredictGoalScorer && fixture.goalScorerFromTeam && fixture.goalScorerFromTeam.length > 0) {
-      const playersByTeam = fetchTeamByName(fixture.goalScorerFromTeam[0]);
-      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
-    }
+    const fetchTeams = async () => {
+      if (fixture?.shouldPredictGoalScorer) {
+        const homePlayers = await fetchTeamByName(fixture?.homeTeam.name);
+        const awayPlayers = await fetchTeamByName(fixture?.awayTeam.name);
+
+        if (homePlayers && homePlayers.length > 0) {
+          setHomeTeamPlayers(homePlayers);
+        }
+        if (awayPlayers && awayPlayers.length > 0) {
+          setAwayTeamPlayers(awayPlayers);
+        }
+      }
+    };
+    fetchTeams();
   }, []);
-
-  useEffect(() => {
-    console.log('🔴', players);
-  }, [players]);
 
   const fetchTeamByName = async (teamName: string) => {
     const teamsRef = collection(db, CollectionEnum.TEAMS);
@@ -544,10 +551,13 @@ const CorrectPredictionsModal = ({
       </Modal>
       {showSelectGoalScorerModal && (
         <GoalScorerModal
-          players={players}
+          fixture={fixture}
+          homeTeamPlayers={homeTeamPlayers}
+          awayTeamPlayers={awayTeamPlayers}
           onClose={() => setShowSelectGoalScorerModal(false)}
           onSave={(players) => handleSelectGoalScorers(players)}
           multiple
+          initialSelectedPlayers={[...homeTeamPlayers, ...awayTeamPlayers].filter((player) => goalScorers.includes(player.name))}
         />
       )}
     </>

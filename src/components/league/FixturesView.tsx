@@ -19,7 +19,7 @@ import {
 } from '../../utils/Fixture';
 import {
   getLastGameWeek,
-  getPredictionOutcome, getPredictionStatus, getUserPreviousGameWeekPrecitedGoalScorer, withDocumentIdOnObject,
+  getPredictionOutcome, getPredictionStatus, getUserPreviousGameWeekPrecitedGoalScorers, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import CustomDatePicker from '../input/DatePicker';
 import GamePredictor from '../game/GamePredictor';
@@ -421,7 +421,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               numberOfParticipantsPredicted={ongoingGameWeek.games.predictions.filter((p) => p.fixtureId === fixture.id).length}
               // anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
               isLeagueCreator={isCreator}
-              previousGameWeekPredictedGoalScorer={getUserPreviousGameWeekPrecitedGoalScorer(getLastGameWeek(previousGameWeeks), user?.documentId ?? '')}
+              previousGameWeekPredictedGoalScorers={getUserPreviousGameWeekPrecitedGoalScorers(getLastGameWeek(previousGameWeeks), user?.documentId ?? '', [fixture.homeTeam.name, fixture.awayTeam.name])}
               onShowStats={() => setIsStatsModalOpen(fixture)}
             />
           ))}

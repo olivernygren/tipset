@@ -37,7 +37,7 @@ export interface Fixture {
   kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
-  goalScorerFromTeam?: Array<string> | null; // team names
+  goalScorerFromTeam?: Array<string> | null;
   teamType: TeamType;
   previewStats?: FixturePreviewStats;
   includeStats?: boolean;

@@ -34,13 +34,24 @@ const PredictionsModal = ({
 
   const gameHasFinished = fixture && Boolean(fixture.finalResult);
 
-  const [players, setPlayers] = useState<Array<Player>>([]);
+  const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
+  const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
 
   useEffect(() => {
-    if (fixture && fixture.shouldPredictGoalScorer && fixture.goalScorerFromTeam && fixture.goalScorerFromTeam.length > 0) {
-      const playersByTeam = fetchTeamByName(fixture.goalScorerFromTeam[0]);
-      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
-    }
+    const fetchTeams = async () => {
+      if (fixture?.shouldPredictGoalScorer) {
+        const homePlayers = await fetchTeamByName(fixture?.homeTeam.name);
+        const awayPlayers = await fetchTeamByName(fixture?.awayTeam.name);
+
+        if (homePlayers && homePlayers.length > 0) {
+          setHomeTeamPlayers(homePlayers);
+        }
+        if (awayPlayers && awayPlayers.length > 0) {
+          setAwayTeamPlayers(awayPlayers);
+        }
+      }
+    };
+    fetchTeams();
   }, []);
 
   const fetchTeamByName = async (teamName: string) => {
@@ -61,12 +72,13 @@ const PredictionsModal = ({
   };
 
   const getPlayerByName = (name: string) => {
-    const playerObj = players.find((player) => player.name === name);
+    const combinedPlayers = [...homeTeamPlayers, ...awayTeamPlayers];
+    const playerObj = combinedPlayers.find((player) => player.name === name);
     const positionColor = getPlayerPositionColor((playerObj?.position.general ?? '') as GeneralPositionEnum);
 
     return (
       <GoalScorerCard>
-        {playerObj && playerObj.picture && (
+        {playerObj && (
           <AvatarContainer>
             <Avatar
               src={playerObj.externalPictureUrl ?? playerObj.picture ?? '/images/placeholder-fancy.png'}
@@ -115,7 +127,7 @@ const PredictionsModal = ({
         {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
           <GoalScorersContainer desktopColumn={fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length < 5}>
             <HeadingsTypography variant="h5">Målskyttar</HeadingsTypography>
-              {fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length > 0 ? (
+              {fixture.finalResult?.goalScorers && fixture.finalResult?.goalScorers.length > 0 && [...homeTeamPlayers, ...awayTeamPlayers].length > 0 ? (
                 <GoalScorers>
                   {fixture.finalResult.goalScorers.map((scorer) => (
                     getPlayerByName(scorer)

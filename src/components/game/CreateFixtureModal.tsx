@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { CheckSquare, PlusCircle, Square } from '@phosphor-icons/react';
 import { theme } from '../../theme';
-import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import { Fixture, FixtureInput, TeamType } from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
 import { hasInvalidTeamName } from '../../utils/helpers';
@@ -11,10 +11,8 @@ import { PredictionLeague } from '../../utils/League';
 import { generateRandomID } from '../../utils/firebaseHelpers';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import Button from '../buttons/Button';
-import Checkbox from '../input/Checkbox';
 import CustomDatePicker from '../input/DatePicker';
 import Input from '../input/Input';
-import Select from '../input/Select';
 import SelectImitation from '../input/SelectImitation';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
@@ -43,9 +41,8 @@ const CreateFixtureModal = ({
   const [tournament, setTournament] = useState<string>(fixture?.tournament ?? '');
   const [kickoffDateTime, setKickoffDateTime] = useState<Date>(fixture?.kickOffTime ? new Date(fixture.kickOffTime) : new Date());
   const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(fixture?.shouldPredictGoalScorer ?? false);
-  const [goalScorerTeam, setGoalScorerTeam] = useState<Array<string> | null>(fixture?.goalScorerFromTeam ?? null);
   const [fixtureNickname, setFixtureNickname] = useState<string>(fixture?.fixtureNickname ?? '');
-  const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? false);
+  const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? true);
 
   const [showSelectTeamModal, setShowSelectTeamModal] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState<boolean>(false);
@@ -57,8 +54,7 @@ const CreateFixtureModal = ({
     || homeTeam === awayTeam
     || !stadium
     || !tournament
-    || !kickoffDateTime
-    || (shouldPredictGoalScorer && (!goalScorerTeam || goalScorerTeam.includes('Välj lag')));
+    || !kickoffDateTime;
 
   const handleSelectTeam = (team: Team | undefined, isHomeTeam: boolean) => {
     if (!team) return;
@@ -89,7 +85,6 @@ const CreateFixtureModal = ({
       tournament,
       kickOffTime: new Date(kickoffDateTime).toISOString(),
       shouldPredictGoalScorer,
-      ...(shouldPredictGoalScorer && { goalScorerFromTeam: goalScorerTeam }),
       ...(fixtureNickname && { fixtureNickname }),
       teamType,
       includeStats,
@@ -122,20 +117,7 @@ const CreateFixtureModal = ({
     setTournament('');
     setKickoffDateTime(new Date());
     setShouldPredictGoalScorer(false);
-    setGoalScorerTeam(null);
     setFixtureNickname('');
-  };
-
-  const handleSetGoalScrorerTeam = (selection: string) => {
-    if (selection === 'Välj lag') {
-      setGoalScorerTeam(null);
-      return;
-    }
-    if (selection === 'Båda lagen') {
-      setGoalScorerTeam([homeTeam?.name!, awayTeam?.name!]);
-      return;
-    }
-    setGoalScorerTeam([selection]);
   };
 
   return (
@@ -239,26 +221,10 @@ const CreateFixtureModal = ({
               onClick={(e) => {
                 e.stopPropagation();
                 setShouldPredictGoalScorer(!shouldPredictGoalScorer);
-                if (shouldPredictGoalScorer) {
-                  setGoalScorerTeam(null);
-                }
               }}
               colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
             />
             <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
-            {shouldPredictGoalScorer && homeTeam && awayTeam && (
-              <Section justifyContent="flex-end" flexDirection="row">
-                <Select
-                  options={[
-                    { value: 'Välj lag', label: 'Välj lag' },
-                    { value: homeTeam.name, label: homeTeam.name },
-                    { value: awayTeam.name, label: awayTeam.name },
-                  ]}
-                  value={goalScorerTeam ? goalScorerTeam[0] : 'Välj lag'}
-                  onChange={(value) => handleSetGoalScrorerTeam(value)}
-                />
-              </Section>
-            )}
           </OptionalInclusionContainer>
         </Section>
         <Section flexDirection="row" alignItems="center" gap="xxs">

@@ -95,18 +95,29 @@ export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
   }
 };
 
-export const getUserPreviousGameWeekPrecitedGoalScorer = (previousGameWeek: LeagueGameWeek | undefined, userId: string): Player | undefined => {
+export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: LeagueGameWeek | undefined, userId: string, teams?: Array<string>): Array<Player> => {
   if (!previousGameWeek) {
-    return undefined;
+    return [];
   }
 
-  const prediction = previousGameWeek.games.predictions.find((prediction) => prediction.userId === userId && prediction.goalScorer);
+  const allPreviousGameWeekPredictedGoalScorers = previousGameWeek.games.predictions.filter((prediction) => prediction.userId === userId && prediction.goalScorer);
+  const allPredictedGoalScorers = allPreviousGameWeekPredictedGoalScorers.map((prediction) => prediction.goalScorer);
 
-  if (!prediction) {
-    return undefined;
-  }
+  return allPredictedGoalScorers.filter((goalScorer) => goalScorer !== undefined) as Array<Player>;
+  // return allPreviousGameWeekPredictedGoalScorers.map((prediction) => ({
+  //   playerName: prediction.goalScorer?.name || '',
+  //   playerId: prediction.goalScorer?.id || '',
+  //   teamName: teams || '',
+  //   teamId: prediction.goalScorer?.teamId || '',
+  // }));
 
-  return prediction.goalScorer;
+  // const predictions = previousGameWeek.games.predictions.filter((prediction) => prediction.userId === userId && prediction.goalScorer);
+
+  // if (!predictions) {
+  //   return undefined;
+  // }
+
+  // return predictions.goalScorer;
 };
 
 export const getLastGameWeek = (previousGameWeeks: Array<LeagueGameWeek> | undefined): LeagueGameWeek | undefined => {

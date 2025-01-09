@@ -15,7 +15,7 @@ import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typ
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
 import {
-  defenderGoalPoints, forwardGoalPoints, midfielderGoalPoints, withDocumentIdOnObjectsInArray,
+  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints, withDocumentIdOnObjectsInArray,
 } from '../../utils/helpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import Input from '../input/Input';
@@ -25,14 +25,19 @@ import Tag from '../tag/Tag';
 import { Section } from '../section/Section';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
+import { Fixture } from '../../utils/Fixture';
+import { getFlagUrlByCountryName } from '../../utils/Team';
+import NationAvatar from '../avatar/NationAvatar';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
   onClose: () => void;
-  players: Array<Player>;
+  homeTeamPlayers: Array<Player>;
+  awayTeamPlayers: Array<Player>;
+  fixture?: Fixture;
   initialSelectedPlayers?: Array<Player | undefined>;
   multiple?: boolean;
-  previousGameWeekPredictedGoalScorer?: Player | undefined;
+  previousGameWeekPredictedGoalScorers?: Array<Player>;
 }
 
 enum FilterEnum {
@@ -42,10 +47,19 @@ enum FilterEnum {
 }
 
 const GoalScorerModal = ({
-  onSave, onClose, players, initialSelectedPlayers, multiple, previousGameWeekPredictedGoalScorer,
+  onSave,
+  onClose,
+  initialSelectedPlayers,
+  multiple,
+  previousGameWeekPredictedGoalScorers,
+  homeTeamPlayers,
+  awayTeamPlayers,
+  fixture,
 }: GoalScorerModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
+  const [playersToShow, setPlayersToShow] = useState<Array<Player>>(homeTeamPlayers);
+  const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [selectedGoalScorers, setSelectedGoalScorers] = useState<Array<Player | undefined>>(initialSelectedPlayers || []);
   const [defenders, setDefenders] = useState<Array<Player>>([]);
   const [midfielders, setMidfielders] = useState<Array<Player>>([]);
@@ -54,11 +68,13 @@ const GoalScorerModal = ({
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
   const [playerRatings, setPlayerRatings] = useState<Array<PlayerRating>>([]);
+  const [previouslySelectedGoalScorer, setPreviouslySelectedGoalScorer] = useState<Player | null>(null);
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
-  const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorer && previousGameWeekPredictedGoalScorer.id === player.id;
+  const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorers?.some((selectedPlayer) => selectedPlayer.id === player.id && playersToShow.some((playerToShow) => playerToShow.id === player.id));
   const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
   const playerExistsInRatings = (player: Player) => playerRatings.some((rating) => rating.playerName === player.name);
+  // const previousGameWeekPredictedGoalScorerExists = previousGameWeekPredictedGoalScorers?.some((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -79,14 +95,40 @@ const GoalScorerModal = ({
   }, []);
 
   useEffect(() => {
-    const defenders = players.filter((player) => player.position.general === GeneralPositionEnum.DF);
-    const midfielders = players.filter((player) => player.position.general === GeneralPositionEnum.MF);
-    const forwards = players.filter((player) => player.position.general === GeneralPositionEnum.FW);
+    const hasHomeTeamPlayers = homeTeamPlayers.length > 0;
+    const hasAwayTeamPlayers = awayTeamPlayers.length > 0;
+
+    if (hasHomeTeamPlayers) {
+      setPlayersToShow(homeTeamPlayers);
+      setSelectedTeam('home');
+      return;
+    }
+
+    if (hasAwayTeamPlayers && !hasHomeTeamPlayers) {
+      setPlayersToShow(awayTeamPlayers);
+      setSelectedTeam('away');
+    }
+  }, []);
+
+  useEffect(() => {
+    const sortedPlayers = getSortedPlayerByPosition(playersToShow);
+    const defenders = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.DF);
+    const midfielders = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.MF);
+    const forwards = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.FW);
 
     setDefenders(defenders);
     setMidfielders(midfielders);
     setForwards(forwards);
-  }, [players]);
+  }, [playersToShow]);
+
+  useEffect(() => {
+    if (previousGameWeekPredictedGoalScorers && previousGameWeekPredictedGoalScorers.length > 0) {
+      if (playersToShow.some((player) => previousGameWeekPredictedGoalScorers.some((previousPlayer) => previousPlayer.id === player.id))) {
+        const previouslySelectedGoalScorer = previousGameWeekPredictedGoalScorers.find((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
+        setPreviouslySelectedGoalScorer(previouslySelectedGoalScorer || null);
+      }
+    }
+  }, [playersToShow]);
 
   const handlePlayerClick = (player: Player) => {
     if (multiple) {
@@ -101,10 +143,11 @@ const GoalScorerModal = ({
   };
 
   const handleSearch = (value: string) => {
-    const filteredPlayers = players.filter((player) => player.name.toLowerCase().includes(value.toLowerCase()));
-    const defenders = filteredPlayers.filter((player) => player.position.general === GeneralPositionEnum.DF);
-    const midfielders = filteredPlayers.filter((player) => player.position.general === GeneralPositionEnum.MF);
-    const forwards = filteredPlayers.filter((player) => player.position.general === GeneralPositionEnum.FW);
+    const filteredPlayers = playersToShow.filter((player) => player.name.toLowerCase().includes(value.toLowerCase()));
+    const sortedPlayers = getSortedPlayerByPosition(filteredPlayers);
+    const defenders = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.DF);
+    const midfielders = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.MF);
+    const forwards = sortedPlayers.filter((player) => player.position.general === GeneralPositionEnum.FW);
 
     setDefenders(defenders);
     setMidfielders(midfielders);
@@ -133,7 +176,7 @@ const GoalScorerModal = ({
       disabled={isPlayerItemDisabled(player)}
     >
       <PlayerInfo>
-        <Avatar
+        {/* <Avatar
           src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
           alt={player.name}
           size={AvatarSize.M}
@@ -142,7 +185,28 @@ const GoalScorerModal = ({
           opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
           customBorderWidth={1}
           backgroundColor={theme.colors.silverLight}
-        />
+        /> */}
+        <AvatarContainer>
+          <Avatar
+            src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
+            alt={player.name}
+            size={AvatarSize.M}
+            objectFit="cover"
+            showBorder
+            customBorderWidth={1}
+            opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
+            backgroundColor={theme.colors.silverLight}
+          />
+          <NationAvatarContainer disabled={isPlayerItemDisabled(player)}>
+            {player.country && (
+              <NationAvatar
+                flagUrl={getFlagUrlByCountryName(player.country)}
+                nationName={player.country as string}
+                size={AvatarSize.XS}
+              />
+            )}
+          </NationAvatarContainer>
+        </AvatarContainer>
         <NormalTypography variant="m" color={isPlayerItemDisabled(player) ? theme.colors.silver : theme.colors.textDefault}>
           {player.name}
         </NormalTypography>
@@ -261,7 +325,35 @@ const GoalScorerModal = ({
         )}
       </ModalToolBar>
       <ModalContent>
-        {previousGameWeekPredictedGoalScorer && (
+        <TeamTabs>
+          {homeTeamPlayers.length > 0 && (
+            <TeamTab
+              selected={selectedTeam === 'home'}
+              onClick={() => {
+                setPlayersToShow(homeTeamPlayers);
+                setSelectedTeam('home');
+              }}
+            >
+              <EmphasisTypography variant="m" color={selectedTeam === 'home' ? theme.colors.white : theme.colors.silverDarker}>
+                {fixture?.homeTeam.name ?? ''}
+              </EmphasisTypography>
+            </TeamTab>
+          )}
+          {awayTeamPlayers.length > 0 && (
+            <TeamTab
+              selected={selectedTeam === 'away'}
+              onClick={() => {
+                setPlayersToShow(awayTeamPlayers);
+                setSelectedTeam('away');
+              }}
+            >
+              <EmphasisTypography variant="m" color={selectedTeam === 'away' ? theme.colors.white : theme.colors.silverDarker}>
+                {fixture?.awayTeam.name ?? ''}
+              </EmphasisTypography>
+            </TeamTab>
+          )}
+        </TeamTabs>
+        {previouslySelectedGoalScorer && (
           <PreviousGoalScorer>
             <Section flexDirection="row" gap="xxs" alignItems="center">
               <Info size={24} color={theme.colors.silverDarker} weight="fill" />
@@ -276,7 +368,7 @@ const GoalScorerModal = ({
                   Förra omgången valde du:
                 </NormalTypography>
                 <EmphasisTypography variant="s" color={theme.colors.silverDarker}>
-                  {previousGameWeekPredictedGoalScorer.name}
+                  {previouslySelectedGoalScorer.name}
                 </EmphasisTypography>
               </Section>
             </Section>
@@ -323,7 +415,7 @@ const GoalScorerModal = ({
           fullWidth
           disabled={!selectedGoalScorers}
         >
-          Välj spelare
+          {multiple ? `Välj spelare (${selectedGoalScorers.length} st)` : 'Välj spelare'}
         </Button>
       </ButtonsContainer>
     </Modal>
@@ -458,6 +550,43 @@ const GoalsScored = styled.div`
   align-items: center;
   gap: ${theme.spacing.xxxs};
   width: fit-content;
+`;
+
+const TeamTabs = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxs};
+  padding-bottom: ${theme.spacing.xxs};
+  border-bottom: 1px solid ${theme.colors.silverLight};
+`;
+
+const TeamTab = styled.div<{ selected?: boolean }>`
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.s};
+  background-color: ${({ selected }) => (selected ? theme.colors.primary : theme.colors.silverLighter)};
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ selected }) => (selected ? theme.colors.primary : theme.colors.primaryBleach)};
+  }
+`;
+
+const AvatarContainer = styled.div`
+  height: fit-content;
+  width: fit-content;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: ${theme.spacing.xxxs};
+`;
+
+const NationAvatarContainer = styled.div<{ disabled?: boolean }>`
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
 `;
 
 export default GoalScorerModal;

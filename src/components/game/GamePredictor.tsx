@@ -23,7 +23,7 @@ import IconButton from '../buttons/IconButton';
 import Tag from '../tag/Tag';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { getSortedPlayerByPosition, withDocumentIdOnObject } from '../../utils/helpers';
+import { withDocumentIdOnObject } from '../../utils/helpers';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -35,14 +35,14 @@ interface GamePredictorProps {
   hasPredicted?: boolean;
   predictionValue?: Prediction;
   loading?: boolean;
-  previousGameWeekPredictedGoalScorer?: Player;
+  previousGameWeekPredictedGoalScorers?: Array<Player>;
   numberOfParticipantsPredicted?: number;
   isLeagueCreator?: boolean;
 }
 
 const GamePredictor = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, onShowStats, hasPredicted, predictionValue, loading, previousGameWeekPredictedGoalScorer, isLeagueCreator, numberOfParticipantsPredicted,
+  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, onShowStats, hasPredicted, predictionValue, loading, previousGameWeekPredictedGoalScorers, isLeagueCreator, numberOfParticipantsPredicted,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -50,7 +50,8 @@ const GamePredictor = ({
   const [awayGoals, setAwayGoals] = useState<string>(predictionValue?.awayGoals.toString() ?? '');
   const [predictedPlayerToScore, setPredictedPlayerToScore] = useState<Player | undefined>(predictionValue && predictionValue.goalScorer ? predictionValue.goalScorer : undefined);
   const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
-  const [players, setPlayers] = useState<Array<Player>>([]);
+  const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
+  const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
   const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
@@ -58,10 +59,20 @@ const GamePredictor = ({
   const hasPredictedAwayWin = homeGoals !== '' && awayGoals !== '' && homeGoals < awayGoals;
 
   useEffect(() => {
-    if (game.shouldPredictGoalScorer && game.goalScorerFromTeam && game.goalScorerFromTeam.length > 0) {
-      const playersByTeam = fetchTeamByName(game.goalScorerFromTeam[0]);
-      playersByTeam.then((players) => setPlayers(getSortedPlayerByPosition(players)));
-    }
+    const fetchTeams = async () => {
+      if (game.shouldPredictGoalScorer) {
+        const homePlayers = await fetchTeamByName(game.homeTeam.name);
+        const awayPlayers = await fetchTeamByName(game.awayTeam.name);
+
+        if (homePlayers && homePlayers.length > 0) {
+          setHomeTeamPlayers(homePlayers);
+        }
+        if (awayPlayers && awayPlayers.length > 0) {
+          setAwayTeamPlayers(awayPlayers);
+        }
+      }
+    };
+    fetchTeams();
   }, []);
 
   const fetchTeamByName = async (teamName: string) => {
@@ -422,11 +433,13 @@ const GamePredictor = ({
       </Card>
       {isSelectGoalScorerModalOpen && (
         <GoalScorerModal
-          players={players}
+          homeTeamPlayers={homeTeamPlayers}
+          awayTeamPlayers={awayTeamPlayers}
+          fixture={game}
           onSave={(players) => handleUpdatePlayerPrediction(players[0])}
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
           initialSelectedPlayers={[predictedPlayerToScore]}
-          previousGameWeekPredictedGoalScorer={previousGameWeekPredictedGoalScorer}
+          previousGameWeekPredictedGoalScorers={previousGameWeekPredictedGoalScorers}
         />
       )}
     </>
@@ -523,7 +536,7 @@ const getGoalScorerHoverColor = (disabled?: boolean, shouldPredictGoalScorer?: b
     return theme.colors.primaryDark;
   }
   if (disabled) return theme.colors.white;
-  return theme.colors.primaryBleach;
+  return theme.colors.primaryFade;
 };
 
 const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabled?: boolean, hasPredicted?: boolean, hasChosen?: boolean }>`

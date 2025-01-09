@@ -68,7 +68,7 @@ const AdminPlayersPage = () => {
                 <TeamLogo src={team?.logoUrl} alt={team?.name} />
               </LogoContainer>
               <TeamNameContainer teamPrimaryColor={team?.teamPrimaryColor} className="team-name-container">
-                <EmphasisTypography variant="m">{team?.name}</EmphasisTypography>
+                <EmphasisTypography variant="m" align="center">{team?.name}</EmphasisTypography>
               </TeamNameContainer>
             </TeamCard>
           ))}
@@ -114,7 +114,7 @@ const TeamCards = styled.div`
 const TeamCard = styled.div<{ teamPrimaryColor?: string }>`
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.l};
-  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.m};
+  padding: ${theme.spacing.m} ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s};
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xs};
@@ -159,6 +159,9 @@ const TeamNameContainer = styled.div<{ teamPrimaryColor?: string }>`
   border-radius: 100px;
   background-color: ${theme.colors.white};
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default AdminPlayersPage;

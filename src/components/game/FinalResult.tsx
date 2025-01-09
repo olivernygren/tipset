@@ -18,7 +18,7 @@ const FinalResult = ({
 }: FinalResultProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const isFullTime = fixture.kickOffTime && new Date(fixture.kickOffTime).getTime() + 2 * 60 * 60 * 1000 < new Date().getTime();
+  const isFullTime = fixture.finalResult || (fixture.kickOffTime && new Date(fixture.kickOffTime).getTime() + 2 * 60 * 60 * 1000 < new Date().getTime());
 
   const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
