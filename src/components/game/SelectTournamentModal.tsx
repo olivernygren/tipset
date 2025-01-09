@@ -29,6 +29,7 @@ enum TournamentCountryFiltersEnum {
   FRANCE = 'Frankrike',
   SWEDEN = 'Sverige',
   EUROPE = 'Europa',
+  NATIONAL = 'Landslag',
 }
 
 const SelectTournamentModal = ({
@@ -71,6 +72,8 @@ const SelectTournamentModal = ({
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.ALLSVENSKAN));
       case TournamentCountryFiltersEnum.EUROPE:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.CHAMPIONS_LEAGUE) || tournament.includes(TournamentsEnum.EUROPA_LEAGUE) || tournament.includes(TournamentsEnum.CONFERENCE_LEAGUE));
+      case TournamentCountryFiltersEnum.NATIONAL:
+        return teamType === TeamType.CLUBS ? [] : getNationalTeamTournaments();
       default:
         return [];
     }
@@ -205,7 +208,7 @@ const SelectTournamentModal = ({
       <ModalContent>
         <HeadingsTypography variant="h4">Turneringar</HeadingsTypography>
         <AllTournaments>
-          {teamType === TeamType.CLUBS && searchValue.length < 2 && Object.values(TournamentCountryFiltersEnum).map((country) => (
+          {(teamType === TeamType.CLUBS || teamType === TeamType.ALL) && searchValue.length < 2 && Object.values(TournamentCountryFiltersEnum).map((country) => (
             <CountrysTournaments>
               <EmphasisTypography variant="m">
                 {country}
@@ -216,9 +219,9 @@ const SelectTournamentModal = ({
             </CountrysTournaments>
           ))}
           {teamType === TeamType.NATIONS && searchValue.length < 2 && (
-          <TournamentsList>
-            {getNationalTeamTournaments().map((tournament) => getTournament(tournament))}
-          </TournamentsList>
+            <TournamentsList>
+              {getNationalTeamTournaments().map((tournament) => getTournament(tournament))}
+            </TournamentsList>
           )}
           {searchValue.length > 1 && (
             <TournamentsList>

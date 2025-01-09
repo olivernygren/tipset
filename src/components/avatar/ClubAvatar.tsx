@@ -7,10 +7,11 @@ interface ClubAvatarProps {
   size: AvatarSize;
   showBorder?: boolean;
   noPadding?: boolean;
+  shape?: 'circle' | 'square';
 }
 
 const ClubAvatar = ({
-  logoUrl, clubName, size, showBorder, noPadding,
+  logoUrl, clubName, size, showBorder, noPadding, shape,
 }: ClubAvatarProps) => (
   <Avatar
     src={logoUrl}
@@ -19,6 +20,7 @@ const ClubAvatar = ({
     title={clubName}
     showBorder={showBorder}
     noPadding={noPadding}
+    shape={shape}
   />
 );
 

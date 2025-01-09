@@ -46,6 +46,7 @@ const Select = ({
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.currentTarget.value)}
+      onClick={(e) => e.stopPropagation()}
     >
       {optionGroups ? optionGroups.map((optionGroup) => (
         <optgroup key={optionGroup.label} label={optionGroup.label}>

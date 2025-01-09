@@ -35,6 +35,7 @@ interface AvatarProps {
   noPadding?: boolean;
   opacity?: number;
   title?: string;
+  shape?: 'circle' | 'square';
 }
 
 interface StyledAvatarProps {
@@ -46,10 +47,11 @@ interface StyledAvatarProps {
   backgroundColor?: string;
   noPadding?: boolean;
   opacity?: number;
+  shape?: 'circle' | 'square';
 }
 
 const Avatar = ({
-  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, backgroundColor, noPadding = false, opacity = 1, title, customBorderWidth,
+  src, size = AvatarSize.M, alt, objectFit = 'contain', showBorder = false, customBorderColor, backgroundColor, noPadding = false, opacity = 1, title, customBorderWidth, shape = 'circle',
 }: AvatarProps) => (
   <StyledAvatar
     title={title}
@@ -62,6 +64,7 @@ const Avatar = ({
     noPadding={noPadding}
     className="avatar"
     opacity={opacity}
+    shape={shape}
   >
     <img src={src} alt={alt ?? 'avatar'} />
   </StyledAvatar>
@@ -130,7 +133,7 @@ const StyledAvatar = styled.div<StyledAvatarProps>`
   padding: ${({ objectFit, size }) => getAvatarPadding(objectFit, size)};
   margin: ${({ objectFit, size }) => getAvatarMargin(objectFit, size)};
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: ${({ shape }) => (shape === 'circle' ? '50%' : '0')};
   background-color: ${({ backgroundColor }) => (backgroundColor || 'transparent')};
   opacity: ${({ opacity }) => opacity};
 

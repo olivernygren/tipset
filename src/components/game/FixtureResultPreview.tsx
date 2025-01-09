@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Eye, FireSimple, Target } from '@phosphor-icons/react';
+import {
+  Eye, FireSimple, SoccerBall, Target,
+} from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
@@ -31,6 +33,7 @@ const FixtureResultPreview = ({
   const useShortTeamNames = isTablet;
   const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
   const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult);
+  const correctGoalScorerPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctGoalScorer);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -98,6 +101,9 @@ const FixtureResultPreview = ({
             <PointsContainer>
               {(oddsBonusPointsAwarded || correctResultPredicted) && (
                 <PointsIcons>
+                  {correctGoalScorerPredicted && (
+                    <SoccerBall size={16} color={theme.colors.silverDarker} weight="fill" />
+                  )}
                   {oddsBonusPointsAwarded && (
                     <FireSimple size={16} color={theme.colors.silverDarker} />
                   )}
@@ -264,7 +270,7 @@ const MobileButtonContainer = styled.div`
 
 const PointsIcons = styled.div`
   display: flex;
-  gap: 2px;
+  gap: 4px;
   align-items: center;
 `;
 

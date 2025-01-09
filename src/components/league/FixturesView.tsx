@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Info, ListChecks, PlusCircle, XCircle,
+  Info, ListChecks, MagnifyingGlass, PlusCircle, XCircle,
 } from '@phosphor-icons/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styled from 'styled-components';
@@ -39,6 +39,7 @@ import Modal from '../modal/Modal';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import PredictionsModal from './PredictionsModal';
 import CreateFixtureModal from '../game/CreateFixtureModal';
+import FindOtherFixturesModal from './FindOtherFixturesModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -69,6 +70,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [oddsBonusModalOpen, setOddsBonusModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
   const [showFixturePredictionsModal, setShowFixturePredictionsModal] = useState<string | null>(null);
+  const [findOtherFixturesModalOpen, setFindOtherFixturesModalOpen] = useState<boolean>(false);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -471,7 +473,17 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       </Section>
       <Divider />
       <Section gap="s">
-        <HeadingsTypography variant="h5">Matcher</HeadingsTypography>
+        <Section flexDirection="row" alignItems="center" gap="xxs" justifyContent="space-between">
+          <HeadingsTypography variant="h5">Matcher</HeadingsTypography>
+          <Button
+            variant="primary"
+            size="s"
+            onClick={() => setFindOtherFixturesModalOpen(true)}
+            icon={<MagnifyingGlass size={20} color={theme.colors.white} weight="bold" />}
+          >
+            Hitta matcher
+          </Button>
+        </Section>
         <Section gap="xxs">
           {newGameWeekFixtures.length > 0 && (
             newGameWeekFixtures
@@ -501,33 +513,29 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           <NormalTypography variant="l">Lägg till match</NormalTypography>
         </CreateFixtureCard>
       </Section>
-      {!isCreateFixtureModalOpen && (
-        <>
-          <Divider />
-          {createGameWeekError && (
-            <NormalTypography variant="m" color={theme.colors.red}>
-              {createGameWeekError}
-            </NormalTypography>
-          )}
-          <Section flexDirection="row" gap="xs">
-            <Button
-              variant="secondary"
-              onClick={() => setShowCreateGameWeekSection(false)}
-            >
-              Avbryt
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleCreateGameWeek}
-              disabled={isCreateFixtureModalOpen || createGameWeekLoading}
-              loading={createGameWeekLoading}
-              fullWidth={isMobile}
-            >
-              Skapa omgång
-            </Button>
-          </Section>
-        </>
+      <Divider />
+      {createGameWeekError && (
+      <NormalTypography variant="m" color={theme.colors.red}>
+        {createGameWeekError}
+      </NormalTypography>
       )}
+      <Section flexDirection="row" gap="xs">
+        <Button
+          variant="secondary"
+          onClick={() => setShowCreateGameWeekSection(false)}
+        >
+          Avbryt
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleCreateGameWeek}
+          disabled={isCreateFixtureModalOpen || createGameWeekLoading || newGameWeekFixtures.length === 0}
+          loading={createGameWeekLoading}
+          fullWidth={isMobile}
+        >
+          Skapa omgång
+        </Button>
+      </Section>
     </CreateGameWeekSection>
   );
 
@@ -795,6 +803,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           predictions={previousGameWeeks?.map((gw) => gw.games.predictions).flat().filter((p) => p.fixtureId === showFixturePredictionsModal) ?? []}
           fixture={previousGameWeeks?.map((gw) => gw.games.fixtures).flat().find((f) => f.id === showFixturePredictionsModal)}
           onClose={() => setShowFixturePredictionsModal(null)}
+        />
+      )}
+      {findOtherFixturesModalOpen && (
+        <FindOtherFixturesModal
+          onClose={() => setFindOtherFixturesModalOpen(false)}
         />
       )}
     </>

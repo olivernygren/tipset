@@ -17,6 +17,7 @@ export enum PredictionOutcomeEnum {
 export enum TeamType {
   CLUBS = 'clubs',
   NATIONS = 'nations',
+  ALL = 'all',
 }
 
 export interface FixtureResult {

@@ -7,7 +7,7 @@ import {
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
-import { ArsenalPlayers, Player } from '../../utils/Players';
+import { Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import { devices, theme } from '../../theme';
 import { Team } from '../../utils/Team';
@@ -230,6 +230,7 @@ const GamePredictor = ({
               clubName={displayName}
               logoUrl={logoUrl}
               size={isMobile ? AvatarSize.L : AvatarSize.XL}
+              shape="square"
             />
           ) : (
             <NationAvatar
