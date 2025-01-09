@@ -7,7 +7,7 @@ import { EmphasisTypography } from '../typography/Typography';
 
 export interface ButtonProps {
   variant?: 'primary' | 'secondary';
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   children: any;
   disabled?: boolean;
   disabledInvisible?: boolean;

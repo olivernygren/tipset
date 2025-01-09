@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CheckCircle, Circle, MagnifyingGlass } from '@phosphor-icons/react';
 import {
-  collection, getDocs, query, where,
+  collection, getDocs,
 } from 'firebase/firestore';
 import Modal from '../modal/Modal';
 import { theme } from '../../theme';

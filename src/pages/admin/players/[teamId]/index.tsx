@@ -35,6 +35,7 @@ import EditPlayerModal from '../../../../components/players/EditPlayerModal';
 import DeleteTeamModal from '../../../../components/teams/DeleteTeamModal';
 import EditTeamModal from '../../../../components/teams/EditTeamModal';
 import EditPlayerStatusModal from '../../../../components/players/EditPlayerStatusModal';
+import TextButton from '../../../../components/buttons/TextButton';
 
 const PlayersByTeamPage = () => {
   const [team, setTeam] = useState<Team | null>(null);
@@ -200,20 +201,21 @@ const PlayersByTeamPage = () => {
         </AvailabilityTag>
       )}
       {isEditMode && (
-        <Section gap="xxs" fitContent flexDirection="row">
-          <IconButton
-            icon={<Engine size={20} />}
-            colors={{ normal: theme.colors.textDefault }}
+        <Section gap="xxs" fitContent flexDirection="row" alignItems="center">
+          <TextButton
+            color="primary"
             onClick={(e) => {
-              e.stopPropagation();
+              e?.stopPropagation();
               setEditPlayerStatus(player);
               setEditPlayerStatusModalOpen(true);
             }}
-          />
+          >
+            Status
+          </TextButton>
           <IconButton
             icon={<ArrowBendDoubleUpRight size={20} />}
             colors={{ normal: theme.colors.textDefault }}
-            onClick={(e) => {}}
+            onClick={() => {}}
           />
           <IconButton
             icon={<PencilSimple size={20} />}

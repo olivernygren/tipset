@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Plus } from '@phosphor-icons/react';
+import { Plus, Sparkle } from '@phosphor-icons/react';
 import { collection, getDocs } from 'firebase/firestore';
 import { theme } from '../../../theme';
 import { EmphasisTypography, HeadingsTypography } from '../../../components/typography/Typography';
@@ -12,9 +12,13 @@ import { CollectionEnum } from '../../../utils/Firebase';
 import { db } from '../../../config/firebase';
 import { withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
 import CreateTeamModal from '../../../components/teams/CreateTeamModal';
+import { Section } from '../../../components/section/Section';
+import CreateTeamViaFotMobSnippetModal from '../../../components/teams/CreateTeamViaFotMobSnippetModal';
+import { convertCountryCodeToCountryEnum } from '../../../utils/fotmobHelpers';
 
 const AdminPlayersPage = () => {
   const [addTeamModalOpen, setAddTeamModalOpen] = useState<boolean>(false);
+  const [addTeamViaFotmobSnippetModalOpen, setAddTeamViaFotmobSnippetModalOpen] = useState<boolean>(false);
   const [teams, setTeams] = useState<Array<Team>>([]);
 
   useEffect(() => {
@@ -34,13 +38,22 @@ const AdminPlayersPage = () => {
       <PageContent>
         <Header>
           <HeadingsTypography variant="h2" as="h1">Spelare & Lag</HeadingsTypography>
-          <Button
-            variant="primary"
-            icon={<Plus color={theme.colors.white} size={20} weight="bold" />}
-            onClick={() => setAddTeamModalOpen(true)}
-          >
-            Lägg till lag
-          </Button>
+          <Section flexDirection="row" gap="xs" fitContent>
+            <Button
+              variant="secondary"
+              icon={<Sparkle color={theme.colors.primary} size={20} weight="fill" />}
+              onClick={() => setAddTeamViaFotmobSnippetModalOpen(true)}
+            >
+              Skapa lag via FotMob
+            </Button>
+            <Button
+              variant="primary"
+              icon={<Plus color={theme.colors.white} size={20} weight="bold" />}
+              onClick={() => setAddTeamModalOpen(true)}
+            >
+              Lägg till lag
+            </Button>
+          </Section>
         </Header>
         <Divider />
         <HeadingsTypography variant="h4">Välj lag</HeadingsTypography>
@@ -64,6 +77,12 @@ const AdminPlayersPage = () => {
       {addTeamModalOpen && (
         <CreateTeamModal
           onClose={() => setAddTeamModalOpen(false)}
+          refetchTeams={handleFetchTeams}
+        />
+      )}
+      {addTeamViaFotmobSnippetModalOpen && (
+        <CreateTeamViaFotMobSnippetModal
+          onClose={() => setAddTeamViaFotmobSnippetModalOpen(false)}
           refetchTeams={handleFetchTeams}
         />
       )}

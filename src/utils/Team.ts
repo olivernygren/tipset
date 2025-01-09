@@ -5,6 +5,7 @@ import { CountryEnum, Player } from './Players';
 
 /* eslint-disable no-restricted-syntax */
 export interface Team {
+  id?: string;
   documentId?: string;
   name: string;
   shortName?: string;
@@ -12,8 +13,19 @@ export interface Team {
   darkModeLogoUrl?: string;
   stadium?: string;
   country?: string;
+  countryCode?: string;
+  federation?: FederationEnum;
   teamPrimaryColor?: string;
   players?: Player[];
+}
+
+export enum FederationEnum {
+  EUROPE = 'Europa',
+  SOUTH_AMERICA = 'Sydamerika',
+  AFRICA = 'Afrika',
+  ASIA = 'Asien',
+  NORTH_AMERICA = 'Nordamerika',
+  OCEANIA = 'Oceanien',
 }
 
 export enum LeagueEnum {
@@ -161,7 +173,984 @@ export const getTeamPrimaryColorByName = (teamName: string): string => {
   return '';
 };
 
-export const Teams = {
+export const nationalTeams: Team[] = [
+  {
+    name: 'England',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg',
+    countryCode: 'ENG',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Brasilien',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg',
+    countryCode: 'BRA',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Tyskland',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg',
+    countryCode: 'GER',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Belgien',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Belgium.svg',
+    countryCode: 'BEL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Nederländerna',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg',
+    countryCode: 'NED',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Frankrike',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/france/flag-square-500.png',
+    countryCode: 'FRA',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Spanien',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg',
+    countryCode: 'ESP',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Italien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/italy/flag-square-500.png',
+    countryCode: 'ITA',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Argentina',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg',
+    countryCode: 'ARG',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Portugal',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg',
+    countryCode: 'POR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Skottland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/scotland/flag-square-500.png',
+    countryCode: 'SCO',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Norge',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
+    countryCode: 'NOR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Danmark',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg',
+    countryCode: 'DEN',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Sverige',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Flag_of_Sweden.svg',
+    countryCode: 'SWE',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Finland',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Finland.svg',
+    countryCode: 'FIN',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Schweiz',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Flag_of_Switzerland_%28Pantone%29.svg',
+    countryCode: 'SUI',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Ukraina',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg',
+    countryCode: 'UKR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Österrike',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg',
+    countryCode: 'AUT',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Polen',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/Flag_of_Poland.svg',
+    countryCode: 'POL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Ghana',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Ghana.svg',
+    countryCode: 'GHA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Japan',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg',
+    countryCode: 'JPN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Tjeckien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/czech-republic/flag-square-500.png',
+    countryCode: 'CZE',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Kroatien',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg',
+    countryCode: 'CRO',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Slovakien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/slovakia/flag-square-500.png',
+    countryCode: 'SVK',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Serbien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/serbia/flag-square-500.png',
+    countryCode: 'SRB',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Azerbajdzjan',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg',
+    countryCode: 'AZE',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Kosovo',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Kosovo.svg',
+    countryCode: 'KVX',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Slovenien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/slovenia/flag-square-500.png',
+    countryCode: 'SVN',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Montenegro',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/montenegro/flag-square-500.png',
+    countryCode: 'MNE',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Albanien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/albania/flag-square-500.png',
+    countryCode: 'ALB',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Bosnien och Hercegovina',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/bosnia-and-herzegovina/flag-square-500.png',
+    countryCode: 'BIH',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Nordmakedonien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/north-macedonia/flag-square-500.png',
+    countryCode: 'MKD',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Bulgarien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/bulgaria/flag-square-500.png',
+    countryCode: 'BUL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Uruguay',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/uruguay/flag-square-500.png',
+    countryCode: 'URU',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Island',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/iceland/flag-square-500.png',
+    countryCode: 'ISL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Elfenbenskusten',
+    logoUrl: 'https://www.countryflags.com/wp-content/uploads/cote-d-ivoire-flag-png-large.png',
+    countryCode: 'CIV',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Nigeria',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/nigeria/flag-square-500.png',
+    countryCode: 'NGA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Surinam',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/suriname/flag-square-500.png',
+    countryCode: 'SUR',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Gambia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/gambia/flag-square-500.png',
+    countryCode: 'GAM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Senegal',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/senegal/flag-square-500.png',
+    countryCode: 'SEN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Kamerun',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/cameroon/flag-square-500.png',
+    countryCode: 'CMR',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Marocko',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/morocco/flag-square-500.png',
+    countryCode: 'MAR',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Tunisien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/tunisia/flag-square-500.png',
+    countryCode: 'TUN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Egypten',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/egypt/flag-square-500.png',
+    countryCode: 'EGY',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Sydafrika',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/south-africa/flag-square-500.png',
+    countryCode: 'RSA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Algeriet',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/algeria/flag-square-500.png',
+    countryCode: 'ALG',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Kongo-Kinshasa',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-kinshasa/flag-square-500.png',
+    countryCode: 'COD',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'El Salvador',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/el-salvador/flag-square-500.png',
+    countryCode: 'SLV',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Honduras',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/honduras/flag-square-500.png',
+    countryCode: 'HON',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Costa Rica',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/costa-rica/flag-square-500.png',
+    countryCode: 'CRC',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Panama',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/panama/flag-square-500.png',
+    countryCode: 'PAN',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'USA',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/united-states-of-america/flag-square-500.png',
+    countryCode: 'USA',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Mexiko',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/mexico/flag-square-500.png',
+    countryCode: 'MEX',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Kanada',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/canada/flag-square-500.png',
+    countryCode: 'CAN',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Jamaica',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/jamaica/flag-square-500.png',
+    countryCode: 'JAM',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Trinidad och Tobago',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/trinidad-and-tobago/flag-square-500.png',
+    countryCode: 'TRI',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Haiti',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/haiti/flag-square-500.png',
+    countryCode: 'HAI',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Guatemala',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/guatemala/flag-square-500.png',
+    countryCode: 'GUA',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Nicaragua',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/nicaragua/flag-square-500.png',
+    countryCode: 'NCA',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Kuba',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/cuba/flag-square-500.png',
+    countryCode: 'CUB',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Dominikanska republiken',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/dominican-republic/flag-square-500.png',
+    countryCode: 'DOM',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Honduras',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/honduras/flag-square-500.png',
+    countryCode: 'HON',
+    federation: FederationEnum.NORTH_AMERICA,
+  },
+  {
+    name: 'Sydkorea',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/south-korea/flag-square-500.png',
+    countryCode: 'KOR',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Kina',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/china/flag-square-500.png',
+    countryCode: 'CHN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Australien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/australia/flag-square-500.png',
+    countryCode: 'AUS',
+    federation: FederationEnum.OCEANIA,
+  },
+  {
+    name: 'Nya Zeeland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/new-zealand/flag-square-500.png',
+    countryCode: 'NZL',
+    federation: FederationEnum.OCEANIA,
+  },
+  {
+    name: 'Färöarna',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/faroe-islands/flag-square-500.png',
+    countryCode: 'FRO',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Turkiet',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/turkey/flag-square-500.png',
+    countryCode: 'TUR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Rumänien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/romania/flag-square-500.png',
+    countryCode: 'ROU',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Ungern',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/hungary/flag-square-500.png',
+    countryCode: 'HUN',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Grekland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/greece/flag-square-500.png',
+    countryCode: 'GRE',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Kazakstan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/kazakhstan/flag-square-500.png',
+    countryCode: 'KAZ',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Kuwait',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/kuwait/flag-square-500.png',
+    countryCode: 'KUW',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Libanon',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/lebanon/flag-square-500.png',
+    countryCode: 'LBN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Jordanien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/jordan/flag-square-500.png',
+    countryCode: 'JOR',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Armenien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/armenia/flag-square-500.png',
+    countryCode: 'ARM',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Georgien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/georgia/flag-square-500.png',
+    countryCode: 'GEO',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Iran',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/iran/flag-square-500.png',
+    countryCode: 'IRN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Irak',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/iraq/flag-square-500.png',
+    countryCode: 'IRQ',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Kenya',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/kenya/flag-square-500.png',
+    countryCode: 'KEN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Uganda',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/uganda/flag-square-500.png',
+    countryCode: 'UGA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Zimbabwe',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/zimbabwe/flag-square-500.png',
+    countryCode: 'ZIM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Zambia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/zambia/flag-square-500.png',
+    countryCode: 'ZAM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Tanzania',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/tanzania/flag-square-500.png',
+    countryCode: 'TAN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Syrien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/syria/flag-square-500.png',
+    countryCode: 'SYR',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Israel',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/israel/flag-square-500.png',
+    countryCode: 'ISR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Cypern',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/cyprus/flag-square-500.png',
+    countryCode: 'CYP',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Irland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/ireland/flag-square-500.png',
+    countryCode: 'IRL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Wales',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/wales/flag-square-500.png',
+    countryCode: 'WAL',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Nordirland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/northern-ireland/flag-square-500.png',
+    countryCode: 'NIR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Estland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/estonia/flag-square-500.png',
+    countryCode: 'EST',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Lettland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/latvia/flag-square-500.png',
+    countryCode: 'LAT',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Litauen',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/lithuania/flag-square-500.png',
+    countryCode: 'LTU',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Moldavien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/moldova/flag-square-500.png',
+    countryCode: 'MDA',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Luxemburg',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/luxembourg/flag-square-500.png',
+    countryCode: 'LUX',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Malta',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/malta/flag-square-500.png',
+    countryCode: 'MLT',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Andorra',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/andorra/flag-square-500.png',
+    countryCode: 'AND',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Paraguay',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/paraguay/flag-square-500.png',
+    countryCode: 'PAR',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Peru',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/peru/flag-square-500.png',
+    countryCode: 'PER',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Chile',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/chile/flag-square-500.png',
+    countryCode: 'CHI',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Ecuador',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/ecuador/flag-square-500.png',
+    countryCode: 'ECU',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Bolivia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/bolivia/flag-square-500.png',
+    countryCode: 'BOL',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Venezuela',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/venezuela/flag-square-500.png',
+    countryCode: 'VEN',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Colombia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/colombia/flag-square-500.png',
+    countryCode: 'COL',
+    federation: FederationEnum.SOUTH_AMERICA,
+  },
+  {
+    name: 'Brunei',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/brunei/flag-square-500.png',
+    countryCode: 'BRU',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Filippinerna',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/philippines/flag-square-500.png',
+    countryCode: 'PHI',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Thailand',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/thailand/flag-square-500.png',
+    countryCode: 'THA',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Vietnam',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/vietnam/flag-square-500.png',
+    countryCode: 'VIE',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Malaysia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/malaysia/flag-square-500.png',
+    countryCode: 'MAS',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Singapore',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/singapore/flag-square-500.png',
+    countryCode: 'SIN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Indonesien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/indonesia/flag-square-500.png',
+    countryCode: 'IDN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Kambodja',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/cambodia/flag-square-500.png',
+    countryCode: 'CAM',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Laos',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/laos/flag-square-500.png',
+    countryCode: 'LAO',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Myanmar',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/myanmar/flag-square-500.png',
+    countryCode: 'MYA',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Libyen',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/libya/flag-square-500.png',
+    countryCode: 'LBY',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Sudan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/sudan/flag-square-500.png',
+    countryCode: 'SUD',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Etiopien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/ethiopia/flag-square-500.png',
+    countryCode: 'ETH',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Somalia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/somalia/flag-square-500.png',
+    countryCode: 'SOM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Eritrea',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/eritrea/flag-square-500.png',
+    countryCode: 'ERI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Djibouti',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/djibouti/flag-square-500.png',
+    countryCode: 'DJI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Mauretanien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/mauritania/flag-square-500.png',
+    countryCode: 'MTN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Mali',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/mali/flag-square-500.png',
+    countryCode: 'MLI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Burkina Faso',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/burkina-faso/flag-square-500.png',
+    countryCode: 'BFA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Niger',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/niger/flag-square-500.png',
+    countryCode: 'NIG',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Tchad',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/chad/flag-square-500.png',
+    countryCode: 'CHA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Centralafrikanska republiken',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/central-african-republic/flag-square-500.png',
+    countryCode: 'CAF',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Gabon',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/gabon/flag-square-500.png',
+    countryCode: 'GAB',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Kongo-Brazzaville',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/congo-brazzaville/flag-square-500.png',
+    countryCode: 'CGO',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Angola',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/angola/flag-square-500.png',
+    countryCode: 'ANG',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Togo',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/togo/flag-square-500.png',
+    countryCode: 'TOG',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Benin',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/benin/flag-square-500.png',
+    countryCode: 'BEN',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Burundi',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/burundi/flag-square-500.png',
+    countryCode: 'BDI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Rwanda',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/rwanda/flag-square-500.png',
+    countryCode: 'RWA',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Namibia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/namibia/flag-square-500.png',
+    countryCode: 'NAM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Botswana',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/botswana/flag-square-500.png',
+    countryCode: 'BOT',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Swaziland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/swaziland/flag-square-500.png',
+    countryCode: 'SWZ',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Lesotho',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/lesotho/flag-square-500.png',
+    countryCode: 'LES',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Sierra Leone',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/sierra-leone/flag-square-500.png',
+    countryCode: 'SLE',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Liberia',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/liberia/flag-square-500.png',
+    countryCode: 'LBR',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Guinea',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/guinea/flag-square-500.png',
+    countryCode: 'GUI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Guinea-Bissau',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/guinea-bissau/flag-square-500.png',
+    countryCode: 'GNB',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Kap Verde',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/cape-verde/flag-square-500.png',
+    countryCode: 'CPV',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'São Tomé och Príncipe',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/sao-tome-and-principe/flag-square-500.png',
+    countryCode: 'STP',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Komorerna',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/comoros/flag-square-500.png',
+    countryCode: 'COM',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Ryssland',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/russia/flag-square-500.png',
+    countryCode: 'RUS',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Belarus',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/belarus/flag-square-500.png',
+    countryCode: 'BLR',
+    federation: FederationEnum.EUROPE,
+  },
+  {
+    name: 'Malawi',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/malawi/flag-square-500.png',
+    countryCode: 'MWI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Mozambique',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/mozambique/flag-square-500.png',
+    countryCode: 'MOZ',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Madagaskar',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/madagascar/flag-square-500.png',
+    countryCode: 'MAD',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Mauritius',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/mauritius/flag-square-500.png',
+    countryCode: 'MRI',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Seychellerna',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/seychelles/flag-square-500.png',
+    countryCode: 'SEY',
+    federation: FederationEnum.AFRICA,
+  },
+  {
+    name: 'Indien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/india/flag-square-500.png',
+    countryCode: 'IND',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Pakistan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/pakistan/flag-square-500.png',
+    countryCode: 'PAK',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Bangladesh',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/bangladesh/flag-square-500.png',
+    countryCode: 'BAN',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Sri Lanka',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/sri-lanka/flag-square-500.png',
+    countryCode: 'SRI',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Nepal',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/nepal/flag-square-500.png',
+    countryCode: 'NEP',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Bhutan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/bhutan/flag-square-500.png',
+    countryCode: 'BHU',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Maldiverna',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/maldives/flag-square-500.png',
+    countryCode: 'MDV',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Nordkorea',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/north-korea/flag-square-500.png',
+    countryCode: 'PRK',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Turkmenistan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/turkmenistan/flag-square-500.png',
+    countryCode: 'TKM',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Uzbekistan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/uzbekistan/flag-square-500.png',
+    countryCode: 'UZB',
+    federation: FederationEnum.ASIA,
+  },
+  {
+    name: 'Tadzjikistan',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/tajikistan/flag-square-500.png',
+    countryCode: 'TJK',
+    federation: FederationEnum.ASIA,
+  },
+];
+
+type TeamsType = { [key: string]: Team[] };
+
+export const Teams: TeamsType = {
   [LeagueEnum.PREMIER_LEAGUE]: [
     {
       name: 'Arsenal',
@@ -1352,162 +2341,5 @@ export const Teams = {
       teamPrimaryColor: '#1b1059',
     },
   ],
-  [LeagueEnum.NATIONS]: [
-    {
-      name: 'England',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg',
-    },
-    {
-      name: 'Brasilien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg',
-    },
-    {
-      name: 'Tyskland',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg',
-    },
-    {
-      name: 'Belgien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Belgium.svg',
-    },
-    {
-      name: 'Nederländerna',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg',
-    },
-    {
-      name: 'Frankrike',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/france/flag-square-500.png',
-    },
-    {
-      name: 'Spanien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg',
-    },
-    {
-      name: 'Italien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/italy/flag-square-500.png',
-    },
-    {
-      name: 'Argentina',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg',
-    },
-    {
-      name: 'Portugal',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg',
-    },
-    {
-      name: 'Skottland',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/scotland/flag-square-500.png',
-    },
-    {
-      name: 'Norge',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg',
-    },
-    {
-      name: 'Danmark',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg',
-    },
-    {
-      name: 'Sverige',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Flag_of_Sweden.svg',
-    },
-    {
-      name: 'Finland',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Finland.svg',
-    },
-    {
-      name: 'Schweiz',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Flag_of_Switzerland_%28Pantone%29.svg',
-    },
-    {
-      name: 'Ukraina',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg',
-    },
-    {
-      name: 'Österrike',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg',
-    },
-    {
-      name: 'Polen',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/1/12/Flag_of_Poland.svg',
-    },
-    {
-      name: 'Ghana',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Ghana.svg',
-    },
-    {
-      name: 'Japan',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg',
-    },
-    {
-      name: 'Tjeckien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/czech-republic/flag-square-500.png',
-    },
-    {
-      name: 'Kroatien',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg',
-    },
-    {
-      name: 'Slovakien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/slovakia/flag-square-500.png',
-    },
-    {
-      name: 'Serbien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/serbia/flag-square-500.png',
-    },
-    {
-      name: 'Azerbajdzjan',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg',
-    },
-    {
-      name: 'Kosovo',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Kosovo.svg',
-    },
-    {
-      name: 'Slovenien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/slovenia/flag-square-500.png',
-    },
-    {
-      name: 'Montenegro',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/montenegro/flag-square-500.png',
-    },
-    {
-      name: 'Albanien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/albania/flag-square-500.png',
-    },
-    {
-      name: 'Bosnien och Hercegovina',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/bosnia-and-herzegovina/flag-square-500.png',
-    },
-    {
-      name: 'Nordmakedonien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/north-macedonia/flag-square-500.png',
-    },
-    {
-      name: 'Bulgarien',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/bulgaria/flag-square-500.png',
-    },
-    {
-      name: 'Uruguay',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/uruguay/flag-square-500.png',
-    },
-    {
-      name: 'Island',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/iceland/flag-square-500.png',
-    },
-    {
-      name: 'Elfenbenskusten',
-      logoUrl: 'https://www.countryflags.com/wp-content/uploads/cote-d-ivoire-flag-png-large.png',
-    },
-    {
-      name: 'Nigeria',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/nigeria/flag-square-500.png',
-    },
-    {
-      name: 'Surinam',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/suriname/flag-square-500.png',
-    },
-    {
-      name: 'Gambia',
-      logoUrl: 'https://cdn.countryflags.com/thumbs/gambia/flag-square-500.png',
-    },
-  ],
+  [LeagueEnum.NATIONS]: nationalTeams,
 };

@@ -3,9 +3,9 @@ export enum ExactPositionEnum {
   RB = 'RB',
   CB = 'CB',
   LB = 'LB',
-  CDM = 'CDM',
+  DM = 'DM',
   CM = 'CM',
-  CAM = 'CAM',
+  AM = 'AM',
   RM = 'RM',
   LM = 'LM',
   RW = 'RW',
@@ -399,7 +399,7 @@ export const ArsenalPlayers: Array<Player> = [
     id: '3r6eegh129r29r1odhdmed',
     name: ArsenalPlayersEnum.THOMAS_PARTEY,
     position: {
-      exact: ExactPositionEnum.CDM,
+      exact: ExactPositionEnum.DM,
       general: GeneralPositionEnum.MF,
     },
     number: 5,
@@ -411,7 +411,7 @@ export const ArsenalPlayers: Array<Player> = [
     id: '39rj2j10rw9gn9rnwenw2j',
     name: ArsenalPlayersEnum.DECLAN_RICE,
     position: {
-      exact: ExactPositionEnum.CDM,
+      exact: ExactPositionEnum.DM,
       general: GeneralPositionEnum.MF,
     },
     number: 41,
@@ -447,7 +447,7 @@ export const ArsenalPlayers: Array<Player> = [
   //   id: 'rh27tg9fofh9w4ghnfoif',
   //   name: ArsenalPlayersEnum.FABIO_VIEIRA,
   //   position: {
-  //     exact: ExactPositionEnum.CAM,
+  //     exact: ExactPositionEnum.AM,
   //     general: GeneralPositionEnum.MF,
   //   },
   //   number: 21,
@@ -459,7 +459,7 @@ export const ArsenalPlayers: Array<Player> = [
     id: 'mwokepoe2yr4wr8yr4owru',
     name: ArsenalPlayersEnum.MARTIN_ODEGAARD,
     position: {
-      exact: ExactPositionEnum.CAM,
+      exact: ExactPositionEnum.AM,
       general: GeneralPositionEnum.MF,
     },
     number: 8,

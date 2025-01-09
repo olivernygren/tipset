@@ -158,7 +158,7 @@ export const getExactPositionOptions = (generalPosition: GeneralPositionEnum) =>
     case GeneralPositionEnum.DF:
       return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.CB || position === ExactPositionEnum.LB || position === ExactPositionEnum.RB);
     case GeneralPositionEnum.MF:
-      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.CM || position === ExactPositionEnum.CDM || position === ExactPositionEnum.CAM || position === ExactPositionEnum.LM || position === ExactPositionEnum.RM);
+      return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.CM || position === ExactPositionEnum.DM || position === ExactPositionEnum.AM || position === ExactPositionEnum.LM || position === ExactPositionEnum.RM);
     case GeneralPositionEnum.FW:
       return Object.values(ExactPositionEnum).filter((position) => position === ExactPositionEnum.ST || position === ExactPositionEnum.LW || position === ExactPositionEnum.RW);
     default:
@@ -180,7 +180,7 @@ export const getSortedPlayerByPosition = (players: Array<Player>): Array<Player>
   const forwards = players.filter((player) => player.position.general === GeneralPositionEnum.FW);
 
   const defenderOrder = ['RB', 'CB', 'LB'];
-  const midfielderOrder = ['CDM', 'CM', 'RM', 'CAM', 'LM'];
+  const midfielderOrder = ['DM', 'CM', 'RM', 'AM', 'LM'];
   const forwardOrder = ['RW', 'ST', 'LW'];
 
   const sortByExactPosition = (players: Array<Player>, order: Array<string>): Array<Player> => players.sort((a, b) => {
