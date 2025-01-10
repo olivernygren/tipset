@@ -648,6 +648,18 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                 </Section>
               )}
             </OngoingGameWeekHeader>
+            <Section flexDirection="row" gap="xxs" alignItems="center" justifyContent="center" backgroundColor={theme.colors.primaryFade} padding={theme.spacing.xs} borderRadius={theme.borderRadius.m}>
+              <Section gap="xxs" alignItems="center">
+                <EmphasisTypography variant="m" color={theme.colors.textDefault}>🎉 Nyhet! Nu kan du tippa målskytt i flera utvalda lag</EmphasisTypography>
+                <NormalTypography variant="s" color={theme.colors.primaryDark}>
+                  (Välj fortsatt
+                  {' '}
+                  <u>en</u>
+                  {' '}
+                  målskytt per match - från antingen hemmalaget eller bortalaget)
+                </NormalTypography>
+              </Section>
+            </Section>
             {ongoingGameWeek ? (
               <>
                 {getOngoingGameWeekContent()}

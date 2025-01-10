@@ -5,10 +5,11 @@ interface NationAvatarProps {
   nationName: string;
   flagUrl: string;
   size: AvatarSize;
+  backgroundColor?: string;
 }
 
 const NationAvatar = ({
-  nationName, flagUrl, size,
+  nationName, flagUrl, size, backgroundColor,
 }: NationAvatarProps) => (
   <Avatar
     src={flagUrl}
@@ -17,6 +18,7 @@ const NationAvatar = ({
     showBorder
     objectFit="cover"
     title={nationName}
+    backgroundColor={backgroundColor}
   />
 );
 

@@ -125,7 +125,11 @@ const GoalScorerModal = ({
     if (previousGameWeekPredictedGoalScorers && previousGameWeekPredictedGoalScorers.length > 0) {
       if (playersToShow.some((player) => previousGameWeekPredictedGoalScorers.some((previousPlayer) => previousPlayer.id === player.id))) {
         const previouslySelectedGoalScorer = previousGameWeekPredictedGoalScorers.find((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
+        console.log('previouslySelectedGoalScorer', previouslySelectedGoalScorer);
+
         setPreviouslySelectedGoalScorer(previouslySelectedGoalScorer || null);
+      } else {
+        setPreviouslySelectedGoalScorer(null);
       }
     }
   }, [playersToShow]);
@@ -176,16 +180,6 @@ const GoalScorerModal = ({
       disabled={isPlayerItemDisabled(player)}
     >
       <PlayerInfo>
-        {/* <Avatar
-          src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
-          alt={player.name}
-          size={AvatarSize.M}
-          objectFit="cover"
-          showBorder
-          opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
-          customBorderWidth={1}
-          backgroundColor={theme.colors.silverLight}
-        /> */}
         <AvatarContainer>
           <Avatar
             src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
@@ -203,6 +197,7 @@ const GoalScorerModal = ({
                 flagUrl={getFlagUrlByCountryName(player.country)}
                 nationName={player.country as string}
                 size={AvatarSize.XS}
+                backgroundColor={theme.colors.white}
               />
             )}
           </NationAvatarContainer>
