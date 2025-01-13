@@ -191,16 +191,17 @@ const GoalScorerModal = ({
             opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
             backgroundColor={theme.colors.silverLight}
           />
-          <NationAvatarContainer disabled={isPlayerItemDisabled(player)}>
-            {player.country && (
-              <NationAvatar
-                flagUrl={getFlagUrlByCountryName(player.country)}
-                nationName={player.country as string}
-                size={AvatarSize.XS}
-                backgroundColor={theme.colors.white}
-              />
-            )}
-          </NationAvatarContainer>
+          {!isPlayerItemDisabled(player) && (
+            <NationAvatarContainer>
+              {player.country && (
+                <NationAvatar
+                  flagUrl={getFlagUrlByCountryName(player.country)}
+                  nationName={player.country as string}
+                  size={AvatarSize.XS}
+                />
+              )}
+            </NationAvatarContainer>
+          )}
         </AvatarContainer>
         <NormalTypography variant="m" color={isPlayerItemDisabled(player) ? theme.colors.silver : theme.colors.textDefault}>
           {player.name}

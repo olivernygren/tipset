@@ -5,7 +5,7 @@ import {
   collection, getDocs,
 } from 'firebase/firestore';
 import Modal from '../modal/Modal';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import IconButton from '../buttons/IconButton';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -20,6 +20,10 @@ import { CollectionEnum } from '../../utils/Firebase';
 import { withDocumentIdOnObjectsInArray } from '../../utils/helpers';
 import { PredictionLeague } from '../../utils/League';
 import { errorNotify } from '../../utils/toast/toastHelpers';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
+import { AvatarSize } from '../avatar/Avatar';
+import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 enum SearchType {
   BY_TOURNAMENT = 'BY_TOURNAMENT',
@@ -35,9 +39,12 @@ interface ExternalFixture {
 
 interface FindOtherFixturesModalProps {
   onClose: () => void;
+  onFixtureSelect: (fixture: Fixture) => void;
 }
 
-const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
+const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesModalProps) => {
+  const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
   const [searchType, setSearchType] = useState<SearchType>(SearchType.BY_TOURNAMENT);
   const [showTournamentsModal, setShowTournamentsModal] = useState<boolean>(false);
   const [showTeamsModal, setShowTeamsModal] = useState<boolean>(false);
@@ -115,13 +122,19 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
     }
   };
 
-  const getKickoffDateAndTime = (kickoffTime: string) => {
+  const getKickoffDateAndTime = (kickoffTime: string, options?: { dateOnly?: boolean, timeOnly?: boolean }) => {
     const date = new Date(kickoffTime);
+
     const weekday = date.toLocaleDateString('sv-SE', { weekday: 'short' }).charAt(0).toUpperCase() + date.toLocaleDateString('sv-SE', { weekday: 'short' }).slice(1);
     const day = date.getDate();
     const month = date.toLocaleDateString('sv-SE', { month: 'short' }).replace('.', '');
+
     const hours = date.getHours();
     const minutes = date.getMinutes();
+
+    if (options && options.dateOnly) return `${weekday} ${day} ${month}`;
+    if (options && options.timeOnly) return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+
     return `${weekday} ${day} ${month} ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   };
 
@@ -132,14 +145,29 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
     setAvailableFixtures([]);
   };
 
+  const getAvatar = (team: Team, fixture: Fixture) => (fixture.teamType === TeamType.CLUBS ? (
+    <ClubAvatar
+      logoUrl={team.logoUrl}
+      clubName={team.name}
+      size={AvatarSize.S}
+    />
+  ) : (
+    <NationAvatar
+      flagUrl={team.logoUrl}
+      nationName={team.name}
+      size={AvatarSize.S}
+    />
+  ));
+
   return (
     <>
       <Modal
         title="Hitta andra matcher"
         onClose={onClose}
+        mobileFullScreen
       >
         <ModalContent>
-          <Section flexDirection="row" alignItems="center" gap="s">
+          <SearchTypesContainer>
             <SearchTypeItem selected={searchType === SearchType.BY_TOURNAMENT} onClick={() => handleChangeSearchType(SearchType.BY_TOURNAMENT)}>
               <IconButton
                 icon={searchType === SearchType.BY_TOURNAMENT ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
@@ -170,7 +198,7 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
                 Välj landslag
               </EmphasisTypography>
             </SearchTypeItem>
-          </Section>
+          </SearchTypesContainer>
           <Section gap="xxs">
             {searchType === SearchType.BY_TOURNAMENT ? (
               <>
@@ -195,22 +223,35 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
             )}
           </Section>
           {availableFixtures.length > 0 ? (
-            <Section gap="s">
+            <MainContent>
               <HeadingsTypography variant="h5">Tillgängliga matcher</HeadingsTypography>
               <AvailableFixturesContainer>
-                {availableFixtures.map((externalFixture) => (
-                  <AvailableFixtureItem key={externalFixture.fixture.id}>
-                    <EmphasisTypography variant="s">{`${externalFixture.fixture.homeTeam.name} - ${externalFixture.fixture.awayTeam.name}`}</EmphasisTypography>
-                    <EmphasisTypography variant="s">{getKickoffDateAndTime(externalFixture.fixture.kickOffTime)}</EmphasisTypography>
-                    <HeadingsTypography variant="h6">{externalFixture.leagueName}</HeadingsTypography>
+                {availableFixtures.map(({ fixture }) => (
+                  <AvailableFixtureItem key={fixture.id} onClick={() => onFixtureSelect(fixture)}>
+                    <FixtureDate>
+                      <NormalTypography variant="s">{getKickoffDateAndTime(fixture.kickOffTime, { dateOnly: true })}</NormalTypography>
+                      <NormalTypography variant="s">•</NormalTypography>
+                      <NormalTypography variant="s">{fixture.tournament}</NormalTypography>
+                    </FixtureDate>
+                    <FixtureTeams>
+                      <TeamContainer flexEnd>
+                        <EmphasisTypography variant="s">{isMobile ? (fixture.homeTeam.shortName || fixture.homeTeam.name) : fixture.homeTeam.name}</EmphasisTypography>
+                        {getAvatar(fixture.homeTeam, fixture)}
+                      </TeamContainer>
+                      <EmphasisTypography variant="s" color={theme.colors.silverDark}>{getKickoffDateAndTime(fixture.kickOffTime, { timeOnly: true })}</EmphasisTypography>
+                      <TeamContainer>
+                        {getAvatar(fixture.awayTeam, fixture)}
+                        <EmphasisTypography variant="s">{isMobile ? (fixture.awayTeam.shortName || fixture.awayTeam.name) : fixture.awayTeam.name}</EmphasisTypography>
+                      </TeamContainer>
+                    </FixtureTeams>
                   </AvailableFixtureItem>
                 ))}
               </AvailableFixturesContainer>
-            </Section>
+            </MainContent>
           ) : (
             <NormalTypography variant="m" color={theme.colors.silverDark}>Inga matcher tillgängliga</NormalTypography>
           )}
-          <Section flexDirection="row" alignItems="center" gap="s">
+          <ButtonContainer>
             <Button
               onClick={onClose}
               variant="secondary"
@@ -228,7 +269,7 @@ const FindOtherFixturesModal = ({ onClose }: FindOtherFixturesModalProps) => {
             >
               Sök
             </Button>
-          </Section>
+          </ButtonContainer>
         </ModalContent>
       </Modal>
       {showTournamentsModal && (
@@ -254,6 +295,18 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
+  flex-grow: 1;
+`;
+
+const SearchTypesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+
+  @media ${devices.tablet} {
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const SearchTypeItem = styled.div<{ selected: boolean }>`
@@ -275,6 +328,13 @@ const SearchTypeItem = styled.div<{ selected: boolean }>`
   }
 `;
 
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.s};
+  flex-grow: 1;
+`;
+
 const AvailableFixturesContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -286,19 +346,57 @@ const AvailableFixturesContainer = styled.div`
 const AvailableFixtureItem = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   flex: 1;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.xxs};
   min-width: 100px;
-  padding: ${theme.spacing.s};
-  border-radius: ${theme.borderRadius.m};
+  border-radius: ${theme.borderRadius.l};
   background-color: ${theme.colors.silverLighter};
-  box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid ${theme.colors.silverLight};
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 
   &:hover {
     background-color: ${theme.colors.primaryFade};
+    border-color: ${theme.colors.primaryLighter};
   }
+`;
+
+const FixtureDate = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: ${theme.spacing.xs};
+  border-bottom: 1px solid ${theme.colors.silverLight};
+  padding: ${theme.spacing.xs} 0;
+`;
+
+const FixtureTeams = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  gap: ${theme.spacing.xxs};
+  padding-bottom: ${theme.spacing.xxs};
+`;
+
+const TeamContainer = styled.div<{ flexEnd?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxxs};
+  width: fit-content;
+  white-space: nowrap;
+  ${({ flexEnd }) => flexEnd && 'margin-left: auto;'}
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.s};
+  padding-right: ${theme.spacing.xxxs};
+  margin-top: auto;
 `;
 
 export default FindOtherFixturesModal;
