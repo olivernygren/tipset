@@ -176,16 +176,6 @@ const GoalScorerModal = ({
       disabled={isPlayerItemDisabled(player)}
     >
       <PlayerInfo>
-        {/* <Avatar
-          src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
-          alt={player.name}
-          size={AvatarSize.M}
-          objectFit="cover"
-          showBorder
-          opacity={isPlayerItemDisabled(player) ? 0.4 : 1}
-          customBorderWidth={1}
-          backgroundColor={theme.colors.silverLight}
-        /> */}
         <AvatarContainer>
           <Avatar
             src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
@@ -200,11 +190,11 @@ const GoalScorerModal = ({
           {!isPlayerItemDisabled(player) && (
             <NationAvatarContainer>
               {player.country && (
-              <NationAvatar
-                flagUrl={getFlagUrlByCountryName(player.country)}
-                nationName={player.country as string}
-                size={AvatarSize.XS}
-              />
+                <NationAvatar
+                  flagUrl={getFlagUrlByCountryName(player.country)}
+                  nationName={player.country as string}
+                  size={AvatarSize.XS}
+                />
               )}
             </NationAvatarContainer>
           )}
