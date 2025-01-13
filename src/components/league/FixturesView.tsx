@@ -352,6 +352,14 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     }
   };
 
+  const handleAddExternalFixture = (fixture: Fixture) => {
+    console.log('Adding fixture', fixture);
+
+    setNewGameWeekFixtures([...newGameWeekFixtures, fixture]);
+    setFindOtherFixturesModalOpen(false);
+    successNotify('Match tillagd');
+  };
+
   // const handlePreFillFixtureData = (fixture: Fixture) => {
   //   setNewFixtureHomeTeam(fixture.homeTeam);
   //   setNewFixtureAwayTeam(fixture.awayTeam);
@@ -552,6 +560,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
               hidePredictions={new Date(fixture.kickOffTime) > new Date()}
               isCorrectionMode
+              useShortNames={isMobile}
             />
           ))}
         </Section>
@@ -808,6 +817,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       {findOtherFixturesModalOpen && (
         <FindOtherFixturesModal
           onClose={() => setFindOtherFixturesModalOpen(false)}
+          onFixtureSelect={(fixture) => handleAddExternalFixture(fixture)}
         />
       )}
     </>
