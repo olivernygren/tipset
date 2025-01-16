@@ -121,22 +121,11 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
   gap: ${theme.spacing.xxxs};
   width: fit-content;
   white-space: nowrap;
+
   ${({ isHomeTeam }) => isHomeTeam && css`
     justify-content: flex-end;
     margin-left: auto;
   `}
-  
-  /* @media ${devices.mobileL} {
-    ${({ isHomeTeam }) => isHomeTeam && css`
-    `}
-  } */
-`;
-
-const Absolute = styled.div`
-  position: absolute;
-  top: 50%;
-  right: ${theme.spacing.xs};
-  transform: translateY(-50%);
 `;
 
 export default UpcomingFixturePreview;

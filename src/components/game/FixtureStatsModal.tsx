@@ -183,9 +183,17 @@ const FixtureStatsModal = ({
       <Card>
         <CardHeader>
           <HeadingsTypography variant="h4" color={theme.colors.textDefault}>{team.name}</HeadingsTypography>
-          <TeamLogoWrapper>
-            <TeamLogo src={team.logoUrl} alt={team.name} />
-          </TeamLogoWrapper>
+          {fixture.teamType === TeamType.CLUBS ? (
+            <TeamLogoWrapper>
+              <TeamLogo src={team.logoUrl} alt={team.name} />
+            </TeamLogoWrapper>
+          ) : (
+            <NationAvatar
+              flagUrl={team.logoUrl}
+              nationName={team.name}
+              size={AvatarSize.XXL}
+            />
+          )}
         </CardHeader>
         <CardContent>
           <Statistic>
@@ -318,6 +326,7 @@ const CardHeader = styled.div`
   background-color: ${theme.colors.silverLighter};
   border-radius: ${theme.borderRadius.m} ${theme.borderRadius.m} 0 0;
   padding: ${theme.spacing.s};
+  max-height: 64px;
 `;
 
 const StatisticHeading = styled.div`
