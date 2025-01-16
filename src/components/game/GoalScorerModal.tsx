@@ -5,17 +5,16 @@ import {
   Bandaids,
   CheckCircle, Circle, Funnel, Info, Rectangle, SoccerBall, Virus, XCircle,
 } from '@phosphor-icons/react';
-import { collection, getDocs } from 'firebase/firestore';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
 import {
-  GeneralPositionEnum, Player, PlayerRating, PlayerStatusEnum,
+  GeneralPositionEnum, Player, PlayerStatusEnum,
 } from '../../utils/Players';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
 import {
-  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints, withDocumentIdOnObjectsInArray,
+  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints,
 } from '../../utils/helpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import Input from '../input/Input';
@@ -23,11 +22,10 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import TextButton from '../buttons/TextButton';
 import Tag from '../tag/Tag';
 import { Section } from '../section/Section';
-import { db } from '../../config/firebase';
-import { CollectionEnum } from '../../utils/Firebase';
 import { Fixture } from '../../utils/Fixture';
-import { getFlagUrlByCountryName } from '../../utils/Team';
+import { getFlagUrlByCountryName, TournamentsEnum } from '../../utils/Team';
 import NationAvatar from '../avatar/NationAvatar';
+import { FotMobStatListItem, getFotMobGoalStatsUrl } from '../../utils/Fotmob';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
@@ -44,6 +42,14 @@ enum FilterEnum {
   DEFENDERS = 'DEFENDERS',
   MIDFIELDERS = 'MIDFIELDERS',
   FORWARDS = 'FORWARDS',
+}
+
+interface PlayerGoal {
+  teamName: string;
+  teamId: string;
+  playerName: string;
+  playerId: string;
+  goals: number;
 }
 
 const GoalScorerModal = ({
@@ -67,31 +73,62 @@ const GoalScorerModal = ({
   const [searchValue, setSearchValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
-  const [playerRatings, setPlayerRatings] = useState<Array<PlayerRating>>([]);
+  // const [playerRatings, setPlayerRatings] = useState<Array<PlayerRating>>([]);
   const [previouslySelectedGoalScorer, setPreviouslySelectedGoalScorer] = useState<Player | null>(null);
+  const [goalStats, setGoalStats] = useState<Array<PlayerGoal>>([]);
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorers?.some((selectedPlayer) => selectedPlayer.id === player.id && playersToShow.some((playerToShow) => playerToShow.id === player.id));
   const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
-  const playerExistsInRatings = (player: Player) => playerRatings.some((rating) => rating.playerName === player.name);
+  // const playerExistsInRatings = (player: Player) => playerRatings.some((rating) => rating.playerName === player.name);
   // const previousGameWeekPredictedGoalScorerExists = previousGameWeekPredictedGoalScorers?.some((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
 
+  // useEffect(() => {
+  //   const fetchRatings = async () => {
+  //     try {
+  //       const playerRatingCollectionRef = collection(db, CollectionEnum.PLAYER_RATINGS);
+  //       if (!playerRatingCollectionRef) return;
+
+  //       const playerRatingData = await getDocs(playerRatingCollectionRef);
+  //       const playerRatings = withDocumentIdOnObjectsInArray<PlayerRating>(playerRatingData.docs);
+
+  //       setPlayerRatings(playerRatings);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchRatings();
+  // }, []);
+
   useEffect(() => {
-    const fetchRatings = async () => {
-      try {
-        const playerRatingCollectionRef = collection(db, CollectionEnum.PLAYER_RATINGS);
-        if (!playerRatingCollectionRef) return;
-
-        const playerRatingData = await getDocs(playerRatingCollectionRef);
-        const playerRatings = withDocumentIdOnObjectsInArray<PlayerRating>(playerRatingData.docs);
-
-        setPlayerRatings(playerRatings);
-      } catch (error) {
-        console.error(error);
-      }
+    const fetchGoalStats = async (): Promise<{ homeTeamPlayersStats: Array<FotMobStatListItem>, awayTeamPlayersStats: Array<FotMobStatListItem> }> => {
+      // Get fetch url by fixture tournament
+      const res = await fetch(getFotMobGoalStatsUrl(fixture?.tournament as TournamentsEnum));
+      const data = await res.json();
+      const playersList: Array<FotMobStatListItem> = data.TopLists[0].StatList;
+      const homeTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.homeTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.homeTeam.id?.toString());
+      const awayTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.awayTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.awayTeam.id?.toString());
+      return { homeTeamPlayersStats, awayTeamPlayersStats };
     };
+    fetchGoalStats().then(({ homeTeamPlayersStats, awayTeamPlayersStats }) => {
+      const convertedHomeTeamPlayers: Array<PlayerGoal> = homeTeamPlayersStats.map((player) => ({
+        teamName: player.TeamName,
+        playerName: player.ParticipantName,
+        goals: player.StatValue,
+        playerId: player.ParticipantId?.toString() ?? '',
+        teamId: player.TeamId?.toString() ?? fixture?.homeTeam.id,
+      }));
+      const convertedAwayTeamPlayers: Array<PlayerGoal> = awayTeamPlayersStats.map((player) => ({
+        teamName: player.TeamName,
+        playerName: player.ParticipantName,
+        goals: player.StatValue,
+        playerId: player.ParticipantId?.toString() ?? '',
+        teamId: player.TeamId?.toString() ?? fixture?.awayTeam.id,
+      }));
 
-    fetchRatings();
+      setGoalStats([...convertedHomeTeamPlayers, ...convertedAwayTeamPlayers]);
+    });
   }, []);
 
   useEffect(() => {
@@ -162,10 +199,10 @@ const GoalScorerModal = ({
     }
   };
 
-  const getGoalsScoredForPlayer = (playerName: string) => {
-    const playerRating = playerRatings.find((rating) => rating.playerName === playerName);
-    return playerRating ? playerRating.goals : 0;
-  };
+  // const getGoalsScoredForPlayer = (playerName: string) => {
+  //   const playerRating = playerRatings.find((rating) => rating.playerName === playerName);
+  //   return playerRating ? playerRating.goals : 0;
+  // };
 
   const getPlayer = (player: Player) => (
     <PlayerItem
@@ -215,10 +252,18 @@ const GoalScorerModal = ({
           </IconContainer>
         ) : (
           <Flex>
-            {playerExistsInRatings(player) && (
+            {/* {playerExistsInRatings(player) && (
               <GoalsScored>
                 <NormalTypography variant="s" color={theme.colors.silver}>
                   {getGoalsScoredForPlayer(player.name)}
+                </NormalTypography>
+                <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
+              </GoalsScored>
+            )} */}
+            {goalStats.find((p) => player.id === p.playerId || player.name === p.playerName) && (
+              <GoalsScored>
+                <NormalTypography variant="s" color={theme.colors.silver}>
+                  {goalStats.find((p) => player.id === p.playerId || player.name === p.playerName)?.goals}
                 </NormalTypography>
                 <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
               </GoalsScored>

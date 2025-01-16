@@ -1864,7 +1864,7 @@ export const Teams: TeamsType = {
     {
       name: 'Eintracht Frankfurt',
       shortName: 'Frankfurt',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/9810.png',
       stadium: 'Deutsche Bank Park',
       country: CountryEnum.GERMANY,
       teamPrimaryColor: '#e0000c',

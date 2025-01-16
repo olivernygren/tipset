@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Info, ListChecks, MagnifyingGlass, PlusCircle, XCircle,
+  Info, ListChecks, MagnifyingGlass, PencilSimple, PlusCircle, XCircle,
 } from '@phosphor-icons/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styled from 'styled-components';
@@ -82,6 +82,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [predictionStatuses, setPredictionStatuses] = useState<Array<{ fixtureId: string, status: PredictionStatus }>>([]);
   const [gameWeekPredictionStatus, setGameWeekPredictionStatus] = useState<string>('');
   const [predictionLoading, setPredictionLoading] = useState<string | null>(null);
+
+  const fixturesCanBeCorrected = ongoingGameWeek?.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -405,6 +407,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <EditGameWeekView
           gameWeek={ongoingGameWeek}
           onClose={() => setEditGameWeekViewOpen(false)}
+          refetch={refetchLeague}
         />
       );
     }
@@ -633,8 +636,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       backgroundColor={theme.colors.primaryBleach}
                       size="l"
                     />
-                    {(isCreator || hasAdminRights) && (
-                      ongoingGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) && (
+                    {(isCreator || hasAdminRights) && !editGameWeekViewOpen && (
+                      fixturesCanBeCorrected && (
                         showCorrectGameWeekContent ? (
                           <IconButton
                             icon={<XCircle size={24} />}
@@ -653,6 +656,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                         )
                       )
                     )}
+                    {(isCreator || hasAdminRights) && !showCorrectGameWeekContent && !editGameWeekViewOpen && (
+                      <IconButton
+                        icon={<PencilSimple size={24} />}
+                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                        onClick={() => setEditGameWeekViewOpen(true)}
+                      />
+                    )}
                   </Section>
                 </Section>
               )}
@@ -660,7 +670,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             {ongoingGameWeek ? (
               <>
                 {getOngoingGameWeekContent()}
-                {ongoingGameWeek.games.fixtures.some((f) => f.odds) && (
+                {ongoingGameWeek.games.fixtures.some((f) => f.odds) && !editGameWeekViewOpen && (
                   <Section padding="8px 0">
                     <TextButton
                       icon={<Info size={20} color={theme.colors.primary} />}
