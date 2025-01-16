@@ -123,15 +123,15 @@ const StatusOptionCard = styled.div<{ selected: boolean }>`
   align-items: center;
   padding: ${theme.spacing.s};
   border-radius: ${theme.borderRadius.m};
-  background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.white)};
-  border: 1px solid ${({ selected }) => (selected ? theme.colors.primaryLight : theme.colors.silverLight)};
+  background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.white)};
+  border: 1px solid ${({ selected }) => (selected ? theme.colors.primaryLighter : theme.colors.silverLight)};
   box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.06);
   color: ${({ selected }) => (selected ? theme.colors.white : theme.colors.black)};
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.silverLighter)};
+    background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.silverLighter)};
     color: ${theme.colors.white};
   }
 `;
