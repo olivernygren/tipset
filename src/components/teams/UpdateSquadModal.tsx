@@ -11,27 +11,46 @@ import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Button from '../buttons/Button';
 import Modal from '../modal/Modal';
 import Textarea from '../textarea/Textarea';
+import { Player } from '../../utils/Players';
 
 interface UpdateSquadModalProps {
   teamId: string;
+  currentPlayers: Array<Player>;
   onClose: () => void;
   refetchTeam: () => void;
 }
 
-const UpdateSquadModal = ({ teamId, onClose, refetchTeam }: UpdateSquadModalProps) => {
+const UpdateSquadModal = ({
+  teamId, currentPlayers, onClose, refetchTeam,
+}: UpdateSquadModalProps) => {
   const [snippet, setSnippet] = useState<string>('');
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const syncSquad = (currentPlayers: Array<Player>, newSquad: Array<Player>): Array<Player> => {
+    const newSquadMap = new Map(newSquad.map((player) => [player.id, player]));
+
+    const updatedSquad = currentPlayers.filter((player) => newSquadMap.has(player.id));
+
+    newSquad.forEach((player) => {
+      if (!currentPlayers.some((currentPlayer) => currentPlayer.id === player.id)) {
+        updatedSquad.push(player);
+      }
+    });
+
+    return updatedSquad;
+  };
 
   const handleUpdateEntireSquad = async () => {
     setLoading(true);
 
     try {
       const teamFromSnippet = convertFotMobTeamToTeam(JSON.parse(snippet));
-      const players = teamFromSnippet.players ?? [];
+      const newSquad = teamFromSnippet.players ?? [];
+      const updatedPlayers = syncSquad(currentPlayers, newSquad);
 
       await updateDoc(doc(db, CollectionEnum.TEAMS, teamId), {
-        players,
+        players: updatedPlayers,
       });
 
       successNotify('Truppen uppdaterades');

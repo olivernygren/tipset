@@ -438,6 +438,7 @@ const PlayersByTeamPage = () => {
           onClose={() => setUpdateSquadModal(false)}
           teamId={teamIdFromUrl}
           refetchTeam={fetchTeamById}
+          currentPlayers={players}
         />
       )}
       <RootToast />
