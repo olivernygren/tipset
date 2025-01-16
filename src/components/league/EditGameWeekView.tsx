@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, CheckCircle } from '@phosphor-icons/react';
+import { ArrowLeft, CheckCircle, Plus } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
@@ -19,6 +19,8 @@ import NationAvatar from '../avatar/NationAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import EditFixtureModal from '../game/EditFixtureModal';
+import IconButton from '../buttons/IconButton';
+import CreateFixtureModal from '../game/CreateFixtureModal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
@@ -33,6 +35,7 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
   const [editFixture, setEditFixture] = useState<Fixture | null>(null);
   const [gameWeekFixtures, setGameWeekFixtures] = useState(gameWeek.games.fixtures);
   const [gameWeekPredictions, setGameWeekPredictions] = useState(gameWeek.games.predictions);
+  const [showCreateFixtureModal, setShowCreateFixtureModal] = useState<boolean>(false);
 
   const handleUpdateFixture = (updatedFixture: FixtureInput) => {
     const updatedFixtures = gameWeekFixtures.map((fixture) => {
@@ -70,8 +73,6 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
       },
     };
 
-    // Lägg till match i omgången
-
     try {
       const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, gameWeek.leagueId));
       const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
@@ -88,7 +89,6 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
       });
     } catch (error) {
       errorNotify('Något gick fel när omgången skulle uppdateras');
-      console.error(error);
     }
 
     setUpdateLoading(false);
@@ -143,7 +143,7 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
           </TeamContainer>
         </Teams>
       </FixtureItem>
-      {index < gameWeek.games.fixtures.length - 1 && <Divider />}
+      {index < gameWeekFixtures.length - 1 && <Divider />}
     </>
   );
 
@@ -152,14 +152,21 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
       <Section gap="m">
         <Divider />
         <FixtureList>
-          <Section
-            padding={theme.spacing.xs}
-            backgroundColor={theme.colors.silverLight}
-            borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
-            alignItems="center"
-          >
-            <EmphasisTypography variant="m" color={theme.colors.textDefault}>{`Redigera omgång ${gameWeek.round}`}</EmphasisTypography>
-          </Section>
+          <FixtureListHeader>
+            <div />
+            <EmphasisTypography
+              variant="m"
+              color={theme.colors.textDefault}
+              align="center"
+            >
+              {`Redigera omgång ${gameWeek.round}`}
+            </EmphasisTypography>
+            <IconButton
+              icon={<Plus size={20} weight="bold" />}
+              colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark }}
+              onClick={() => setShowCreateFixtureModal(true)}
+            />
+          </FixtureListHeader>
           {gameWeekFixtures.map((fixture, index) => getFixtureItem(fixture, index))}
         </FixtureList>
         <Section flexDirection="row" gap="xs" alignItems="center">
@@ -189,6 +196,14 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
           onDeleteFixture={handleDeleteFixture}
         />
       )}
+      {showCreateFixtureModal && (
+        <CreateFixtureModal
+          fixture={null}
+          allNewGameWeekFixtures={gameWeekFixtures}
+          onClose={() => setShowCreateFixtureModal(false)}
+          onUpdateAllNewGameWeekFixtures={(newFixtures) => setGameWeekFixtures(newFixtures)}
+        />
+      )}
     </>
   );
 };
@@ -203,7 +218,17 @@ const FixtureList = styled.div`
   border-radius: ${theme.borderRadius.l};
   overflow: hidden;
   border: 1px solid ${theme.colors.silverLight};
-  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLight};
+`;
+
+const FixtureListHeader = styled.div`
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  background-color: ${theme.colors.silverLight};
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
 `;
 
 const FixtureItem = styled.div`

@@ -8,6 +8,7 @@ export interface Team {
   id?: string;
   documentId?: string;
   name: string;
+  fotMobName?: string;
   shortName?: string;
   logoUrl: string;
   darkModeLogoUrl?: string;
@@ -1146,6 +1147,12 @@ export const nationalTeams: Team[] = [
     countryCode: 'TJK',
     federation: FederationEnum.ASIA,
   },
+  {
+    name: 'Saudiarabien',
+    logoUrl: 'https://cdn.countryflags.com/thumbs/saudi-arabia/flag-square-500.png',
+    countryCode: 'KSA',
+    federation: FederationEnum.ASIA,
+  },
 ];
 
 type TeamsType = { [key: string]: Team[] };
@@ -1694,6 +1701,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Inter',
+      fotMobName: 'Internazionale',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
       stadium: 'Giuseppe Meazza',
       country: CountryEnum.ITALY,

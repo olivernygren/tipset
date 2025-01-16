@@ -1,6 +1,4 @@
-import {
-  addDoc, collection, doc, updateDoc,
-} from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { db } from '../../config/firebase';
@@ -26,12 +24,11 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
   const [teamPrimaryColor, setNewTeamPrimaryColor] = useState<string>(team?.teamPrimaryColor ?? '');
   const [teamStadium, setNewTeamStadium] = useState<string>(team?.stadium ?? '');
   const [teamCountry, setNewTeamCountry] = useState<string>(team?.country ?? '');
+  const [teamId, setTeamId] = useState(team?.id ?? '');
 
   const [creationLoading, setCreationLoading] = useState<boolean>(false);
 
   const isValid = teamName && teamLogoUrl && teamPrimaryColor && teamStadium && teamCountry;
-
-  console.log(team);
 
   const handleUpdateTeam = async () => {
     if (!team || !team.documentId) {
@@ -49,6 +46,7 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
       stadium: teamStadium,
       country: teamCountry,
       players: team?.players ?? [],
+      id: teamId,
     };
 
     if (!isValid) {
@@ -61,8 +59,6 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
       onClose();
       refetchTeam();
     } catch (error) {
-      console.log(error);
-
       errorNotify('Något gick fel');
     } finally {
       setCreationLoading(false);
@@ -81,13 +77,13 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
           <Input
             label="Lagets namn"
             value={teamName}
-            onChange={(e) => setNewTeamName(e.target.value)}
+            onChange={(e) => setNewTeamName(e.currentTarget.value)}
             fullWidth
           />
           <Input
             label="Kort namn"
             value={teamShortName}
-            onChange={(e) => setNewTeamShortName(e.target.value)}
+            onChange={(e) => setNewTeamShortName(e.currentTarget.value)}
             fullWidth
           />
         </Section>
@@ -95,13 +91,13 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
           <Input
             label="Logo-URL"
             value={teamLogoUrl}
-            onChange={(e) => setNewTeamLogoUrl(e.target.value)}
+            onChange={(e) => setNewTeamLogoUrl(e.currentTarget.value)}
             fullWidth
           />
           <Input
             label="Primärfärg"
             value={teamPrimaryColor}
-            onChange={(e) => setNewTeamPrimaryColor(e.target.value)}
+            onChange={(e) => setNewTeamPrimaryColor(e.currentTarget.value)}
             fullWidth
           />
         </Section>
@@ -109,16 +105,22 @@ const EditTeamModal = ({ onClose, refetchTeam, team }: EditTeamModalProps) => {
           <Input
             label="Arena"
             value={teamStadium}
-            onChange={(e) => setNewTeamStadium(e.target.value)}
+            onChange={(e) => setNewTeamStadium(e.currentTarget.value)}
             fullWidth
           />
           <Input
             label="Land"
             value={teamCountry}
-            onChange={(e) => setNewTeamCountry(e.target.value)}
+            onChange={(e) => setNewTeamCountry(e.currentTarget.value)}
             fullWidth
           />
         </Section>
+        <Input
+          label="ID"
+          value={teamId}
+          onChange={(e) => setTeamId(e.currentTarget.value)}
+          fullWidth
+        />
       </Form>
       <ModalButtons>
         <Button
