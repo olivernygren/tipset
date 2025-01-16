@@ -8,7 +8,7 @@ import {
   ArrowBendDoubleUpRight,
   Bandaids,
   CheckCircle,
-  DotsThree, PencilSimple, Plus, Rectangle, Trash, Virus, X,
+  DotsThree, PencilSimple, Plus, Rectangle, Trash, UsersFour, Virus, X,
 } from '@phosphor-icons/react';
 import { db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
@@ -37,6 +37,7 @@ import EditTeamModal from '../../../../components/teams/EditTeamModal';
 import EditPlayerStatusModal from '../../../../components/players/EditPlayerStatusModal';
 import TextButton from '../../../../components/buttons/TextButton';
 import TransferPlayerModal from '../../../../components/teams/TransferPlayerModal';
+import UpdateSquadModal from '../../../../components/teams/UpdateSquadModal';
 
 const PlayersByTeamPage = () => {
   const [team, setTeam] = useState<Team | null>(null);
@@ -61,6 +62,7 @@ const PlayersByTeamPage = () => {
   const [editPlayerStatusModalOpen, setEditPlayerStatusModalOpen] = useState<boolean>(false);
   const [transferPlayer, setTransferPlayer] = useState<Player | null>(null);
   const [showTransferPlayerModal, setShowTransferPlayerModal] = useState<boolean>(false);
+  const [updateSquadModal, setUpdateSquadModal] = useState<boolean>(false);
 
   const teamIdFromUrl = window.location.pathname.split('/')[3];
 
@@ -275,7 +277,7 @@ const PlayersByTeamPage = () => {
             backgroundColor={theme.colors.white}
           />
           {contextMenuOpen && (
-            <ContextMenu positionX="right" positionY="bottom" offsetY={94 + 12} offsetX={0}>
+            <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 3) + 12} offsetX={0}>
               <ContextMenuOption
                 icon={<PencilSimple size={24} color={theme.colors.textDefault} />}
                 onClick={() => {
@@ -283,6 +285,15 @@ const PlayersByTeamPage = () => {
                   setContextMenuOpen(false);
                 }}
                 label="Redigera lag"
+                color={theme.colors.textDefault}
+              />
+              <ContextMenuOption
+                icon={<UsersFour size={24} color={theme.colors.textDefault} />}
+                onClick={() => {
+                  setUpdateSquadModal(true);
+                  setContextMenuOpen(false);
+                }}
+                label="Uppdatera trupp"
                 color={theme.colors.textDefault}
               />
               <ContextMenuOption
@@ -422,6 +433,13 @@ const PlayersByTeamPage = () => {
           refetch={fetchTeamById}
         />
       )}
+      {updateSquadModal && (
+        <UpdateSquadModal
+          onClose={() => setUpdateSquadModal(false)}
+          teamId={teamIdFromUrl}
+          refetchTeam={fetchTeamById}
+        />
+      )}
       <RootToast />
     </>
   );
@@ -486,10 +504,6 @@ const PlayerItem = styled.div<{ showHoverEffect: boolean }>`
     &:hover {
       background-color: ${theme.colors.primaryFade};
       border-color: ${theme.colors.primaryLighter};
-/* 
-      .availability-tag {
-        background-color: ${theme.colors.primaryBleach};
-      } */
     }
   `}
 `;
