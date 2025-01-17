@@ -22,6 +22,7 @@ import ProfilePage from './pages/profile';
 import PlayerRatingsPage from './pages/admin/player-ratings';
 import AdminPlayersPage from './pages/admin/players';
 import PlayersByTeamPage from './pages/admin/players/[teamId]';
+import { theme } from './theme';
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -118,12 +119,12 @@ const App = () => {
       <Root>
         <Header />
         <Router>
-          <div className="App">
+          <Content className="App">
             <Routes>
               {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
               {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
             </Routes>
-          </div>
+          </Content>
         </Router>
       </Root>
     </AnimatePresence>
@@ -131,8 +132,15 @@ const App = () => {
 };
 
 const Root = styled.div`
+  /* display: grid;
+  grid-template-rows: 80px 1fr; */
   overflow-x: hidden;
   max-width: 100vw;
+  background-color: ${theme.colors.silverLighter};
+`;
+
+const Content = styled.div`
+  padding-top: 80px;
 `;
 
 export default App;
