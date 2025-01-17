@@ -1723,10 +1723,10 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Napoli',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/SSC_Napoli_2007.svg',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/9875.png',
       stadium: 'Stadio Diego Armando Maradona',
       country: CountryEnum.ITALY,
-      teamPrimaryColor: '#007dc3',
+      teamPrimaryColor: '#02a1db',
     },
     {
       name: 'Lazio',
