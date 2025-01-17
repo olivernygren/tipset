@@ -23,14 +23,15 @@ import IconButton from '../buttons/IconButton';
 
 interface CreateFixtureModalProps {
   onClose: () => void;
-  league: PredictionLeague;
+  league?: PredictionLeague;
   fixture: Fixture | null;
   allNewGameWeekFixtures: Array<Fixture>;
-  onUpdateAllNewGameWeekFixtures: React.Dispatch<React.SetStateAction<Array<Fixture>>>;
+  onUpdateAllNewGameWeekFixtures?: React.Dispatch<React.SetStateAction<Array<Fixture>>>;
+  onAddFixtureToGameWeek?: (newFixture: FixtureInput) => void;
 }
 
 const CreateFixtureModal = ({
-  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, fixture,
+  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, fixture, onAddFixtureToGameWeek,
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -68,7 +69,7 @@ const CreateFixtureModal = ({
   };
 
   const handleAddFixtureToGameWeek = () => {
-    if (!homeTeam || !awayTeam || league.hasEnded) return;
+    if (!homeTeam || !awayTeam || league?.hasEnded) return;
 
     if (allNewGameWeekFixtures.length === 24) {
       errorNotify('Max antal matcher per omgång är 24');
@@ -97,9 +98,13 @@ const CreateFixtureModal = ({
         }
         return f;
       });
-      onUpdateAllNewGameWeekFixtures(updatedFixtures);
-    } else {
+      if (onUpdateAllNewGameWeekFixtures) {
+        onUpdateAllNewGameWeekFixtures(updatedFixtures);
+      }
+    } else if (onUpdateAllNewGameWeekFixtures) {
       onUpdateAllNewGameWeekFixtures([...allNewGameWeekFixtures, { ...newFixtureInput }]);
+    } else if (onAddFixtureToGameWeek) {
+      onAddFixtureToGameWeek(newFixtureInput);
     }
 
     onClose();

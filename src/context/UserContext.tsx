@@ -20,38 +20,46 @@ const UserContext = createContext<UserContextProps>({ user: null, hasAdminRights
 export const useUser = () => useContext(UserContext);
 
 export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = Cookies.get('user');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  const [hasAdminRights, setHasAdminRights] = useState<boolean>(() => {
-    const storedUser = Cookies.get('user');
-    return storedUser ? JSON.parse(storedUser).role === 'ADMIN' : false;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [hasAdminRights, setHasAdminRights] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   const contextValue = useMemo(() => ({ user, hasAdminRights }), [user, hasAdminRights]);
 
   useEffect(() => {
+    const fetchUser = async (userId: string) => {
+      const userDocRef = doc(db, CollectionEnum.USERS, userId);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
+        setUser(userWithDocId);
+        setHasAdminRights(userWithDocId.role === 'ADMIN');
+      } else {
+        console.log('No such user!');
+      }
+    };
+
+    const storedUserId = Cookies.get('user_id');
+    if (storedUserId) {
+      fetchUser(storedUserId);
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDocRef = doc(db, CollectionEnum.USERS, user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        const userId = user.uid;
+        Cookies.set('user_id', userId, { expires: 365 * 3, secure: true, sameSite: 'strict' });
+        fetchUser(userId);
 
-        if (userDocSnap.exists()) {
-          const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
-          setUser(userWithDocId);
-          Cookies.set('user', JSON.stringify(userWithDocId), { expires: 365 * 3, secure: true, sameSite: 'strict' });
-          if (userWithDocId?.role === 'ADMIN') {
-            setHasAdminRights(true);
-          }
-        } else {
-          console.log('No such user!');
+        // Temporary logic to remove the old "user" cookie
+        if (Cookies.get('user')) {
+          Cookies.remove('user');
+          console.log('Old "user" cookie removed');
         }
       } else {
         setUser(null);
         setHasAdminRights(false);
-        Cookies.remove('user');
+        Cookies.remove('user_id');
       }
       setLoading(false);
     });
@@ -61,7 +69,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
   }, []);
 
   if (loading && !user) {
-    return <div>Loading...</div>; // Or a spinner
+    return null;
   }
 
   return (

@@ -107,8 +107,8 @@ const GoalScorerModal = ({
       const res = await fetch(getFotMobGoalStatsUrl(fixture?.tournament as TournamentsEnum));
       const data = await res.json();
       const playersList: Array<FotMobStatListItem> = data.TopLists[0].StatList;
-      const homeTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.homeTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.homeTeam.id?.toString());
-      const awayTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.awayTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.awayTeam.id?.toString());
+      const homeTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.homeTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.homeTeam.id?.toString() || player.TeamName === fixture?.homeTeam.fotMobName);
+      const awayTeamPlayersStats = playersList.filter((player: FotMobStatListItem) => fixture?.awayTeam.name.includes(player.TeamName) || player.TeamId.toString() === fixture?.awayTeam.id?.toString() || player.TeamName === fixture?.awayTeam.fotMobName);
       return { homeTeamPlayersStats, awayTeamPlayersStats };
     };
     fetchGoalStats().then(({ homeTeamPlayersStats, awayTeamPlayersStats }) => {

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
-  collection, doc, getDoc, updateDoc,
+  doc, getDoc, updateDoc,
 } from 'firebase/firestore';
 import {
-  GeneralPositionEnum, ExactPositionEnum, Player, CountryEnum, getAgeByBirthDate,
+  GeneralPositionEnum, ExactPositionEnum, Player, CountryEnum,
 } from '../../utils/Players';
 import Button from '../buttons/Button';
 import CustomDatePicker from '../input/DatePicker';
@@ -15,7 +15,7 @@ import { Section } from '../section/Section';
 import { EmphasisTypography } from '../typography/Typography';
 import { theme } from '../../theme';
 import { createRandomPlayerId, getExactPositionOptions, withDocumentIdOnObject } from '../../utils/helpers';
-import { errorNotify } from '../../utils/toast/toastHelpers';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { Team } from '../../utils/Team';
@@ -75,6 +75,7 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
         await updateDoc(doc(db, CollectionEnum.TEAMS, teamId), updatedTeam);
       }
 
+      successNotify('Spelare skapad');
       refetchPlayers();
     } catch (error) {
       errorNotify('Något gick fel');
