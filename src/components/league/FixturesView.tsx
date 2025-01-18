@@ -40,6 +40,7 @@ import CompactFixtureResult from '../game/CompactFixtureResult';
 import PredictionsModal from './PredictionsModal';
 import CreateFixtureModal from '../game/CreateFixtureModal';
 import FindOtherFixturesModal from './FindOtherFixturesModal';
+import CorrectingFixtureCard from '../game/CorrectingFixtureCard';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -526,9 +527,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       </Section>
       <Divider />
       {createGameWeekError && (
-      <NormalTypography variant="m" color={theme.colors.red}>
-        {createGameWeekError}
-      </NormalTypography>
+        <NormalTypography variant="m" color={theme.colors.red}>
+          {createGameWeekError}
+        </NormalTypography>
       )}
       <Section flexDirection="row" gap="xs">
         <Button
@@ -555,18 +556,14 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
     return (
       <>
-        <Section gap="xxs">
+        <CorrectFixturesContainer>
           {ongoingGameWeek.games.fixtures.map((fixture) => (
-            <CreateAndCorrectFixturePreview
+            <CorrectingFixtureCard
               fixture={fixture}
-              hasBeenCorrected={ongoingGameWeek.hasBeenCorrected || Boolean(fixture.finalResult)}
-              onShowPredictionsClick={() => setShowPredictionsModalFixtureId(fixture.id)}
-              hidePredictions={new Date(fixture.kickOffTime) > new Date()}
-              isCorrectionMode
-              useShortNames={isMobile}
+              onClick={() => setShowPredictionsModalFixtureId(fixture.id)}
             />
           ))}
-        </Section>
+        </CorrectFixturesContainer>
         {showPredictionsModalFixtureId && (
           <CorrectPredictionsModal
             onClose={() => setShowPredictionsModalFixtureId(null)}
@@ -911,6 +908,19 @@ const PreviousRoundCard = styled.div`
 
 const NoWrapTypography = styled(NormalTypography)`
   white-space: nowrap;
+`;
+
+const CorrectFixturesContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: ${theme.spacing.xs};
+  width: 100%;
+  
+  @media ${devices.laptop} {
+    grid-template-columns: 1fr 1fr;
+    gap: ${theme.spacing.s};
+  }
 `;
 
 export default FixturesView;
