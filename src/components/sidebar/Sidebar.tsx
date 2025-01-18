@@ -23,6 +23,7 @@ const StyledSidebar = styled.div`
   width: 250px;
   border-right: 1px solid ${theme.colors.silverLight};
   position: relative;
+  background-color: ${theme.colors.white};
 `;
 
 const LinksContainer = styled.div`

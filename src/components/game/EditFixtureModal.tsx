@@ -126,7 +126,7 @@ const EditFixtureModal = ({
             />
           </Section>
         </Section>
-        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
+        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">
           <Input
             label="Arena"
             value={stadium}
@@ -141,7 +141,7 @@ const EditFixtureModal = ({
             minDate={new Date()}
           />
         </Section>
-        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
+        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">
           <Section gap="xxs">
             <EmphasisTypography variant="s">Turnering</EmphasisTypography>
             <SelectImitation
@@ -158,7 +158,7 @@ const EditFixtureModal = ({
             fullWidth
           />
         </Section>
-        <Section gap="xxs">
+        <Section gap="xs" padding={`${theme.spacing.xxs} 0`}>
           <OptionalInclusionContainer onClick={() => setIncludeStats(!includeStats)}>
             <IconButton
               icon={includeStats ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
@@ -182,7 +182,7 @@ const EditFixtureModal = ({
             <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
           </OptionalInclusionContainer>
         </Section>
-        <Section flexDirection="row" alignItems="center" gap="xxs">
+        <ButtonsContainer>
           <Button
             color="red"
             variant="primary"
@@ -206,7 +206,7 @@ const EditFixtureModal = ({
           >
             Spara
           </Button>
-        </Section>
+        </ButtonsContainer>
       </AddFixtureContainer>
       {showSelectTeamModal && (
         <SelectTeamModal
@@ -232,9 +232,10 @@ const EditFixtureModal = ({
 const AddFixtureContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.m};
+  gap: ${theme.spacing.s};
   width: 100%;
   box-sizing: border-box;
+  flex-grow: 1;
 `;
 
 const OptionalInclusionContainer = styled.div`
@@ -254,6 +255,14 @@ const OptionalInclusionContainer = styled.div`
     border-color: ${theme.colors.primaryLighter};
     background-color: ${theme.colors.primaryFade};
   }
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xs};
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: auto;
 `;
 
 export default EditFixtureModal;

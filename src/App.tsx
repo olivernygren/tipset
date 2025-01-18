@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
-import { User, onAuthStateChanged } from 'firebase/auth';
 import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/home';
 import TestPage from './pages/test';
 import LoginPage from './pages/login';
-import { auth } from './config/firebase';
 import Header from './components/header/Header';
 import AdminPage from './pages/admin';
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -23,17 +21,18 @@ import PlayerRatingsPage from './pages/admin/player-ratings';
 import AdminPlayersPage from './pages/admin/players';
 import PlayersByTeamPage from './pages/admin/players/[teamId]';
 import { theme } from './theme';
+import { useUser } from './context/UserContext';
 
 const App = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, hasAdminRights } = useUser();
+  // const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    if (user) {
       setIsLoading(false);
-    });
-  }, []);
+    }
+  }, [user]);
 
   const pages = [
     {
@@ -105,7 +104,7 @@ const App = () => {
     <Route
       path={path}
       element={(
-        <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null} isAdmin>
+        <PrivateRoute isLoading={isLoading} isAuthenticated={user !== null && !isLoading} isAdmin={hasAdminRights}>
           <AdminLayout>
             {pageComponentElement}
           </AdminLayout>
@@ -132,8 +131,6 @@ const App = () => {
 };
 
 const Root = styled.div`
-  /* display: grid;
-  grid-template-rows: 80px 1fr; */
   overflow-x: hidden;
   max-width: 100vw;
   background-color: ${theme.colors.silverLighter};

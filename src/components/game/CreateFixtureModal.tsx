@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { CheckSquare, PlusCircle, Square } from '@phosphor-icons/react';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import { Fixture, FixtureInput, TeamType } from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
@@ -131,11 +131,12 @@ const CreateFixtureModal = ({
       onClose={onClose}
       mobileFullScreen
       size="m"
+      headerDivider
     >
       <AddFixtureContainer>
         <TeamTypeSelectorContainer>
           <HeadingsTypography variant="h5">Typ av lag</HeadingsTypography>
-          <Section flexDirection="row" gap="xs" fitContent>
+          <Section flexDirection="row" gap="xs" fitContent={!isMobile}>
             <TeamTypeSelectorButton
               isSelected={teamType === TeamType.CLUBS}
               onClick={() => {
@@ -176,7 +177,7 @@ const CreateFixtureModal = ({
             />
           </Section>
         </Section>
-        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
+        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">
           <Input
             label="Arena"
             value={stadium}
@@ -191,7 +192,7 @@ const CreateFixtureModal = ({
             minDate={new Date()}
           />
         </Section>
-        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 'm' : 'l'} alignItems="center">
+        <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">
           <Section gap="xxs">
             <EmphasisTypography variant="s">Turnering</EmphasisTypography>
             <SelectImitation
@@ -208,7 +209,7 @@ const CreateFixtureModal = ({
             fullWidth
           />
         </Section>
-        <Section gap="xxs">
+        <Section gap="xs" padding={`${theme.spacing.xxs} 0`}>
           <OptionalInclusionContainer onClick={() => setIncludeStats(!includeStats)}>
             <IconButton
               icon={includeStats ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
@@ -278,13 +279,18 @@ const CreateFixtureModal = ({
 
 const TeamTypeSelectorContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: ${theme.spacing.s};
   background-color: ${theme.colors.silverBleach};
   padding: ${theme.spacing.s};
   border-radius: ${theme.borderRadius.m};
   border: 1px solid ${theme.colors.silverLight};
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 `;
 
 const TeamTypeSelectorButton = styled.div<{ isSelected: boolean }>`
@@ -296,6 +302,7 @@ const TeamTypeSelectorButton = styled.div<{ isSelected: boolean }>`
   border: 2px solid ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.silver)};
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  flex: 1;
 
   :hover {
     border-color: ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.primaryLight)};
@@ -304,12 +311,16 @@ const TeamTypeSelectorButton = styled.div<{ isSelected: boolean }>`
       color: ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.primaryLight)};
     }
   }
+
+  @media ${devices.tablet} {
+    flex: unset;
+  }
 `;
 
 const AddFixtureContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.m};
+  gap: ${theme.spacing.s};
   width: 100%;
   box-sizing: border-box;
 `;

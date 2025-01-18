@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Calculator, XCircle } from '@phosphor-icons/react';
+import {
+  Calculator, CaretDown, CaretUp,
+} from '@phosphor-icons/react';
 import {
   collection, doc, getDoc, getDocs, query, updateDoc, where,
 } from 'firebase/firestore';
+import { PlusCircle } from '@phosphor-icons/react/dist/ssr';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Modal from '../modal/Modal';
 import { Section } from '../section/Section';
@@ -15,7 +18,6 @@ import {
   Prediction, FixtureResult, PredictionPoints, TeamType,
   Fixture,
 } from '../../utils/Fixture';
-import Input from '../input/Input';
 import { Divider } from '../Divider';
 import {
   Player, GeneralPositionEnum,
@@ -24,17 +26,18 @@ import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import {
-  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints, withDocumentIdOnObject,
+  defenderGoalPoints, forwardGoalPoints, getGeneralPositionShorthand, getPlayerPositionColor, midfielderGoalPoints, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import MobilePredictionCard from '../cards/MobilePredictionCard';
-import { AvatarSize } from '../avatar/Avatar';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { errorNotify } from '../../utils/toast/toastHelpers';
-import SelectImitation from '../input/SelectImitation';
 import GoalScorerModal from '../game/GoalScorerModal';
 import { Team } from '../../utils/Team';
+import GoalsInput from '../game/GoalsInput';
+import TextButton from '../buttons/TextButton';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -58,6 +61,9 @@ const CorrectPredictionsModal = ({
   const [showSelectGoalScorerModal, setShowSelectGoalScorerModal] = useState(false);
   const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
   const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
+  const [isGoalScorersExpanded, setIsGoalScorersExpanded] = useState<boolean>(false);
+
+  const hasGoalScorers = goalScorers.length > 0;
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -382,6 +388,51 @@ const CorrectPredictionsModal = ({
     return '-';
   };
 
+  const getTeamAvatar = (team: Team, customSize?: AvatarSize) => {
+    if (fixture?.teamType === TeamType.CLUBS) {
+      return (
+        <ClubAvatar
+          logoUrl={team.logoUrl}
+          clubName={team.name}
+          size={customSize || AvatarSize.L}
+        />
+      );
+    }
+    return (
+      <NationAvatar
+        flagUrl={team.logoUrl}
+        nationName={team.name}
+        size={customSize || AvatarSize.L}
+      />
+    );
+  };
+
+  const getPlayerAvatarByName = (name: string, index: number, showTeam?: boolean) => {
+    const combinedPlayers = [...homeTeamPlayers, ...awayTeamPlayers];
+    const playerObj = combinedPlayers.find((player) => player.name === name);
+
+    if (!playerObj || !fixture) return null;
+
+    return (
+      <AvatarContainer index={index}>
+        <Avatar
+          src={playerObj.externalPictureUrl ?? playerObj.picture ?? '/images/placeholder-fancy.png'}
+          alt={playerObj.name}
+          size={AvatarSize.M}
+          objectFit="cover"
+          showBorder
+          backgroundColor={theme.colors.silverLight}
+          customBorderWidth={1}
+        />
+        {showTeam && (
+          <GoalScorerTeamAvatar>
+            {getTeamAvatar(homeTeamPlayers.some((player) => player.name === name) ? fixture.homeTeam : fixture.awayTeam, AvatarSize.XS)}
+          </GoalScorerTeamAvatar>
+        )}
+      </AvatarContainer>
+    );
+  };
+
   if (!ongoingGameWeek) return null;
 
   return (
@@ -394,87 +445,81 @@ const CorrectPredictionsModal = ({
         mobileFullScreen
       >
         <Section gap="m">
-          <HeadingsTypography variant="h5">Fyll i resultatet i matchen</HeadingsTypography>
           {ongoingGameWeek.games.fixtures
             .filter((fixture) => fixture.id === gameId)
             .map((fixture) => (
               <Section key={fixture.id} gap="m">
                 <FixtureResultWrapper>
+                  {!isMobile && (
+                    <Section gap="xxxs">
+                      <HeadingsTypography variant="h6">Slutrestultat</HeadingsTypography>
+                      <NormalTypography variant="s" color={theme.colors.textLight}>Fyll i matchens slutresultat</NormalTypography>
+                    </Section>
+                  )}
                   <ResultInputContainer>
-                    {fixture.teamType === TeamType.CLUBS ? (
-                      <ClubAvatar
-                        logoUrl={fixture.homeTeam.logoUrl}
-                        clubName={fixture.homeTeam.name}
-                        size={AvatarSize.L}
-                      />
-                    ) : (
-                      <NationAvatar
-                        flagUrl={fixture.homeTeam.logoUrl}
-                        nationName={fixture.homeTeam.name}
-                        size={AvatarSize.L}
-                      />
-                    )}
-                    <Input
-                      placeholder="0"
-                      textAlign="center"
-                      type="number"
-                      value={finalResult.homeGoals ?? ''}
-                      onChange={(e) => setFinalResult({ ...finalResult, homeGoals: e.target.value })}
-                      fullWidth
+                    {getTeamAvatar(fixture.homeTeam)}
+                    <GoalsInput
+                      goals={finalResult.homeGoals ?? ''}
+                      onInputChange={(value) => setFinalResult({ ...finalResult, homeGoals: value })}
                     />
                     <NormalTypography variant="m">-</NormalTypography>
-                    <Input
-                      placeholder="0"
-                      type="number"
-                      textAlign="center"
-                      value={finalResult.awayGoals ?? ''}
-                      onChange={(e) => setFinalResult({ ...finalResult, awayGoals: e.target.value })}
-                      fullWidth
+                    <GoalsInput
+                      goals={finalResult.awayGoals ?? ''}
+                      onInputChange={(value) => setFinalResult({ ...finalResult, awayGoals: value })}
                     />
-                    {fixture.teamType === TeamType.CLUBS ? (
-                      <ClubAvatar
-                        logoUrl={fixture.awayTeam.logoUrl}
-                        clubName={fixture.awayTeam.name}
-                        size={AvatarSize.L}
-                      />
-                    ) : (
-                      <NationAvatar
-                        flagUrl={fixture.awayTeam.logoUrl}
-                        nationName={fixture.awayTeam.name}
-                        size={AvatarSize.L}
-                      />
-                    )}
+                    {getTeamAvatar(fixture.awayTeam)}
                   </ResultInputContainer>
                 </FixtureResultWrapper>
                 {fixture.shouldPredictGoalScorer && (
-                  <>
-                    <FixtureResultWrapper>
-                      <NormalTypography variant="m">Målgörare</NormalTypography>
-                      <SelectImitation
-                        value={goalScorers[0]}
-                        onClick={() => setShowSelectGoalScorerModal(true)}
-                        placeholder="Välj målgörare"
-                        fullWidth={isMobile}
-                      />
-                    </FixtureResultWrapper>
-                    {goalScorers.length > 0 && (
-                    <Section gap={isMobile ? 'xxxs' : 'xxs'}>
-                      {goalScorers.map((goalScorer) => (
-                        <GoalScorerContainer>
-                          <NormalTypography variant="m">
-                            {`⚽️ ${goalScorer}`}
-                          </NormalTypography>
-                          <IconButton
-                            icon={<XCircle size={24} weight="fill" />}
-                            onClick={() => setGoalScorers(goalScorers.filter((scorer) => scorer !== goalScorer))}
-                            title="Ta bort målgörare"
-                            colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                          />
-                        </GoalScorerContainer>
+                  <GoalScorersContainer isExpanded={isGoalScorersExpanded}>
+                    <GoalScorersMainContent>
+                      <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
+                      <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
+                        {hasGoalScorers && (
+                          goalScorers.map((scorer, index) => (
+                            getPlayerAvatarByName(scorer, index)
+                          ))
+                        )}
+                      </GoalScorersAvatars>
+                      {(!hasGoalScorers || !isMobile) && (
+                        <IconButton
+                          icon={<PlusCircle size={32} weight="fill" />}
+                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                          onClick={() => setShowSelectGoalScorerModal(true)}
+                        />
+                      )}
+                      {hasGoalScorers && (
+                        <IconButton
+                          icon={isGoalScorersExpanded ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
+                          colors={{ normal: theme.colors.textDefault }}
+                          onClick={() => setIsGoalScorersExpanded(!isGoalScorersExpanded)}
+                        />
+                      )}
+                    </GoalScorersMainContent>
+                    <ExpandedGoalScorers>
+                      {goalScorers.map((scorer) => (
+                        <GoalScorerCard>
+                          {getPlayerAvatarByName(scorer, 0, true)}
+                          <NormalTypography variant="m">{scorer}</NormalTypography>
+                          <PlayerPositionTag bgColor={getPlayerPositionColor([...homeTeamPlayers, ...awayTeamPlayers].find((player) => player.name === scorer)?.position.general as GeneralPositionEnum)}>
+                            <NormalTypography variant="xs" color={theme.colors.white}>
+                              {getGeneralPositionShorthand([...homeTeamPlayers, ...awayTeamPlayers].find((player) => player.name === scorer)?.position.general as GeneralPositionEnum)}
+                            </NormalTypography>
+                          </PlayerPositionTag>
+                        </GoalScorerCard>
                       ))}
-                    </Section>
-                    )}
-                  </>
+                      {hasGoalScorers && isMobile && (
+                        <TextButton
+                          size="s"
+                          icon={<PlusCircle size={24} weight="fill" color={theme.colors.primary} />}
+                          onClick={() => setShowSelectGoalScorerModal(true)}
+                          fullWidth
+                        >
+                          Lägg till målskyttar
+                        </TextButton>
+                      )}
+                    </ExpandedGoalScorers>
+                  </GoalScorersContainer>
                 )}
               </Section>
             ))}
@@ -612,16 +657,31 @@ const FixtureResultWrapper = styled.div`
   gap: ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
-  justify-content: center;
+  justify-content: space-between;
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.m};
+  padding: ${theme.spacing.xs} ${theme.spacing.xs} ${theme.spacing.xs} ${theme.spacing.s};
+  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLight};
+  border: 1px solid ${theme.colors.silverLight};
 
-  @media ${devices.tablet} {
-    width: auto;
-  }
-
-  @media ${devices.mobileL} {
-    justify-content: flex-start;
+  @media ${devices.mobile} {
+    justify-content: center;
   }
 `;
+
+// const GoalScorersContainer = styled.div`
+//   display: flex;
+//   align-items: center;
+//   gap: ${theme.spacing.xs};
+//   width: 100%;
+//   box-sizing: border-box;
+//   justify-content: space-between;
+//   background-color: ${theme.colors.silverLighter};
+//   border-radius: ${theme.borderRadius.m};
+//   padding: ${theme.spacing.xs};
+//   box-shadow: 0px 2px 0px 0px ${theme.colors.silverLight};
+//   border: 1px solid ${theme.colors.silverLight};
+// `;
 
 const ResultInputContainer = styled.div`
   display: grid;
@@ -631,12 +691,91 @@ const ResultInputContainer = styled.div`
   justify-content: center;
 `;
 
-const GoalScorerContainer = styled.div`
+const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  border: 1px solid ${theme.colors.silverLight};
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.m};
+  padding: 0 ${theme.spacing.xs};
+  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
+  max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '60px')};
+  overflow: hidden;
+  transition: max-height 0.6s cubic-bezier(.39,-0.15,.46,.94);
   width: 100%;
   box-sizing: border-box;
+  
+  @media ${devices.tablet} {
+    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
+    /* padding: ${theme.spacing.xxs} ${theme.spacing.s} ${theme.spacing.xxs} ${theme.spacing.s}; */
+  }
+`;
+
+const GoalScorersMainContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  min-height: 60px;
+  
+  ${HeadingsTypography} {
+    flex: 1;
+  }
+
+  @media ${devices.tablet} {
+    gap: ${theme.spacing.s};
+    min-height: 56px;
+  }
+`;
+
+const GoalScorersAvatars = styled.div<{ hasGoalScorers: boolean }>`
+  display: flex;
+  align-items: center;
+  padding-top: ${theme.spacing.xxxs};
+  margin-left: auto;
+  ${({ hasGoalScorers }) => hasGoalScorers && 'margin-right: -10px;'}
+`;
+
+const ExpandedGoalScorers = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  padding-bottom: ${theme.spacing.xs};
+`;
+
+const GoalScorerTeamAvatar = styled.div`
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  z-index: 1;
+`;
+
+const AvatarContainer = styled.div<{ index: number }>`
+  position: relative;
+  z-index: ${({ index }) => index};
+  margin-left: ${({ index }) => (index === 0 ? '0' : '-28px')};
+`;
+
+const PlayerPositionTag = styled.div<{ bgColor: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
+  border-radius: ${theme.borderRadius.l};
+  background-color: ${({ bgColor }) => bgColor};
+  margin-left: auto;
+`;
+
+const GoalScorerCard = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 ${theme.spacing.xs} 0 ${theme.spacing.xxxs};
+  gap: ${theme.spacing.xxxs};
+  background-color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.m};
+  border: 1px solid ${theme.colors.silverLight};
 `;
 
 export default CorrectPredictionsModal;
