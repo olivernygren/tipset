@@ -33,10 +33,10 @@ import CustomSkeleton, { ParagraphSkeleton } from '../../components/skeleton/Cus
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [fetchLoading, setFetchLoading] = useState(true);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [participantLeagues, setParticipantLeagues] = useState<Array<PredictionLeague>>([]);
   const [creatorLeagues, setCreatorLeagues] = useState<Array<PredictionLeague>>([]);
   const [endedLeagues, setEndedLeagues] = useState<Array<PredictionLeague>>([]);
@@ -51,8 +51,8 @@ const PredictionLeaguesPage = () => {
   const [createLeagueLoading, setCreateLeagueLoading] = useState<boolean>(false);
   const [joinLeagueLoading, setJoinLeagueLoading] = useState<string | null>(null);
 
-  const currentUserId = auth.currentUser?.uid ?? '';
-  const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
+  const currentUserId = user?.documentId ?? '';
+  // const currentUserId = auth.currentUser?.uid ?? '';
 
   useEffect(() => {
     if (currentUserId) {
@@ -61,6 +61,7 @@ const PredictionLeaguesPage = () => {
   }, [currentUserId]);
 
   const fetchLeagues = async () => {
+    setFetchLoading(true);
     try {
       const data = await getDocs(query(collection(db, CollectionEnum.LEAGUES), where('participants', 'array-contains', currentUserId)));
       const currentUserLeagues = withDocumentIdOnObjectsInArray<PredictionLeague>(data.docs);
@@ -74,8 +75,9 @@ const PredictionLeaguesPage = () => {
       setCreatorLeagues(allCreatorLeagues);
     } catch (err) {
       console.error(err);
+    } finally {
+      setFetchLoading(false);
     }
-    setFetchLoading(false);
   };
 
   const handleCreateLeague = async () => {
@@ -106,7 +108,10 @@ const PredictionLeaguesPage = () => {
     };
 
     try {
+      const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
+
       await addDoc(leagueCollectionRef, newLeague);
+
       setShowCreateLeagueModal(false);
       setShowJoinLeagueModal(false);
       fetchLeagues();
@@ -118,8 +123,6 @@ const PredictionLeaguesPage = () => {
   };
 
   const handleJoinLeague = async () => {
-    console.log(currentUserId, user);
-
     if (!currentUserId || !user) return;
 
     setJoinLeagueLoading('modal');
@@ -304,11 +307,11 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {!currentUserId && (
-          <NormalTypography variant="m" color={theme.colors.silverDarker}>Hämtar... Om du inte är inloggad, logga in för att se och gå med i ligor</NormalTypography>
+        {!user && !fetchLoading && !userLoading && (
+          <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
         )}
-        {fetchLoading && currentUserId && getSkeletonLoader()}
-        {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
+        {fetchLoading && Boolean(user) && getSkeletonLoader()}
+        {!fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
           <>
             {creatorLeagues.length > 0 && (
               <Section gap="s">
@@ -336,7 +339,7 @@ const PredictionLeaguesPage = () => {
             )}
           </>
         )}
-        {!fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
+        {Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
           <>
             <NormalTypography variant="m">Du är inte med i några ligor ännu.</NormalTypography>
             <Section flexDirection="row" gap="l">

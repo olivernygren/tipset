@@ -18,7 +18,7 @@ import { Divider } from '../Divider';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 
 const Header = () => {
-  const { user, hasAdminRights } = useUser();
+  const { user, hasAdminRights, loading } = useUser();
   const isTablet = useResizeListener(DeviceSizes.TABLET);
 
   const hasUserCookie = Cookies.get('user');
@@ -29,6 +29,10 @@ const Header = () => {
   useEffect(() => {
     setIsSignedIn(Boolean(user));
   }, [user]);
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   const handleSignOut = async () => {
     try {
@@ -77,7 +81,6 @@ const Header = () => {
                 {isSignedIn && (
                   <LoggedInUser>
                     {user?.profilePicture && <Avatar src={`/images/${user?.profilePicture}.png`} alt="avatar" size={AvatarSize.M} showBorder objectFit="cover" />}
-                    {/* <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.email}` ?? '?'}</EmphasisTypography> */}
                     <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}`}</EmphasisTypography>
                   </LoggedInUser>
                 )}

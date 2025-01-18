@@ -12,19 +12,20 @@ import { withDocumentIdOnObject } from '../utils/helpers';
 
 interface UserContextProps {
   user: User | null;
-  hasAdminRights: boolean;
+  hasAdminRights: boolean | undefined;
+  loading: boolean;
 }
 
-const UserContext = createContext<UserContextProps>({ user: null, hasAdminRights: false });
+const UserContext = createContext<UserContextProps>({ user: null, hasAdminRights: false, loading: true });
 
 export const useUser = () => useContext(UserContext);
 
 export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [hasAdminRights, setHasAdminRights] = useState<boolean>(false);
+  const [hasAdminRights, setHasAdminRights] = useState<boolean>();
   const [loading, setLoading] = useState<boolean>(true);
 
-  const contextValue = useMemo(() => ({ user, hasAdminRights }), [user, hasAdminRights]);
+  const contextValue = useMemo(() => ({ user, hasAdminRights, loading }), [user, hasAdminRights, loading]);
 
   useEffect(() => {
     const fetchUser = async (userId: string) => {
@@ -33,8 +34,11 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
       if (userDocSnap.exists()) {
         const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
+        console.log('User data:', userWithDocId);
+
         setUser(userWithDocId);
         setHasAdminRights(userWithDocId.role === 'ADMIN');
+        setLoading(false);
       } else {
         console.log('No such user!');
       }
