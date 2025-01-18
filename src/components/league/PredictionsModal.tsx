@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled from 'styled-components';
 import {
   collection, getDocs, query, where,
 } from 'firebase/firestore';
@@ -163,7 +163,6 @@ const PredictionsModal = ({
             <ExpandedGoalScorers>
               {fixture?.finalResult?.goalScorers?.map((scorer) => (
                 <GoalScorerCard>
-                  {/* {getTeamAvatar(homeTeamPlayers.some((player) => player.name === scorer) ? fixture.homeTeam : fixture.awayTeam)} */}
                   {getPlayerAvatarByName(scorer, 0, true)}
                   <NormalTypography variant="m" align="center">{scorer}</NormalTypography>
                   <PlayerPositionTag bgColor={getPlayerPositionColor([...homeTeamPlayers, ...awayTeamPlayers].find((player) => player.name === scorer)?.position.general as GeneralPositionEnum)}>

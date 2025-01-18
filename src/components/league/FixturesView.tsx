@@ -621,9 +621,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               <HeadingsTypography variant="h4">Pågående omgång</HeadingsTypography>
               {ongoingGameWeek && (
                 <Section flexDirection={isMobile ? 'column' : 'row'} alignItems="center" gap="s" justifyContent="flex-end" fitContent={!isMobile} padding={isMobile ? `${theme.spacing.xxxs} 0 0 0` : '0'}>
-                  <Section>
-                    <NoWrapTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NoWrapTypography>
-                  </Section>
+                  {!showCorrectGameWeekContent && (
+                    <Section>
+                      <NoWrapTypography variant="m" color={theme.colors.textLight}>{getGameWeekPredictionStatusText()}</NoWrapTypography>
+                    </Section>
+                  )}
                   <Section
                     flexDirection="row"
                     alignItems="center"

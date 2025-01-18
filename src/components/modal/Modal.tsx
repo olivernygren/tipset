@@ -24,7 +24,7 @@ const Modal = ({
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const getModalWidth = () => {
-    if (mobileBottomSheet && isMobile) {
+    if ((mobileBottomSheet || mobileFullScreen) && isMobile) {
       return '100%';
     }
 
