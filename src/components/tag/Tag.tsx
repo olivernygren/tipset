@@ -1,16 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
-import { NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 
 interface TagProps {
   textAndIconColor?: string;
   backgroundColor?: string;
-  text: string;
+  text?: string;
   icon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   size?: 's' | 'm' | 'l';
   fullWidth?: boolean;
   onClick?: () => void;
+  textWeight?: 'emphasis' | 'normal';
 }
 
 interface StyledTagProps {
@@ -22,7 +24,7 @@ interface StyledTagProps {
 }
 
 const Tag = ({
-  text, textAndIconColor, backgroundColor, icon, size = 'm', fullWidth, onClick,
+  text, textAndIconColor, backgroundColor, icon, size = 'm', fullWidth, onClick, textWeight = 'normal', endIcon,
 }: TagProps) => (
   <StyledTag
     size={size}
@@ -32,9 +34,18 @@ const Tag = ({
     onClick={onClick || undefined}
   >
     {icon}
-    <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
-      {text}
-    </NormalTypography>
+    {Boolean(text) && (
+      textWeight === 'emphasis' ? (
+        <EmphasisTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
+          {text}
+        </EmphasisTypography>
+      ) : (
+        <NormalTypography color={textAndIconColor || theme.colors.primary} variant={size === 's' ? 's' : 'm'}>
+          {text}
+        </NormalTypography>
+      )
+    )}
+    {endIcon}
   </StyledTag>
 );
 

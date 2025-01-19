@@ -661,27 +661,13 @@ const FixtureResultWrapper = styled.div`
   background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
   padding: ${theme.spacing.xs} ${theme.spacing.xs} ${theme.spacing.xs} ${theme.spacing.s};
-  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLight};
+  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLighter};
   border: 1px solid ${theme.colors.silverLight};
 
   @media ${devices.mobile} {
     justify-content: center;
   }
 `;
-
-// const GoalScorersContainer = styled.div`
-//   display: flex;
-//   align-items: center;
-//   gap: ${theme.spacing.xs};
-//   width: 100%;
-//   box-sizing: border-box;
-//   justify-content: space-between;
-//   background-color: ${theme.colors.silverLighter};
-//   border-radius: ${theme.borderRadius.m};
-//   padding: ${theme.spacing.xs};
-//   box-shadow: 0px 2px 0px 0px ${theme.colors.silverLight};
-//   border: 1px solid ${theme.colors.silverLight};
-// `;
 
 const ResultInputContainer = styled.div`
   display: grid;
@@ -708,7 +694,6 @@ const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   
   @media ${devices.tablet} {
     max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
-    /* padding: ${theme.spacing.xxs} ${theme.spacing.s} ${theme.spacing.xxs} ${theme.spacing.s}; */
   }
 `;
 

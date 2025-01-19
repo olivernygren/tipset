@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-  Coin, Eye, FireSimple, Target,
+  Coin, Eye, FireSimple, SoccerBall, Target,
 } from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
@@ -29,6 +29,7 @@ const CompactFixtureResult = ({
 
   const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult);
   const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
+  const correctGoalScorerPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctGoalScorer);
 
   const getClubAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
@@ -77,8 +78,11 @@ const CompactFixtureResult = ({
         <ButtonsAndPointsWrapper>
           {predictions && (
           <PointsTag>
-            {(oddsBonusPointsAwarded || correctResultPredicted) && (
+            {(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) && (
               <PointsIcons>
+                {correctGoalScorerPredicted && (
+                  <SoccerBall size={16} color={theme.colors.silverDarker} weight="fill" />
+                )}
                 {oddsBonusPointsAwarded && (
                   <FireSimple size={16} color={theme.colors.silverDarker} />
                 )}

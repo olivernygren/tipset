@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { ChartBar, MapPin, PlusCircle } from '@phosphor-icons/react';
+import {
+  ChartBar, FireSimple, MapPin, PlusCircle, SoccerBall, Target,
+} from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import {
   collection, getDocs, query, where,
 } from 'firebase/firestore';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
-import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
+import {
+  Fixture, Prediction, PredictionPoints, TeamType,
+} from '../../utils/Fixture';
 import { Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import { devices, theme } from '../../theme';
@@ -24,6 +28,7 @@ import Tag from '../tag/Tag';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { withDocumentIdOnObject } from '../../utils/helpers';
+import Tooltip from '../tooltip/Tooltip';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -38,11 +43,26 @@ interface GamePredictorProps {
   previousGameWeekPredictedGoalScorers?: Array<Player>;
   numberOfParticipantsPredicted?: number;
   isLeagueCreator?: boolean;
+  awardedPoints?: PredictionPoints;
+  particpantsThatPredicted?: Array<string>;
 }
 
 const GamePredictor = ({
+  game,
+  gameNumber,
+  onPlayerPredictionUpdate,
+  onResultUpdate,
+  onSave,
+  onShowStats,
+  hasPredicted,
+  predictionValue,
+  loading,
+  previousGameWeekPredictedGoalScorers,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  game, gameNumber, onPlayerPredictionUpdate, onResultUpdate, onSave, onShowStats, hasPredicted, predictionValue, loading, previousGameWeekPredictedGoalScorers, isLeagueCreator, numberOfParticipantsPredicted,
+  isLeagueCreator,
+  numberOfParticipantsPredicted,
+  awardedPoints,
+  particpantsThatPredicted,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -52,6 +72,7 @@ const GamePredictor = ({
   const [isSelectGoalScorerModalOpen, setIsSelectGoalScorerModalOpen] = useState(false);
   const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
   const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
+  const [showParticipantsPredictedTooltip, setShowParticipantsPredictedTooltip] = useState<boolean>(false);
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
   const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
@@ -228,6 +249,23 @@ const GamePredictor = ({
     return theme.colors.primary;
   };
 
+  const getFormattedPredictedParticipantNames = () => {
+    if (particpantsThatPredicted && particpantsThatPredicted.length > 0) {
+      const [name1, name2, name3, ...rest] = particpantsThatPredicted;
+      const restCount = rest.length;
+
+      if (particpantsThatPredicted.length === 1) {
+        return name1;
+      } if (particpantsThatPredicted.length === 2) {
+        return `${name1} & ${name2}`;
+      } if (particpantsThatPredicted.length === 3) {
+        return `${name1}, ${name2} & ${name3}`;
+      }
+      return `${name1}, ${name2} & ${name3} + ${restCount} till`;
+    }
+    return 'Ingen';
+  };
+
   const getTeam = (team: Team, isAwayTeam: boolean) => {
     const { name, shortName } = team;
     const logoUrl = (hasPredicted && team.darkModeLogoUrl) ? team.darkModeLogoUrl : team.logoUrl;
@@ -259,6 +297,42 @@ const GamePredictor = ({
   };
 
   const getCardHeaderContent = () => {
+    if (game.finalResult && awardedPoints) {
+      const correctGoalScorerPredicted = awardedPoints.correctGoalScorer > 0;
+      const correctResultPredicted = awardedPoints.correctResult > 0;
+      const oddsBonusPointsAwarded = awardedPoints.oddsBonus > 0;
+
+      return (
+        <Section flexDirection="row" alignItems="center" gap="xs" justifyContent="center">
+          <Tag
+            size="m"
+            textWeight="emphasis"
+            text={`${awardedPoints.total} p`}
+            textAndIconColor={hasPredicted ? theme.colors.primaryDark : theme.colors.primaryDark}
+            backgroundColor={hasPredicted ? theme.colors.gold : theme.colors.primaryBleach}
+          />
+          <Tag
+            size="m"
+            textAndIconColor={theme.colors.gold}
+            backgroundColor={theme.colors.primaryDark}
+            icon={(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) ? (
+              <PointsIcons>
+                {correctGoalScorerPredicted && (
+                  <SoccerBall size={18} weight="fill" />
+                )}
+                {oddsBonusPointsAwarded && (
+                  <FireSimple size={18} />
+                )}
+                {correctResultPredicted && (
+                  <Target size={18} />
+                )}
+              </PointsIcons>
+            ) : undefined}
+          />
+        </Section>
+      );
+    }
+
     if (isMobile) {
       return (
         <>
@@ -285,6 +359,7 @@ const GamePredictor = ({
         </>
       );
     }
+
     return (
       <>
         <Section flexDirection="row" gap="xxxs" alignItems="center" fitContent overflow="hidden">
@@ -329,7 +404,17 @@ const GamePredictor = ({
               {!isMobile && game.shouldPredictGoalScorer && <NormalTypography variant="s" color={getTextColor()}>•</NormalTypography>}
             </>
           )}
-          <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
+          <NumberOfParticipantsPredicted
+            onMouseEnter={() => setShowParticipantsPredictedTooltip(true)}
+            onMouseLeave={() => setShowParticipantsPredictedTooltip(false)}
+          >
+            <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
+            {particpantsThatPredicted && particpantsThatPredicted.length > 0 && showParticipantsPredictedTooltip && !isMobile && (
+              <TooltipContainer>
+                <Tooltip text={getFormattedPredictedParticipantNames()} />
+              </TooltipContainer>
+            )}
+          </NumberOfParticipantsPredicted>
         </TagsSection>
         <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
         <GameWrapper>
@@ -651,6 +736,29 @@ const PotentialOddsBonusPoints = styled.div<{ hasPredicted?: boolean }>`
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach)};
   padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.s};
+`;
+
+const PointsIcons = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  align-items: center;
+`;
+
+const NumberOfParticipantsPredicted = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  cursor: pointer;
+  position: relative;
+`;
+
+const TooltipContainer = styled.div`
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 `;
 
 export default GamePredictor;

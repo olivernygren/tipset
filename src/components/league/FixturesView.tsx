@@ -435,6 +435,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               isLeagueCreator={isCreator}
               previousGameWeekPredictedGoalScorers={getUserPreviousGameWeekPrecitedGoalScorers(getLastGameWeek(previousGameWeeks), user?.documentId ?? '', [fixture.homeTeam.name, fixture.awayTeam.name])}
               onShowStats={() => setIsStatsModalOpen(fixture)}
+              awardedPoints={ongoingGameWeek.games.predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points}
+              particpantsThatPredicted={ongoingGameWeek.games.predictions.filter((p) => p.fixtureId === fixture.id).map((p) => p.username).filter((username): username is string => username !== undefined)}
             />
           ))}
       </FixturesGrid>

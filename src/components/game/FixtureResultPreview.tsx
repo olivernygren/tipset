@@ -99,7 +99,7 @@ const FixtureResultPreview = ({
         >
           {predictions && (
             <PointsContainer>
-              {(oddsBonusPointsAwarded || correctResultPredicted) && (
+              {(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) && (
                 <PointsIcons>
                   {correctGoalScorerPredicted && (
                     <SoccerBall size={16} color={theme.colors.silverDarker} weight="fill" />
@@ -130,7 +130,6 @@ const FixtureResultPreview = ({
             </MobileButtonContainer>
           ) : (
             <TextButton
-              disabled={!predictions || predictions.length === 0}
               onClick={handleOpenModal}
             >
               Se allas tips
@@ -270,7 +269,7 @@ const MobileButtonContainer = styled.div`
 
 const PointsIcons = styled.div`
   display: flex;
-  gap: 4px;
+  gap: ${theme.spacing.xxxs};
   align-items: center;
 `;
 
