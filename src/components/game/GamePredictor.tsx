@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ChartBar, FireSimple, MapPin, PlusCircle, SoccerBall, Target,
+  ChartBar, CheckCircle, FireSimple, MapPin, PlusCircle, SoccerBall, Target,
+  XCircle,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import {
   collection, getDocs, query, where,
 } from 'firebase/firestore';
+import { useHover } from 'react-haiku';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import {
@@ -65,6 +67,9 @@ const GamePredictor = ({
   particpantsThatPredicted,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+  const { hovered: homeWinHovered, ref: homeWinRef } = useHover();
+  const { hovered: drawHovered, ref: drawRef } = useHover();
+  const { hovered: awayWinHovered, ref: awayWinRef } = useHover();
 
   const [homeGoals, setHomeGoals] = useState<string>(predictionValue?.homeGoals.toString() ?? '');
   const [awayGoals, setAwayGoals] = useState<string>(predictionValue?.awayGoals.toString() ?? '');
@@ -78,6 +83,8 @@ const GamePredictor = ({
   const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
   const hasPredictedDraw = homeGoals !== '' && awayGoals !== '' && homeGoals === awayGoals;
   const hasPredictedAwayWin = homeGoals !== '' && awayGoals !== '' && homeGoals < awayGoals;
+  const predictedCorrectGoalScorer = predictedPlayerToScore && game.finalResult && game.finalResult.goalScorers && game.finalResult.goalScorers.includes(predictedPlayerToScore.name);
+  const predictedIncorrectGoalScorer = predictedPlayerToScore && game.finalResult && game.finalResult.goalScorers && !game.finalResult.goalScorers.includes(predictedPlayerToScore.name);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -182,39 +189,35 @@ const GamePredictor = ({
 
   const getTextColor = () => (hasPredicted ? theme.colors.white : theme.colors.textDefault);
 
-  // const getPotentialOddsBonusPoints = () => {
-  //   if (game.odds && homeGoals !== '' && awayGoals !== '') {
-  //     const homeWinOdds = parseFloat(game.odds.homeWin);
-  //     const drawOdds = parseFloat(game.odds.draw);
-  //     const awayWinOdds = parseFloat(game.odds.awayWin);
+  const getPotentialOddsBonusPoints = (hoveredOdds: 'home' | 'draw' | 'away') => {
+    if (game.odds) {
+      const homeWinOdds = parseFloat(game.odds.homeWin);
+      const drawOdds = parseFloat(game.odds.draw);
+      const awayWinOdds = parseFloat(game.odds.awayWin);
 
-  //     const getBonusPointsFromOdds = (odds: number): number => {
-  //       if (odds >= 1 && odds <= 2.99) return 0;
-  //       if (odds >= 3.0 && odds <= 3.99) return 1;
-  //       if (odds >= 4.0 && odds <= 5.99) return 2;
-  //       if (odds >= 6.0 && odds <= 9.99) return 3;
-  //       if (odds >= 10) return 5;
-  //       return 0;
-  //     };
+      const getBonusPointsFromOdds = (odds: number): number => {
+        if (odds >= 1 && odds <= 2.99) return 0;
+        if (odds >= 3.0 && odds <= 3.99) return 1;
+        if (odds >= 4.0 && odds <= 5.99) return 2;
+        if (odds >= 6.0 && odds <= 9.99) return 3;
+        if (odds >= 10) return 5;
+        return 0;
+      };
 
-  //     const homeWinPredicted = homeGoals > awayGoals;
-  //     const drawPredicted = homeGoals === awayGoals;
-  //     const awayWinPredicted = homeGoals < awayGoals;
+      if (hoveredOdds === 'home' && homeWinOdds) {
+        return getBonusPointsFromOdds(homeWinOdds);
+      }
+      if (hoveredOdds === 'draw' && drawOdds) {
+        return getBonusPointsFromOdds(drawOdds);
+      }
+      if (hoveredOdds === 'away' && awayWinOdds) {
+        return getBonusPointsFromOdds(awayWinOdds);
+      }
 
-  //     if (homeWinPredicted && homeWinOdds) {
-  //       return getBonusPointsFromOdds(homeWinOdds);
-  //     }
-  //     if (drawPredicted && drawOdds) {
-  //       return getBonusPointsFromOdds(drawOdds);
-  //     }
-  //     if (awayWinPredicted && awayWinOdds) {
-  //       return getBonusPointsFromOdds(awayWinOdds);
-  //     }
-
-  //     return 0;
-  //   }
-  //   return 0;
-  // };
+      return 0;
+    }
+    return 0;
+  };
 
   const handleInputChange = (team: 'home' | 'away', value: string) => {
     if (value !== '' && !/^[0-9]$/.test(value)) {
@@ -264,6 +267,31 @@ const GamePredictor = ({
       return `${name1}, ${name2} & ${name3} + ${restCount} till`;
     }
     return 'Ingen';
+  };
+
+  const getPotentialOddsBonusPointsTooltip = (hoveredOdds: 'home' | 'draw' | 'away') => {
+    let hasPredictedThisOutcome;
+
+    if (hoveredOdds === 'home') {
+      hasPredictedThisOutcome = hasPredictedHomeWin;
+    } else if (hoveredOdds === 'draw') {
+      hasPredictedThisOutcome = hasPredictedDraw;
+    } else {
+      hasPredictedThisOutcome = hasPredictedAwayWin;
+    }
+
+    const potentialOddsBonusPoints = getPotentialOddsBonusPoints(hoveredOdds);
+
+    return (
+      <TooltipContainer topOffset={36}>
+        <Tooltip
+          textWeight={hasPredictedThisOutcome ? 'emphasis' : 'normal'}
+          text={`${potentialOddsBonusPoints}`}
+          endIcon={<FireSimple size={18} color={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white} weight={hasPredictedThisOutcome ? 'fill' : 'regular'} />}
+          textColor={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white}
+        />
+      </TooltipContainer>
+    );
   };
 
   const getTeam = (team: Team, isAwayTeam: boolean) => {
@@ -410,7 +438,7 @@ const GamePredictor = ({
           >
             <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
             {particpantsThatPredicted && particpantsThatPredicted.length > 0 && showParticipantsPredictedTooltip && !isMobile && (
-              <TooltipContainer>
+              <TooltipContainer topOffset={24}>
                 <Tooltip text={getFormattedPredictedParticipantNames()} />
               </TooltipContainer>
             )}
@@ -444,23 +472,27 @@ const GamePredictor = ({
           <>
             <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
             <OddsContainer hasPredicted={hasPredicted}>
-              <OddsWrapper hasPredictedThisOutcome={hasPredictedHomeWin}>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
+              <OddsWrapper>
+                {homeWinHovered && !isMobile && getPotentialOddsBonusPointsTooltip('home')}
+                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedHomeWin} ref={homeWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
+                </OddsTextWrapper>
               </OddsWrapper>
-              <OddsWrapper hasPredictedThisOutcome={hasPredictedDraw}>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
+              <OddsWrapper>
+                {drawHovered && !isMobile && getPotentialOddsBonusPointsTooltip('draw')}
+                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedDraw} ref={drawRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
+                </OddsTextWrapper>
               </OddsWrapper>
-              <OddsWrapper hasPredictedThisOutcome={hasPredictedAwayWin}>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
-                <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
+              <OddsWrapper>
+                {awayWinHovered && !isMobile && getPotentialOddsBonusPointsTooltip('away')}
+                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedAwayWin} ref={awayWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
+                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
+                </OddsTextWrapper>
               </OddsWrapper>
-              {/* {homeGoals !== '' && awayGoals !== '' && (
-                <PotentialOddsBonusPoints hasPredicted={hasPredicted}>
-                  <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primaryDark}>{`OB: ${getPotentialOddsBonusPoints()}`}</NormalTypography>
-                </PotentialOddsBonusPoints>
-              )} */}
             </OddsContainer>
           </>
         )}
@@ -493,6 +525,16 @@ const GamePredictor = ({
                     customBorderWidth={1}
                     backgroundColor={theme.colors.silverLight}
                   />
+                  {predictedCorrectGoalScorer && (
+                    <GoalScorerIconWrapper>
+                      <CheckCircle color={theme.colors.gold} size={16} weight="fill" />
+                    </GoalScorerIconWrapper>
+                  )}
+                  {predictedIncorrectGoalScorer && (
+                    <GoalScorerIconWrapper>
+                      <XCircle color={theme.colors.red} size={16} weight="fill" />
+                    </GoalScorerIconWrapper>
+                  )}
                 </AvatarWrapper>
               ) : (
                 <PlusCircle color={getGoalScorerIconButtonColor()} size={36} weight="fill" />
@@ -686,7 +728,7 @@ const TagsSection = styled.div`
 `;
 
 const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
-  padding: ${theme.spacing.xs} 0;
+  padding: 6px 0;
   border-radius: ${theme.borderRadius.s};
   align-items: center;
   display: grid;
@@ -697,19 +739,28 @@ const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
   position: relative;
 `;
 
-const OddsWrapper = styled.div<{ hasPredictedThisOutcome?: boolean }>`
+const OddsWrapper = styled.div`
   display: flex;
   gap: ${theme.spacing.xxs};
   align-items: center;
   justify-content: center;
-  display: flex;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+`;
 
-  ${({ hasPredictedThisOutcome }) => hasPredictedThisOutcome && css`
-    /* ${NormalTypography} {
-      text-decoration: underline;
-    } */
+const OddsTextWrapper = styled.div<{ hasPredictedThisOutcome?: boolean, hasPredicted?: boolean }>`
+  display: flex;
+  gap: ${theme.spacing.xxs};
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 100px;
+  padding: 6px ${theme.spacing.xs};
+  cursor: pointer;
+
+  ${({ hasPredictedThisOutcome, hasPredicted }) => hasPredictedThisOutcome && css`
+    background-color: ${hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach};
   `};
 `;
 
@@ -723,19 +774,7 @@ const AvatarWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const PotentialOddsBonusPoints = styled.div<{ hasPredicted?: boolean }>`
-  /* position: absolute;
-  top: -26px;
-  right: 0; */
-  /* transform: translateX(-50%); */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach)};
-  padding: ${theme.spacing.xxxs} ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.s};
+  position: relative;
 `;
 
 const PointsIcons = styled.div`
@@ -753,12 +792,23 @@ const NumberOfParticipantsPredicted = styled.div`
   position: relative;
 `;
 
-const TooltipContainer = styled.div`
+const TooltipContainer = styled.div<{ topOffset: number }>`
   position: absolute;
-  top: 24px;
+  top: ${({ topOffset }) => `${topOffset}px`};
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+`;
+
+const GoalScorerIconWrapper = styled.div`
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  z-index: 1;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  background-color: ${theme.colors.textDefault};
 `;
 
 export default GamePredictor;

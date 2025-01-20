@@ -9,6 +9,7 @@ interface TooltipProps {
   textSize?: 'xs' | 's' | 'm' | 'l';
   backgroundColor?: string;
   textColor?: string;
+  endIcon?: React.ReactNode;
 }
 
 interface StyledTooltipProps {
@@ -16,7 +17,7 @@ interface StyledTooltipProps {
 }
 
 const Tooltip = ({
-  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white,
+  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white, endIcon,
 }: TooltipProps) => (
   <StyledTooltip backgroundColor={backgroundColor}>
     <TooltipPoint backgroundColor={backgroundColor} />
@@ -29,11 +30,13 @@ const Tooltip = ({
         {text}
       </NormalTypography>
     )}
+    {endIcon}
   </StyledTooltip>
 );
 
 const StyledTooltip = styled.div<StyledTooltipProps>`
   display: flex;
+  gap: ${theme.spacing.xxxs};
   align-items: center;
   justify-content: center;
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};

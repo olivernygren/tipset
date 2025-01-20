@@ -637,33 +637,40 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                       backgroundColor={theme.colors.primaryBleach}
                       size="l"
                     />
-                    {(isCreator || hasAdminRights) && !editGameWeekViewOpen && (
-                      fixturesCanBeCorrected && (
-                        showCorrectGameWeekContent ? (
-                          <IconButton
-                            icon={<XCircle size={24} />}
-                            colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                            onClick={() => setShowCorrectGameWeekContent(false)}
-                          />
-                        ) : (
-                          <Button
-                            variant="primary"
-                            size="s"
-                            onClick={() => setShowCorrectGameWeekContent(true)}
-                            icon={<ListChecks size={20} color={theme.colors.white} />}
-                          >
-                            Rätta
-                          </Button>
+                    <Section
+                      flexDirection="row"
+                      alignItems="center"
+                      gap={isMobile ? 'xxs' : 'xs'}
+                      fitContent
+                    >
+                      {(isCreator || hasAdminRights) && !editGameWeekViewOpen && (
+                        fixturesCanBeCorrected && (
+                          showCorrectGameWeekContent ? (
+                            <IconButton
+                              icon={<XCircle size={24} />}
+                              colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                              onClick={() => setShowCorrectGameWeekContent(false)}
+                            />
+                          ) : (
+                            <Button
+                              variant="primary"
+                              size="s"
+                              onClick={() => setShowCorrectGameWeekContent(true)}
+                              icon={<ListChecks size={20} color={theme.colors.white} />}
+                            >
+                              Rätta
+                            </Button>
+                          )
                         )
-                      )
-                    )}
-                    {(isCreator || hasAdminRights) && !showCorrectGameWeekContent && !editGameWeekViewOpen && (
+                      )}
+                      {(isCreator || hasAdminRights) && !showCorrectGameWeekContent && !editGameWeekViewOpen && (
                       <IconButton
                         icon={<PencilSimple size={24} />}
                         colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                         onClick={() => setEditGameWeekViewOpen(true)}
                       />
-                    )}
+                      )}
+                    </Section>
                   </Section>
                 </Section>
               )}
