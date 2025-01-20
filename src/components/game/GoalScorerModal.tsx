@@ -74,37 +74,15 @@ const GoalScorerModal = ({
   const [searchValue, setSearchValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<FilterEnum>>([FilterEnum.DEFENDERS, FilterEnum.MIDFIELDERS, FilterEnum.FORWARDS]);
-  // const [playerRatings, setPlayerRatings] = useState<Array<PlayerRating>>([]);
   const [previouslySelectedGoalScorer, setPreviouslySelectedGoalScorer] = useState<Player | null>(null);
   const [goalStats, setGoalStats] = useState<Array<PlayerGoal>>([]);
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorers?.some((selectedPlayer) => selectedPlayer.id === player.id && playersToShow.some((playerToShow) => playerToShow.id === player.id));
   const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
-  // const playerExistsInRatings = (player: Player) => playerRatings.some((rating) => rating.playerName === player.name);
-  // const previousGameWeekPredictedGoalScorerExists = previousGameWeekPredictedGoalScorers?.some((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
-
-  // useEffect(() => {
-  //   const fetchRatings = async () => {
-  //     try {
-  //       const playerRatingCollectionRef = collection(db, CollectionEnum.PLAYER_RATINGS);
-  //       if (!playerRatingCollectionRef) return;
-
-  //       const playerRatingData = await getDocs(playerRatingCollectionRef);
-  //       const playerRatings = withDocumentIdOnObjectsInArray<PlayerRating>(playerRatingData.docs);
-
-  //       setPlayerRatings(playerRatings);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchRatings();
-  // }, []);
 
   useEffect(() => {
     const fetchGoalStats = async (): Promise<{ homeTeamPlayersStats: Array<FotMobStatListItem>, awayTeamPlayersStats: Array<FotMobStatListItem> }> => {
-      // Get fetch url by fixture tournament
       const res = await fetch(getFotMobGoalStatsUrl(fixture?.tournament as TournamentsEnum));
       const data = await res.json();
       const playersList: Array<FotMobStatListItem> = data.TopLists[0].StatList;
@@ -163,8 +141,6 @@ const GoalScorerModal = ({
     if (previousGameWeekPredictedGoalScorers && previousGameWeekPredictedGoalScorers.length > 0) {
       if (playersToShow.some((player) => previousGameWeekPredictedGoalScorers.some((previousPlayer) => previousPlayer.id === player.id))) {
         const previouslySelectedGoalScorer = previousGameWeekPredictedGoalScorers.find((player) => playersToShow.some((playerToShow) => playerToShow.id === player.id));
-        console.log('previouslySelectedGoalScorer', previouslySelectedGoalScorer);
-
         setPreviouslySelectedGoalScorer(previouslySelectedGoalScorer || null);
       } else {
         setPreviouslySelectedGoalScorer(null);

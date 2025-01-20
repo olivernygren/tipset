@@ -1165,6 +1165,7 @@ export const Teams: TeamsType = {
       stadium: 'Emirates Stadium',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#E40514',
+      id: '9825',
     },
     {
       name: 'Chelsea',
@@ -1172,6 +1173,7 @@ export const Teams: TeamsType = {
       stadium: 'Stamford Bridge',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#034694',
+      id: '8455',
     },
     {
       name: 'Liverpool',
@@ -1180,6 +1182,7 @@ export const Teams: TeamsType = {
       stadium: 'Anfield',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#d11f2b',
+      id: '8650',
     },
     {
       name: 'Manchester City',
@@ -1188,6 +1191,7 @@ export const Teams: TeamsType = {
       stadium: 'Etihad Stadium',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#6CABDD',
+      id: '8456',
     },
     {
       name: 'Manchester United',
@@ -1196,6 +1200,7 @@ export const Teams: TeamsType = {
       stadium: 'Old Trafford',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#DA291C',
+      id: '10260',
     },
     {
       name: 'Tottenham',
@@ -1203,6 +1208,7 @@ export const Teams: TeamsType = {
       stadium: 'Tottenham Hotspur Stadium',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#132257',
+      id: '8586',
     },
     {
       name: 'Everton',
@@ -1231,6 +1237,7 @@ export const Teams: TeamsType = {
       stadium: 'Villa Park',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#7A003C',
+      id: '10252',
     },
     {
       name: 'Wolves',
@@ -1252,6 +1259,7 @@ export const Teams: TeamsType = {
       stadium: 'St. James\' Park',
       country: CountryEnum.ENGLAND,
       teamPrimaryColor: '#000000',
+      id: '10261',
     },
     {
       name: 'Crystal Palace',
@@ -1487,6 +1495,7 @@ export const Teams: TeamsType = {
       stadium: 'Santiago Bernabéu',
       country: CountryEnum.SPAIN,
       teamPrimaryColor: '#fbbe00',
+      id: '8633',
     },
     {
       name: 'FC Barcelona',
@@ -1496,6 +1505,7 @@ export const Teams: TeamsType = {
       stadium: 'Estadi Olímpic Lluís Companys',
       country: CountryEnum.SPAIN,
       teamPrimaryColor: '#a50044',
+      id: '8634',
     },
     {
       name: 'Atletico Madrid',
@@ -1504,6 +1514,7 @@ export const Teams: TeamsType = {
       stadium: 'Wanda Metropolitano',
       country: CountryEnum.SPAIN,
       teamPrimaryColor: '#cb3524',
+      id: '9906',
     },
     {
       name: 'Sevilla',
@@ -1518,6 +1529,7 @@ export const Teams: TeamsType = {
       stadium: 'Mestalla',
       country: CountryEnum.SPAIN,
       teamPrimaryColor: '#ee7836',
+      id: '10267',
     },
     {
       name: 'Real Sociedad',
@@ -1547,6 +1559,7 @@ export const Teams: TeamsType = {
       stadium: 'Estadio San Mamés',
       country: CountryEnum.SPAIN,
       teamPrimaryColor: '#ee211e',
+      id: '8315',
     },
     {
       name: 'Girona FC',
@@ -1698,6 +1711,7 @@ export const Teams: TeamsType = {
       stadium: 'Allianz Stadium',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#000000',
+      id: '9885',
     },
     {
       name: 'Inter',
@@ -1706,6 +1720,7 @@ export const Teams: TeamsType = {
       stadium: 'Giuseppe Meazza',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#01229c',
+      id: '8636',
     },
     {
       name: 'AC Milan',
@@ -1713,6 +1728,7 @@ export const Teams: TeamsType = {
       stadium: 'San Siro',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#e3032a',
+      id: '8564',
     },
     {
       name: 'AS Roma',
@@ -1720,6 +1736,7 @@ export const Teams: TeamsType = {
       stadium: 'Stadio Olimpico',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#8f1e2c',
+      id: '8686',
     },
     {
       name: 'Napoli',
@@ -1727,6 +1744,7 @@ export const Teams: TeamsType = {
       stadium: 'Stadio Diego Armando Maradona',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#02a1db',
+      id: '9875',
     },
     {
       name: 'Lazio',
@@ -1741,6 +1759,7 @@ export const Teams: TeamsType = {
       stadium: 'Stadio Artemio Franchi',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#61318c',
+      id: '8535',
     },
     {
       name: 'Atalanta',
@@ -1748,6 +1767,7 @@ export const Teams: TeamsType = {
       stadium: 'Gewiss Stadium',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#275baf',
+      id: '8524',
     },
     {
       name: 'Bologna',
@@ -1844,6 +1864,7 @@ export const Teams: TeamsType = {
       stadium: 'Allianz Arena',
       country: CountryEnum.GERMANY,
       teamPrimaryColor: '#ed0137',
+      id: '9823',
     },
     {
       name: 'Borussia Dortmund',
@@ -1852,6 +1873,7 @@ export const Teams: TeamsType = {
       stadium: 'Signal Iduna Park',
       country: CountryEnum.GERMANY,
       teamPrimaryColor: '#ffd900',
+      id: '9789',
     },
     {
       name: 'RB Leipzig',
@@ -1868,6 +1890,7 @@ export const Teams: TeamsType = {
       stadium: 'BayArena',
       country: CountryEnum.GERMANY,
       teamPrimaryColor: '#d50000',
+      id: '8178',
     },
     {
       name: 'Eintracht Frankfurt',
@@ -1985,6 +2008,7 @@ export const Teams: TeamsType = {
       stadium: 'Volksparkstadion',
       country: CountryEnum.GERMANY,
       teamPrimaryColor: '#195bb4',
+      id: '9790',
     },
     {
       name: 'Schalke 04',
@@ -2042,6 +2066,7 @@ export const Teams: TeamsType = {
       stadium: 'Parc des Princes',
       country: CountryEnum.FRANCE,
       teamPrimaryColor: '#004170',
+      id: '9847',
     },
     {
       name: 'Lyon',

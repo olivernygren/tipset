@@ -42,10 +42,6 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({
   isLoading, isAuthenticated, isAdmin, children,
 }) => {
-  console.log('PrivateRoute isAuthenticated:', isAuthenticated);
-  console.log('PrivateRoute isAdmin:', isAdmin);
-  console.log('PrivateRoute isLoading:', isLoading);
-
   if (isLoading) {
     return null; // Or a loading spinner
   }
