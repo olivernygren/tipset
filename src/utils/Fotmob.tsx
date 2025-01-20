@@ -132,30 +132,11 @@ export interface FotMobStatListItem {
   TeamName: string;
 }
 
-export const getFotMobGoalStatsUrl = (tournament: TournamentsEnum) => {
-  switch (tournament) {
-    case TournamentsEnum.SERIE_A:
-      return 'https://data.fotmob.com/stats/55/season/23819/goals.json';
-    case TournamentsEnum.PREMIER_LEAGUE:
-      return 'https://data.fotmob.com/stats/47/season/23685/goals.json';
-    case TournamentsEnum.BUNDESLIGA:
-      return 'https://data.fotmob.com/stats/54/season/23794/goals.json';
-    case TournamentsEnum.LIGUE_1:
-      return 'https://data.fotmob.com/stats/53/season/23724/goals.json';
-    case TournamentsEnum.LA_LIGA:
-      return 'https://data.fotmob.com/stats/87/season/23686/goals.json';
-    // case TournamentsEnum.CHAMPIONS_LEAGUE:
-    //   return 'https://data.fotmob.com/stats/2/season/23723/goals.json';
-    default:
-      return '';
-  }
-};
-
 export const fotMobTournamentGoalStatsUrls = {
   [TournamentsEnum.SERIE_A]: 'https://data.fotmob.com/stats/55/season/23819/goals.json',
   [TournamentsEnum.PREMIER_LEAGUE]: 'https://data.fotmob.com/stats/47/season/23685/goals.json',
   [TournamentsEnum.BUNDESLIGA]: 'https://data.fotmob.com/stats/54/season/23794/goals.json',
   [TournamentsEnum.LIGUE_1]: 'https://data.fotmob.com/stats/53/season/23724/goals.json',
   [TournamentsEnum.LA_LIGA]: 'https://data.fotmob.com/stats/87/season/23686/goals.json',
-  // [TournamentsEnum.CHAMPIONS_LEAGUE]: 'https://data.fotmob.com/stats/2/season/23723/goals.json',
+  [TournamentsEnum.CHAMPIONS_LEAGUE]: 'https://data.fotmob.com/stats/42/season/24110/goals.json',
 };

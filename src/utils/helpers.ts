@@ -104,20 +104,6 @@ export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: Lea
   const allPredictedGoalScorers = allPreviousGameWeekPredictedGoalScorers.map((prediction) => prediction.goalScorer);
 
   return allPredictedGoalScorers.filter((goalScorer) => goalScorer !== undefined) as Array<Player>;
-  // return allPreviousGameWeekPredictedGoalScorers.map((prediction) => ({
-  //   playerName: prediction.goalScorer?.name || '',
-  //   playerId: prediction.goalScorer?.id || '',
-  //   teamName: teams || '',
-  //   teamId: prediction.goalScorer?.teamId || '',
-  // }));
-
-  // const predictions = previousGameWeek.games.predictions.filter((prediction) => prediction.userId === userId && prediction.goalScorer);
-
-  // if (!predictions) {
-  //   return undefined;
-  // }
-
-  // return predictions.goalScorer;
 };
 
 export const getLastGameWeek = (previousGameWeeks: Array<LeagueGameWeek> | undefined): LeagueGameWeek | undefined => {

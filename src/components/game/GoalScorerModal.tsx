@@ -25,7 +25,8 @@ import { Section } from '../section/Section';
 import { Fixture } from '../../utils/Fixture';
 import { getFlagUrlByCountryName, TournamentsEnum } from '../../utils/Team';
 import NationAvatar from '../avatar/NationAvatar';
-import { FotMobStatListItem, getFotMobGoalStatsUrl } from '../../utils/Fotmob';
+import { FotMobStatListItem } from '../../utils/Fotmob';
+import { getFotMobGoalStatsUrl } from '../../utils/fotmobHelpers';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
