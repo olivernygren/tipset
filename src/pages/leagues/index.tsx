@@ -4,7 +4,7 @@ import {
   getDocs, collection, where, query, addDoc, updateDoc,
 } from 'firebase/firestore';
 import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
   Medal, PlusCircle, UserPlus, Users,
 } from '@phosphor-icons/react';
@@ -457,6 +457,15 @@ const PredictionLeaguesPage = () => {
   );
 };
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
 const PageHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -464,6 +473,7 @@ const PageHeader = styled.div`
   gap: ${theme.spacing.m};
   border-bottom: 1px solid ${theme.colors.silverLight};
   padding-bottom: ${theme.spacing.s};
+  animation: ${fadeIn} 0.4s ease;
 `;
 
 const LeaguesContainer = styled.div`
@@ -485,6 +495,7 @@ const LeagueCard = styled(motion.div)`
   cursor: pointer;
   min-height: 250px;
   box-sizing: border-box;
+  animation: ${fadeIn} 0.4s ease;
 
   > * {
     cursor: pointer;

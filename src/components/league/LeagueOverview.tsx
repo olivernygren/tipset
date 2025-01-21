@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
-  ArrowCircleRight, Coins, Fire, FireSimple, PencilSimple, PlusCircle, Target, TrendUp,
+  ArrowCircleRight, FireSimple, PencilSimple, PlusCircle, Target, TrendUp,
 } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
@@ -513,6 +513,17 @@ const PreviousRoundCard = styled.div`
   overflow: hidden;
 `;
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const UpcomingFixturesDateContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -523,6 +534,7 @@ const UpcomingFixturesDateContainer = styled.div`
   border-radius: ${theme.borderRadius.l};
   overflow: hidden;
   border: 1px solid ${theme.colors.silverLight};
+  animation: ${fadeIn} 0.4s ease;
 `;
 
 export default LeagueOverview;

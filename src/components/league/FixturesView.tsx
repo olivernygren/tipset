@@ -5,6 +5,7 @@ import {
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { LeagueGameWeek, LeagueGameWeekInput, PredictionLeague } from '../../utils/League';
 import { Section } from '../section/Section';
 import { devices, theme } from '../../theme';

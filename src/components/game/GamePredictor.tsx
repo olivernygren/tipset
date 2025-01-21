@@ -3,7 +3,7 @@ import {
   ChartBar, CheckCircle, FireSimple, MapPin, PlusCircle, SoccerBall, Target,
   XCircle,
 } from '@phosphor-icons/react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import {
   collection, getDocs, query, where,
 } from 'firebase/firestore';
@@ -289,6 +289,7 @@ const GamePredictor = ({
           text={`${potentialOddsBonusPoints}`}
           endIcon={<FireSimple size={18} color={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white} weight={hasPredictedThisOutcome ? 'fill' : 'regular'} />}
           textColor={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white}
+          show={(hoveredOdds === 'home' && homeWinHovered) || (hoveredOdds === 'draw' && drawHovered) || (hoveredOdds === 'away' && awayWinHovered)}
         />
       </TooltipContainer>
     );
@@ -437,9 +438,9 @@ const GamePredictor = ({
             onMouseLeave={() => setShowParticipantsPredictedTooltip(false)}
           >
             <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
-            {particpantsThatPredicted && particpantsThatPredicted.length > 0 && showParticipantsPredictedTooltip && !isMobile && (
+            {particpantsThatPredicted && particpantsThatPredicted.length > 0 && !isMobile && (
               <TooltipContainer topOffset={24}>
-                <Tooltip text={getFormattedPredictedParticipantNames()} />
+                <Tooltip text={getFormattedPredictedParticipantNames()} show={showParticipantsPredictedTooltip} />
               </TooltipContainer>
             )}
           </NumberOfParticipantsPredicted>
@@ -473,21 +474,21 @@ const GamePredictor = ({
             <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
             <OddsContainer hasPredicted={hasPredicted}>
               <OddsWrapper>
-                {homeWinHovered && !isMobile && getPotentialOddsBonusPointsTooltip('home')}
+                {!isMobile && getPotentialOddsBonusPointsTooltip('home')}
                 <OddsTextWrapper hasPredictedThisOutcome={hasPredictedHomeWin} ref={homeWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
                 </OddsTextWrapper>
               </OddsWrapper>
               <OddsWrapper>
-                {drawHovered && !isMobile && getPotentialOddsBonusPointsTooltip('draw')}
+                {!isMobile && getPotentialOddsBonusPointsTooltip('draw')}
                 <OddsTextWrapper hasPredictedThisOutcome={hasPredictedDraw} ref={drawRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
                 </OddsTextWrapper>
               </OddsWrapper>
               <OddsWrapper>
-                {awayWinHovered && !isMobile && getPotentialOddsBonusPointsTooltip('away')}
+                {!isMobile && getPotentialOddsBonusPointsTooltip('away')}
                 <OddsTextWrapper hasPredictedThisOutcome={hasPredictedAwayWin} ref={awayWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
@@ -573,6 +574,17 @@ const GamePredictor = ({
   );
 };
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const Card = styled.div<{ hasPredicted?: boolean }>`
   border-radius: ${theme.borderRadius.l};
   border: 2px solid ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primary)};
@@ -583,6 +595,7 @@ const Card = styled.div<{ hasPredicted?: boolean }>`
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.primary : theme.colors.white)};
   width: 100%;
   box-sizing: border-box;
+  animation: ${fadeIn} 0.4s ease;
 `;
 
 const CardHeader = styled.div<{ includesStats?: boolean }>`
@@ -758,6 +771,7 @@ const OddsTextWrapper = styled.div<{ hasPredictedThisOutcome?: boolean, hasPredi
   border-radius: 100px;
   padding: 6px ${theme.spacing.xs};
   cursor: pointer;
+  transition: background-color 0.5s ease;
 
   ${({ hasPredictedThisOutcome, hasPredicted }) => hasPredictedThisOutcome && css`
     background-color: ${hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach};

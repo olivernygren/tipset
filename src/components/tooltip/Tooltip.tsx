@@ -1,5 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { CSSTransition } from 'react-transition-group';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import { theme } from '../../theme';
 
@@ -10,6 +11,7 @@ interface TooltipProps {
   backgroundColor?: string;
   textColor?: string;
   endIcon?: React.ReactNode;
+  show: boolean;
 }
 
 interface StyledTooltipProps {
@@ -17,22 +19,47 @@ interface StyledTooltipProps {
 }
 
 const Tooltip = ({
-  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white, endIcon,
+  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white, endIcon, show,
 }: TooltipProps) => (
-  <StyledTooltip backgroundColor={backgroundColor}>
-    <TooltipPoint backgroundColor={backgroundColor} />
-    {textWeight === 'emphasis' ? (
-      <EmphasisTypography variant={textSize} color={textColor} align="center" noWrap>
-        {text}
-      </EmphasisTypography>
-    ) : (
-      <NormalTypography variant={textSize} color={textColor} align="center" noWrap>
-        {text}
-      </NormalTypography>
-    )}
-    {endIcon}
-  </StyledTooltip>
+  <CSSTransition
+    in={show}
+    timeout={200}
+    classNames="fade"
+    unmountOnExit
+  >
+    <StyledTooltip backgroundColor={backgroundColor}>
+      <TooltipPoint backgroundColor={backgroundColor} />
+      {textWeight === 'emphasis' ? (
+        <EmphasisTypography variant={textSize} color={textColor} align="center" noWrap>
+          {text}
+        </EmphasisTypography>
+      ) : (
+        <NormalTypography variant={textSize} color={textColor} align="center" noWrap>
+          {text}
+        </NormalTypography>
+      )}
+      {endIcon}
+    </StyledTooltip>
+  </CSSTransition>
 );
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const fadeOut = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`;
 
 const StyledTooltip = styled.div<StyledTooltipProps>`
   display: flex;
@@ -45,6 +72,15 @@ const StyledTooltip = styled.div<StyledTooltipProps>`
   position: relative;
   max-width: 250px;
   width: fit-content;
+  animation: ${fadeIn} 0.2s ease;
+
+  &.fade-enter {
+    animation: ${fadeIn} 0.2s ease forwards;
+  }
+
+  &.fade-exit {
+    animation: ${fadeOut} 0.2s ease forwards;
+  }
 `;
 
 const TooltipPoint = styled.div<StyledTooltipProps>`
