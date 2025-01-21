@@ -70,7 +70,7 @@ const StyledTooltip = styled.div<StyledTooltipProps>`
   border-radius: ${theme.borderRadius.m};
   background-color: ${({ backgroundColor }) => backgroundColor};
   position: relative;
-  max-width: 250px;
+  max-width: 500px;
   width: fit-content;
   animation: ${fadeIn} 0.2s ease;
 
