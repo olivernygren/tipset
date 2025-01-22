@@ -1,11 +1,10 @@
 import styled, { keyframes } from 'styled-components';
 import {
-  ArrowCircleRight, FireSimple, PencilSimple, PlusCircle, Target, TrendUp,
+  ArrowCircleRight, PencilSimple, PlusCircle,
 } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import { theme, devices } from '../../theme';
-import { getUserStandingPositionInLeague } from '../../utils/firebaseHelpers';
 import Button from '../buttons/Button';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
@@ -19,6 +18,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import { Fixture } from '../../utils/Fixture';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
+import LeagueStandingsTable from '../standings/LeagueStandingsTable';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -33,7 +33,6 @@ const LeagueOverview = ({
 }: LeagueOverviewProps) => {
   const { user, hasAdminRights } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
-  const isMobileDevice = useResizeListener(DeviceSizes.MOBILE_DEVICE);
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
@@ -120,62 +119,6 @@ const LeagueOverview = ({
     return groupedFixtures;
   };
 
-  const getUserLatestGameWeekTotalPoints = (userId: string) => {
-    if (!league || !league.gameWeeks) return 0;
-
-    const previousGameWeek = currentGameWeek ? league.gameWeeks[league.gameWeeks.length - 2] : league.gameWeeks[league.gameWeeks.length - 1];
-    const currentGameWeekHasStarted = currentGameWeek && currentGameWeek?.games.predictions.some((g) => g.points !== undefined);
-    const pointsHaveBeenAwarded = Boolean(currentGameWeekHasStarted || (previousGameWeek && previousGameWeek?.games.predictions.some((g) => g.points !== undefined)));
-
-    if (!currentGameWeek && (!league.gameWeeks || !league.gameWeeks.length)) return 0;
-    if (!pointsHaveBeenAwarded) return 0;
-
-    const gameWeek = currentGameWeekHasStarted ? currentGameWeek : previousGameWeek;
-    const userPredictions = gameWeek?.games.predictions.filter((prediction) => prediction.userId === userId);
-
-    return userPredictions?.reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0) ?? '?';
-  };
-
-  const getUserLeagueStandingsItem = (position: number, place?: PredictionLeagueStanding) => {
-    if (!place) return null;
-    const isLoggedInUser = place.userId === currentUserId;
-
-    return (
-      <UserLeaguePosition isLoggedInUser={isLoggedInUser}>
-        <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
-          <NormalTypography variant="m" color={theme.colors.primaryDark}>
-            {position}
-          </NormalTypography>
-          <NormalTypography variant="m" color={theme.colors.textDefault}>
-            {`${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
-          </NormalTypography>
-        </Section>
-        {!isMobileDevice && (
-          <CenteredGridItem>
-            <NormalTypography variant="m" color={theme.colors.textLight}>
-              {league.gameWeeks && league.gameWeeks.length > 0 ? `${getUserLatestGameWeekTotalPoints(place.userId) > 0 ? '+' : '±'}${getUserLatestGameWeekTotalPoints(place.userId)}` : '-'}
-            </NormalTypography>
-          </CenteredGridItem>
-        )}
-        <CenteredGridItem>
-          <NormalTypography variant="m" color={theme.colors.textLight}>
-            {place.oddsBonusPoints ?? 0}
-          </NormalTypography>
-        </CenteredGridItem>
-        <CenteredGridItem>
-          <NormalTypography variant="m" color={theme.colors.textDefault}>
-            {place.correctResults}
-          </NormalTypography>
-        </CenteredGridItem>
-        <CenteredGridItem>
-          <EmphasisTypography variant="m" color={theme.colors.primary}>
-            {place.points}
-          </EmphasisTypography>
-        </CenteredGridItem>
-      </UserLeaguePosition>
-    );
-  };
-
   return (
     <>
       <Wrapper>
@@ -188,7 +131,7 @@ const LeagueOverview = ({
           ) : (
             <>
               <HeadingsTypography variant="h3">
-                {currentGameWeek && !currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) ? 'Aktuella matcher' : 'Kommande matcher'}
+                Aktuell omgång
               </HeadingsTypography>
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
@@ -249,40 +192,20 @@ const LeagueOverview = ({
           <GridSection>
             <TableSectionHeader>
               <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
-              {league.standings && league.standings.length > 0 && (
+              {/* {league.standings && league.standings.length > 0 && (
               <>
                 <EmphasisTypography variant="m" color={theme.colors.textLight}>
                   {`Din placering: ${getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}`}
                 </EmphasisTypography>
-                {/* Show separate user placing somewhere if they are outside the top 5 */}
-                {/* {getUserLeaguePosition(league.standings.find((place) => place.userId === currentUserId))} */}
               </>
-              )}
+              )} */}
             </TableSectionHeader>
             {league.standings && league.standings.length > 0 ? (
-              <LeagueStandings>
-                <LeagueStandingsHeader>
-                  <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
-                    <EmphasisTypography variant="s" color={theme.colors.textLight}>#</EmphasisTypography>
-                    <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
-                  </Section>
-                  {!isMobileDevice && (
-                    <CenteredGridItem>
-                      <TrendUp size={20} color={theme.colors.textLight} />
-                    </CenteredGridItem>
-                  )}
-                  <CenteredGridItem>
-                    <FireSimple size={20} color={theme.colors.textLight} />
-                  </CenteredGridItem>
-                  <CenteredGridItem>
-                    <Target size={20} color={theme.colors.textLight} />
-                  </CenteredGridItem>
-                  <CenteredGridItem>
-                    <EmphasisTypography variant="s" color={theme.colors.textLight} align="center">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
-                  </CenteredGridItem>
-                </LeagueStandingsHeader>
-                {sortedLeagueStandings.map((place, index) => getUserLeagueStandingsItem(index + 1, place))}
-              </LeagueStandings>
+              <LeagueStandingsTable
+                sortedLeagueStandings={sortedLeagueStandings}
+                currentUserId={currentUserId}
+                league={league}
+              />
             ) : (
               <NormalTypography variant="m" color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
             )}
@@ -311,7 +234,6 @@ const LeagueOverview = ({
                     </EmphasisTypography>
                   </RoundPointsContainer>
                 </Section>
-                {/* <Divider color={theme.colors.silverLight} /> */}
                 <Section
                   gap="xxs"
                   padding={`${theme.spacing.xs}`}
@@ -418,59 +340,6 @@ const GridSection = styled.div`
 
 const MarginTopButton = styled.div`
   margin-top: auto;
-`;
-
-const LeagueStandings = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(5, auto);
-  column-gap: ${theme.spacing.xs};
-  row-gap: ${theme.spacing.xxxs};
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
-  display: grid;
-  grid-template-columns: 6fr 1fr 1fr 40px;
-  gap: ${theme.spacing.xxs};
-  align-items: center;
-  padding: ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.s};
-  background-color: ${({ isLoggedInUser }) => (isLoggedInUser ? theme.colors.primaryFade : theme.colors.silverLighter)};
-  box-sizing: border-box;
-  grid-auto-flow: column;
-
-  @media ${devices.mobileL} {
-    grid-template-columns: 5fr 1fr 1fr 1fr 40px;
-  }
- 
-  @media ${devices.tablet} {
-    grid-template-columns: 4fr 1fr 1fr 1fr 50px;
-  }
-`;
-
-const LeagueStandingsHeader = styled.div`
-  display: grid;
-  grid-template-columns: 6fr 1fr 1fr 40px;
-  gap: ${theme.spacing.xxs};
-  align-items: center;
-  padding: 0 ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs};
-  border-radius: ${theme.borderRadius.xs};
-  background-color: ${theme.colors.white};
-
-  @media ${devices.mobileL} {
-    grid-template-columns: 5fr 1fr 1fr 1fr 40px;
-  }
-
-  @media ${devices.tablet} {
-    grid-template-columns: 4fr 1fr 1fr 1fr 50px;
-  }
-`;
-
-const CenteredGridItem = styled.div`
-  display: flex;
-  justify-content: center;
 `;
 
 const TableSectionHeader = styled.div`

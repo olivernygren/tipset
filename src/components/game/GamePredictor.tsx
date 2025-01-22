@@ -11,7 +11,7 @@ import { useHover } from 'react-haiku';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import {
-  Fixture, Prediction, PredictionPoints, TeamType,
+  Fixture, FixtureOutcomeEnum, Prediction, PredictionPoints, TeamType,
 } from '../../utils/Fixture';
 import { Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
@@ -269,6 +269,21 @@ const GamePredictor = ({
     return 'Ingen';
   };
 
+  const wasThisOutcomeByFinalResult = (outcome: 'home' | 'draw' | 'away') => {
+    if (game.finalResult) {
+      if (outcome === 'home' && game.finalResult.homeTeamGoals > game.finalResult.awayTeamGoals) {
+        return true;
+      }
+      if (outcome === 'draw' && game.finalResult.homeTeamGoals === game.finalResult.awayTeamGoals) {
+        return true;
+      }
+      if (outcome === 'away' && game.finalResult.homeTeamGoals < game.finalResult.awayTeamGoals) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const getPotentialOddsBonusPointsTooltip = (hoveredOdds: 'home' | 'draw' | 'away') => {
     let hasPredictedThisOutcome;
 
@@ -290,7 +305,6 @@ const GamePredictor = ({
           endIcon={<FireSimple size={18} color={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white} weight={hasPredictedThisOutcome ? 'fill' : 'regular'} />}
           textColor={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white}
           show={(hoveredOdds === 'home' && homeWinHovered) || (hoveredOdds === 'draw' && drawHovered) || (hoveredOdds === 'away' && awayWinHovered)}
-          textSize="xs"
         />
       </TooltipContainer>
     );
@@ -482,21 +496,36 @@ const GamePredictor = ({
             <OddsContainer hasPredicted={hasPredicted}>
               <OddsWrapper>
                 {!isMobile && getPotentialOddsBonusPointsTooltip('home')}
-                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedHomeWin} ref={homeWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                <OddsTextWrapper
+                  hasPredictedThisOutcome={hasPredictedHomeWin}
+                  ref={homeWinRef as React.RefObject<HTMLDivElement>}
+                  hasPredicted={hasPredicted}
+                  wasThisOutcomeByFinalResult={wasThisOutcomeByFinalResult('home')}
+                >
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>1</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.homeWin}</NormalTypography>
                 </OddsTextWrapper>
               </OddsWrapper>
               <OddsWrapper>
                 {!isMobile && getPotentialOddsBonusPointsTooltip('draw')}
-                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedDraw} ref={drawRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                <OddsTextWrapper
+                  hasPredictedThisOutcome={hasPredictedDraw}
+                  ref={drawRef as React.RefObject<HTMLDivElement>}
+                  hasPredicted={hasPredicted}
+                  wasThisOutcomeByFinalResult={wasThisOutcomeByFinalResult('draw')}
+                >
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>X</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.draw}</NormalTypography>
                 </OddsTextWrapper>
               </OddsWrapper>
               <OddsWrapper>
                 {!isMobile && getPotentialOddsBonusPointsTooltip('away')}
-                <OddsTextWrapper hasPredictedThisOutcome={hasPredictedAwayWin} ref={awayWinRef as React.RefObject<HTMLDivElement>} hasPredicted={hasPredicted}>
+                <OddsTextWrapper
+                  hasPredictedThisOutcome={hasPredictedAwayWin}
+                  ref={awayWinRef as React.RefObject<HTMLDivElement>}
+                  hasPredicted={hasPredicted}
+                  wasThisOutcomeByFinalResult={wasThisOutcomeByFinalResult('away')}
+                >
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.gold : theme.colors.primary}>2</NormalTypography>
                   <NormalTypography variant="s" color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{game.odds.awayWin}</NormalTypography>
                 </OddsTextWrapper>
@@ -534,7 +563,7 @@ const GamePredictor = ({
                     backgroundColor={theme.colors.silverLight}
                   />
                   {predictedCorrectGoalScorer && (
-                    <GoalScorerIconWrapper>
+                    <GoalScorerIconWrapper wasCorrect>
                       <CheckCircle color={theme.colors.gold} size={16} weight="fill" />
                     </GoalScorerIconWrapper>
                   )}
@@ -769,7 +798,7 @@ const OddsWrapper = styled.div`
   position: relative;
 `;
 
-const OddsTextWrapper = styled.div<{ hasPredictedThisOutcome?: boolean, hasPredicted?: boolean }>`
+const OddsTextWrapper = styled.div<{ hasPredictedThisOutcome?: boolean, hasPredicted?: boolean, wasThisOutcomeByFinalResult?: boolean }>`
   display: flex;
   gap: ${theme.spacing.xxs};
   align-items: center;
@@ -783,6 +812,10 @@ const OddsTextWrapper = styled.div<{ hasPredictedThisOutcome?: boolean, hasPredi
   ${({ hasPredictedThisOutcome, hasPredicted }) => hasPredictedThisOutcome && css`
     background-color: ${hasPredicted ? theme.colors.primaryDark : theme.colors.primaryBleach};
   `};
+
+  ${({ wasThisOutcomeByFinalResult }) => wasThisOutcomeByFinalResult && css`
+    border: 2px solid ${theme.colors.gold};
+  `}
 `;
 
 const GoalScorer = styled.div`
@@ -821,7 +854,7 @@ const TooltipContainer = styled.div<{ topOffset: number }>`
   z-index: 10;
 `;
 
-const GoalScorerIconWrapper = styled.div`
+const GoalScorerIconWrapper = styled.div<{ wasCorrect?: boolean }>`
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -829,7 +862,7 @@ const GoalScorerIconWrapper = styled.div`
   border-radius: 50%;
   width: 16px;
   height: 16px;
-  background-color: ${theme.colors.textDefault};
+  background-color: ${({ wasCorrect }) => (wasCorrect ? theme.colors.textDefault : theme.colors.white)};
 `;
 
 export default GamePredictor;
