@@ -290,6 +290,7 @@ const GamePredictor = ({
           endIcon={<FireSimple size={18} color={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white} weight={hasPredictedThisOutcome ? 'fill' : 'regular'} />}
           textColor={hasPredictedThisOutcome ? theme.colors.gold : theme.colors.white}
           show={(hoveredOdds === 'home' && homeWinHovered) || (hoveredOdds === 'draw' && drawHovered) || (hoveredOdds === 'away' && awayWinHovered)}
+          textSize="xs"
         />
       </TooltipContainer>
     );
@@ -340,24 +341,26 @@ const GamePredictor = ({
             textAndIconColor={hasPredicted ? theme.colors.primaryDark : theme.colors.primaryDark}
             backgroundColor={hasPredicted ? theme.colors.gold : theme.colors.primaryBleach}
           />
-          <Tag
-            size="m"
-            textAndIconColor={theme.colors.gold}
-            backgroundColor={theme.colors.primaryDark}
-            icon={(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) ? (
-              <PointsIcons>
-                {correctGoalScorerPredicted && (
-                  <SoccerBall size={18} weight="fill" />
-                )}
-                {oddsBonusPointsAwarded && (
-                  <FireSimple size={18} />
-                )}
-                {correctResultPredicted && (
-                  <Target size={18} />
-                )}
-              </PointsIcons>
-            ) : undefined}
-          />
+          {(correctGoalScorerPredicted || correctResultPredicted || oddsBonusPointsAwarded) && (
+            <Tag
+              size="m"
+              textAndIconColor={theme.colors.gold}
+              backgroundColor={theme.colors.primaryDark}
+              icon={(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) ? (
+                <PointsIcons>
+                  {correctGoalScorerPredicted && (
+                    <SoccerBall size={18} weight="fill" />
+                  )}
+                  {oddsBonusPointsAwarded && (
+                    <FireSimple size={18} />
+                  )}
+                  {correctResultPredicted && (
+                    <Target size={18} />
+                  )}
+                </PointsIcons>
+              ) : undefined}
+            />
+          )}
         </Section>
       );
     }
@@ -440,7 +443,11 @@ const GamePredictor = ({
             <EmphasisTypography variant="s" color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>{`${numberOfParticipantsPredicted === 0 ? 'Ingen' : numberOfParticipantsPredicted} deltagare har tippat`}</EmphasisTypography>
             {particpantsThatPredicted && particpantsThatPredicted.length > 0 && !isMobile && (
               <TooltipContainer topOffset={24}>
-                <Tooltip text={getFormattedPredictedParticipantNames()} show={showParticipantsPredictedTooltip} />
+                <Tooltip
+                  text={getFormattedPredictedParticipantNames()}
+                  show={showParticipantsPredictedTooltip}
+                  textSize="xs"
+                />
               </TooltipContainer>
             )}
           </NumberOfParticipantsPredicted>
