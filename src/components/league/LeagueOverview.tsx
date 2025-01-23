@@ -205,6 +205,7 @@ const LeagueOverview = ({
                 sortedLeagueStandings={sortedLeagueStandings}
                 currentUserId={currentUserId}
                 league={league}
+                currentGameWeek={currentGameWeek}
               />
             ) : (
               <NormalTypography variant="m" color={theme.colors.silverDarker}>Ingen tabell finns</NormalTypography>
