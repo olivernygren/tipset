@@ -30,7 +30,7 @@ const Auth = () => {
   const [firstname, setFirstname] = useState<string>('');
   const [lastname, setLastname] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [showRegisterView, setShowRegisterView] = useState<boolean>(false);
+  const [showRegisterView, setShowRegisterView] = useState<boolean>(true);
   const [createAccountStep, setCreateAccountStep] = useState(1);
   const [selectedAvatar, setSelectedAvatar] = useState('generic');
   const [showAvatarModal, setShowAvatarModal] = useState(false);

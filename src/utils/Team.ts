@@ -1384,7 +1384,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'AIK',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5f/AIK_logo.svg/1920px-AIK_logo.svg.png',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/8349.png',
       stadium: 'Strawberry Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#023154',
