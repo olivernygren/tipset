@@ -204,7 +204,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
             )}
           </>
         ) : (
-          <Section padding={`0 ${theme.spacing.xxs}`}>
+          <Section>
             <NormalTypography variant="m" color={theme.colors.silverDark}>Inga poäng</NormalTypography>
           </Section>
         )}
