@@ -55,6 +55,20 @@ const FixtureResultPreview = ({
     />
   ));
 
+  const getResult = () => {
+    if (!fixture.finalResult) return '? - ?';
+
+    const finalScoreString = `${fixture.finalResult.homeTeamGoals ?? '?'} - ${fixture.finalResult.awayTeamGoals ?? '?'}`;
+
+    // if (fixture.aggregateScore) {
+    //   const homeTeamTotalGoals = fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals;
+    //   const awayTeamTotalGoals = fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals;
+    //   return `(${homeTeamTotalGoals}) ${fixture.finalResult.homeTeamGoals} - ${fixture.finalResult.awayTeamGoals} (${awayTeamTotalGoals})`;
+    // }
+
+    return finalScoreString;
+  };
+
   return (
     <>
       <FixtureContainer>
@@ -76,13 +90,19 @@ const FixtureResultPreview = ({
           </TeamContainer>
           {!isMobile && (
             <ResultContainer>
+              {fixture.aggregateScore && fixture.finalResult && (
+                <NormalTypography variant="s" color={theme.colors.silverDark}>
+                  {`(${fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals})`}
+                </NormalTypography>
+              )}
               <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault}>
-                {fixture.finalResult?.homeTeamGoals ?? '?'}
-                {' '}
-                -
-                {' '}
-                {fixture.finalResult?.awayTeamGoals ?? '?'}
+                {getResult()}
               </NoWrapTypography>
+              {fixture.aggregateScore && fixture.finalResult && (
+                <NormalTypography variant="s" color={theme.colors.silverDark}>
+                  {`(${fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals})`}
+                </NormalTypography>
+              )}
             </ResultContainer>
           )}
           <TeamContainer>
@@ -242,7 +262,7 @@ const ResultContainer = styled.div`
   padding: 0 ${theme.spacing.xxs};
   width: fit-content;
   height: 100%;
-  gap: ${theme.spacing.xxxs};
+  gap: ${theme.spacing.xxs};
 `;
 
 const PointsContainer = styled.div`

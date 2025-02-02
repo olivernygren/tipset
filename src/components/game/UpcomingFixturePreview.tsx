@@ -57,15 +57,24 @@ const UpcomingFixturePreview = ({
           </NormalTypography>
           {getTeamAvatar(fixture.homeTeam)}
         </TeamContainer>
-        <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>
-          {canViewPredictions ? (
-            <IconButton
-              icon={<Eye size={24} />}
-              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
-              onClick={onShowPredictionsClick || (() => {})}
-            />
-          ) : getKickoffTime(fixture.kickOffTime)}
-        </NormalTypography>
+        {canViewPredictions ? (
+          <IconButton
+            icon={<Eye size={24} />}
+            colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
+            onClick={onShowPredictionsClick || (() => {})}
+          />
+        ) : (
+          <MiddleSection>
+            <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>
+              {getKickoffTime(fixture.kickOffTime)}
+            </NormalTypography>
+            {fixture.aggregateScore && (
+              <NormalTypography variant="xs" color={theme.colors.textDefault}>
+                {`(${fixture.aggregateScore.homeTeamGoals} - ${fixture.aggregateScore.awayTeamGoals})`}
+              </NormalTypography>
+            )}
+          </MiddleSection>
+        )}
         <TeamContainer>
           {getTeamAvatar(fixture.awayTeam)}
           <NormalTypography variant={isMobile ? 's' : 'm'}>
@@ -126,6 +135,13 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
     justify-content: flex-end;
     margin-left: auto;
   `}
+`;
+
+const MiddleSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default UpcomingFixturePreview;

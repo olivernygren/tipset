@@ -62,12 +62,22 @@ const CompactFixtureResult = ({
       </ResultContainer>
       <Teams>
         <TeamWrapper>
+          {fixture.aggregateScore && (
+            <NormalTypography variant="s" color={theme.colors.silverDarker}>
+              {fixture.finalResult ? `(${fixture.finalResult.homeTeamGoals + fixture.aggregateScore.homeTeamGoals})` : `(${fixture.aggregateScore.homeTeamGoals})`}
+            </NormalTypography>
+          )}
           {!isMobile && getClubAvatar(fixture.homeTeam)}
           <NormalTypography variant="s">
             {isMobile ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
           </NormalTypography>
         </TeamWrapper>
         <TeamWrapper>
+          {fixture.aggregateScore && (
+            <NormalTypography variant="s" color={theme.colors.silverDarker}>
+              {fixture.finalResult ? `(${fixture.finalResult.awayTeamGoals + fixture.aggregateScore.awayTeamGoals})` : `(${fixture.aggregateScore.awayTeamGoals})`}
+            </NormalTypography>
+          )}
           {!isMobile && getClubAvatar(fixture.awayTeam)}
           <NormalTypography variant="s">
             {isMobile ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}

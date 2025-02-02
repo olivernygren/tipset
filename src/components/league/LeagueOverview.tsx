@@ -192,13 +192,6 @@ const LeagueOverview = ({
           <GridSection>
             <TableSectionHeader>
               <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
-              {/* {league.standings && league.standings.length > 0 && (
-              <>
-                <EmphasisTypography variant="m" color={theme.colors.textLight}>
-                  {`Din placering: ${getUserStandingPositionInLeague(currentUserId, sortedLeagueStandings)}`}
-                </EmphasisTypography>
-              </>
-              )} */}
             </TableSectionHeader>
             {league.standings && league.standings.length > 0 ? (
               <LeagueStandingsTable
