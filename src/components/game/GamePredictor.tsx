@@ -314,6 +314,8 @@ const GamePredictor = ({
     const { name, shortName } = team;
     const logoUrl = (hasPredicted && team.darkModeLogoUrl) ? team.darkModeLogoUrl : team.logoUrl;
     const displayName = (isMobile && shortName) ? shortName : name;
+    const aggregatedScore = isAwayTeam ? game.aggregateScore?.awayTeamGoals : game.aggregateScore?.homeTeamGoals;
+    const abc = `${displayName} (${aggregatedScore})`;
 
     return (
       <TeamContainer team={isAwayTeam ? 'away' : 'home'}>
@@ -333,7 +335,7 @@ const GamePredictor = ({
             />
           )}
           <TeamName variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault} align="center">
-            {displayName}
+            {aggregatedScore !== undefined ? abc : displayName}
           </TeamName>
         </AvatarAndTeamName>
       </TeamContainer>

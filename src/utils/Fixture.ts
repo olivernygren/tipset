@@ -43,6 +43,7 @@ export interface Fixture {
   includeStats?: boolean;
   fixtureNickname?: string;
   odds?: FixtureOdds;
+  aggregateScore?: FixtureResult;
 }
 
 export interface FixtureInput {
@@ -58,6 +59,7 @@ export interface FixtureInput {
   teamType: TeamType;
   includeStats?: boolean;
   fixtureNickname?: string;
+  aggregateScore?: FixtureResult;
 }
 
 export interface PredictionPoints {

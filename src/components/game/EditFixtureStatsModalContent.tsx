@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion';
 import {
   Fixture, FixtureOdds, FixtureOutcomeEnum, FixturePreviewStats, FixtureResult,
+  TeamType,
 } from '../../utils/Fixture';
 import { PredictionLeague, LeagueGameWeek } from '../../utils/League';
 import Button from '../buttons/Button';
@@ -26,6 +27,9 @@ import IconButton from '../buttons/IconButton';
 import Textarea from '../textarea/Textarea';
 import TextButton from '../buttons/TextButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
+import { AvatarSize } from '../avatar/Avatar';
 
 interface EditFixtureStatsModalContentProps {
   fixture: Fixture;
@@ -49,6 +53,7 @@ const EditFixtureStatsModalContent = ({
   const [isStandingsExpanded, setIsStandingsExpanded] = useState<boolean>(false);
   const [isInsightsExpanded, setIsInsightsExpanded] = useState<boolean>(false);
   const [isOddsExpanded, setIsOddsExpanded] = useState<boolean>(false);
+  const [isAggregateScoreExpanded, setIsAggregateScoreExpanded] = useState<boolean>(false);
 
   // Edit values
   const [editStandingsPositionValue, setEditStandingsPositionValue] = useState({
@@ -86,6 +91,8 @@ const EditFixtureStatsModalContent = ({
   const [editAwayTeamInsightsValue, setEditAwayTeamInsightsValue] = useState<string>('');
   const [createNewHomeTeamInsight, setCreateNewHomeTeamInsight] = useState(false);
   const [createNewAwayTeamInsight, setCreateNewAwayTeamInsight] = useState(false);
+  const [homeTeamAggregateScore, setHomeTeamAggregateScore] = useState<string>(fixture.aggregateScore?.homeTeamGoals.toString() ?? '');
+  const [awayTeamAggregateScore, setAwayTeamAggregateScore] = useState<string>(fixture.aggregateScore?.awayTeamGoals.toString() ?? '');
 
   const [hasAutoAppliedForm, setHasAutoAppliedForm] = useState({ homeTeam: false, awayTeam: false });
   const [hasAutoAppliedLastFixture, setHasAutoAppliedLastFixture] = useState({ homeTeam: false, awayTeam: false });
@@ -96,6 +103,7 @@ const EditFixtureStatsModalContent = ({
   const hasAddedLastFixtureForAwayTeam = editLastFixtureOpponents.awayTeamOpponent !== undefined && awayTeamLastFixtureOutcome !== FixtureOutcomeEnum.NONE;
   const hasAddedOdds = odds.homeWin !== '' || odds.draw !== '' || odds.awayWin !== '';
   const hasAddedInsights = homeTeamInsights.length > 0 || awayTeamInsights.length > 0;
+  const hasAddedAggregateScore = homeTeamAggregateScore !== '' && awayTeamAggregateScore !== '';
 
   const handleSaveStats = async () => {
     if (!ongoingGameWeek) return;
@@ -136,6 +144,7 @@ const EditFixtureStatsModalContent = ({
       ...fixture,
       previewStats,
       ...(hasAddedOdds && { odds }),
+      ...(hasAddedAggregateScore && { aggregateScore: { homeTeamGoals: parseInt(homeTeamAggregateScore), awayTeamGoals: parseInt(awayTeamAggregateScore) } }),
     };
 
     const updatedGameWeek: LeagueGameWeek = {
@@ -213,6 +222,20 @@ const EditFixtureStatsModalContent = ({
       setCreateNewAwayTeamInsight(false);
     }
   };
+
+  const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
+    <ClubAvatar
+      logoUrl={team.logoUrl}
+      clubName={team.name}
+      size={isMobile ? AvatarSize.S : AvatarSize.M}
+    />
+  ) : (
+    <NationAvatar
+      flagUrl={team.logoUrl}
+      nationName={team.name}
+      size={isMobile ? AvatarSize.S : AvatarSize.M}
+    />
+  ));
 
   const applyAutomaticFormValues = (isHomeTeam: boolean): void => {
     if (!league.gameWeeks || !ongoingGameWeek || league.gameWeeks.length < 2) return;
@@ -708,6 +731,30 @@ const EditFixtureStatsModalContent = ({
               {getOddsInputs()}
             </DropdownContent>
           </Dropdown>
+          <Dropdown isExpanded={isAggregateScoreExpanded}>
+            <DropdownHeader onClick={() => setIsAggregateScoreExpanded(!isAggregateScoreExpanded)}>
+              {hasAddedAggregateScore && <CheckCircle size={24} color={theme.colors.primary} weight="fill" />}
+              <EmphasisTypography>Sammanlagt resultat</EmphasisTypography>
+              <RotatingIcon isExpanded={isAggregateScoreExpanded}>
+                <CaretDown size={20} color={theme.colors.textDefault} />
+              </RotatingIcon>
+            </DropdownHeader>
+            <DropdownContent>
+              <StandingsInputsRow>
+                {getAvatar(fixture.homeTeam)}
+                <GoalsInput
+                  goals={homeTeamAggregateScore}
+                  onInputChange={(value) => setHomeTeamAggregateScore(value)}
+                />
+                <NormalTypography variant="m">–</NormalTypography>
+                <GoalsInput
+                  goals={awayTeamAggregateScore}
+                  onInputChange={(value) => setAwayTeamAggregateScore(value)}
+                />
+                {getAvatar(fixture.awayTeam)}
+              </StandingsInputsRow>
+            </DropdownContent>
+          </Dropdown>
         </DropdownsContainer>
         <ActionButtonsContainer>
           <Button
@@ -793,7 +840,7 @@ const DropdownHeader = styled.div`
 
 const RotatingIcon = styled.div<{ isExpanded?: boolean }>`
   svg {
-    transform: ${({ isExpanded }) => (isExpanded ? 'rotate(180deg)' : 'rotate(0deg)')};
+    transform: ${({ isExpanded }) => (isExpanded ? 'rotate(-180deg)' : 'rotate(0deg)')};
     transition: transform 0.3s ease;
   }
 `;
