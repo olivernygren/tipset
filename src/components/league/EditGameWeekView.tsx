@@ -21,6 +21,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import EditFixtureModal from '../game/EditFixtureModal';
 import IconButton from '../buttons/IconButton';
 import CreateFixtureModal from '../game/CreateFixtureModal';
+import CustomDatePicker from '../input/DatePicker';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
@@ -39,6 +40,7 @@ const EditGameWeekView = ({
   const [gameWeekFixtures, setGameWeekFixtures] = useState(gameWeek.games.fixtures);
   const [gameWeekPredictions, setGameWeekPredictions] = useState(gameWeek.games.predictions);
   const [showCreateFixtureModal, setShowCreateFixtureModal] = useState<boolean>(false);
+  const [gameWeekStartDate, setGameWeekStartDate] = useState<Date | null>(new Date(gameWeek.startDate));
 
   const handleUpdateFixture = (updatedFixture: FixtureInput) => {
     const updatedFixtures = gameWeekFixtures.map((fixture) => {
@@ -69,6 +71,7 @@ const EditGameWeekView = ({
 
     const updatedGameWeek = {
       ...gameWeek,
+      ...(gameWeekStartDate && { startDate: gameWeekStartDate.toISOString() }),
       games: {
         ...gameWeek.games,
         fixtures: gameWeekFixtures,
@@ -154,6 +157,12 @@ const EditGameWeekView = ({
     <>
       <Section gap="m">
         <Divider />
+        <CustomDatePicker
+          label="Startdatum för omgången (kan tippas fr.o.m)"
+          selectedDate={gameWeekStartDate || new Date()}
+          onChange={(date) => setGameWeekStartDate(date)}
+          minDate={minDate}
+        />
         <FixtureList>
           <FixtureListHeader>
             <div />
@@ -206,6 +215,7 @@ const EditGameWeekView = ({
           allNewGameWeekFixtures={gameWeekFixtures}
           onClose={() => setShowCreateFixtureModal(false)}
           onUpdateAllNewGameWeekFixtures={(newFixtures) => setGameWeekFixtures(newFixtures)}
+          minDate={minDate}
         />
       )}
     </>

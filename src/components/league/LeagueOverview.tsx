@@ -158,7 +158,7 @@ const LeagueOverview = ({
                 </Section>
               )}
               {!currentGameWeek && upcomingGameWeek && (
-                <NormalTypography variant="m" color={theme.colors.textLight}>{`Nästa omgång kan tippas fr.o.m ${getNextGameWeekStartDate()}`}</NormalTypography>
+                <NormalTypography variant="m" color={theme.colors.textLight}>{`Nästa omgång kan tippas tidigast ${getNextGameWeekStartDate()}`}</NormalTypography>
               )}
               {!currentGameWeek && !upcomingGameWeek && (
                 <>

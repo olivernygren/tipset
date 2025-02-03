@@ -99,11 +99,6 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
     setCreatePlayerLoading(false);
   };
 
-  const handleEditNewPlayerName = (value: string) => {
-    setNewPlayerName(value);
-    setNewPlayerImageFilePath(`${value.toLowerCase().replace(' ', '-')}.png`);
-  };
-
   const handleChangeGeneralPosition = (value: string) => {
     setNewPlayerGeneralPosition(value as GeneralPositionEnum);
     setNewPlayerSpecificPosition(getExactPositionOptions(value as GeneralPositionEnum)[0]);
@@ -120,7 +115,7 @@ const CreatePlayerModal = ({ onClose, refetchPlayers, teamId }: CreatePlayerModa
         <Input
           label="Namn"
           value={newPlayerName}
-          onChange={(e) => handleEditNewPlayerName(e.currentTarget.value)}
+          onChange={(e) => setNewPlayerName(e.currentTarget.value)}
           fullWidth
         />
         <Section flexDirection="row" gap="s" alignItems="center">

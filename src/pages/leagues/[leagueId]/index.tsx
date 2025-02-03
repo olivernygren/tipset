@@ -248,6 +248,8 @@ const PredictionLeaguePage = () => {
 
     if (currentGameWeek) {
       round = `Omgång ${currentGameWeek.round}`;
+    } else {
+      return null;
     }
 
     const allFixturesInFuture = currentGameWeek?.games.fixtures.every((fixture) => new Date(fixture.kickOffTime) > new Date());

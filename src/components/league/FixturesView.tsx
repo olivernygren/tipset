@@ -76,6 +76,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<Fixture | null>(null);
   const [showFixturePredictionsModal, setShowFixturePredictionsModal] = useState<string | null>(null);
   const [findOtherFixturesModalOpen, setFindOtherFixturesModalOpen] = useState<boolean>(false);
+  const [upcomingGameWeekFixtures, setUpcomingGameWeekFixtures] = useState<Array<Fixture>>([]);
 
   const [newGameWeekStartDate, setNewGameWeekStartDate] = useState<Date>(ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date());
   const [newGameWeekFixtures, setNewGameWeekFixtures] = useState<Array<Fixture>>([]);
@@ -117,6 +118,10 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
 
       if (currentGameWeek) {
         setNewGameWeekStartDate(getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []));
+      }
+
+      if (comingGameWeeks && comingGameWeeks.length > 0) {
+        setUpcomingGameWeekFixtures(comingGameWeeks[0].games.fixtures);
       }
     }
   }, [league]);
@@ -386,6 +391,28 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     successNotify('Match tillagd');
   };
 
+  const handleAddFixtureToUpcomingGameWeek = (fixture: Fixture) => {
+    if (!league || !upcomingGameWeeks || upcomingGameWeeks.length === 0) return;
+
+    const upcomingGameWeek = upcomingGameWeeks[0];
+    const latestKickoffTime = getLastKickoffTimeInGameWeek(ongoingGameWeek);
+
+    if (new Date(fixture.kickOffTime) < new Date(upcomingGameWeek.startDate)) {
+      errorNotify('Matchen startar innan omgången');
+      return;
+    }
+
+    if (newGameWeekFixtures.some((fixture) => new Date(fixture.kickOffTime) < latestKickoffTime)) {
+      setCreateGameWeekError('En eller flera matcher startar före en annan match i ligan');
+      setCreateGameWeekLoading(false);
+      return;
+    }
+
+    setNewGameWeekFixtures([...newGameWeekFixtures, fixture]);
+    setFindOtherFixturesModalOpen(false);
+    successNotify('Match tillagd');
+  };
+
   // const handlePreFillFixtureData = (fixture: Fixture) => {
   //   setNewFixtureHomeTeam(fixture.homeTeam);
   //   setNewFixtureAwayTeam(fixture.awayTeam);
@@ -397,6 +424,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   //   setNewFixtureNickname(fixture.fixtureNickname ?? '');
   //   setAddFixtureViewOpen(true);
   // };
+
+  const handleEditGameWeekClick = (gameWeek: 'ongoing' | 'upcoming') => {
+    if (gameWeek === 'ongoing') {
+      setEditGameWeekViewOpen(true);
+      setEditUpcomingGameWeekViewOpen(false);
+    } else {
+      setEditUpcomingGameWeekViewOpen(true);
+      setEditGameWeekViewOpen(false);
+    }
+  };
 
   const getNextGameWeekStartDate = () => {
     if (!upcomingGameWeeks || upcomingGameWeeks.length === 0) return '';
@@ -701,7 +738,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                         <IconButton
                           icon={<PencilSimple size={24} />}
                           colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                          onClick={() => setEditGameWeekViewOpen(true)}
+                          onClick={() => handleEditGameWeekClick('ongoing')}
                         />
                       )}
                     </Section>
@@ -739,26 +776,28 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           >
             <Section flexDirection="row" alignItems="center" justifyContent="space-between" gap="xxs">
               <HeadingsTypography variant="h4">Nästa omgång</HeadingsTypography>
-              <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
-                <NormalTypography variant="m" color={theme.colors.silverDark}>
-                  {`Kan tippas fr.o.m. ${getNextGameWeekStartDate()}`}
-                </NormalTypography>
-                {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
-                  <Tag
-                    text={`Omgång ${upcomingGameWeeks[0].round}`}
-                    textAndIconColor={theme.colors.primaryDark}
-                    backgroundColor={theme.colors.primaryBleach}
-                    size="l"
-                  />
-                )}
-                {(isCreator || hasAdminRights) && !editUpcomingGameWeekViewOpen && (
-                  <IconButton
-                    icon={<PencilSimple size={24} />}
-                    colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                    onClick={() => setEditUpcomingGameWeekViewOpen(true)}
-                  />
-                )}
-              </Section>
+              {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
+                <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
+                  <NormalTypography variant="m" color={theme.colors.silverDark}>
+                    {`Kan tippas tidigast ${getNextGameWeekStartDate()}`}
+                  </NormalTypography>
+                  {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
+                    <Tag
+                      text={`Omgång ${upcomingGameWeeks[0].round}`}
+                      textAndIconColor={theme.colors.primaryDark}
+                      backgroundColor={theme.colors.primaryBleach}
+                      size="l"
+                    />
+                  )}
+                  {(isCreator || hasAdminRights) && !editUpcomingGameWeekViewOpen && (
+                    <IconButton
+                      icon={<PencilSimple size={24} />}
+                      colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                      onClick={() => handleEditGameWeekClick('upcoming')}
+                    />
+                  )}
+                </Section>
+              )}
             </Section>
             {upcomingGameWeeks && upcomingGameWeeks.length > 0 ? (
               <>
@@ -770,7 +809,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     minDate={ongoingGameWeek ? getLastKickoffTimeInGameWeek(ongoingGameWeek) : new Date()}
                   />
                 ) : (
-                  Array.from(groupFixturesByDate(upcomingGameWeeks[0].games.fixtures).entries()).map(([date, fixtures]) => (
+                  Array.from(groupFixturesByDate(upcomingGameWeekFixtures).entries()).map(([date, fixtures]) => (
                     <UpcomingFixturesDateContainer key={date.toString()}>
                       <Section
                         padding={theme.spacing.xs}
@@ -875,7 +914,10 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onClose={() => setIsCreateFixtureModalOpen(false)}
           league={league}
           allNewGameWeekFixtures={newGameWeekFixtures}
+          // allNewGameWeekFixtures={editUpcomingGameWeekViewOpen && upcomingGameWeeks !== undefined ? (upcomingGameWeeks[0]?.games.fixtures ?? []) : newGameWeekFixtures}
           onUpdateAllNewGameWeekFixtures={setNewGameWeekFixtures}
+          // onUpdateAllNewGameWeekFixtures={!editUpcomingGameWeekViewOpen ? setNewGameWeekFixtures : undefined}
+          // onAddFixtureToGameWeek={editUpcomingGameWeekViewOpen ? (fixture) => handleAddFixtureToUpcomingGameWeek(fixture) : undefined}
           fixture={newFixtureToEdit}
           minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
         />
