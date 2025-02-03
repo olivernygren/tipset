@@ -28,19 +28,32 @@ interface CreateFixtureModalProps {
   allNewGameWeekFixtures: Array<Fixture>;
   onUpdateAllNewGameWeekFixtures?: React.Dispatch<React.SetStateAction<Array<Fixture>>>;
   onAddFixtureToGameWeek?: (newFixture: FixtureInput) => void;
+  minDate?: Date;
 }
 
 const CreateFixtureModal = ({
-  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, fixture, onAddFixtureToGameWeek,
+  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, fixture, onAddFixtureToGameWeek, minDate,
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const getDefaultKickoffTime = () => {
+    if (fixture?.kickOffTime) {
+      return new Date(fixture.kickOffTime);
+    }
+
+    if (minDate) {
+      return new Date(minDate);
+    }
+
+    return new Date();
+  };
 
   const [teamType, setTeamType] = useState<TeamType>(fixture?.teamType ?? TeamType.CLUBS);
   const [homeTeam, setHomeTeam] = useState<Team | undefined>(fixture?.homeTeam);
   const [awayTeam, setAwayTeam] = useState<Team | undefined>(fixture?.awayTeam);
   const [stadium, setStadium] = useState<string>(fixture?.stadium ?? '');
   const [tournament, setTournament] = useState<string>(fixture?.tournament ?? '');
-  const [kickoffDateTime, setKickoffDateTime] = useState<Date>(fixture?.kickOffTime ? new Date(fixture.kickOffTime) : new Date());
+  const [kickoffDateTime, setKickoffDateTime] = useState<Date>(getDefaultKickoffTime());
   const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(fixture?.shouldPredictGoalScorer ?? false);
   const [fixtureNickname, setFixtureNickname] = useState<string>(fixture?.fixtureNickname ?? '');
   const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? true);
@@ -189,7 +202,7 @@ const CreateFixtureModal = ({
             selectedDate={kickoffDateTime}
             onChange={(date) => handleUpdateKickoffTime(date!)}
             fullWidth
-            minDate={new Date()}
+            minDate={minDate ?? new Date()}
           />
         </Section>
         <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">

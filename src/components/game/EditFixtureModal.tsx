@@ -26,10 +26,11 @@ interface CreateFixtureModalProps {
   onSave: (fixture: Fixture) => void;
   onDeleteFixture: () => void;
   fixture: Fixture;
+  minDate?: Date;
 }
 
 const EditFixtureModal = ({
-  onClose, onSave, onDeleteFixture, fixture,
+  onClose, onSave, onDeleteFixture, fixture, minDate,
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -138,7 +139,7 @@ const EditFixtureModal = ({
             selectedDate={kickoffDateTime}
             onChange={(date) => handleUpdateKickoffTime(date!)}
             fullWidth
-            minDate={new Date()}
+            minDate={minDate ?? new Date()}
           />
         </Section>
         <Section flexDirection={isMobile ? 'column' : 'row'} gap={isMobile ? 's' : 'm'} alignItems="center">

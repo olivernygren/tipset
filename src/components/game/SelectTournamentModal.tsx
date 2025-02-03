@@ -131,7 +131,7 @@ const SelectTournamentModal = ({
         return '/images/tournaments/nations-league.avif';
       case TournamentsEnum.WORLD_CUP:
       case TournamentsEnum.WORLD_CUP_QUALIFIERS:
-        return '/images/tournaments/world-cup.jpg';
+        return '/images/tournaments/world-cup.png';
       case TournamentsEnum.EUROS:
       case TournamentsEnum.EUROS_QUALIFIERS:
         return '/images/tournaments/euros.webp';

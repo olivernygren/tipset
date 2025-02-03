@@ -1,5 +1,5 @@
 import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
-import { PredictionOutcomeEnum, PredictionStatus } from './Fixture';
+import { Fixture, PredictionOutcomeEnum, PredictionStatus } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import {
@@ -213,4 +213,52 @@ export const getPlayerStatusName = (status: PlayerStatusEnum) => {
     default:
       return '';
   }
+};
+
+export const getLastKickoffTimeInAllGameWeeks = (allGameWeeks: Array<LeagueGameWeek>): Date => {
+  const fixtures = allGameWeeks.flatMap((gameWeek) => gameWeek.games.fixtures);
+
+  if (fixtures.length === 0) return new Date();
+
+  const latestKickoff = fixtures.reduce((latest, fixture) => {
+    const fixtureDate = new Date(fixture.kickOffTime);
+    return fixtureDate > latest ? fixtureDate : latest;
+  }, new Date(fixtures[0].kickOffTime));
+
+  const day = new Date(latestKickoff);
+  day.setHours(23, 59, 59, 0);
+
+  return day;
+};
+
+export const getLastKickoffTimeInGameWeek = (gameWeek?: LeagueGameWeek): Date => {
+  if (!gameWeek) return new Date();
+
+  const { fixtures } = gameWeek.games;
+
+  if (fixtures.length === 0) return new Date();
+
+  const latestKickoff = fixtures.reduce((latest, fixture) => {
+    const fixtureDate = new Date(fixture.kickOffTime);
+    return fixtureDate > latest ? fixtureDate : latest;
+  }, new Date(fixtures[0].kickOffTime));
+
+  const day = new Date(latestKickoff);
+  day.setHours(23, 59, 59, 0);
+
+  return day;
+};
+
+export const groupFixturesByDate = (fixtures: Array<Fixture>) => {
+  const groupedFixtures = new Map();
+
+  fixtures.forEach((fixture) => {
+    const date = new Date(fixture.kickOffTime).toLocaleDateString();
+    if (!groupedFixtures.has(date)) {
+      groupedFixtures.set(date, []);
+    }
+    groupedFixtures.get(date).push(fixture);
+  });
+
+  return groupedFixtures;
 };

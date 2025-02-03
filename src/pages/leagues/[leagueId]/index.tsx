@@ -241,7 +241,10 @@ const PredictionLeaguePage = () => {
       return null;
     }
 
-    const currentGameWeek = [...league.gameWeeks].pop();
+    const currentGameWeek = league.gameWeeks.find((gameWeek) => {
+      const now = new Date();
+      return new Date(gameWeek.startDate) < now && !gameWeek.hasBeenCorrected && !gameWeek.hasEnded;
+    });
 
     if (currentGameWeek) {
       round = `Omgång ${currentGameWeek.round}`;

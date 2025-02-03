@@ -24,6 +24,12 @@ const CustomDatePicker = ({
 }: CustomDatePickerProps) => {
   registerLocale('sv', sv);
 
+  const handleChange = (date: Date | null) => {
+    if (date !== null && minDate !== undefined && date >= minDate) {
+      onChange(date);
+    }
+  };
+
   return (
     <Section gap="xxs">
       {label && (
@@ -32,8 +38,8 @@ const CustomDatePicker = ({
       <DatePickerWrapper fullWidth={fullWidth}>
         <DatePicker
           selected={selectedDate}
-          onSelect={(date) => onChange(date)}
-          onChange={(date) => onChange(date)}
+          onSelect={(date) => handleChange(date)}
+          onChange={(date) => handleChange(date)}
           showTimeSelect={includeTime}
           dateFormat={includeTime ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd'}
           locale="sv"

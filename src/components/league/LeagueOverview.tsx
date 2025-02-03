@@ -19,6 +19,7 @@ import { Fixture } from '../../utils/Fixture';
 import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import LeagueStandingsTable from '../standings/LeagueStandingsTable';
+import { groupFixturesByDate } from '../../utils/helpers';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -103,20 +104,6 @@ const LeagueOverview = ({
     const weekday = fixtureDate.toLocaleString('default', { weekday: 'long' }).replaceAll('.', '').charAt(0).toUpperCase() + fixtureDate.toLocaleString('default', { weekday: 'long' }).slice(1);
     const month = fixtureDate.toLocaleString('default', { month: 'long' }).replaceAll('.', '');
     return `${weekday} ${day} ${month}`;
-  };
-
-  const groupFixturesByDate = (fixtures: Array<Fixture>) => {
-    const groupedFixtures = new Map();
-
-    fixtures.forEach((fixture) => {
-      const date = new Date(fixture.kickOffTime).toLocaleDateString();
-      if (!groupedFixtures.has(date)) {
-        groupedFixtures.set(date, []);
-      }
-      groupedFixtures.get(date).push(fixture);
-    });
-
-    return groupedFixtures;
   };
 
   return (

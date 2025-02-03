@@ -24,11 +24,14 @@ import CreateFixtureModal from '../game/CreateFixtureModal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
+  minDate?: Date;
   onClose: () => void;
   refetch: () => void;
 }
 
-const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps) => {
+const EditGameWeekView = ({
+  gameWeek, onClose, refetch, minDate,
+}: EditGameWeekViewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
@@ -194,6 +197,7 @@ const EditGameWeekView = ({ gameWeek, onClose, refetch }: EditGameWeekViewProps)
           onClose={() => setEditFixture(null)}
           onSave={(fixtureInput) => handleUpdateFixture(fixtureInput)}
           onDeleteFixture={handleDeleteFixture}
+          minDate={minDate}
         />
       )}
       {showCreateFixtureModal && (
