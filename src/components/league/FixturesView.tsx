@@ -386,44 +386,23 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   };
 
   const handleAddExternalFixture = (fixture: Fixture) => {
-    setNewGameWeekFixtures([...newGameWeekFixtures, fixture]);
-    setFindOtherFixturesModalOpen(false);
-    successNotify('Match tillagd');
-  };
-
-  const handleAddFixtureToUpcomingGameWeek = (fixture: Fixture) => {
-    if (!league || !upcomingGameWeeks || upcomingGameWeeks.length === 0) return;
-
-    const upcomingGameWeek = upcomingGameWeeks[0];
     const latestKickoffTime = getLastKickoffTimeInGameWeek(ongoingGameWeek);
 
-    if (new Date(fixture.kickOffTime) < new Date(upcomingGameWeek.startDate)) {
-      errorNotify('Matchen startar innan omgången');
-      return;
-    }
-
-    if (newGameWeekFixtures.some((fixture) => new Date(fixture.kickOffTime) < latestKickoffTime)) {
-      setCreateGameWeekError('En eller flera matcher startar före en annan match i ligan');
-      setCreateGameWeekLoading(false);
-      return;
+    if (ongoingGameWeek) {
+      if (new Date(fixture.kickOffTime) < latestKickoffTime) {
+        errorNotify('Matchen har avspark före den nuvarande omgången är slut');
+        return;
+      }
+      if (new Date(fixture.kickOffTime) < newGameWeekStartDate) {
+        errorNotify('Matchen har avspark före omgången startar');
+        return;
+      }
     }
 
     setNewGameWeekFixtures([...newGameWeekFixtures, fixture]);
     setFindOtherFixturesModalOpen(false);
     successNotify('Match tillagd');
   };
-
-  // const handlePreFillFixtureData = (fixture: Fixture) => {
-  //   setNewFixtureHomeTeam(fixture.homeTeam);
-  //   setNewFixtureAwayTeam(fixture.awayTeam);
-  //   setNewFixtureStadium(fixture.stadium);
-  //   setNewFixtureTournament(fixture.tournament);
-  //   setNewFixtureKickoffDateTime(new Date(fixture.kickOffTime));
-  //   setNewFixtureShouldPredictGoalScorer(Boolean(fixture.shouldPredictGoalScorer));
-  //   setNewFixtureGoalScorerTeam(fixture.goalScorerFromTeam ? fixture.goalScorerFromTeam : null);
-  //   setNewFixtureNickname(fixture.fixtureNickname ?? '');
-  //   setAddFixtureViewOpen(true);
-  // };
 
   const handleEditGameWeekClick = (gameWeek: 'ongoing' | 'upcoming') => {
     if (gameWeek === 'ongoing') {

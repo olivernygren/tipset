@@ -29,6 +29,7 @@ enum SearchType {
   BY_TOURNAMENT = 'BY_TOURNAMENT',
   BY_CLUB = 'BY_CLUB',
   BY_NATIONAL_TEAM = 'BY_NATIONAL_TEAM',
+  ALL = 'ALL',
 }
 
 interface ExternalFixture {
@@ -168,6 +169,16 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
       >
         <ModalContent>
           <SearchTypesContainer>
+            <SearchTypeItem selected={searchType === SearchType.ALL} onClick={() => handleChangeSearchType(SearchType.ALL)}>
+              <IconButton
+                icon={searchType === SearchType.ALL ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
+                onClick={() => {}}
+                colors={{ normal: searchType === SearchType.ALL ? theme.colors.primary : theme.colors.silverDark }}
+              />
+              <EmphasisTypography variant="m">
+                Se alla
+              </EmphasisTypography>
+            </SearchTypeItem>
             <SearchTypeItem selected={searchType === SearchType.BY_TOURNAMENT} onClick={() => handleChangeSearchType(SearchType.BY_TOURNAMENT)}>
               <IconButton
                 icon={searchType === SearchType.BY_TOURNAMENT ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
