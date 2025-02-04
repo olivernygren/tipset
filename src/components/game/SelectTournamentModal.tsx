@@ -13,6 +13,7 @@ import Input from '../input/Input';
 import { TeamType } from '../../utils/Fixture';
 import IconButton from '../buttons/IconButton';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
+import { getTournamentIcon } from '../../utils/helpers';
 
 interface SelectTournamentModalProps {
   onClose: () => void;
@@ -29,6 +30,8 @@ enum TournamentCountryFiltersEnum {
   FRANCE = 'Frankrike',
   SWEDEN = 'Sverige',
   EUROPE = 'Europa',
+  NETHERLANDS = 'Nederländerna',
+  PORTUGAL = 'Portugal',
   NATIONAL = 'Landslag',
 }
 
@@ -49,14 +52,6 @@ const SelectTournamentModal = ({
       || tournament.includes(TournamentsEnum.NATIONS_LEAGUE));
 
   const getTournamentsByCountry = (country: TournamentCountryFiltersEnum) => {
-    // if (teamType === TeamType.NATIONS) {
-    //   return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.WORLD_CUP)
-    //   || tournament.includes(TournamentsEnum.WORLD_CUP_QUALIFIERS)
-    //   || tournament.includes(TournamentsEnum.EUROS)
-    //   || tournament.includes(TournamentsEnum.EUROS_QUALIFIERS)
-    //   || tournament.includes(TournamentsEnum.NATIONS_LEAGUE));
-    // }
-
     switch (country) {
       case TournamentCountryFiltersEnum.ENGLAND:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.PREMIER_LEAGUE) || tournament.includes(TournamentsEnum.FA_CUP) || tournament.includes(TournamentsEnum.CARABAO_CUP) || tournament.includes(TournamentsEnum.CHAMPIONSHIP));
@@ -68,10 +63,14 @@ const SelectTournamentModal = ({
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.BUNDESLIGA) || tournament.includes(TournamentsEnum.DFB_POKAL) || tournament.includes(TournamentsEnum.BUNDESLIGA_2));
       case TournamentCountryFiltersEnum.FRANCE:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.LIGUE_1));
+      case TournamentCountryFiltersEnum.EUROPE:
+        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.CHAMPIONS_LEAGUE) || tournament.includes(TournamentsEnum.EUROPA_LEAGUE) || tournament.includes(TournamentsEnum.CONFERENCE_LEAGUE) || tournament.includes(TournamentsEnum.UEFA_SUPER_CUP));
       case TournamentCountryFiltersEnum.SWEDEN:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.ALLSVENSKAN));
-      case TournamentCountryFiltersEnum.EUROPE:
-        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.CHAMPIONS_LEAGUE) || tournament.includes(TournamentsEnum.EUROPA_LEAGUE) || tournament.includes(TournamentsEnum.CONFERENCE_LEAGUE));
+      case TournamentCountryFiltersEnum.NETHERLANDS:
+        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.EREDIVISIE));
+      case TournamentCountryFiltersEnum.PORTUGAL:
+        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.PRIMEIRA_LIGA));
       case TournamentCountryFiltersEnum.NATIONAL:
         return teamType === TeamType.CLUBS ? [] : getNationalTeamTournaments();
       default:
@@ -87,57 +86,6 @@ const SelectTournamentModal = ({
 
     const filteredTournaments = originalTournaments.filter((tournament) => tournament.toLowerCase().includes(value.toLowerCase()));
     setTournaments(filteredTournaments);
-  };
-
-  const getTournamentIcon = (tournament: string) => {
-    switch (tournament) {
-      case TournamentsEnum.PREMIER_LEAGUE:
-        return '/images/tournaments/premier-league.png';
-      case TournamentsEnum.FA_CUP:
-        return '/images/tournaments/fa-cup.png';
-      case TournamentsEnum.CARABAO_CUP:
-        return '/images/tournaments/carabao-cup.png';
-      case TournamentsEnum.CHAMPIONSHIP:
-        return '/images/tournaments/championship.png';
-      case TournamentsEnum.LA_LIGA:
-        return '/images/tournaments/la-liga.png';
-      case TournamentsEnum.COPA_DEL_REY:
-        return '/images/tournaments/copa-del-rey.png';
-      case TournamentsEnum.SUPERCOPA:
-        return '/images/tournaments/supercopa.svg';
-      case TournamentsEnum.SERIE_A:
-        return '/images/tournaments/serie-a.png';
-      case TournamentsEnum.SUPERCOPPA_ITALIANA:
-        return '/images/tournaments/supercoppa.png';
-      case TournamentsEnum.COPPA_ITALIA:
-        return '/images/tournaments/coppa-italia.jpg';
-      case TournamentsEnum.BUNDESLIGA:
-        return '/images/tournaments/bundesliga.png';
-      case TournamentsEnum.DFB_POKAL:
-        return '/images/tournaments/dfb-pokal.png';
-      case TournamentsEnum.BUNDESLIGA_2:
-        return '/images/tournaments/2-bundesliga.png';
-      case TournamentsEnum.LIGUE_1:
-        return '/images/tournaments/ligue-1.jpg';
-      case TournamentsEnum.CHAMPIONS_LEAGUE:
-        return '/images/tournaments/champions-league.png';
-      case TournamentsEnum.EUROPA_LEAGUE:
-        return '/images/tournaments/europa-league.png';
-      case TournamentsEnum.CONFERENCE_LEAGUE:
-        return '/images/tournaments/conference-league.png';
-      case TournamentsEnum.ALLSVENSKAN:
-        return '/images/tournaments/allsvenskan.webp';
-      case TournamentsEnum.NATIONS_LEAGUE:
-        return '/images/tournaments/nations-league.avif';
-      case TournamentsEnum.WORLD_CUP:
-      case TournamentsEnum.WORLD_CUP_QUALIFIERS:
-        return '/images/tournaments/world-cup.png';
-      case TournamentsEnum.EUROS:
-      case TournamentsEnum.EUROS_QUALIFIERS:
-        return '/images/tournaments/euros.webp';
-      default:
-        return '';
-    }
   };
 
   const getTournament = (tournament: string) => (
@@ -210,9 +158,11 @@ const SelectTournamentModal = ({
         <AllTournaments>
           {(teamType === TeamType.CLUBS || teamType === TeamType.ALL) && searchValue.length < 2 && Object.values(TournamentCountryFiltersEnum).map((country) => (
             <CountrysTournaments>
-              <EmphasisTypography variant="m">
-                {country}
-              </EmphasisTypography>
+              {(country !== TournamentCountryFiltersEnum.NATIONAL || (country === TournamentCountryFiltersEnum.NATIONAL && teamType !== TeamType.CLUBS)) && (
+                <EmphasisTypography variant="m">
+                  {country}
+                </EmphasisTypography>
+              )}
               <TournamentsList>
                 {getTournamentsByCountry(country).map((tournament) => getTournament(tournament))}
               </TournamentsList>

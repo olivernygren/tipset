@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import {
-  ArrowCircleRight, PencilSimple, PlusCircle,
+  ArrowCircleRight, ArrowRight, CaretCircleLeft, CaretCircleRight, PencilSimple, PlusCircle,
 } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
@@ -20,6 +20,7 @@ import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import LeagueStandingsTable from '../standings/LeagueStandingsTable';
 import { groupFixturesByDate } from '../../utils/helpers';
+import TextButton from '../buttons/TextButton';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -40,6 +41,8 @@ const LeagueOverview = ({
   const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [showCurrentFixturePredictionsModal, setShowCurrentFixturePredictionModal] = useState<string | null>(null);
   const [showPreviousFixturePredictionsModal, setShowPreviousFixturePredictionsModal] = useState<string | null>(null);
+  const [displayedFixtures, setDisplayedFixtures] = useState<Array<Fixture>>([]);
+  const [showingNextGameWeek, setShowingNextGameWeek] = useState<boolean>(false);
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -50,6 +53,7 @@ const LeagueOverview = ({
 
       if (currentGameWeek) {
         setCurrentGameWeek(currentGameWeek);
+        setDisplayedFixtures(currentGameWeek.games.fixtures);
       }
 
       const previousGameWeek = league.gameWeeks
@@ -106,6 +110,16 @@ const LeagueOverview = ({
     return `${weekday} ${day} ${month}`;
   };
 
+  const handleShowNextGameWeek = () => {
+    setShowingNextGameWeek(true);
+    setDisplayedFixtures(upcomingGameWeek?.games.fixtures ?? []);
+  };
+
+  const handleShowCurrentGameWeek = () => {
+    setShowingNextGameWeek(false);
+    setDisplayedFixtures(currentGameWeek?.games.fixtures ?? []);
+  };
+
   return (
     <>
       <Wrapper>
@@ -117,13 +131,38 @@ const LeagueOverview = ({
             </>
           ) : (
             <>
-              <HeadingsTypography variant="h3">
-                Aktuell omgång
-              </HeadingsTypography>
+              <Section justifyContent="space-between" alignItems="center" flexDirection="row">
+                <HeadingsTypography variant="h3">
+                  {showingNextGameWeek ? 'Nästa omgång' : 'Aktuell omgång'}
+                </HeadingsTypography>
+                {upcomingGameWeek && upcomingGameWeek.games.fixtures && upcomingGameWeek.games.fixtures.length > 0 && (
+                  <Section gap="xxxs" alignItems="center" flexDirection="row" fitContent>
+                    <IconButton
+                      icon={<CaretCircleLeft size={28} weight="fill" />}
+                      onClick={handleShowCurrentGameWeek}
+                      colors={{
+                        normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silverLight,
+                      }}
+                      disabled={!showingNextGameWeek}
+                    />
+                    <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                      {`Omgång ${showingNextGameWeek ? upcomingGameWeek.round : currentGameWeek?.round}`}
+                    </EmphasisTypography>
+                    <IconButton
+                      icon={<CaretCircleRight size={28} weight="fill" />}
+                      onClick={handleShowNextGameWeek}
+                      colors={{
+                        normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silverLight,
+                      }}
+                      disabled={showingNextGameWeek}
+                    />
+                  </Section>
+                )}
+              </Section>
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
                   <FixturesContainer>
-                    {Array.from(groupFixturesByDate(currentGameWeek.games.fixtures).entries()).map(([date, fixtures]) => (
+                    {Array.from(groupFixturesByDate(displayedFixtures).entries()).map(([date, fixtures]) => (
                       <UpcomingFixturesDateContainer>
                         <Section
                           padding={theme.spacing.xs}
@@ -148,7 +187,7 @@ const LeagueOverview = ({
                       </UpcomingFixturesDateContainer>
                     ))}
                   </FixturesContainer>
-                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && (
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && !showingNextGameWeek && (
                     <MarginTopButton>
                       <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight="fill" size={24} color={theme.colors.white} />}>
                         Tippa matcher

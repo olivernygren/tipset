@@ -262,3 +262,60 @@ export const groupFixturesByDate = (fixtures: Array<Fixture>) => {
 
   return groupedFixtures;
 };
+
+export const getTournamentIcon = (tournament: string) => {
+  switch (tournament) {
+    case TournamentsEnum.PREMIER_LEAGUE:
+      return '/images/tournaments/premier-league.png';
+    case TournamentsEnum.FA_CUP:
+      return '/images/tournaments/fa-cup.png';
+    case TournamentsEnum.CARABAO_CUP:
+      return '/images/tournaments/carabao-cup.png';
+    case TournamentsEnum.CHAMPIONSHIP:
+      return '/images/tournaments/championship.png';
+    case TournamentsEnum.LA_LIGA:
+      return '/images/tournaments/la-liga.png';
+    case TournamentsEnum.COPA_DEL_REY:
+      return '/images/tournaments/copa-del-rey.png';
+    case TournamentsEnum.SUPERCOPA:
+      return '/images/tournaments/supercopa.svg';
+    case TournamentsEnum.SERIE_A:
+      return '/images/tournaments/serie-a.png';
+    case TournamentsEnum.SUPERCOPPA_ITALIANA:
+      return '/images/tournaments/supercoppa.png';
+    case TournamentsEnum.COPPA_ITALIA:
+      return '/images/tournaments/coppa-italia.jpg';
+    case TournamentsEnum.BUNDESLIGA:
+      return '/images/tournaments/bundesliga.png';
+    case TournamentsEnum.DFB_POKAL:
+      return '/images/tournaments/dfb-pokal.png';
+    case TournamentsEnum.BUNDESLIGA_2:
+      return '/images/tournaments/2-bundesliga.png';
+    case TournamentsEnum.LIGUE_1:
+      return '/images/tournaments/ligue-1.jpg';
+    case TournamentsEnum.CHAMPIONS_LEAGUE:
+      return '/images/tournaments/champions-league.png';
+    case TournamentsEnum.EUROPA_LEAGUE:
+      return '/images/tournaments/europa-league.png';
+    case TournamentsEnum.CONFERENCE_LEAGUE:
+      return '/images/tournaments/conference-league.png';
+    case TournamentsEnum.UEFA_SUPER_CUP:
+      return '/images/tournaments/uefa-super-cup.png';
+    case TournamentsEnum.ALLSVENSKAN:
+      return '/images/tournaments/allsvenskan.webp';
+    case TournamentsEnum.EREDIVISIE:
+      return '/images/tournaments/eredivisie.png';
+    case TournamentsEnum.PRIMEIRA_LIGA:
+      return '/images/tournaments/liga-portugal.png';
+    case TournamentsEnum.NATIONS_LEAGUE:
+      return '/images/tournaments/nations-league.avif';
+    case TournamentsEnum.WORLD_CUP:
+    case TournamentsEnum.WORLD_CUP_QUALIFIERS:
+      return '/images/tournaments/world-cup.png';
+    case TournamentsEnum.EUROS:
+    case TournamentsEnum.EUROS_QUALIFIERS:
+      return '/images/tournaments/euros.webp';
+    default:
+      return '';
+  }
+};
