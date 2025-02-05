@@ -98,7 +98,7 @@ const StyledSelect = styled.select`
   position: absolute;
   inset: 0 0 0 8px;
   cursor: pointer;
-  font-family: 'Readex Pro', sans-serif;
+  font-family: ${theme.fontFamily}, sans-serif;
   font-size: 16px;
   border: none;
   background: transparent;

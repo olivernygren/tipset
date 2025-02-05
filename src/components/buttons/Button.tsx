@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { SpinnerGap } from '@phosphor-icons/react';
 import { theme } from '../../theme';
-import { EmphasisTypography } from '../typography/Typography';
+import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 
 export interface ButtonProps {
   variant?: 'primary' | 'secondary';
@@ -20,6 +20,18 @@ export interface ButtonProps {
   loading?: boolean;
   id?: string;
 }
+
+export interface StyledButtonProps {
+  variant?: 'primary' | 'secondary';
+  disabled?: boolean;
+  disabledInvisible?: boolean;
+  fullWidth?: boolean;
+  color: keyof typeof theme.colors;
+  textColor?: string;
+  size?: 's' | 'm' | 'l';
+}
+
+type ButtonState = 'normal' | 'hover' | 'active';
 
 const Button = ({
   variant = 'primary', onClick, children, disabled, disabledInvisible, fullWidth, color = 'primary', textColor = theme.colors.white, size = 'm', icon, loading, endIcon, id,
@@ -68,22 +80,25 @@ const Button = ({
   );
 };
 
-const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color: keyof typeof theme.colors | undefined, disabled?: boolean) => {
+const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color: keyof typeof theme.colors, state: ButtonState, disabled?: boolean) => {
   if (variant === 'secondary') {
+    if (state === 'hover') {
+      return theme.colors.silverBleach;
+    }
     return 'transparent';
   }
-  // if (hover) {
-  //   if (color === 'primary') {
-  //     return theme.colors.primaryDark;
-  //   }
-  //   return theme.colors[color];
-  // }
-  // if (active) {
-  //   if (color === 'primary') {
-  //     return theme.colors.primaryDarker;
-  //   }
-  //   return theme.colors[color];
-  // }
+  if (state === 'hover') {
+    if (color === 'primary') {
+      return theme.colors.primaryDark;
+    }
+    return theme.colors[color];
+  }
+  if (state === 'active') {
+    if (color === 'primary') {
+      return theme.colors.primaryDarker;
+    }
+    return theme.colors[color];
+  }
   if (disabled) {
     return theme.colors.silverLight;
   }
@@ -96,36 +111,42 @@ const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color:
   return 'transparent';
 };
 
-const getBorderColor = (color: keyof typeof theme.colors | undefined, disabled?: boolean) => {
-  // if (hover) {
-  //   if (color === 'primary') {
-  //     return theme.colors.primaryDark;
-  //   }
-  //   return theme.colors[color];
-  // }
-  // if (active) {
-  //   if (color === 'primary') {
-  //     return theme.colors.primaryDarker;
-  //   }
-  //   return theme.colors[color];
-  // }
+const getBorderColor = (color: keyof typeof theme.colors, state: ButtonState, disabled?: boolean, variant?: 'primary' | 'secondary') => {
+  if (state === 'hover' && variant === 'primary') {
+    if (color === 'primary' && variant === 'primary') {
+      return theme.colors.primaryDark;
+    }
+    return theme.colors[color];
+  }
+  if (state === 'active' && variant === 'primary') {
+    if (color === 'primary') {
+      return theme.colors.primaryDarker;
+    }
+    return theme.colors[color];
+  }
   if (disabled) {
     return theme.colors.silverLight;
   }
   if (color) {
+    if (color === 'primary' && variant === 'secondary') {
+      return theme.colors.silverLight;
+    }
     return theme.colors[color];
+    // return theme.colors.silverLight;
   }
-  return theme.colors.primary;
+  return theme.colors.silverLight;
+  // return theme.colors.primary;
 };
 
-const StyledButton = styled.button<ButtonProps>`
+const StyledButton = styled.button<StyledButtonProps>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
   padding: ${({ size }) => (size === 's' ? `0 ${theme.spacing.xs}` : size === 'm' ? `0 ${theme.spacing.s}` : `0 ${theme.spacing.m}`)};
   height: ${({ size }) => (size === 's' ? '40px' : size === 'm' ? '48px' : '56px')};
+  /* border-radius: ${({ size }) => (size === 's' ? '12px' : '14px')}; */
   border-radius: 100px;
-  background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
-  border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-  border-width: 2px;
+  background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, 'normal', disabled)};
+  border-color: ${({ color, disabled, variant }) => getBorderColor(color, 'normal', disabled, variant)};
+  border-width: 1.5px;
   border-style: solid;
   cursor: ${({ disabledInvisible }) => (disabledInvisible ? 'not-allowed' : 'pointer')};
   box-sizing: border-box;
@@ -140,20 +161,20 @@ const StyledButton = styled.button<ButtonProps>`
   }
 
   &:hover {
-    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
-    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-    transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(1.02)')};
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, 'hover', disabled)};
+    border-color: ${({ color, disabled, variant }) => getBorderColor(color, 'hover', disabled, variant)};
+    /* transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(1.02)')}; */
   }
 
   &:active {
-    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
-    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
-    transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(0.98)')};
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, 'active', disabled)};
+    border-color: ${({ color, disabled, variant }) => getBorderColor(color, 'active', disabled, variant)};
+    transform: ${({ disabled, disabledInvisible }) => (disabled || disabledInvisible ? 'none' : 'scale(0.97)')};
   }
 
   &:disabled {
-    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, disabled)};
-    border-color: ${({ color, disabled }) => getBorderColor(color, disabled)};
+    background-color: ${({ color, variant, disabled }) => getBackgroundColor(variant, color, 'normal', disabled)};
+    border-color: ${({ color, disabled, variant }) => getBorderColor(color, 'normal', disabled, variant)};
     cursor: not-allowed;
   }
 `;

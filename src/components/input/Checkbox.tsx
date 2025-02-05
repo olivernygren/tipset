@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { theme } from '../../theme';
 
 interface CheckboxProps {
   checked: boolean;
@@ -44,7 +45,7 @@ const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-family: 'Readex Pro', sans-serif;
+  font-family: ${theme.fontFamily}, sans-serif;
 `;
 
 const CheckboxText = styled.span`

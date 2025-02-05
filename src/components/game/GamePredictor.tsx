@@ -313,7 +313,7 @@ const GamePredictor = ({
   const getTeam = (team: Team, isAwayTeam: boolean) => {
     const { name, shortName } = team;
     const logoUrl = (hasPredicted && team.darkModeLogoUrl) ? team.darkModeLogoUrl : team.logoUrl;
-    const displayName = (isMobile && shortName) ? shortName : name;
+    const displayName = ((isMobile || team.name.length > 15) && shortName) ? shortName : name;
     const aggregatedScore = isAwayTeam ? game.aggregateScore?.awayTeamGoals : game.aggregateScore?.homeTeamGoals;
     const abc = `${displayName} (${aggregatedScore})`;
 
@@ -547,7 +547,9 @@ const GamePredictor = ({
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
           ) : (
             <Section flexDirection="row" alignItems="center" justifyContent="center">
-              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>Ingen målskytt ska tippas</EmphasisTypography>
+              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.primaryLighter : theme.colors.silver}>
+                Ingen målskytt ska tippas
+              </EmphasisTypography>
             </Section>
           )}
           {game.shouldPredictGoalScorer && (

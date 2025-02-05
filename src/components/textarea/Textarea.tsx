@@ -89,7 +89,7 @@ const StyledTextarea = styled.textarea<StyledTextareaProps>`
   border: ${({ noBorder }) => (noBorder ? 'none' : `1px solid ${theme.colors.silver}`)};
   border-radius: ${theme.borderRadius.s};
   font-size: 16px;
-  font-family: 'Readex Pro', sans-serif;
+  font-family: ${theme.fontFamily}, sans-serif;
   outline: none;
   transition: border-color 0.1s;
   box-sizing: border-box;

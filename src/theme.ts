@@ -56,6 +56,8 @@ export const theme = {
     xl: '16px',
     xxl: '24px',
   },
+  fontFamily: 'Kumbh Sans',
+  // fontFamily: 'Lexend Deca',
 };
 
 export const devices = {

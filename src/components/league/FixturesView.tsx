@@ -543,7 +543,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             variant="primary"
             size="s"
             onClick={() => setFindOtherFixturesModalOpen(true)}
-            icon={<MagnifyingGlass size={20} color={theme.colors.white} weight="bold" />}
+            icon={<MagnifyingGlass size={16} color={theme.colors.white} weight="bold" />}
           >
             Hitta matcher
           </Button>

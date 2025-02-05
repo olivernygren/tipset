@@ -55,7 +55,7 @@ const getHeadingsTypographySize = (variant: HeadingsTypographyProps['variant']) 
 };
 
 const RootTypography = styled.span<RootTypographyProps>`
-  font-family: "Readex Pro", sans-serif;
+  font-family: ${theme.fontFamily}, sans-serif;
   margin: 0;
   color: ${({ color }) => (color || theme.colors.textDefault)};
   cursor: ${({ onClick }) => onClick && 'pointer'};
@@ -65,13 +65,13 @@ const RootTypography = styled.span<RootTypographyProps>`
 
 export const NormalTypography = styled(RootTypography)<RegularTypographyProps>`
   font-size: ${({ variant }) => getRegularTypographySize(variant ?? 'm')};
-  font-weight: 400;
+  font-weight: 500;
   transition: color 0.2s;
 `;
 
 export const EmphasisTypography = styled(RootTypography)<RegularTypographyProps>`
   font-size: ${({ variant }) => getRegularTypographySize(variant ?? 'm')};
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s;
 `;
 
@@ -79,6 +79,6 @@ export const HeadingsTypography = styled(RootTypography).attrs<HeadingsTypograph
   as: variant,
 }))<HeadingsTypographyProps>`
   font-size: ${({ variant }) => getHeadingsTypographySize(variant)};
-  font-weight: 700;
+  font-weight: 800;
   transition: color 0.2s;
 `;

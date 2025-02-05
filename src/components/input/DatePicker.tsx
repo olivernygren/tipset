@@ -80,7 +80,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
       border-radius: ${theme.borderRadius.s};
       font-size: 16px;
       border: none;
-      font-family: 'Readex Pro', sans-serif;
+      font-family: ${theme.fontFamily}, sans-serif;
       outline: none;
       transition: border-color 0.1s;
       box-sizing: border-box;
@@ -91,7 +91,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
   }
 
   .react-datepicker {
-    font-family: 'Readex Pro', sans-serif !important;
+    font-family: ${theme.fontFamily}, sans-serif !important;
     font-size: 14px;
     background-color: ${theme.colors.white};
     border: 1px solid ${theme.colors.silver};
