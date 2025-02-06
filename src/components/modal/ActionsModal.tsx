@@ -11,6 +11,10 @@ interface ActionsModalProps {
   disclaimer?: string;
   size?: 's' | 'm' | 'l';
   actionButtonLabel: string;
+  actionButtonColor?: 'primary' | 'red';
+  actionButtonStartIcon?: React.ReactNode;
+  actionButtonEndIcon?: React.ReactNode;
+  loading?: boolean;
   cancelButtonLabel?: string;
   onActionClick: () => void;
   onCancelClick: () => void;
@@ -19,7 +23,7 @@ interface ActionsModalProps {
   mobileBottomSheet?: boolean;
   headerDivider?: boolean;
   noPadding?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const ActionsModal = ({
@@ -28,6 +32,10 @@ const ActionsModal = ({
   message,
   size = 'm',
   actionButtonLabel,
+  actionButtonColor = 'primary',
+  actionButtonStartIcon,
+  actionButtonEndIcon,
+  loading,
   cancelButtonLabel = 'Avbryt',
   onActionClick,
   onCancelClick,
@@ -62,7 +70,16 @@ const ActionsModal = ({
           {cancelButtonLabel}
         </Button>
       )}
-      <Button onClick={onActionClick} fullWidth>{actionButtonLabel}</Button>
+      <Button
+        onClick={onActionClick}
+        fullWidth
+        color={actionButtonColor}
+        loading={loading}
+        icon={actionButtonStartIcon}
+        endIcon={actionButtonEndIcon}
+      >
+        {actionButtonLabel}
+      </Button>
     </ButtonsContainer>
   </Modal>
 );

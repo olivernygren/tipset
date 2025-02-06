@@ -263,6 +263,26 @@ export const groupFixturesByDate = (fixtures: Array<Fixture>) => {
   return groupedFixtures;
 };
 
+export const groupFixturesByDateAndTournament = (fixtures: Array<Fixture>) => {
+  const groupedFixtures = new Map();
+
+  fixtures.forEach((fixture) => {
+    const date = new Date(fixture.kickOffTime).toLocaleDateString();
+    if (!groupedFixtures.has(date)) {
+      groupedFixtures.set(date, new Map());
+    }
+
+    const { tournament } = fixture;
+    if (!groupedFixtures.get(date).has(tournament)) {
+      groupedFixtures.get(date).set(tournament, []);
+    }
+
+    groupedFixtures.get(date).get(tournament).push(fixture);
+  });
+
+  return groupedFixtures;
+};
+
 export const getTournamentIcon = (tournament: string) => {
   switch (tournament) {
     case TournamentsEnum.PREMIER_LEAGUE:

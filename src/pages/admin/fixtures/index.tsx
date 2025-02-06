@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
-  DotsThree, Funnel, Plus, Sparkle, Trash, WarningDiamond, X,
+  DotsThree, Funnel, MinusCircle, Plus, Sparkle, Trash, WarningDiamond, X,
 } from '@phosphor-icons/react';
 import {
   getDocs, collection, doc, updateDoc,
@@ -25,6 +25,8 @@ import EditFixtureModal from '../../../components/game/EditFixtureModal';
 import ContextMenu from '../../../components/menu/ContextMenu';
 import IconButton from '../../../components/buttons/IconButton';
 import ContextMenuOption from '../../../components/menu/ContextMenuOption';
+import CreateFixturesViaFotMobSnippetModal from '../../../components/game/CreateFixturesViaFotMobSnippetModal';
+import ActionsModal from '../../../components/modal/ActionsModal';
 
 type FixturesCollectionResponse = {
   documentId: string;
@@ -46,10 +48,38 @@ const AdminFixturesPage = () => {
   const [passedFixtures, setPassedFixtures] = useState<Array<Fixture>>([]);
   const [responseDocId, setResponseDocId] = useState<string>('');
   const [createFixtureModalOpen, setCreateFixtureModalOpen] = useState<boolean>(false);
-  const [createFixtureLoading, setCreateFixtureLoading] = useState<boolean>(false);
+  const [createFixturesFromFotMobSnippetModalOpen, setCreateFixturesFromFotMobSnippetModalOpen] = useState<boolean>(false);
   const [editFixture, setEditFixture] = useState<Fixture | null>(null);
   const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<{ type: FilterType; value: string }>>([]);
+  const [confirmDeleteAllModalOpen, setConfirmDeleteAllModalOpen] = useState<boolean>(false);
+
+  const [createFixtureLoading, setCreateFixtureLoading] = useState<boolean>(false);
+  const [deleteAllFixturesLoading, setDeleteAllFixturesLoading] = useState<boolean>(false);
+
+  const getContextMenuOffsetY = () => {
+    let offsetY = 1;
+
+    if (passedFixtures.length > 0) {
+      offsetY += 1;
+    }
+
+    if (allFixtures.length > 0) {
+      offsetY += 1;
+    }
+
+    return offsetY;
+  };
+
+  const fotMobMatchesTournamentIds = [
+    87, // La Liga
+    55, // Serie A
+    54, // Bundesliga
+    53, // Ligue 1
+    47, // Premier League
+    42, // Champions League
+    67, // Allsvenskan
+  ];
 
   useSingleEffect(() => {
     fetchFixtures();
@@ -68,7 +98,6 @@ const AdminFixturesPage = () => {
       const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= new Date());
 
       setAllFixtures(upcomingFixtures);
-      // setFilteredFixtures(upcomingFixtures);
       setPassedFixtures(passedFixtures);
       setResponseDocId(fixturesResponse.documentId);
     } catch (err) {
@@ -119,6 +148,24 @@ const AdminFixturesPage = () => {
       fetchFixtures();
     } catch (error) {
       errorNotify('Något gick fel när matcherna skulle raderas');
+    }
+  };
+
+  const handleDeleteAllFixtures = async () => {
+    setDeleteAllFixturesLoading(true);
+
+    try {
+      await updateDoc(doc(db, CollectionEnum.FIXTURES, responseDocId), {
+        fixtures: [],
+      });
+
+      setConfirmDeleteAllModalOpen(false);
+      successNotify('Alla matcher raderades');
+      fetchFixtures();
+    } catch (error) {
+      errorNotify('Något gick fel när matcherna skulle raderas');
+    } finally {
+      setDeleteAllFixturesLoading(false);
     }
   };
 
@@ -189,7 +236,7 @@ const AdminFixturesPage = () => {
           <HeaderButtons>
             <Button
               variant="secondary"
-              onClick={() => setCreateFixtureModalOpen(true)}
+              onClick={() => setCreateFixturesFromFotMobSnippetModalOpen(true)}
               icon={<Sparkle size={20} weight="fill" color={theme.colors.primary} />}
             >
               Skapa matcher
@@ -214,34 +261,37 @@ const AdminFixturesPage = () => {
               backgroundColor={theme.colors.white}
             />
             {contextMenuOpen && (
-              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 8} offsetX={-24}>
+              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * getContextMenuOffsetY()) - 8} offsetX={-24}>
                 <ContextMenuOption
                   icon={<Funnel size={24} color={theme.colors.textDefault} />}
                   onClick={() => {
-                    // setEditTeamModalOpen(true);
                     setContextMenuOpen(false);
                   }}
                   label="Filtrera"
                   color={theme.colors.textDefault}
                 />
-                {/* <ContextMenuOption
-                  icon={<UsersFour size={24} color={theme.colors.textDefault} />}
-                  onClick={() => {
-                    setUpdateSquadModal(true);
-                    setContextMenuOpen(false);
-                  }}
-                  label="Uppdatera trupp"
-                  color={theme.colors.textDefault}
-                /> */}
-                <ContextMenuOption
-                  icon={<Trash size={24} color={theme.colors.red} />}
-                  onClick={() => {
-                    handleDeleteAllPassedFixtures();
-                    setContextMenuOpen(false);
-                  }}
-                  label="Radera matcher som spelats"
-                  color={theme.colors.red}
-                />
+                {passedFixtures.length > 0 && (
+                  <ContextMenuOption
+                    icon={<MinusCircle size={24} color={theme.colors.red} />}
+                    onClick={() => {
+                      handleDeleteAllPassedFixtures();
+                      setContextMenuOpen(false);
+                    }}
+                    label="Radera matcher som spelats"
+                    color={theme.colors.red}
+                  />
+                )}
+                {allFixtures.length > 0 && (
+                  <ContextMenuOption
+                    icon={<Trash size={24} color={theme.colors.red} />}
+                    onClick={() => {
+                      setConfirmDeleteAllModalOpen(true);
+                      setContextMenuOpen(false);
+                    }}
+                    label="Radera alla matcher"
+                    color={theme.colors.red}
+                  />
+                )}
               </ContextMenu>
             )}
           </HeaderButtons>
@@ -274,6 +324,7 @@ const AdminFixturesPage = () => {
                     backgroundColor={theme.colors.white}
                     onShowPredictionsClick={() => setEditFixture(fixture)}
                     alwaysClickable
+                    hoverColor={theme.colors.silverLighter}
                   />
                   {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
                 </>
@@ -294,6 +345,27 @@ const AdminFixturesPage = () => {
           onClose={() => setEditFixture(null)}
           onSave={(fixtureInput) => handleUpdateFixture(fixtureInput)}
           onDeleteFixture={handleDeleteFixture}
+        />
+      )}
+      {createFixturesFromFotMobSnippetModalOpen && (
+        <CreateFixturesViaFotMobSnippetModal
+          onClose={() => setCreateFixturesFromFotMobSnippetModalOpen(false)}
+          refetchFixtures={fetchFixtures}
+          selectedTournamentIds={fotMobMatchesTournamentIds}
+          collectionDocId={responseDocId}
+          allFixtures={allFixtures}
+        />
+      )}
+      {confirmDeleteAllModalOpen && (
+        <ActionsModal
+          size="s"
+          title="Radera alla matcher"
+          message="Är du säker på att du vill radera alla matcher? Åtgärden går inte att ångra."
+          actionButtonLabel="Radera"
+          onActionClick={handleDeleteAllFixtures}
+          onCancelClick={() => setConfirmDeleteAllModalOpen(false)}
+          actionButtonColor="red"
+          loading={deleteAllFixturesLoading}
         />
       )}
       <RootToast />

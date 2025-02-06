@@ -16,11 +16,12 @@ interface UpcomingFixturePreviewProps {
   onShowPredictionsClick?: () => void;
   useShortNames?: boolean;
   backgroundColor?: string;
+  hoverColor?: string;
   alwaysClickable?: boolean;
 }
 
 const UpcomingFixturePreview = ({
-  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable,
+  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight,
 }: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -52,6 +53,7 @@ const UpcomingFixturePreview = ({
       canViewPredictions={canViewPredictions || alwaysClickable}
       onClick={canViewPredictions || alwaysClickable ? onShowPredictionsClick : undefined}
       backgroundColor={backgroundColor}
+      hoverColor={hoverColor}
     >
       <Teams>
         <TeamContainer isHomeTeam>
@@ -89,7 +91,7 @@ const UpcomingFixturePreview = ({
   );
 };
 
-const Container = styled.div<{ canViewPredictions?: boolean, backgroundColor: string }>`
+const Container = styled.div<{ canViewPredictions?: boolean, backgroundColor: string, hoverColor: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,11 +106,11 @@ const Container = styled.div<{ canViewPredictions?: boolean, backgroundColor: st
   }
 
   @media ${devices.laptop} {
-    ${({ canViewPredictions }) => canViewPredictions && css`
+    ${({ canViewPredictions, hoverColor }) => canViewPredictions && css`
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.1s ease;
       &:hover {
-        background-color: ${theme.colors.silverLight};
+        background-color: ${hoverColor};
       }
     `}
   }

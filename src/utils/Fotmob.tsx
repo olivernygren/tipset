@@ -140,3 +140,47 @@ export const fotMobTournamentGoalStatsUrls = {
   [TournamentsEnum.LA_LIGA]: 'https://data.fotmob.com/stats/87/season/23686/goals.json',
   [TournamentsEnum.CHAMPIONS_LEAGUE]: 'https://data.fotmob.com/stats/42/season/24110/goals.json',
 };
+
+export interface FotMobMatchesByDateResult {
+  leagues: Array<FotMobMatchesByDateLeague>;
+}
+
+export interface FotMobMatchesByDateLeague {
+  ccode: string;
+  id: number;
+  internalRank: number;
+  liveRank: number;
+  localRank: number;
+  matches: Array<FotMobMatch>;
+  name: string;
+  parentLeagueId: number;
+  primaryId: number;
+  simpleLeague: boolean;
+}
+
+export interface FotMobMatch {
+  away: FotMobMatchTeam;
+  eliminatedTeamId: number | null;
+  home: FotMobMatchTeam;
+  id: number;
+  leagueId: number;
+  status: FotMobMatchStatus;
+  statusId: number;
+  time: string;
+  timeTS: number;
+  tournamentStage: string;
+}
+
+export interface FotMobMatchTeam {
+  id: number;
+  name: string;
+  longName: string;
+  score: number;
+}
+
+export interface FotMobMatchStatus {
+  cancelled: boolean;
+  finished: boolean;
+  started: boolean;
+  utcTime: string;
+}

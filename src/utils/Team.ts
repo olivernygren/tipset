@@ -177,6 +177,12 @@ export const getTeamPrimaryColorByName = (teamName: string): string => {
   return '';
 };
 
+export const getStadiumByHomeTeam = (teamName: string, teamShortName: string, teamId: string): string => {
+  const allTeams = getAllTeams();
+  const team = allTeams.find((team: Team) => (team.id !== undefined && team.id === teamId) || team.name === teamName || team.shortName === teamShortName || team.fotMobName === teamName || team.fotMobName === teamShortName || team.name === teamShortName || team.shortName === teamName || team.fotMobName === teamName || team.fotMobName === teamShortName || teamName.includes(team.name) || teamShortName.includes(team.name));
+  return team?.stadium || '';
+};
+
 export const nationalTeams: Team[] = [
   {
     name: 'England',
