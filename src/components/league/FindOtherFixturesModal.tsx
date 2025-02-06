@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { CheckCircle, Circle, MagnifyingGlass } from '@phosphor-icons/react';
+import {
+  CheckCircle, Circle, MagnifyingGlass, Plus,
+} from '@phosphor-icons/react';
 import {
   collection, getDocs,
 } from 'firebase/firestore';
+import { useSingleEffect } from 'react-haiku';
 import Modal from '../modal/Modal';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
@@ -12,18 +15,20 @@ import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typ
 import SelectImitation from '../input/SelectImitation';
 import { Team } from '../../utils/Team';
 import SelectTournamentModal from '../game/SelectTournamentModal';
-import { Fixture, TeamType } from '../../utils/Fixture';
+import { Fixture, FixturesCollectionResponse, TeamType } from '../../utils/Fixture';
 import SelectTeamModal from '../game/SelectTeamModal';
 import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { withDocumentIdOnObjectsInArray } from '../../utils/helpers';
+import { getTournamentIcon, withDocumentIdOnObject, withDocumentIdOnObjectsInArray } from '../../utils/helpers';
 import { PredictionLeague } from '../../utils/League';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
-import { AvatarSize } from '../avatar/Avatar';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
+import { Divider } from '../Divider';
 
 enum SearchType {
   BY_TOURNAMENT = 'BY_TOURNAMENT',
@@ -32,27 +37,56 @@ enum SearchType {
   ALL = 'ALL',
 }
 
-interface ExternalFixture {
-  fixture: Fixture;
-  leagueId: string;
-  leagueName: string;
+interface FixtureGroup {
+  tournament: string;
+  fixtures: Array<Fixture>;
 }
 
 interface FindOtherFixturesModalProps {
   onClose: () => void;
-  onFixtureSelect: (fixture: Fixture) => void;
+  onFixturesSelect: (fixture: Array<Fixture>) => void;
 }
 
-const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesModalProps) => {
+const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixturesModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [searchType, setSearchType] = useState<SearchType>(SearchType.BY_TOURNAMENT);
+  const [searchType, setSearchType] = useState<SearchType>(SearchType.ALL);
   const [showTournamentsModal, setShowTournamentsModal] = useState<boolean>(false);
   const [showTeamsModal, setShowTeamsModal] = useState<boolean>(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [selectedTournament, setSelectedTournament] = useState<string | null>(null);
-  const [availableFixtures, setAvailableFixtures] = useState<Array<ExternalFixture>>([]);
+  const [availableFixtures, setAvailableFixtures] = useState<Array<FixtureGroup>>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [selectedFixtures, setSelectedFixtures] = useState<Array<Fixture>>([]);
+
+  useSingleEffect(() => {
+    fetchFixtures();
+  });
+
+  const fetchFixtures = async () => {
+    try {
+      const data = await getDocs(collection(db, CollectionEnum.FIXTURES));
+      const fixturesResponse = withDocumentIdOnObject<FixturesCollectionResponse>(data.docs[0]);
+
+      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= new Date());
+      // const fixturesSortedByTournament = upcomingFixtures.sort((a, b) => a.tournament.localeCompare(b.tournament));
+      const fixtureGroups = getFixtureGroups(upcomingFixtures);
+
+      setAvailableFixtures(fixtureGroups);
+    } catch (err) {
+      errorNotify('Något gick fel när matcherna skulle hämtas');
+    }
+  };
+
+  const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((acc, fixture) => {
+    const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
+    if (tournamentIndex >= 0) {
+      acc[tournamentIndex].fixtures.push(fixture);
+    } else {
+      acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
+    }
+    return acc;
+  }, [] as Array<FixtureGroup>);
 
   const handleSearchForFixtures = async () => {
     setSearchLoading(true);
@@ -80,21 +114,17 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
     try {
       const filteredLeagues = leagues.filter((league) => league.gameWeeks?.some((gameWeek) => gameWeek.games.fixtures.some((fixture) => fixture.tournament === selectedTournament && new Date(fixture.kickOffTime) > new Date())));
 
-      const fixtures: Array<ExternalFixture> = filteredLeagues
+      const fixtures: Array<Fixture> = filteredLeagues
         .map((league) => league.gameWeeks?.map((gameWeek) => gameWeek.games.fixtures.map((fixture) => {
           if (fixture.tournament === selectedTournament && new Date(fixture.kickOffTime) > new Date()) {
-            return {
-              fixture,
-              leagueId: league.documentId,
-              leagueName: league.name,
-            };
+            return fixture;
           }
           return undefined;
         })))
         .flat(2)
-        .filter((fixture): fixture is ExternalFixture => fixture !== undefined);
+        .filter((fixture): fixture is Fixture => fixture !== undefined);
 
-      setAvailableFixtures(fixtures);
+      setAvailableFixtures(getFixtureGroups(fixtures));
     } catch (error) {
       errorNotify('Något gick fel vid hämtning av matcher');
     }
@@ -103,21 +133,17 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
   const handleSearchForFixturesByTeam = async (leagues: Array<PredictionLeague>) => {
     try {
       const filteredLeagues = leagues.filter((league) => league.gameWeeks?.some((gameWeek) => gameWeek.games.fixtures.some((fixture) => (searchType === SearchType.BY_CLUB ? fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name : fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name) && new Date(fixture.kickOffTime) > new Date())));
-      const fixtures: Array<ExternalFixture> = filteredLeagues
+      const fixtures: Array<Fixture> = filteredLeagues
         .map((league) => league.gameWeeks?.map((gameWeek) => gameWeek.games.fixtures.map((fixture) => {
           if ((searchType === SearchType.BY_CLUB ? fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name : fixture.homeTeam.name === selectedTeam?.name || fixture.awayTeam.name === selectedTeam?.name) && new Date(fixture.kickOffTime) > new Date()) {
-            return {
-              fixture,
-              leagueId: league.documentId,
-              leagueName: league.name,
-            };
+            return fixture;
           }
           return undefined;
         })))
         .flat(2)
-        .filter((fixture): fixture is ExternalFixture => fixture !== undefined);
+        .filter((fixture): fixture is Fixture => fixture !== undefined);
 
-      setAvailableFixtures(fixtures);
+      setAvailableFixtures(getFixtureGroups(fixtures));
     } catch (error) {
       errorNotify('Något gick fel vid hämtning av matcher');
     }
@@ -143,7 +169,6 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
     setSearchType(type);
     setSelectedTeam(null);
     setSelectedTournament(null);
-    setAvailableFixtures([]);
   };
 
   const getAvatar = (team: Team, fixture: Fixture) => (fixture.teamType === TeamType.CLUBS ? (
@@ -160,10 +185,16 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
     />
   ));
 
+  // gör matcherna visuellt valbara
+  // styla om matcherna som visas när man skapar sin gameweek
+  // Fixa filter i denna modal
+  // fixa filter på admin => Matcher
+
   return (
     <>
       <Modal
-        title="Hitta andra matcher"
+        title="Hitta matcher"
+        size="l"
         onClose={onClose}
         mobileFullScreen
       >
@@ -211,7 +242,7 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
             </SearchTypeItem>
           </SearchTypesContainer>
           <Section gap="xxs">
-            {searchType === SearchType.BY_TOURNAMENT ? (
+            {searchType === SearchType.BY_TOURNAMENT && (
               <>
                 <EmphasisTypography variant="s">Turnering</EmphasisTypography>
                 <SelectImitation
@@ -221,7 +252,8 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
                   fullWidth
                 />
               </>
-            ) : (
+            )}
+            {(searchType === SearchType.BY_CLUB || searchType === SearchType.BY_NATIONAL_TEAM) && (
               <>
                 <EmphasisTypography variant="s">{searchType === SearchType.BY_CLUB ? 'Lag' : 'Nation'}</EmphasisTypography>
                 <SelectImitation
@@ -237,25 +269,39 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
             <MainContent>
               <HeadingsTypography variant="h5">Tillgängliga matcher</HeadingsTypography>
               <AvailableFixturesContainer>
-                {availableFixtures.map(({ fixture }) => (
-                  <AvailableFixtureItem key={fixture.id} onClick={() => onFixtureSelect(fixture)}>
-                    <FixtureDate>
-                      <NormalTypography variant="s">{getKickoffDateAndTime(fixture.kickOffTime, { dateOnly: true })}</NormalTypography>
-                      <NormalTypography variant="s">•</NormalTypography>
-                      <NormalTypography variant="s">{fixture.tournament}</NormalTypography>
-                    </FixtureDate>
-                    <FixtureTeams>
-                      <TeamContainer flexEnd>
-                        <EmphasisTypography variant="s">{isMobile ? (fixture.homeTeam.shortName || fixture.homeTeam.name) : fixture.homeTeam.name}</EmphasisTypography>
-                        {getAvatar(fixture.homeTeam, fixture)}
-                      </TeamContainer>
-                      <EmphasisTypography variant="s" color={theme.colors.silverDark}>{getKickoffDateAndTime(fixture.kickOffTime, { timeOnly: true })}</EmphasisTypography>
-                      <TeamContainer>
-                        {getAvatar(fixture.awayTeam, fixture)}
-                        <EmphasisTypography variant="s">{isMobile ? (fixture.awayTeam.shortName || fixture.awayTeam.name) : fixture.awayTeam.name}</EmphasisTypography>
-                      </TeamContainer>
-                    </FixtureTeams>
-                  </AvailableFixtureItem>
+                {availableFixtures.map((fixtureGroup) => (
+                  <FixturesContainer>
+                    <Section
+                      flexDirection="row"
+                      padding={theme.spacing.xxs}
+                      backgroundColor={theme.colors.silverLight}
+                      borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
+                      alignItems="center"
+                      justifyContent="center"
+                      gap="xxxs"
+                    >
+                      <EmphasisTypography variant="m" color={theme.colors.textDefault}>{fixtureGroup.tournament}</EmphasisTypography>
+                      <Avatar
+                        src={getTournamentIcon(fixtureGroup.tournament)}
+                        size={AvatarSize.S}
+                        objectFit="contain"
+                      />
+                    </Section>
+                    {fixtureGroup.fixtures
+                      .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                      .map((fixture: Fixture, index: number, array: Array<any>) => (
+                        <>
+                          <UpcomingFixturePreview
+                            fixture={fixture}
+                            useShortNames={isMobile}
+                            alwaysClickable
+                            showDay
+                            onShowPredictionsClick={() => setSelectedFixtures((prev) => [...prev, fixture])}
+                          />
+                          {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
+                        </>
+                      ))}
+                  </FixturesContainer>
                 ))}
               </AvailableFixturesContainer>
             </MainContent>
@@ -271,14 +317,14 @@ const FindOtherFixturesModal = ({ onClose, onFixtureSelect }: FindOtherFixturesM
               Avbryt
             </Button>
             <Button
-              onClick={handleSearchForFixtures}
+              onClick={() => onFixturesSelect(selectedFixtures)}
               variant="primary"
-              icon={<MagnifyingGlass size={20} weight="bold" color={theme.colors.white} />}
+              icon={<Plus size={20} weight="bold" color={theme.colors.white} />}
               fullWidth
               loading={searchLoading}
-              disabled={(searchType === SearchType.BY_TOURNAMENT && !selectedTournament) || (searchType !== SearchType.BY_TOURNAMENT && !selectedTeam) || searchLoading}
+              disabled={searchLoading || selectedFixtures.length === 0}
             >
-              Sök
+              {`Lägg till matcher (${selectedFixtures.length})`}
             </Button>
           </ButtonContainer>
         </ModalContent>
@@ -408,6 +454,18 @@ const ButtonContainer = styled.div`
   gap: ${theme.spacing.s};
   padding-right: ${theme.spacing.xxxs};
   margin-top: auto;
+`;
+
+const FixturesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  background-color: ${theme.colors.silverLighter};
+  border-radius: ${theme.borderRadius.l};
+  overflow: hidden;
+  border: 1px solid ${theme.colors.silverLight};
 `;
 
 export default FindOtherFixturesModal;

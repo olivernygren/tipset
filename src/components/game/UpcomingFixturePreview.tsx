@@ -6,7 +6,7 @@ import { devices, theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import { AvatarSize } from '../avatar/Avatar';
 import NationAvatar from '../avatar/NationAvatar';
-import { NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import IconButton from '../buttons/IconButton';
 import { Team } from '../../utils/Team';
@@ -18,10 +18,11 @@ interface UpcomingFixturePreviewProps {
   backgroundColor?: string;
   hoverColor?: string;
   alwaysClickable?: boolean;
+  showDay?: boolean;
 }
 
 const UpcomingFixturePreview = ({
-  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight,
+  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight, showDay,
 }: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -32,6 +33,11 @@ const UpcomingFixturePreview = ({
     const hours = date.getHours();
     const minutes = date.getMinutes();
     return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+  };
+
+  const getKickoffDay = (kickoffTime: string) => {
+    const date = new Date(kickoffTime);
+    return date.toLocaleDateString('sv-se', { day: '2-digit', month: 'short' }).replaceAll('.', ' ');
   };
 
   const getTeamAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
@@ -70,7 +76,12 @@ const UpcomingFixturePreview = ({
           />
         ) : (
           <MiddleSection>
-            <NormalTypography variant="s" color={canViewPredictions ? theme.colors.primary : theme.colors.textLight}>
+            {showDay && (
+              <EmphasisTypography variant="xs" color={theme.colors.textDefault}>
+                {getKickoffDay(fixture.kickOffTime)}
+              </EmphasisTypography>
+            )}
+            <NormalTypography variant="s" color={theme.colors.textLight}>
               {getKickoffTime(fixture.kickOffTime)}
             </NormalTypography>
             {fixture.aggregateScore && (

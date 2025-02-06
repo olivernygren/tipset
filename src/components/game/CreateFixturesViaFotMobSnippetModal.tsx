@@ -30,8 +30,11 @@ const CreateFixturesViaFotMobSnippetModal = ({
   const handleCreateFixtures = async () => {
     setCreationLoading(true);
 
+    const allFixtureIds = allFixtures.map((fixture) => fixture.id);
     const filteredFotMobMatches = getFotMobMatchesFromSelectedTournaments(JSON.parse(snippet).leagues, selectedTournamentIds);
-    const fixtures = filteredFotMobMatches.map((match: FotMobMatch) => convertFotMobMatchToFixture(match));
+    const fixtures = filteredFotMobMatches
+      .map((match: FotMobMatch) => convertFotMobMatchToFixture(match, allFixtureIds))
+      .filter((fixture) => fixture !== null);
 
     if (fixtures.length === 0) {
       errorNotify('Inga matcher kunde skapas för valda turneringar');
@@ -43,7 +46,7 @@ const CreateFixturesViaFotMobSnippetModal = ({
       await updateDoc(doc(db, CollectionEnum.FIXTURES, collectionDocId), {
         fixtures: [...allFixtures, ...fixtures],
       });
-      successNotify('Matchen skapades');
+      successNotify('Matcherna skapades');
       onClose();
       refetchFixtures();
     } catch (err) {

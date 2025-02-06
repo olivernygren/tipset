@@ -385,23 +385,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     }
   };
 
-  const handleAddExternalFixture = (fixture: Fixture) => {
-    const latestKickoffTime = getLastKickoffTimeInGameWeek(ongoingGameWeek);
+  const handleAddExternalFixtures = (fixtures: Array<Fixture>) => {
+    setNewGameWeekFixtures((prev) => [...prev, ...fixtures]);
 
-    if (ongoingGameWeek) {
-      if (new Date(fixture.kickOffTime) < latestKickoffTime) {
-        errorNotify('Matchen har avspark före den nuvarande omgången är slut');
-        return;
-      }
-      if (new Date(fixture.kickOffTime) < newGameWeekStartDate) {
-        errorNotify('Matchen har avspark före omgången startar');
-        return;
-      }
-    }
-
-    setNewGameWeekFixtures([...newGameWeekFixtures, fixture]);
     setFindOtherFixturesModalOpen(false);
-    successNotify('Match tillagd');
+    successNotify('Matcher tillagda');
   };
 
   const handleEditGameWeekClick = (gameWeek: 'ongoing' | 'upcoming') => {
@@ -944,7 +932,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       {findOtherFixturesModalOpen && (
         <FindOtherFixturesModal
           onClose={() => setFindOtherFixturesModalOpen(false)}
-          onFixtureSelect={(fixture) => handleAddExternalFixture(fixture)}
+          onFixturesSelect={(fixtures) => handleAddExternalFixtures(fixtures)}
         />
       )}
     </>

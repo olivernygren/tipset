@@ -126,3 +126,8 @@ export interface FixtureOdds {
   draw: string;
   awayWin: string;
 }
+
+export interface FixturesCollectionResponse {
+  documentId: string;
+  fixtures: Array<Fixture>;
+}

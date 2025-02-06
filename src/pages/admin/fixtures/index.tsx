@@ -12,7 +12,7 @@ import { Section } from '../../../components/section/Section';
 import { theme } from '../../../theme';
 import { Divider } from '../../../components/Divider';
 import Button from '../../../components/buttons/Button';
-import { Fixture, FixtureInput } from '../../../utils/Fixture';
+import { Fixture, FixtureInput, FixturesCollectionResponse } from '../../../utils/Fixture';
 import { db } from '../../../config/firebase';
 import { CollectionEnum } from '../../../utils/Firebase';
 import { groupFixturesByDate, withDocumentIdOnObject } from '../../../utils/helpers';
@@ -27,11 +27,6 @@ import IconButton from '../../../components/buttons/IconButton';
 import ContextMenuOption from '../../../components/menu/ContextMenuOption';
 import CreateFixturesViaFotMobSnippetModal from '../../../components/game/CreateFixturesViaFotMobSnippetModal';
 import ActionsModal from '../../../components/modal/ActionsModal';
-
-type FixturesCollectionResponse = {
-  documentId: string;
-  fixtures: Array<Fixture>;
-};
 
 enum FilterType {
   DATE = 'DATE',
@@ -304,33 +299,35 @@ const AdminFixturesPage = () => {
             </EmphasisTypography>
           </PassedFixturesContainer>
         )}
-        {Array.from(groupFixturesByDate(filteredFixtures).entries()).map(([date, fixtures]) => (
-          <FixturesContainer>
-            <Section
-              padding={theme.spacing.xs}
-              backgroundColor={theme.colors.silverLight}
-              borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
-              alignItems="center"
-            >
-              <EmphasisTypography variant="m" color={theme.colors.textDefault}>{getFixturesDateFormatted(date)}</EmphasisTypography>
-            </Section>
-            {fixtures
-              .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-              .map((fixture: Fixture, index: number, array: Array<any>) => (
-                <>
-                  <UpcomingFixturePreview
-                    fixture={fixture}
-                    useShortNames={isMobile}
-                    backgroundColor={theme.colors.white}
-                    onShowPredictionsClick={() => setEditFixture(fixture)}
-                    alwaysClickable
-                    hoverColor={theme.colors.silverLighter}
-                  />
-                  {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
-                </>
-              ))}
-          </FixturesContainer>
-        ))}
+        {Array.from(groupFixturesByDate(filteredFixtures).entries())
+          .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
+          .map(([date, fixtures]) => (
+            <FixturesContainer>
+              <Section
+                padding={theme.spacing.xs}
+                backgroundColor={theme.colors.silverLight}
+                borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
+                alignItems="center"
+              >
+                <EmphasisTypography variant="m" color={theme.colors.textDefault}>{getFixturesDateFormatted(date)}</EmphasisTypography>
+              </Section>
+              {fixtures
+                .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+                .map((fixture: Fixture, index: number, array: Array<any>) => (
+                  <>
+                    <UpcomingFixturePreview
+                      fixture={fixture}
+                      useShortNames={isMobile}
+                      backgroundColor={theme.colors.white}
+                      onShowPredictionsClick={() => setEditFixture(fixture)}
+                      alwaysClickable
+                      hoverColor={theme.colors.silverLighter}
+                    />
+                    {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
+                  </>
+                ))}
+            </FixturesContainer>
+          ))}
       </Section>
       {createFixtureModalOpen && (
         <CreateCentralLevelFixtureModal

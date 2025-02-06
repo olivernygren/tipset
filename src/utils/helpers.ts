@@ -286,7 +286,7 @@ export const groupFixturesByDateAndTournament = (fixtures: Array<Fixture>) => {
 export const getTournamentIcon = (tournament: string) => {
   switch (tournament) {
     case TournamentsEnum.PREMIER_LEAGUE:
-      return '/images/tournaments/premier-league.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/47.png';
     case TournamentsEnum.FA_CUP:
       return '/images/tournaments/fa-cup.png';
     case TournamentsEnum.CARABAO_CUP:
@@ -294,13 +294,15 @@ export const getTournamentIcon = (tournament: string) => {
     case TournamentsEnum.CHAMPIONSHIP:
       return '/images/tournaments/championship.png';
     case TournamentsEnum.LA_LIGA:
-      return '/images/tournaments/la-liga.png';
+      // return '/images/tournaments/la-liga.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/dark/87.png';
     case TournamentsEnum.COPA_DEL_REY:
       return '/images/tournaments/copa-del-rey.png';
     case TournamentsEnum.SUPERCOPA:
       return '/images/tournaments/supercopa.svg';
     case TournamentsEnum.SERIE_A:
-      return '/images/tournaments/serie-a.png';
+      // return '/images/tournaments/serie-a.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/dark/55.png';
     case TournamentsEnum.SUPERCOPPA_ITALIANA:
       return '/images/tournaments/supercoppa.png';
     case TournamentsEnum.COPPA_ITALIA:
@@ -312,7 +314,8 @@ export const getTournamentIcon = (tournament: string) => {
     case TournamentsEnum.BUNDESLIGA_2:
       return '/images/tournaments/2-bundesliga.png';
     case TournamentsEnum.LIGUE_1:
-      return '/images/tournaments/ligue-1.jpg';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/53.png';
+      // return '/images/tournaments/ligue-1.jpg';
     case TournamentsEnum.CHAMPIONS_LEAGUE:
       return '/images/tournaments/champions-league.png';
     case TournamentsEnum.EUROPA_LEAGUE:
@@ -322,7 +325,7 @@ export const getTournamentIcon = (tournament: string) => {
     case TournamentsEnum.UEFA_SUPER_CUP:
       return '/images/tournaments/uefa-super-cup.png';
     case TournamentsEnum.ALLSVENSKAN:
-      return '/images/tournaments/allsvenskan.webp';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/67.png';
     case TournamentsEnum.EREDIVISIE:
       return '/images/tournaments/eredivisie.png';
     case TournamentsEnum.PRIMEIRA_LIGA:

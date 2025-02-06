@@ -162,7 +162,11 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
   }
 };
 
-export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch): Fixture => {
+export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistingFixtureIds: Array<string>): Fixture | null => {
+  if (allExistingFixtureIds.includes(fotMobMatch.id.toString())) {
+    return null;
+  }
+
   const homeTeam: Team = {
     id: fotMobMatch.home.id.toString(),
     name: fotMobMatch.home.longName,
@@ -179,7 +183,7 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch): Fixture =
     id: fotMobMatch.id.toString(),
     homeTeam,
     awayTeam,
-    kickOffTime: fotMobMatch.time,
+    kickOffTime: fotMobMatch.status.utcTime,
     stadium: getStadiumByHomeTeam(homeTeam.name, homeTeam.shortName!, homeTeam.id!),
     teamType: TeamType.CLUBS,
     tournament: getTournamentNameByFotMobId(fotMobMatch.leagueId),
