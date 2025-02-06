@@ -11,6 +11,7 @@ const AdminSidebar = () => {
     { href: `/${RoutesEnum.ADMIN_LEAGUES}`, label: 'Ligor', icon: <></> },
     { href: `/${RoutesEnum.ADMIN_PLAYER_RATINGS}`, label: 'Spelarbetyg', icon: <></> },
     { href: `/${RoutesEnum.ADMIN_PLAYERS}`, label: 'Spelare & Lag', icon: <></> },
+    { href: `/${RoutesEnum.ADMIN_FIXTURES}`, label: 'Matcher', icon: <></> },
   ];
 
   return (

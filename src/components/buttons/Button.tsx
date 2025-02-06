@@ -127,7 +127,7 @@ const getBorderColor = (color: keyof typeof theme.colors, state: ButtonState, di
     return theme.colors.silverLight;
   }
   if (color) {
-    if (color === 'primary' && variant === 'secondary') {
+    if (variant === 'secondary') {
       return theme.colors.silverLight;
     }
     return theme.colors[color];

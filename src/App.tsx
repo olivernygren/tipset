@@ -22,6 +22,7 @@ import AdminPlayersPage from './pages/admin/players';
 import PlayersByTeamPage from './pages/admin/players/[teamId]';
 import { theme } from './theme';
 import { useUser } from './context/UserContext';
+import AdminFixturesPage from './pages/admin/fixtures';
 
 const App = () => {
   const { user, hasAdminRights } = useUser();
@@ -93,6 +94,10 @@ const App = () => {
     {
       pageComponentElement: <PlayersByTeamPage />,
       path: `/${RoutesEnum.ADMIN_PLAYERS_TEAM}`,
+    },
+    {
+      pageComponentElement: <AdminFixturesPage />,
+      path: `/${RoutesEnum.ADMIN_FIXTURES}`,
     },
   ];
 

@@ -15,10 +15,12 @@ interface UpcomingFixturePreviewProps {
   fixture: Fixture;
   onShowPredictionsClick?: () => void;
   useShortNames?: boolean;
+  backgroundColor?: string;
+  alwaysClickable?: boolean;
 }
 
 const UpcomingFixturePreview = ({
-  fixture, onShowPredictionsClick, useShortNames,
+  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable,
 }: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -47,8 +49,9 @@ const UpcomingFixturePreview = ({
 
   return (
     <Container
-      canViewPredictions={canViewPredictions}
-      onClick={canViewPredictions ? onShowPredictionsClick : undefined}
+      canViewPredictions={canViewPredictions || alwaysClickable}
+      onClick={canViewPredictions || alwaysClickable ? onShowPredictionsClick : undefined}
+      backgroundColor={backgroundColor}
     >
       <Teams>
         <TeamContainer isHomeTeam>
@@ -86,11 +89,11 @@ const UpcomingFixturePreview = ({
   );
 };
 
-const Container = styled.div<{ canViewPredictions?: boolean }>`
+const Container = styled.div<{ canViewPredictions?: boolean, backgroundColor: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${theme.colors.silverLighter};
+  background-color: ${({ backgroundColor }) => backgroundColor};
   width: 100%;
   box-sizing: border-box;
   position: relative;

@@ -27,6 +27,7 @@ export interface FixtureResult {
 }
 
 export interface Fixture {
+  documentId?: string;
   id: string;
   homeTeam: Team;
   awayTeam: Team;
