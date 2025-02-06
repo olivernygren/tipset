@@ -282,13 +282,13 @@ const PredictionLeaguePage = () => {
   const getTabIcon = (tab: LeagueTabs, isActive: boolean) => {
     switch (tab) {
       case LeagueTabs.OVERVIEW:
-        return <SquaresFour size={20} color={isActive ? theme.colors.white : theme.colors.textLight} />;
+        return <SquaresFour size={20} color={isActive ? theme.colors.white : theme.colors.textLight} weight={isActive ? 'fill' : 'regular'} />;
       case LeagueTabs.MATCHES:
         return <SoccerBall size={20} weight="fill" color={isActive ? theme.colors.white : theme.colors.textLight} />;
       case LeagueTabs.PARTICIPANTS:
-        return <UserList size={20} color={isActive ? theme.colors.white : theme.colors.textLight} />;
+        return <UserList size={20} color={isActive ? theme.colors.white : theme.colors.textLight} weight={isActive ? 'fill' : 'regular'} />;
       case LeagueTabs.EDIT:
-        return <PencilSimple size={20} color={isActive ? theme.colors.white : theme.colors.textLight} />;
+        return <PencilSimple size={20} color={isActive ? theme.colors.white : theme.colors.textLight} weight={isActive ? 'fill' : 'regular'} />;
       default:
         return null;
     }

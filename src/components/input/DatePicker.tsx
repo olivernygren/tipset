@@ -79,6 +79,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
       padding: ${theme.spacing.xxs} ${theme.spacing.xs};
       border-radius: ${theme.borderRadius.s};
       font-size: 16px;
+      font-weight: 500;
       border: none;
       font-family: ${theme.fontFamily}, sans-serif;
       outline: none;

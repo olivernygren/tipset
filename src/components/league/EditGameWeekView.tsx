@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, CheckCircle, Plus } from '@phosphor-icons/react';
+import {
+  ArrowLeft, CheckCircle, Plus, Trash,
+} from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
@@ -10,7 +12,7 @@ import { Divider } from '../Divider';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { withDocumentIdOnObject } from '../../utils/helpers';
-import { errorNotify } from '../../utils/toast/toastHelpers';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import { devices, theme } from '../../theme';
 import { Fixture, FixtureInput, TeamType } from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
@@ -22,6 +24,7 @@ import EditFixtureModal from '../game/EditFixtureModal';
 import IconButton from '../buttons/IconButton';
 import CreateFixtureModal from '../game/CreateFixtureModal';
 import CustomDatePicker from '../input/DatePicker';
+import Modal from '../modal/Modal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
@@ -36,11 +39,13 @@ const EditGameWeekView = ({
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [editFixture, setEditFixture] = useState<Fixture | null>(null);
   const [gameWeekFixtures, setGameWeekFixtures] = useState(gameWeek.games.fixtures);
   const [gameWeekPredictions, setGameWeekPredictions] = useState(gameWeek.games.predictions);
   const [showCreateFixtureModal, setShowCreateFixtureModal] = useState<boolean>(false);
   const [gameWeekStartDate, setGameWeekStartDate] = useState<Date | null>(new Date(gameWeek.startDate));
+  const [confirmDeleteGameWeekModalOpen, setConfirmDeleteGameWeekModalOpen] = useState<boolean>(false);
 
   const handleUpdateFixture = (updatedFixture: FixtureInput) => {
     const updatedFixtures = gameWeekFixtures.map((fixture) => {
@@ -58,6 +63,13 @@ const EditGameWeekView = ({
   };
 
   const handleDeleteFixture = () => {
+    const hasBeenCorrected = gameWeekFixtures.some((fixture) => fixture.id === editFixture?.id && Boolean(fixture.finalResult));
+
+    if (hasBeenCorrected) {
+      errorNotify('Matchen har redan gett poängutdelning');
+      return;
+    }
+
     const updatedFixtures = gameWeekFixtures.filter((fixture) => fixture.id !== editFixture?.id);
     const updatedPredictions = gameWeek.games.predictions.filter((prediction) => prediction.fixtureId !== editFixture?.id);
 
@@ -100,6 +112,38 @@ const EditGameWeekView = ({
     setUpdateLoading(false);
     onClose();
     refetch();
+  };
+
+  const handleDeleteGameWeek = async () => {
+    setDeleteLoading(true);
+
+    const fixtureInGameWeekHasBeenCorrected = gameWeekFixtures.some((fixture) => Boolean(fixture.finalResult));
+
+    if (fixtureInGameWeekHasBeenCorrected) {
+      errorNotify('En eller flera matcher i omgången har redan gett poängutdelning');
+      setDeleteLoading(false);
+      return;
+    }
+
+    try {
+      const leagueDoc = await getDoc(doc(db, CollectionEnum.LEAGUES, gameWeek.leagueId));
+      const leagueData = withDocumentIdOnObject<PredictionLeague>(leagueDoc);
+
+      const updatedGameWeeks = leagueData.gameWeeks?.filter((week) => week.round !== gameWeek.round);
+
+      await updateDoc(doc(db, CollectionEnum.LEAGUES, gameWeek.leagueId), {
+        gameWeeks: updatedGameWeeks,
+      });
+
+      successNotify('Omgången har raderats');
+      setConfirmDeleteGameWeekModalOpen(false);
+      onClose();
+      refetch();
+    } catch (error) {
+      errorNotify('Något gick fel när omgången skulle raderas');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const getTeamAvatar = (team: Team, fixture: Fixture) => (fixture.teamType === TeamType.CLUBS ? (
@@ -173,11 +217,18 @@ const EditGameWeekView = ({
             >
               {`Redigera omgång ${gameWeek.round}`}
             </EmphasisTypography>
-            <IconButton
-              icon={<Plus size={20} weight="bold" />}
-              colors={{ normal: theme.colors.textDefault, hover: theme.colors.primaryDark }}
-              onClick={() => setShowCreateFixtureModal(true)}
-            />
+            <Icons>
+              <IconButton
+                icon={<Plus size={20} />}
+                colors={{ normal: theme.colors.textDefault, hover: theme.colors.black }}
+                onClick={() => setShowCreateFixtureModal(true)}
+              />
+              <IconButton
+                icon={<Trash size={20} />}
+                colors={{ normal: theme.colors.red, hover: theme.colors.redDark }}
+                onClick={() => setConfirmDeleteGameWeekModalOpen(true)}
+              />
+            </Icons>
           </FixtureListHeader>
           {gameWeekFixtures.map((fixture, index) => getFixtureItem(fixture, index))}
         </FixtureList>
@@ -185,7 +236,7 @@ const EditGameWeekView = ({
           <Button
             variant="secondary"
             onClick={onClose}
-            icon={<ArrowLeft size={24} color={theme.colors.primary} />}
+            icon={<ArrowLeft size={20} color={theme.colors.primary} />}
           >
             Tillbaka
           </Button>
@@ -218,6 +269,36 @@ const EditGameWeekView = ({
           minDate={minDate}
         />
       )}
+      {confirmDeleteGameWeekModalOpen && (
+        <Modal
+          size="s"
+          title={`Radera omgång ${gameWeek.round}`}
+          mobileBottomSheet
+          onClose={() => setConfirmDeleteGameWeekModalOpen(false)}
+        >
+          <NormalTypography variant="m">
+            Är du säker på att du vill radera hela omgången?
+          </NormalTypography>
+          <ModalButtons>
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => setConfirmDeleteGameWeekModalOpen(false)}
+            >
+              Nej
+            </Button>
+            <Button
+              fullWidth
+              onClick={() => handleDeleteGameWeek()}
+              color="red"
+              disabled={deleteLoading}
+              loading={deleteLoading}
+            >
+              Ja, radera
+            </Button>
+          </ModalButtons>
+        </Modal>
+      )}
     </>
   );
 };
@@ -236,7 +317,7 @@ const FixtureList = styled.div`
 
 const FixtureListHeader = styled.div`
   display: grid;
-  grid-template-columns: 32px 1fr 32px;
+  grid-template-columns: 64px 1fr 64px;
   align-items: center;
   background-color: ${theme.colors.silverLight};
   width: 100%;
@@ -290,6 +371,19 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
     justify-content: flex-end;
     margin-left: auto;
   `}
+`;
+
+const Icons = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xxxs};
+  margin-left: auto;
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xs};
+  justify-content: center;
 `;
 
 export default EditGameWeekView;

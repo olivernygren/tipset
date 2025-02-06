@@ -85,7 +85,7 @@ const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color:
     if (state === 'hover' || state === 'active') {
       return theme.colors.silverBleach;
     }
-    return 'transparent';
+    return theme.colors.white;
   }
   if (state === 'hover') {
     // @ts-ignore

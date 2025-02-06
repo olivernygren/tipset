@@ -342,35 +342,35 @@ const GoalScorerModal = ({
           </FiltersContainer>
         )}
       </ModalToolBar>
+      <TeamTabs>
+        {homeTeamPlayers.length > 0 && (
+        <TeamTab
+          selected={selectedTeam === 'home'}
+          onClick={() => {
+            setPlayersToShow(homeTeamPlayers);
+            setSelectedTeam('home');
+          }}
+        >
+          <EmphasisTypography variant="m" color={selectedTeam === 'home' ? theme.colors.white : theme.colors.silverDarker}>
+            {fixture?.homeTeam.name ?? ''}
+          </EmphasisTypography>
+        </TeamTab>
+        )}
+        {awayTeamPlayers.length > 0 && (
+        <TeamTab
+          selected={selectedTeam === 'away'}
+          onClick={() => {
+            setPlayersToShow(awayTeamPlayers);
+            setSelectedTeam('away');
+          }}
+        >
+          <EmphasisTypography variant="m" color={selectedTeam === 'away' ? theme.colors.white : theme.colors.silverDarker}>
+            {fixture?.awayTeam.name ?? ''}
+          </EmphasisTypography>
+        </TeamTab>
+        )}
+      </TeamTabs>
       <ModalContent>
-        <TeamTabs>
-          {homeTeamPlayers.length > 0 && (
-            <TeamTab
-              selected={selectedTeam === 'home'}
-              onClick={() => {
-                setPlayersToShow(homeTeamPlayers);
-                setSelectedTeam('home');
-              }}
-            >
-              <EmphasisTypography variant="m" color={selectedTeam === 'home' ? theme.colors.white : theme.colors.silverDarker}>
-                {fixture?.homeTeam.name ?? ''}
-              </EmphasisTypography>
-            </TeamTab>
-          )}
-          {awayTeamPlayers.length > 0 && (
-            <TeamTab
-              selected={selectedTeam === 'away'}
-              onClick={() => {
-                setPlayersToShow(awayTeamPlayers);
-                setSelectedTeam('away');
-              }}
-            >
-              <EmphasisTypography variant="m" color={selectedTeam === 'away' ? theme.colors.white : theme.colors.silverDarker}>
-                {fixture?.awayTeam.name ?? ''}
-              </EmphasisTypography>
-            </TeamTab>
-          )}
-        </TeamTabs>
         {previouslySelectedGoalScorer && (
           <PreviousGoalScorer>
             <Section flexDirection="row" gap="xxs" alignItems="center">
@@ -507,7 +507,7 @@ const ModalContent = styled.div`
   flex-grow: 1;
   
   @media ${devices.tablet} {
-    padding: ${theme.spacing.l};
+    padding: ${theme.spacing.m} ${theme.spacing.l};
   }
 `;
 
@@ -574,7 +574,7 @@ const TeamTabs = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xxs};
-  padding-bottom: ${theme.spacing.xxs};
+  padding: ${theme.spacing.xs} ${theme.spacing.l};
   border-bottom: 1px solid ${theme.colors.silverLight};
 `;
 

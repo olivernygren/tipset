@@ -47,7 +47,7 @@ const IconButton = ({
     showBorder={showBorder}
     borderColor={borderColor}
     whileHover={{
-      scale: disabled ? 1 : 1.05,
+      // scale: disabled ? 1 : 1.05,
       backgroundColor: backgroundColor || 'rgba(0, 0, 0, 0)',
     }}
     whileTap={{

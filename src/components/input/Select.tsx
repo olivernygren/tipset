@@ -100,6 +100,7 @@ const StyledSelect = styled.select`
   cursor: pointer;
   font-family: ${theme.fontFamily}, sans-serif;
   font-size: 16px;
+  font-weight: 500;
   border: none;
   background: transparent;
   outline: none;
