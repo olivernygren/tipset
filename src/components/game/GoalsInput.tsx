@@ -54,7 +54,7 @@ const GoalsInput = ({
         maxWidth={isMobile ? '44px' : '50px'}
         textAlign="center"
         fontSize={isMobile ? '26px' : '30px'}
-        fontWeight="600"
+        fontWeight="700"
         disabled={disabled}
         customPadding={theme.spacing.xxxs}
       />

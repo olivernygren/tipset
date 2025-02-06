@@ -85,7 +85,7 @@ const StyledTextarea = styled.textarea<StyledTextareaProps>`
   padding: ${({ customPadding }) => customPadding || `${theme.spacing.xxs} ${theme.spacing.xs}`};
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
-  font-weight: ${({ fontWeight }) => fontWeight || 'normal'};
+  font-weight: ${({ fontWeight }) => fontWeight || 500};
   border: ${({ noBorder }) => (noBorder ? 'none' : `1px solid ${theme.colors.silver}`)};
   border-radius: ${theme.borderRadius.s};
   font-size: 16px;

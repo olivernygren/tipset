@@ -748,6 +748,11 @@ const GoalScorerSection = styled.div<{ shouldPredictGoalScorer?: boolean, disabl
 const SaveButtonSection = styled.div<{ hasPredicted?: boolean }>`
   background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.gold : theme.colors.primary)};
   width: 100%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: ${({ hasPredicted }) => (hasPredicted ? theme.colors.goldDark : theme.colors.primaryDark)};
+  }
 `;
 
 const EllipsisTypography = styled(NormalTypography)`

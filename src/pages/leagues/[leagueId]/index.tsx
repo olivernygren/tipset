@@ -620,7 +620,7 @@ const TabsContainer = styled.div`
 
 const Tab = styled(motion.div)<{ active?: boolean }>`
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   background-color: ${({ active }) => (active ? theme.colors.primary : theme.colors.white)};
   cursor: pointer;
   transition: background-color 0.2s;

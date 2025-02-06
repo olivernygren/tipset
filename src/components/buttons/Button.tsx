@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { SpinnerGap } from '@phosphor-icons/react';
 import { theme } from '../../theme';
-import { EmphasisTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography } from '../typography/Typography';
 
 export interface ButtonProps {
   variant?: 'primary' | 'secondary';
@@ -82,16 +82,14 @@ const Button = ({
 
 const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color: keyof typeof theme.colors, state: ButtonState, disabled?: boolean) => {
   if (variant === 'secondary') {
-    if (state === 'hover') {
+    if (state === 'hover' || state === 'active') {
       return theme.colors.silverBleach;
     }
     return 'transparent';
   }
   if (state === 'hover') {
-    if (color === 'primary') {
-      return theme.colors.primaryDark;
-    }
-    return theme.colors[color];
+    // @ts-ignore
+    return theme.colors[`${color}Dark`];
   }
   if (state === 'active') {
     if (color === 'primary') {
@@ -113,14 +111,15 @@ const getBackgroundColor = (variant: 'primary' | 'secondary' | undefined, color:
 
 const getBorderColor = (color: keyof typeof theme.colors, state: ButtonState, disabled?: boolean, variant?: 'primary' | 'secondary') => {
   if (state === 'hover' && variant === 'primary') {
-    if (color === 'primary' && variant === 'primary') {
-      return theme.colors.primaryDark;
+    if (variant === 'primary') {
+      // @ts-ignore
+      return theme.colors[`${color}Dark`];
     }
     return theme.colors[color];
   }
   if (state === 'active' && variant === 'primary') {
     if (color === 'primary') {
-      return theme.colors.primaryDarker;
+      return theme.colors[`${color}Darker`];
     }
     return theme.colors[color];
   }
@@ -132,10 +131,8 @@ const getBorderColor = (color: keyof typeof theme.colors, state: ButtonState, di
       return theme.colors.silverLight;
     }
     return theme.colors[color];
-    // return theme.colors.silverLight;
   }
   return theme.colors.silverLight;
-  // return theme.colors.primary;
 };
 
 const StyledButton = styled.button<StyledButtonProps>`

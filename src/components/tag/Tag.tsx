@@ -54,7 +54,7 @@ const getTagSize = (size?: 's' | 'm' | 'l') => {
 
   switch (size) {
     case 's':
-      return '24px';
+      return '28px';
     case 'm':
       return '32px';
     case 'l':

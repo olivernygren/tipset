@@ -524,7 +524,7 @@ const BottomRow = styled.div`
 const PointsContainer = styled.div<{ isHovered: boolean }>`
   width: fit-content;
   min-width: 40px;
-  height: 40px;
+  height: 36px;
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   border-radius: 100px;
   background-color: ${({ isHovered }) => (isHovered ? theme.colors.primaryDark : theme.colors.silverLighter)};
