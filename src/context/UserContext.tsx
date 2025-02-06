@@ -34,7 +34,6 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
       if (userDocSnap.exists()) {
         const userWithDocId = withDocumentIdOnObject<User>(userDocSnap);
-        console.log('User data:', userWithDocId);
 
         setUser(userWithDocId);
         setHasAdminRights(userWithDocId.role === 'ADMIN');

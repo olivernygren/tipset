@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 
@@ -13,23 +12,16 @@ interface ContextMenuOptionProps {
 
 const ContextMenuOption = ({
   icon, label, onClick, color = theme.colors.primary,
-}: ContextMenuOptionProps) => {
-  const [optionHovered, setOptionHovered] = useState<boolean>(false);
+}: ContextMenuOptionProps) => (
+  <StyledContextMenuOption>
+    <Content>
+      {icon}
+      <EmphasisTypography onClick={onClick} color={color}>{label}</EmphasisTypography>
+    </Content>
+  </StyledContextMenuOption>
+);
 
-  return (
-    <StyledContextMenuOption
-      onHoverStart={() => setOptionHovered(true)}
-      onHoverEnd={() => setOptionHovered(false)}
-    >
-      <Content isHovered={optionHovered}>
-        {icon}
-        <EmphasisTypography onClick={onClick} color={color}>{label}</EmphasisTypography>
-      </Content>
-    </StyledContextMenuOption>
-  );
-};
-
-const StyledContextMenuOption = styled(motion.div)`
+const StyledContextMenuOption = styled.div`
   width: 100%;
   padding: ${theme.spacing.xs} ${theme.spacing.s};
   cursor: pointer;
@@ -37,19 +29,23 @@ const StyledContextMenuOption = styled(motion.div)`
   align-items: center;
   gap: ${theme.spacing.xs};
   box-sizing: border-box;
+  transition: background-color 0.15s ease;
+  
+  &:hover {
+    background-color: ${theme.colors.silverBleach};
+  }
 
   :not(:first-of-type) {
     border-top: 1px solid ${theme.colors.silverLight};
   }
 `;
 
-const Content = styled.div<{ isHovered: boolean }>`
+const Content = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xs};
   width: 100%;
   box-sizing: border-box;
-  transform: ${({ isHovered }) => (isHovered ? 'scale(1.03)' : 'scale(1)')};
   transition: transform 0.2s;
 `;
 

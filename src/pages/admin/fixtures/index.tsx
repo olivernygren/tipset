@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Funnel, Plus, Sparkle } from '@phosphor-icons/react';
 import {
-  getDocs, collection, addDoc, deleteDoc, doc,
-  updateDoc,
+  DotsThree, Funnel, Plus, Sparkle, Trash, WarningDiamond, X,
+} from '@phosphor-icons/react';
+import {
+  getDocs, collection, doc, updateDoc,
 } from 'firebase/firestore';
 import { useSingleEffect } from 'react-haiku';
 import { EmphasisTypography, HeadingsTypography } from '../../../components/typography/Typography';
@@ -14,31 +15,62 @@ import Button from '../../../components/buttons/Button';
 import { Fixture, FixtureInput } from '../../../utils/Fixture';
 import { db } from '../../../config/firebase';
 import { CollectionEnum } from '../../../utils/Firebase';
-import { groupFixturesByDate, withDocumentIdOnObjectsInArray } from '../../../utils/helpers';
+import { groupFixturesByDate, withDocumentIdOnObject } from '../../../utils/helpers';
 import CreateCentralLevelFixtureModal from '../../../components/game/CreateCentralLevelFixtureModal';
 import RootToast from '../../../components/toast/RootToast';
 import { errorNotify, successNotify } from '../../../utils/toast/toastHelpers';
 import UpcomingFixturePreview from '../../../components/game/UpcomingFixturePreview';
 import useResizeListener, { DeviceSizes } from '../../../utils/hooks/useResizeListener';
 import EditFixtureModal from '../../../components/game/EditFixtureModal';
+import ContextMenu from '../../../components/menu/ContextMenu';
+import IconButton from '../../../components/buttons/IconButton';
+import ContextMenuOption from '../../../components/menu/ContextMenuOption';
+
+type FixturesCollectionResponse = {
+  documentId: string;
+  fixtures: Array<Fixture>;
+};
+
+enum FilterType {
+  DATE = 'DATE',
+  TOURNAMENT = 'TOURNAMENT',
+  TEAM = 'TEAM',
+  ALL = 'ALL',
+}
 
 const AdminFixturesPage = () => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [fixtures, setFixtures] = useState<Array<Fixture>>([]);
+  const [allFixtures, setAllFixtures] = useState<Array<Fixture>>([]);
+  const [filteredFixtures, setFilteredFixtures] = useState<Array<Fixture>>([]);
+  const [passedFixtures, setPassedFixtures] = useState<Array<Fixture>>([]);
+  const [responseDocId, setResponseDocId] = useState<string>('');
   const [createFixtureModalOpen, setCreateFixtureModalOpen] = useState<boolean>(false);
   const [createFixtureLoading, setCreateFixtureLoading] = useState<boolean>(false);
   const [editFixture, setEditFixture] = useState<Fixture | null>(null);
+  const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
+  const [selectedFilters, setSelectedFilters] = useState<Array<{ type: FilterType; value: string }>>([]);
 
   useSingleEffect(() => {
     fetchFixtures();
   });
 
+  useEffect(() => {
+    applyFilters();
+  }, [selectedFilters, allFixtures]);
+
   const fetchFixtures = async () => {
     try {
       const data = await getDocs(collection(db, CollectionEnum.FIXTURES));
-      const allFixtures = withDocumentIdOnObjectsInArray<Fixture>(data.docs);
-      setFixtures(allFixtures);
+      const fixturesResponse = withDocumentIdOnObject<FixturesCollectionResponse>(data.docs[0]);
+
+      const passedFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) < new Date());
+      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= new Date());
+
+      setAllFixtures(upcomingFixtures);
+      // setFilteredFixtures(upcomingFixtures);
+      setPassedFixtures(passedFixtures);
+      setResponseDocId(fixturesResponse.documentId);
     } catch (err) {
       errorNotify('Något gick fel när matcherna skulle hämtas');
     }
@@ -48,7 +80,9 @@ const AdminFixturesPage = () => {
     setCreateFixtureLoading(true);
 
     try {
-      await addDoc(collection(db, CollectionEnum.FIXTURES), fixture);
+      await updateDoc(doc(db, CollectionEnum.FIXTURES, responseDocId), {
+        fixtures: [...allFixtures, fixture],
+      });
       successNotify('Matchen skapades');
       fetchFixtures();
     } catch (err) {
@@ -59,11 +93,15 @@ const AdminFixturesPage = () => {
   };
 
   const handleUpdateFixture = async (fixture: Fixture) => {
-    const fixtureDoc = doc(db, CollectionEnum.FIXTURES, fixture.documentId ?? '');
-
     try {
+      const fixturesDoc = doc(db, CollectionEnum.FIXTURES, responseDocId);
+
       setEditFixture(null);
-      await updateDoc(fixtureDoc, fixture as any);
+
+      await updateDoc(fixturesDoc, {
+        fixtures: allFixtures.map((f) => (f.id === fixture.id ? fixture : f)),
+      });
+
       successNotify('Matchen uppdaterades');
       fetchFixtures();
     } catch (err) {
@@ -71,10 +109,25 @@ const AdminFixturesPage = () => {
     }
   };
 
+  const handleDeleteAllPassedFixtures = async () => {
+    try {
+      await updateDoc(doc(db, CollectionEnum.FIXTURES, responseDocId), {
+        fixtures: allFixtures, // replacing all fixtures with only the upcoming ones
+      });
+
+      successNotify('Matcherna som spelats raderades');
+      fetchFixtures();
+    } catch (error) {
+      errorNotify('Något gick fel när matcherna skulle raderas');
+    }
+  };
+
   const handleDeleteFixture = async () => {
     try {
-      const fixtureDoc = doc(db, CollectionEnum.FIXTURES, editFixture?.documentId ?? '');
-      await deleteDoc(fixtureDoc);
+      const fixturesDoc = doc(db, CollectionEnum.FIXTURES, responseDocId);
+      await updateDoc(fixturesDoc, {
+        fixtures: allFixtures.filter((f) => f.id !== editFixture?.id),
+      });
 
       successNotify('Matchen raderades');
       fetchFixtures();
@@ -89,6 +142,43 @@ const AdminFixturesPage = () => {
     const weekday = fixtureDate.toLocaleString('default', { weekday: 'long' }).replaceAll('.', '').charAt(0).toUpperCase() + fixtureDate.toLocaleString('default', { weekday: 'long' }).slice(1);
     const month = fixtureDate.toLocaleString('default', { month: 'long' }).replaceAll('.', '');
     return `${weekday} ${day} ${month}`;
+  };
+
+  const applyFilters = () => {
+    let filtered = [...allFixtures];
+
+    selectedFilters.forEach((filter) => {
+      switch (filter.type) {
+        case FilterType.DATE:
+          filtered = filtered.filter((fixture) => new Date(fixture.kickOffTime).toDateString() === new Date(filter.value).toDateString());
+          break;
+        case FilterType.TOURNAMENT:
+          filtered = filtered.filter((fixture) => fixture.tournament === filter.value);
+          break;
+        case FilterType.TEAM:
+          filtered = filtered.filter((fixture) => fixture.homeTeam.name === filter.value || fixture.awayTeam.name === filter.value);
+          break;
+        case FilterType.ALL:
+          filtered = [...allFixtures];
+          break;
+        default:
+          break;
+      }
+    });
+
+    setFilteredFixtures(filtered);
+  };
+
+  const addFilter = (type: FilterType, value: string) => {
+    setSelectedFilters((prevFilters) => [...prevFilters, { type, value }]);
+  };
+
+  const removeFilter = (type: FilterType, value: string) => {
+    setSelectedFilters((prevFilters) => prevFilters.filter((filter) => filter.type !== type || filter.value !== value));
+  };
+
+  const clearFilters = () => {
+    setSelectedFilters([]);
   };
 
   return (
@@ -115,22 +205,56 @@ const AdminFixturesPage = () => {
         </Header>
         <Divider />
         <ActionBar>
-          <HeadingsTypography variant="h5">Filtrera matcher</HeadingsTypography>
+          <HeadingsTypography variant="h5">Hantera matcher</HeadingsTypography>
           <HeaderButtons>
-            {/* <Button variant="secondary" onClick={() => console.log('Rensa filter')}>
-            Rensa filter
-          </Button> */}
-            <Button
-              variant="secondary"
-              onClick={() => console.log('Rensa filter')}
-              color="textDefault"
-              icon={<Funnel size={20} weight="fill" color={theme.colors.textDefault} />}
-            >
-              Filtrera
-            </Button>
+            <IconButton
+              icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
+              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+              onClick={() => setContextMenuOpen(!contextMenuOpen)}
+              backgroundColor={theme.colors.white}
+            />
+            {contextMenuOpen && (
+              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 8} offsetX={-24}>
+                <ContextMenuOption
+                  icon={<Funnel size={24} color={theme.colors.textDefault} />}
+                  onClick={() => {
+                    // setEditTeamModalOpen(true);
+                    setContextMenuOpen(false);
+                  }}
+                  label="Filtrera"
+                  color={theme.colors.textDefault}
+                />
+                {/* <ContextMenuOption
+                  icon={<UsersFour size={24} color={theme.colors.textDefault} />}
+                  onClick={() => {
+                    setUpdateSquadModal(true);
+                    setContextMenuOpen(false);
+                  }}
+                  label="Uppdatera trupp"
+                  color={theme.colors.textDefault}
+                /> */}
+                <ContextMenuOption
+                  icon={<Trash size={24} color={theme.colors.red} />}
+                  onClick={() => {
+                    handleDeleteAllPassedFixtures();
+                    setContextMenuOpen(false);
+                  }}
+                  label="Radera matcher som spelats"
+                  color={theme.colors.red}
+                />
+              </ContextMenu>
+            )}
           </HeaderButtons>
         </ActionBar>
-        {Array.from(groupFixturesByDate(fixtures).entries()).map(([date, fixtures]) => (
+        {passedFixtures.length > 0 && (
+          <PassedFixturesContainer>
+            <WarningDiamond size={24} color={theme.colors.redDark} weight="fill" />
+            <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+              {`${passedFixtures.length} ${passedFixtures.length === 1 ? 'match' : 'matcher'} har spelats`}
+            </EmphasisTypography>
+          </PassedFixturesContainer>
+        )}
+        {Array.from(groupFixturesByDate(filteredFixtures).entries()).map(([date, fixtures]) => (
           <FixturesContainer>
             <Section
               padding={theme.spacing.xs}
@@ -196,10 +320,24 @@ const ActionBar = styled.div`
   align-items: center;
   justify-content: space-between;
   background-color: ${theme.colors.white};
+  padding: ${theme.spacing.xxs} ${theme.spacing.s};
+  border-radius: ${theme.borderRadius.l};
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+`;
+
+const PassedFixturesContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.white};
   padding: ${theme.spacing.s};
   border-radius: ${theme.borderRadius.l};
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 `;
 
 const fadeIn = keyframes`
