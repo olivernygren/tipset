@@ -171,7 +171,7 @@ export const getFlagUrlByCountryName = (countryName: string): string => {
 
 export const getTeamPrimaryColorByName = (teamName: string): string => {
   for (const league in Teams) {
-    const team = Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
+    const team = Teams[league as LeagueEnum].find((team: Team) => team.name === teamName || team.fotMobName === teamName || team.shortName === teamName || teamName.includes(team.name));
     if (team && (team as any).teamPrimaryColor) return (team as any).teamPrimaryColor || theme.colors.black;
   }
   return '';
