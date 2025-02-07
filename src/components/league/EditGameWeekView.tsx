@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {
-  ArrowLeft, CheckCircle, Plus, Trash,
+  ArrowLeft, CheckCircle, Hammer, MagnifyingGlass, PlusCircle, Trash,
+  XCircle,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
@@ -25,6 +26,9 @@ import IconButton from '../buttons/IconButton';
 import CreateFixtureModal from '../game/CreateFixtureModal';
 import CustomDatePicker from '../input/DatePicker';
 import Modal from '../modal/Modal';
+import ContextMenu from '../menu/ContextMenu';
+import ContextMenuOption from '../menu/ContextMenuOption';
+import FindOtherFixturesModal from './FindOtherFixturesModal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
@@ -41,11 +45,13 @@ const EditGameWeekView = ({
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [editFixture, setEditFixture] = useState<Fixture | null>(null);
-  const [gameWeekFixtures, setGameWeekFixtures] = useState(gameWeek.games.fixtures);
+  const [gameWeekFixtures, setGameWeekFixtures] = useState(gameWeek.games.fixtures.sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime()));
   const [gameWeekPredictions, setGameWeekPredictions] = useState(gameWeek.games.predictions);
   const [showCreateFixtureModal, setShowCreateFixtureModal] = useState<boolean>(false);
   const [gameWeekStartDate, setGameWeekStartDate] = useState<Date | null>(new Date(gameWeek.startDate));
   const [confirmDeleteGameWeekModalOpen, setConfirmDeleteGameWeekModalOpen] = useState<boolean>(false);
+  const [selectAddFixtureMethodMenuOpen, setSelectAddFixtureMethodMenuOpen] = useState<boolean>(false);
+  const [findExternalFixturesModalOpen, setFindExternalFixturesModalOpen] = useState<boolean>(false);
 
   const handleUpdateFixture = (updatedFixture: FixtureInput) => {
     const updatedFixtures = gameWeekFixtures.map((fixture) => {
@@ -219,16 +225,38 @@ const EditGameWeekView = ({
             </EmphasisTypography>
             <Icons>
               <IconButton
-                icon={<Plus size={20} />}
-                colors={{ normal: theme.colors.textDefault, hover: theme.colors.black }}
-                onClick={() => setShowCreateFixtureModal(true)}
-              />
-              <IconButton
-                icon={<Trash size={20} />}
+                icon={<Trash size={20} weight="fill" />}
                 colors={{ normal: theme.colors.red, hover: theme.colors.redDark }}
                 onClick={() => setConfirmDeleteGameWeekModalOpen(true)}
               />
+              <IconButton
+                icon={selectAddFixtureMethodMenuOpen ? <XCircle size={20} weight="fill" /> : <PlusCircle size={20} weight="fill" />}
+                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
+                onClick={() => setSelectAddFixtureMethodMenuOpen(!selectAddFixtureMethodMenuOpen)}
+              />
             </Icons>
+            {selectAddFixtureMethodMenuOpen && (
+              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 8} offsetX={-24}>
+                <ContextMenuOption
+                  icon={<MagnifyingGlass size={24} color={theme.colors.textDefault} />}
+                  onClick={() => {
+                    setFindExternalFixturesModalOpen(true);
+                    setSelectAddFixtureMethodMenuOpen(false);
+                  }}
+                  label="Hitta matcher"
+                  color={theme.colors.textDefault}
+                />
+                <ContextMenuOption
+                  icon={<Hammer size={24} color={theme.colors.textDefault} />}
+                  onClick={() => {
+                    setShowCreateFixtureModal(true);
+                    setSelectAddFixtureMethodMenuOpen(false);
+                  }}
+                  label="Lägg till manuellt"
+                  color={theme.colors.textDefault}
+                />
+              </ContextMenu>
+            )}
           </FixtureListHeader>
           {gameWeekFixtures.map((fixture, index) => getFixtureItem(fixture, index))}
         </FixtureList>
@@ -267,6 +295,15 @@ const EditGameWeekView = ({
           onClose={() => setShowCreateFixtureModal(false)}
           onUpdateAllNewGameWeekFixtures={(newFixtures) => setGameWeekFixtures(newFixtures)}
           minDate={minDate}
+        />
+      )}
+      {findExternalFixturesModalOpen && (
+        <FindOtherFixturesModal
+          onClose={() => setFindExternalFixturesModalOpen(false)}
+          onFixturesSelect={(selectedFixtures) => {
+            setGameWeekFixtures([...gameWeekFixtures, ...selectedFixtures]);
+            setFindExternalFixturesModalOpen(false);
+          }}
         />
       )}
       {confirmDeleteGameWeekModalOpen && (
@@ -324,6 +361,7 @@ const FixtureListHeader = styled.div`
   box-sizing: border-box;
   position: relative;
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  position: relative;
 `;
 
 const FixtureItem = styled.div`

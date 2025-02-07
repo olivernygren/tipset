@@ -11,8 +11,8 @@ import { FotMobMatch } from '../../utils/Fotmob';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { Fixture } from '../../utils/Fixture';
-import { groupFixturesByDate } from '../../utils/helpers';
+import { Fixture, FixtureGroup } from '../../utils/Fixture';
+import { getFixtureGroups, getTournamentIcon, groupFixturesByDate } from '../../utils/helpers';
 import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import UpcomingFixturePreview from './UpcomingFixturePreview';
@@ -20,6 +20,7 @@ import { Divider } from '../Divider';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import ActionsModal from '../modal/ActionsModal';
 import IconButton from '../buttons/IconButton';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 
 interface Props {
   onClose: () => void;
@@ -38,6 +39,7 @@ const CreateFixturesViaFotMobSnippetModal = ({
   const [snippet, setSnippet] = useState<string>('');
   const [creationLoading, setCreationLoading] = useState<boolean>(false);
   const [previewFixtures, setPreviewFixtures] = useState<Array<Fixture>>([]);
+  const [availableFixtureGroups, setAvailableFixtureGroups] = useState<Array<FixtureGroup>>([]);
 
   const handleCreateFixturesPreview = () => {
     const allFixtureIds = allFixtures.map((fixture) => fixture.id);
@@ -47,6 +49,7 @@ const CreateFixturesViaFotMobSnippetModal = ({
       .filter((fixture) => fixture !== null && fixture !== undefined) as Array<Fixture>;
 
     setPreviewFixtures(fixtures);
+    setAvailableFixtureGroups(getFixtureGroups(fixtures));
   };
 
   const handleCreateFixtures = async () => {
@@ -96,29 +99,29 @@ const CreateFixturesViaFotMobSnippetModal = ({
     >
       <Content>
         {previewFixtures.length === 0 && (
-        <Textarea
-          value={snippet}
-          onChange={(e) => setSnippet(e.currentTarget.value)}
-          placeholder="Klistra in FotMob-snippet här"
-          autoFocus
-          fullWidth
-        />
+          <Textarea
+            value={snippet}
+            onChange={(e) => setSnippet(e.currentTarget.value)}
+            placeholder="Klistra in FotMob-snippet här"
+            autoFocus
+            fullWidth
+          />
         )}
         {previewFixtures.length > 0 && (
-        <Section flexDirection="row" gap="s" alignItems="center" justifyContent="space-between">
-          <HeadingsTypography variant="h4" color={theme.colors.textDefault}>
-            {`Förhandsgranskning (${previewFixtures.length} matcher)`}
-          </HeadingsTypography>
-          <IconButton
-            icon={<MinusCircle size={24} />}
-            colors={{
-              normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker, disabled: theme.colors.silver,
-            }}
-            onClick={() => setPreviewFixtures([])}
-          />
-        </Section>
+          <Section flexDirection="row" gap="s" alignItems="center" justifyContent="space-between">
+            <HeadingsTypography variant="h4" color={theme.colors.textDefault}>
+              {`Förhandsgranskning (${previewFixtures.length} matcher)`}
+            </HeadingsTypography>
+            <IconButton
+              icon={<MinusCircle size={24} />}
+              colors={{
+                normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker, disabled: theme.colors.silver,
+              }}
+              onClick={() => setPreviewFixtures([])}
+            />
+          </Section>
         )}
-        {previewFixtures.length > 0 && Array.from(groupFixturesByDate(previewFixtures).entries())
+        {/* {previewFixtures.length > 0 && Array.from(groupFixturesByDate(previewFixtures).entries())
           .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
           .map(([date, fixtures]) => (
             <FixturesContainer>
@@ -143,7 +146,39 @@ const CreateFixturesViaFotMobSnippetModal = ({
                   </>
                 ))}
             </FixturesContainer>
-          ))}
+          ))} */}
+        {previewFixtures.length > 0 && availableFixtureGroups.map((fixtureGroup) => (
+          <FixturesContainer>
+            <Section
+              flexDirection="row"
+              padding={theme.spacing.xxxs}
+              backgroundColor={theme.colors.silverLight}
+              borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
+              alignItems="center"
+              justifyContent="center"
+              gap="xxxs"
+            >
+              <EmphasisTypography variant="m" color={theme.colors.textDefault}>{fixtureGroup.tournament}</EmphasisTypography>
+              <Avatar
+                src={getTournamentIcon(fixtureGroup.tournament)}
+                size={AvatarSize.S}
+                objectFit="contain"
+              />
+            </Section>
+            {fixtureGroup.fixtures
+              .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
+              .map((fixture: Fixture, index: number, array: Array<any>) => (
+                <>
+                  <UpcomingFixturePreview
+                    fixture={fixture}
+                    useShortNames={isMobile}
+                    backgroundColor={theme.colors.white}
+                  />
+                  {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
+                </>
+              ))}
+          </FixturesContainer>
+        ))}
       </Content>
     </ActionsModal>
   );

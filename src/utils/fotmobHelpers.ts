@@ -154,7 +154,8 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
   leaguesArray.forEach((league) => {
     league.matches.forEach((match) => {
       if (isMatchInFuture(match) && (tournaments.includes(league.primaryId) || teamIds.includes(match.home.id) || teamIds.includes(match.away.id))) {
-        matchesSet.add(match);
+        const matchWithLeagueId = { ...match, leagueId: league.parentLeagueId || league.primaryId };
+        matchesSet.add(matchWithLeagueId);
       }
     });
   });
@@ -163,10 +164,13 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
 };
 
 export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum => {
+  console.log(fotMobId);
+
   switch (fotMobId) {
     case 55:
       return TournamentsEnum.SERIE_A;
     case 141:
+    case 893240:
       return TournamentsEnum.COPPA_ITALIA;
     case 222:
       return TournamentsEnum.SUPERCOPPA_ITALIANA;
@@ -175,6 +179,7 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
     case 48:
       return TournamentsEnum.PREMIER_LEAGUE;
     case 132:
+    case 894955:
       return TournamentsEnum.FA_CUP;
     case 133:
       return TournamentsEnum.CARABAO_CUP;
@@ -183,6 +188,7 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
     case 146:
       return TournamentsEnum.BUNDESLIGA_2;
     case 209:
+    case 892581:
       return TournamentsEnum.DFB_POKAL;
     case 53:
       return TournamentsEnum.LIGUE_1;
@@ -193,6 +199,7 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
     case 139:
       return TournamentsEnum.SUPERCOPA;
     case 42:
+    case 897488:
       return TournamentsEnum.CHAMPIONS_LEAGUE;
     case 74:
       return TournamentsEnum.UEFA_SUPER_CUP;
@@ -218,6 +225,7 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
     case 9809:
       return TournamentsEnum.NATIONS_LEAGUE;
     case 114:
+    case 896100:
       return TournamentsEnum.FRIENDLIES;
     default:
       return TournamentsEnum.SERIE_A;

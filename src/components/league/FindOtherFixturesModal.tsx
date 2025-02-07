@@ -12,11 +12,13 @@ import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { Team } from '../../utils/Team';
 import SelectTournamentModal from '../game/SelectTournamentModal';
-import { Fixture, FixturesCollectionResponse, TeamType } from '../../utils/Fixture';
+import {
+  Fixture, FixtureGroup, FixturesCollectionResponse, TeamType,
+} from '../../utils/Fixture';
 import SelectTeamModal from '../game/SelectTeamModal';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { getTournamentIcon, withDocumentIdOnObject } from '../../utils/helpers';
+import { getFixtureGroups, getTournamentIcon, withDocumentIdOnObject } from '../../utils/helpers';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
@@ -29,11 +31,6 @@ enum SearchType {
   BY_CLUB = 'BY_CLUB',
   BY_NATIONAL_TEAM = 'BY_NATIONAL_TEAM',
   ALL = 'ALL',
-}
-
-interface FixtureGroup {
-  tournament: string;
-  fixtures: Array<Fixture>;
 }
 
 interface FindOtherFixturesModalProps {
@@ -49,7 +46,7 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
   const [showTeamsModal, setShowTeamsModal] = useState<boolean>(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [selectedTournament, setSelectedTournament] = useState<string | null>(null);
-  const [availableFixtures, setAvailableFixtures] = useState<Array<FixtureGroup>>([]);
+  const [availableFixtureGroups, setAvailableFixtureGroups] = useState<Array<FixtureGroup>>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(true);
   const [selectedFixtures, setSelectedFixtures] = useState<Array<Fixture>>([]);
 
@@ -66,23 +63,13 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       // const fixturesSortedByTournament = upcomingFixtures.sort((a, b) => a.tournament.localeCompare(b.tournament));
       const fixtureGroups = getFixtureGroups(upcomingFixtures);
 
-      setAvailableFixtures(fixtureGroups);
+      setAvailableFixtureGroups(fixtureGroups);
     } catch (err) {
       errorNotify('Något gick fel när matcherna skulle hämtas');
     } finally {
       setSearchLoading(false);
     }
   };
-
-  const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((acc, fixture) => {
-    const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
-    if (tournamentIndex >= 0) {
-      acc[tournamentIndex].fixtures.push(fixture);
-    } else {
-      acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
-    }
-    return acc;
-  }, [] as Array<FixtureGroup>);
 
   const handleSelectFixture = (fixture: Fixture) => {
     setSelectedFixtures((prev) => {
@@ -114,15 +101,15 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       >
         <ModalContent>
           {searchLoading && <NormalTypography variant="m" color={theme.colors.silverDark}>Laddar matcher...</NormalTypography>}
-          {availableFixtures.length > 0 && !searchLoading && (
+          {availableFixtureGroups.length > 0 && !searchLoading && (
             <MainContent>
               <HeadingsTypography variant="h5">Tillgängliga matcher</HeadingsTypography>
               <AvailableFixturesContainer>
-                {availableFixtures.map((fixtureGroup) => (
+                {availableFixtureGroups.map((fixtureGroup) => (
                   <FixturesContainer>
                     <Section
                       flexDirection="row"
-                      padding={theme.spacing.xxs}
+                      padding={theme.spacing.xxxs}
                       backgroundColor={theme.colors.silverLight}
                       borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
                       alignItems="center"
@@ -155,7 +142,7 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
               </AvailableFixturesContainer>
             </MainContent>
           )}
-          {!searchLoading && availableFixtures.length === 0 && (
+          {!searchLoading && availableFixtureGroups.length === 0 && (
             <NormalTypography variant="m" color={theme.colors.silverDark}>Inga matcher tillgängliga</NormalTypography>
           )}
         </ModalContent>
@@ -196,7 +183,7 @@ const MainContent = styled.div`
 const AvailableFixturesContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.m};
   width: 100%;
   box-sizing: border-box;
 `;
@@ -212,6 +199,7 @@ const fadeIn = keyframes`
 
 const FixturesContainer = styled.div`
   display: flex;
+  /* gap: ${theme.spacing.s}; */
   flex-direction: column;
   width: 100%;
   position: relative;

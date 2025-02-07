@@ -1,5 +1,7 @@
 import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
-import { Fixture, PredictionOutcomeEnum, PredictionStatus } from './Fixture';
+import {
+  Fixture, FixtureGroup, PredictionOutcomeEnum, PredictionStatus,
+} from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import {
@@ -344,12 +346,6 @@ export const getTournamentIcon = (tournament: string) => {
   }
 };
 
-// export const getFixtureNickname = (teams: Array<Team>): string | null => {
-//   const hasSpecifiedTeams = (specifiedTeams: Array<string>) => teams.every((team) => specifiedTeams.includes(team.name));
-
-//   if (hasSpecifiedTeams(['Real Madrid', 'FC Barcelona'])) return 'El Clásico';
-// };
-
 export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
   const teamNicknames: { [key: string]: string } = {
     'Real Madrid,FC Barcelona': 'El Clásico',
@@ -403,3 +399,13 @@ export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
 
   return teamNicknames[teamNames] || undefined;
 };
+
+export const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((acc, fixture) => {
+  const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
+  if (tournamentIndex >= 0) {
+    acc[tournamentIndex].fixtures.push(fixture);
+  } else {
+    acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
+  }
+  return acc;
+}, [] as Array<FixtureGroup>);
