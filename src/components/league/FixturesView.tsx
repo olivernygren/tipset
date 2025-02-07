@@ -45,6 +45,7 @@ import CreateFixtureModal from '../game/CreateFixtureModal';
 import FindOtherFixturesModal from './FindOtherFixturesModal';
 import CorrectingFixtureCard from '../game/CorrectingFixtureCard';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
+import EditFixtureModal from '../game/EditFixtureModal';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -548,7 +549,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     hidePredictions
                     onClick={() => {
                       setNewFixtureToEdit(fixture);
-                      setIsCreateFixtureModalOpen(true);
                     }}
                   />
                   <IconButton
@@ -881,11 +881,20 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onClose={() => setIsCreateFixtureModalOpen(false)}
           league={league}
           allNewGameWeekFixtures={newGameWeekFixtures}
-          // allNewGameWeekFixtures={editUpcomingGameWeekViewOpen && upcomingGameWeeks !== undefined ? (upcomingGameWeeks[0]?.games.fixtures ?? []) : newGameWeekFixtures}
           onUpdateAllNewGameWeekFixtures={setNewGameWeekFixtures}
-          // onUpdateAllNewGameWeekFixtures={!editUpcomingGameWeekViewOpen ? setNewGameWeekFixtures : undefined}
-          // onAddFixtureToGameWeek={editUpcomingGameWeekViewOpen ? (fixture) => handleAddFixtureToUpcomingGameWeek(fixture) : undefined}
+          fixture={null}
+          minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
+        />
+      )}
+      {newFixtureToEdit && (
+        <EditFixtureModal
           fixture={newFixtureToEdit}
+          onClose={() => setNewFixtureToEdit(null)}
+          onSave={(updatedFixture) => {
+            setNewGameWeekFixtures(newGameWeekFixtures.map((f) => (f.id === updatedFixture.id ? updatedFixture : f)));
+            setNewFixtureToEdit(null);
+          }}
+          onDeleteFixture={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== newFixtureToEdit.id))}
           minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
         />
       )}

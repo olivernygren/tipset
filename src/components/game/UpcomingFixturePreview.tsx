@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Eye } from '@phosphor-icons/react';
+import { CheckCircle, Eye } from '@phosphor-icons/react';
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
@@ -14,6 +14,7 @@ import { Team } from '../../utils/Team';
 interface UpcomingFixturePreviewProps {
   fixture: Fixture;
   onShowPredictionsClick?: () => void;
+  onSelectFixture?: () => void;
   useShortNames?: boolean;
   backgroundColor?: string;
   hoverColor?: string;
@@ -22,9 +23,11 @@ interface UpcomingFixturePreviewProps {
 }
 
 const UpcomingFixturePreview = ({
-  fixture, onShowPredictionsClick, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight, showDay,
+  fixture, onShowPredictionsClick, onSelectFixture, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight, showDay,
 }: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const [isSelected, setIsSelected] = useState<boolean>(false);
 
   const canViewPredictions = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
 
@@ -54,10 +57,22 @@ const UpcomingFixturePreview = ({
     />
   ));
 
+  const handleClick = () => {
+    if (onSelectFixture) {
+      setIsSelected(!isSelected);
+      onSelectFixture();
+      return;
+    }
+
+    if (onShowPredictionsClick) {
+      onShowPredictionsClick();
+    }
+  };
+
   return (
     <Container
       canViewPredictions={canViewPredictions || alwaysClickable}
-      onClick={canViewPredictions || alwaysClickable ? onShowPredictionsClick : undefined}
+      onClick={handleClick}
       backgroundColor={backgroundColor}
       hoverColor={hoverColor}
     >
@@ -76,15 +91,20 @@ const UpcomingFixturePreview = ({
           />
         ) : (
           <MiddleSection>
-            {showDay && (
+            {isSelected && (
+              <CheckCircle size={24} color={theme.colors.primary} weight="fill" />
+            )}
+            {showDay && !isSelected && (
               <EmphasisTypography variant="xs" color={theme.colors.textDefault}>
                 {getKickoffDay(fixture.kickOffTime)}
               </EmphasisTypography>
             )}
-            <NormalTypography variant="s" color={theme.colors.textLight}>
-              {getKickoffTime(fixture.kickOffTime)}
-            </NormalTypography>
-            {fixture.aggregateScore && (
+            {!isSelected && (
+              <NormalTypography variant="s" color={theme.colors.textLight}>
+                {getKickoffTime(fixture.kickOffTime)}
+              </NormalTypography>
+            )}
+            {fixture.aggregateScore && !isSelected && (
               <NormalTypography variant="xs" color={theme.colors.textDefault}>
                 {`(${fixture.aggregateScore.homeTeamGoals} - ${fixture.aggregateScore.awayTeamGoals})`}
               </NormalTypography>

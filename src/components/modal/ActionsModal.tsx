@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from './Modal';
 import { NormalTypography } from '../typography/Typography';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import Button from '../buttons/Button';
 
 interface ActionsModalProps {
@@ -14,6 +14,7 @@ interface ActionsModalProps {
   actionButtonColor?: 'primary' | 'red';
   actionButtonStartIcon?: React.ReactNode;
   actionButtonEndIcon?: React.ReactNode;
+  actionButtonDisabled?: boolean;
   loading?: boolean;
   cancelButtonLabel?: string;
   onActionClick: () => void;
@@ -35,6 +36,7 @@ const ActionsModal = ({
   actionButtonColor = 'primary',
   actionButtonStartIcon,
   actionButtonEndIcon,
+  actionButtonDisabled,
   loading,
   cancelButtonLabel = 'Avbryt',
   onActionClick,
@@ -43,8 +45,8 @@ const ActionsModal = ({
   mobileFullScreen,
   mobileBottomSheet,
   headerDivider,
-  noPadding,
   children,
+  noPadding,
 }: ActionsModalProps) => (
   <Modal
     title={title}
@@ -54,9 +56,9 @@ const ActionsModal = ({
     headerDivider={headerDivider}
     mobileFullScreen={mobileFullScreen}
     mobileBottomSheet={mobileBottomSheet}
-    noPadding={noPadding}
+    noPadding
   >
-    <ModalContent>
+    <ModalContent noPadding={noPadding}>
       {message && message.length > 0 && (
         <NormalTypography variant="m" color={theme.colors.silverDarker}>
           {message}
@@ -64,7 +66,7 @@ const ActionsModal = ({
       )}
       {children}
     </ModalContent>
-    <ButtonsContainer>
+    <ButtonsContainer divider={headerDivider}>
       {!hideCancelButton && (
         <Button variant="secondary" onClick={onCancelClick} fullWidth>
           {cancelButtonLabel}
@@ -77,6 +79,7 @@ const ActionsModal = ({
         loading={loading}
         icon={actionButtonStartIcon}
         endIcon={actionButtonEndIcon}
+        disabled={actionButtonDisabled}
       >
         {actionButtonLabel}
       </Button>
@@ -84,16 +87,29 @@ const ActionsModal = ({
   </Modal>
 );
 
-const ModalContent = styled.div`
+const ModalContent = styled.div<{ noPadding?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.m)};
+  
+  @media ${devices.tablet} {
+    padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.l)};
+  }
 `;
 
-const ButtonsContainer = styled.div`
+const ButtonsContainer = styled.div<{ divider?: boolean }>`
   display: flex;
   gap: ${theme.spacing.s};
   align-items: center;
+  padding: ${theme.spacing.m};
+  ${({ divider }) => divider && `border-top: 1px solid ${theme.colors.silverLight};`}
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.m} ${theme.spacing.l};
+  }
 `;
 
 export default ActionsModal;
