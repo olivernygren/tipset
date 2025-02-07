@@ -288,56 +288,57 @@ export const getTournamentIcon = (tournament: string) => {
     case TournamentsEnum.PREMIER_LEAGUE:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/47.png';
     case TournamentsEnum.FA_CUP:
-      return '/images/tournaments/fa-cup.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/132.png';
     case TournamentsEnum.CARABAO_CUP:
-      return '/images/tournaments/carabao-cup.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/133.png';
     case TournamentsEnum.CHAMPIONSHIP:
-      return '/images/tournaments/championship.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/48.png';
     case TournamentsEnum.LA_LIGA:
-      // return '/images/tournaments/la-liga.png';
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/dark/87.png';
     case TournamentsEnum.COPA_DEL_REY:
-      return '/images/tournaments/copa-del-rey.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/138.png';
     case TournamentsEnum.SUPERCOPA:
-      return '/images/tournaments/supercopa.svg';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/139.png';
     case TournamentsEnum.SERIE_A:
-      // return '/images/tournaments/serie-a.png';
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/dark/55.png';
     case TournamentsEnum.SUPERCOPPA_ITALIANA:
-      return '/images/tournaments/supercoppa.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/222.png';
     case TournamentsEnum.COPPA_ITALIA:
-      return '/images/tournaments/coppa-italia.jpg';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/141.png';
     case TournamentsEnum.BUNDESLIGA:
-      return '/images/tournaments/bundesliga.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/54.png';
     case TournamentsEnum.DFB_POKAL:
-      return '/images/tournaments/dfb-pokal.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/209.png';
     case TournamentsEnum.BUNDESLIGA_2:
-      return '/images/tournaments/2-bundesliga.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/146.png';
     case TournamentsEnum.LIGUE_1:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/53.png';
-      // return '/images/tournaments/ligue-1.jpg';
     case TournamentsEnum.CHAMPIONS_LEAGUE:
-      return '/images/tournaments/champions-league.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/42.png';
     case TournamentsEnum.EUROPA_LEAGUE:
-      return '/images/tournaments/europa-league.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/73.png';
     case TournamentsEnum.CONFERENCE_LEAGUE:
-      return '/images/tournaments/conference-league.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/10216.png';
     case TournamentsEnum.UEFA_SUPER_CUP:
-      return '/images/tournaments/uefa-super-cup.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/74.png';
     case TournamentsEnum.ALLSVENSKAN:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/67.png';
+    case TournamentsEnum.SVENSKA_CUPEN:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/171.png';
     case TournamentsEnum.EREDIVISIE:
-      return '/images/tournaments/eredivisie.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/57.png';
     case TournamentsEnum.PRIMEIRA_LIGA:
-      return '/images/tournaments/liga-portugal.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/61.png';
     case TournamentsEnum.NATIONS_LEAGUE:
-      return '/images/tournaments/nations-league.avif';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/9806.png';
     case TournamentsEnum.WORLD_CUP:
     case TournamentsEnum.WORLD_CUP_QUALIFIERS:
-      return '/images/tournaments/world-cup.png';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/77.png';
     case TournamentsEnum.EUROS:
     case TournamentsEnum.EUROS_QUALIFIERS:
-      return '/images/tournaments/euros.webp';
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/50.png';
+    case TournamentsEnum.FRIENDLIES:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/114.png';
     default:
       return '';
   }

@@ -81,6 +81,7 @@ export enum CountryEnum {
   MOLDOVA = 'Moldavien',
   ESTONIA = 'Estland',
   AZERBAIJAN = 'Azerbajdzjan',
+  PLACEHOLDER = 'Placeholder',
 }
 
 export enum PlayerStatusEnum {

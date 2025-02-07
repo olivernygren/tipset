@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { updateDoc, doc } from 'firebase/firestore';
 import { theme } from '../../theme';
-import { convertFotMobMatchToFixture, getFotMobMatchesFromSelectedCountries, getFotMobMatchesFromSelectedTournaments } from '../../utils/fotmobHelpers';
+import {
+  convertFotMobMatchToFixture, getFotMobMatchesFromTournamentsAndTeams,
+} from '../../utils/fotmobHelpers';
 import Button from '../buttons/Button';
 import Modal from '../modal/Modal';
 import Textarea from '../textarea/Textarea';
@@ -16,22 +18,25 @@ interface Props {
   onClose: () => void;
   refetchFixtures: () => void;
   selectedTournamentIds: Array<number>;
+  selectedTeamIds: Array<number>;
   collectionDocId: string;
   allFixtures: Array<Fixture>;
 }
 
 const CreateFixturesViaFotMobSnippetModal = ({
-  onClose, refetchFixtures, selectedTournamentIds, collectionDocId, allFixtures,
+  onClose, refetchFixtures, selectedTournamentIds, collectionDocId, allFixtures, selectedTeamIds,
 }: Props) => {
   const [snippet, setSnippet] = useState<string>('');
-
   const [creationLoading, setCreationLoading] = useState<boolean>(false);
+
+  // create fixture preview before creating fixtures
 
   const handleCreateFixtures = async () => {
     setCreationLoading(true);
 
     const allFixtureIds = allFixtures.map((fixture) => fixture.id);
-    const filteredFotMobMatches = getFotMobMatchesFromSelectedTournaments(JSON.parse(snippet).leagues, selectedTournamentIds);
+    // const filteredFotMobMatches = getFotMobMatchesFromSelectedTournaments(JSON.parse(snippet).leagues, selectedTournamentIds);
+    const filteredFotMobMatches = getFotMobMatchesFromTournamentsAndTeams(JSON.parse(snippet).leagues, selectedTournamentIds, selectedTeamIds);
     const fixtures = filteredFotMobMatches
       .map((match: FotMobMatch) => convertFotMobMatchToFixture(match, allFixtureIds))
       .filter((fixture) => fixture !== null);
@@ -40,7 +45,6 @@ const CreateFixturesViaFotMobSnippetModal = ({
       errorNotify('Inga matcher kunde skapas för valda turneringar');
       return;
     }
-    console.log(fixtures);
 
     try {
       await updateDoc(doc(db, CollectionEnum.FIXTURES, collectionDocId), {

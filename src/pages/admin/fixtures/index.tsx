@@ -27,6 +27,7 @@ import IconButton from '../../../components/buttons/IconButton';
 import ContextMenuOption from '../../../components/menu/ContextMenuOption';
 import CreateFixturesViaFotMobSnippetModal from '../../../components/game/CreateFixturesViaFotMobSnippetModal';
 import ActionsModal from '../../../components/modal/ActionsModal';
+import { getTeamsByTournament, TournamentsEnum } from '../../../utils/Team';
 
 enum FilterType {
   DATE = 'DATE',
@@ -74,6 +75,29 @@ const AdminFixturesPage = () => {
     47, // Premier League
     42, // Champions League
     67, // Allsvenskan
+  ];
+
+  const allAllsvenskanTeams = getTeamsByTournament(TournamentsEnum.ALLSVENSKAN).map((team) => Number(team.id));
+
+  // Always include games for thse teams
+  const fotMobMatchesTeamIds = [
+    ...allAllsvenskanTeams, // Allsvenskan (all teams)
+    Number('9825'), // Arsenal
+    Number('8455'), // Chelsea
+    Number('10260'), // Manchester United
+    Number('8456'), // Manchester City
+    Number('8650'), // Liverpool
+    Number('8586'), // Tottenham
+    Number('8633'), // Real Madrid
+    Number('8634'), // Barcelona
+    Number('9906'), // Atletico Madrid
+    Number('9885'), // Juventus
+    Number('8636'), // Inter
+    Number('8564'), // AC Milan
+    Number('9823'), // Bayern Munchen
+    Number('9789'), // Borussia Dortmund
+    Number('8178'), // Leverkusen
+    Number('9847'), // PSG
   ];
 
   useSingleEffect(() => {
@@ -351,6 +375,7 @@ const AdminFixturesPage = () => {
           selectedTournamentIds={fotMobMatchesTournamentIds}
           collectionDocId={responseDocId}
           allFixtures={allFixtures}
+          selectedTeamIds={fotMobMatchesTeamIds as Array<number>}
         />
       )}
       {confirmDeleteAllModalOpen && (
