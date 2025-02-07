@@ -5,7 +5,7 @@ import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import {
   ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
 } from './Players';
-import { TournamentsEnum } from './Team';
+import { Team, TournamentsEnum } from './Team';
 import { theme } from '../theme';
 
 export const defenderGoalPoints = 5;
@@ -342,4 +342,64 @@ export const getTournamentIcon = (tournament: string) => {
     default:
       return '';
   }
+};
+
+// export const getFixtureNickname = (teams: Array<Team>): string | null => {
+//   const hasSpecifiedTeams = (specifiedTeams: Array<string>) => teams.every((team) => specifiedTeams.includes(team.name));
+
+//   if (hasSpecifiedTeams(['Real Madrid', 'FC Barcelona'])) return 'El Clásico';
+// };
+
+export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
+  const teamNicknames: { [key: string]: string } = {
+    'Real Madrid,FC Barcelona': 'El Clásico',
+    'Real Madrid,Atlético Madrid': 'El Derbi Madrileño',
+    'Real Sociedad,Athletic Bilbao': 'Euskal Derbia',
+    'Real Betis,Sevilla': 'Derbi Sevillano',
+    'Sporting Gijón,Real Oviedo': 'Derbi Asturiano',
+    'Celta Vigo,Deportivo La Coruña': 'O Noso Derbi',
+    'Valencia,Levante': 'Derbi Valenciano',
+    'Valencia,Villarreal': 'Derbi de la Comunitat',
+    'Manchester United,Liverpool': 'North West Derby',
+    'Manchester United,Manchester City': 'Manchester Derby',
+    'Arsenal,Tottenham': 'North London Derby',
+    'Crystal Palace,Brighton': 'M23 Derby',
+    'Fulham,Chelsea': 'West London Derby',
+    'West Ham,Millwall': 'Dockers Derby',
+    'Birmingham City,Aston Villa': 'Second City Derby',
+    'Birmingham City,West Bromwich Albion': 'Black Country Derby',
+    'Sheffield United,Sheffield Wednesday': 'Steel City Derby',
+    'Newcastle,Sunderland': 'Tyne-Wear Derby',
+    'AC Milan,Inter': 'Derby della Madonnina',
+    'Inter,Juventus': 'Derby d‘Italia',
+    'Roma,Lazio': 'Derby della Capitale',
+    'Napoli,Juventus': 'Derby del Sole',
+    'Juventus,Torino': 'Derby della Mole',
+    'Genoa,Sampdoria': 'Derby della Lanterna',
+    'Atalanta,Brescia': 'Derby della Lombardia',
+    'Borussia Dortmund,Bayern Munich': 'Der Klassiker',
+    'Schalke 04,Borussia Dortmund': 'Revierderby',
+    'Hamburger SV,St. Pauli': 'Nordderby',
+    'Köln,Borussia Mönchengladbach': 'Rheinland Derby',
+    'Bayer Leverkusen,Köln': 'Rhein Derby',
+    'Paris Saint-Germain,Marseille': 'Le Classique',
+    'Marseille,Lyon': 'Choc des Olympiques',
+    'Lyon,Saint-Étienne': 'Derby Rhône-Alpes',
+    'Monaco,Nice': 'Derby de la Côte d‘Azur',
+    'Lille,Lens': 'Derby du Nord',
+    'Ajax,PSV': 'De Topper',
+    'Feyenoord,Ajax': 'De Klassieker',
+    'Benfica,Porto': 'O Clássico',
+    'Sporting CP,Benfica': 'O Derby de Lisboa',
+    'IFK Göteborg,GAIS': 'Göteborgsderbyt',
+    'AIK,Djurgården': '08-Derby',
+    'Malmö FF,Helsingborg': 'Skånederbyt',
+    'Djurgården,Hammarby': 'Tvillingderbyt',
+    'AIK,Hammarby': '08-Derby',
+    'IFK Göteborg,Malmö FF': 'Mästa Mästarderbyt',
+  };
+
+  const teamNames = teams.map((team) => team.name).sort().join(',');
+
+  return teamNicknames[teamNames] || undefined;
 };

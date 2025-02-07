@@ -131,15 +131,7 @@ export const getTeamsObjectByCountry = (): { [key: string]: Team[] } => {
   return teamsByCountry;
 };
 
-export const getTeamsByTournament = (tournament: string): Team[] => {
-  const teams: Team[] = [];
-  for (const league in Teams) {
-    Teams[league as LeagueEnum].forEach((team: Team) => {
-      if (team.country === tournament) teams.push(team);
-    });
-  }
-  return teams;
-};
+export const getTeamsByTournament = (tournament: string): Team[] => Teams[tournament as LeagueEnum].map((team: Team) => team);
 
 export const getAllTeams = (): Team[] => {
   const teams: Team[] = [];
@@ -1886,13 +1878,13 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Lecce',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/US_Lecce_Logo.png',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/9888.png',
       stadium: 'Stadio Via del Mare',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#012857',
     },
     {
-      name: 'Como 1907',
+      name: 'Como',
       shortName: 'Como',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
       stadium: 'Stadio Giuseppe Sinigaglia',

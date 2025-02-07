@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
-  DotsThree, Funnel, MinusCircle, Plus, Sparkle, Trash, WarningDiamond, X,
+  DotsThree, Funnel, MinusCircle, PencilSimple, Plus, Sparkle, Trash, WarningDiamond, X,
 } from '@phosphor-icons/react';
 import {
   getDocs, collection, doc, updateDoc,
@@ -54,7 +54,7 @@ const AdminFixturesPage = () => {
   const [deleteAllFixturesLoading, setDeleteAllFixturesLoading] = useState<boolean>(false);
 
   const getContextMenuOffsetY = () => {
-    let offsetY = 1;
+    let offsetY = 2;
 
     if (passedFixtures.length > 0) {
       offsetY += 1;
@@ -287,6 +287,14 @@ const AdminFixturesPage = () => {
                     setContextMenuOpen(false);
                   }}
                   label="Filtrera"
+                  color={theme.colors.textDefault}
+                />
+                <ContextMenuOption
+                  icon={<PencilSimple size={24} color={theme.colors.textDefault} />}
+                  onClick={() => {
+                    setContextMenuOpen(false);
+                  }}
+                  label="Redigera"
                   color={theme.colors.textDefault}
                 />
                 {passedFixtures.length > 0 && (

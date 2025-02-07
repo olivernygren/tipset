@@ -2,6 +2,7 @@ import { Fixture, TeamType } from './Fixture';
 import {
   FotMobMatch, FotMobMatchesByDateLeague, FotMobMatchTeam, FotMobSquad, FotMobTeamsResponse,
 } from './Fotmob';
+import { getFixtureNickname } from './helpers';
 import {
   CountryEnum, ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
 } from './Players';
@@ -148,14 +149,11 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
   teamIds: Array<number>,
 ): Array<FotMobMatch> => {
   const matchesSet = new Set<FotMobMatch>();
+  const isMatchInFuture = (match: FotMobMatch) => new Date(match.status.utcTime) > new Date();
 
-  leaguesArray.forEach((tournament) => {
-    tournament.matches.forEach((match) => {
-      if (
-        tournaments.includes(tournament.primaryId)
-        || teamIds.includes(match.home.id)
-        || teamIds.includes(match.away.id)
-      ) {
+  leaguesArray.forEach((league) => {
+    league.matches.forEach((match) => {
+      if (isMatchInFuture(match) && (tournaments.includes(league.primaryId) || teamIds.includes(match.home.id) || teamIds.includes(match.away.id))) {
         matchesSet.add(match);
       }
     });
@@ -240,11 +238,11 @@ export const matchFotMobTeamWithRealTeam = (fotMobTeam: FotMobMatchTeam): Team |
   } = matchingTeam;
 
   return {
-    id,
+    id: id || fotMobTeam.id.toString(),
     name,
-    shortName,
     logoUrl,
-    stadium,
+    ...(stadium && { stadium }),
+    ...(shortName && { shortName }),
   };
 };
 
@@ -267,6 +265,8 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
     logoUrl: `https://images.fotmob.com/image_resources/logo/teamlogo/${fotMobMatch.away.id}.png`,
   };
 
+  const fixtureNickname = getFixtureNickname([homeTeam, awayTeam]);
+
   return {
     id: fotMobMatch.id.toString(),
     homeTeam,
@@ -277,5 +277,6 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
     tournament: getTournamentNameByFotMobId(fotMobMatch.leagueId),
     includeStats: true,
     shouldPredictGoalScorer: false,
+    ...(fixtureNickname && { fixtureNickname }),
   };
 };
