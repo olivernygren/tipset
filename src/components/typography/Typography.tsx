@@ -79,6 +79,6 @@ export const HeadingsTypography = styled(RootTypography).attrs<HeadingsTypograph
   as: variant,
 }))<HeadingsTypographyProps>`
   font-size: ${({ variant }) => getHeadingsTypographySize(variant)};
-  font-weight: 700;
+  font-weight: 800;
   transition: color 0.2s;
 `;
