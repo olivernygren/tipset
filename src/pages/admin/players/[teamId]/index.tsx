@@ -142,7 +142,7 @@ const PlayersByTeamPage = () => {
       case PlayerStatusEnum.MAY_BE_INJURED:
         return theme.colors.goldBleach;
       case PlayerStatusEnum.ILL:
-        return theme.colors.primaryBleach;
+        return theme.colors.primaryFade;
       default:
         return theme.colors.silverLighter;
     }
@@ -167,7 +167,7 @@ const PlayersByTeamPage = () => {
   };
 
   const getPlayer = (player: Player) => (
-    <PlayerItem key={player.id} showHoverEffect={!isEditMode}>
+    <PlayerItem key={player.id}>
       <PlayerInfoContainer>
         <PlayerPositionTag bgColor={getPlayerPositionColor((player?.position.general ?? '') as GeneralPositionEnum)}>
           <NormalTypography variant="xs" color={theme.colors.white}>{player?.position.exact ?? '?'}</NormalTypography>
@@ -487,18 +487,17 @@ const PlayersContainer = styled.div`
   gap: ${theme.spacing.m};
 `;
 
-const PlayerItem = styled.div<{ showHoverEffect: boolean }>`
+const PlayerItem = styled.div<{ showHoverEffect?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xl};
-  padding: 2px ${theme.spacing.xs} 2px ${theme.spacing.xxs};
+  padding: 2px ${theme.spacing.xxs} 2px ${theme.spacing.xxs};
   border-radius: ${theme.borderRadius.m};
   background-color: ${theme.colors.white};
   box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.08);
   border: 1px solid ${theme.colors.silverLight};
   width: 100%;
   box-sizing: border-box;
-  cursor: pointer;
   transition: all 0.15s ease;
 
   ${({ showHoverEffect }) => showHoverEffect && css`

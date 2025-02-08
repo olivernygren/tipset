@@ -90,6 +90,8 @@ export enum PlayerStatusEnum {
   MAY_BE_INJURED = 'MAY_BE_INJURED',
   SUSPENDED = 'SUSPENDED',
   ILL = 'ILL',
+  PERSONAL_ISSUES = 'PERSONAL_ISSUES',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export interface Player {

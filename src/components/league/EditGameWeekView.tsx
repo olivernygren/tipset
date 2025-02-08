@@ -290,7 +290,6 @@ const EditGameWeekView = ({
       )}
       {showCreateFixtureModal && (
         <CreateFixtureModal
-          fixture={null}
           allNewGameWeekFixtures={gameWeekFixtures}
           onClose={() => setShowCreateFixtureModal(false)}
           onUpdateAllNewGameWeekFixtures={(newFixtures) => setGameWeekFixtures(newFixtures)}
@@ -301,9 +300,11 @@ const EditGameWeekView = ({
         <FindOtherFixturesModal
           onClose={() => setFindExternalFixturesModalOpen(false)}
           onFixturesSelect={(selectedFixtures) => {
-            setGameWeekFixtures([...gameWeekFixtures, ...selectedFixtures]);
+            setGameWeekFixtures([...gameWeekFixtures, ...selectedFixtures].sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime()));
             setFindExternalFixturesModalOpen(false);
           }}
+          minDate={minDate}
+          alreadySelectedFixtures={gameWeekFixtures}
         />
       )}
       {confirmDeleteGameWeekModalOpen && (

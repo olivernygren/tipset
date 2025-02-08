@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { CheckSquare, PlusCircle, Square } from '@phosphor-icons/react';
@@ -6,7 +6,7 @@ import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import { Fixture, FixtureInput, TeamType } from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
-import { hasInvalidTeamName } from '../../utils/helpers';
+import { hasInvalidTeamName, isPredictGoalScorerPossibleByTeamNames } from '../../utils/helpers';
 import { PredictionLeague } from '../../utils/League';
 import { generateRandomID } from '../../utils/firebaseHelpers';
 import { errorNotify } from '../../utils/toast/toastHelpers';
@@ -20,11 +20,11 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import SelectTeamModal from './SelectTeamModal';
 import SelectTournamentModal from './SelectTournamentModal';
 import IconButton from '../buttons/IconButton';
+import InfoDialogue from '../info/InfoDialogue';
 
 interface CreateFixtureModalProps {
   onClose: () => void;
   league?: PredictionLeague;
-  fixture: Fixture | null;
   allNewGameWeekFixtures: Array<Fixture>;
   onUpdateAllNewGameWeekFixtures?: React.Dispatch<React.SetStateAction<Array<Fixture>>>;
   onAddFixtureToGameWeek?: (newFixture: FixtureInput) => void;
@@ -32,34 +32,40 @@ interface CreateFixtureModalProps {
 }
 
 const CreateFixtureModal = ({
-  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, fixture, onAddFixtureToGameWeek, minDate,
+  onClose, league, allNewGameWeekFixtures, onUpdateAllNewGameWeekFixtures, onAddFixtureToGameWeek, minDate,
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const getDefaultKickoffTime = () => {
-    if (fixture?.kickOffTime) {
-      return new Date(fixture.kickOffTime);
-    }
-
     if (minDate) {
       return new Date(minDate);
     }
 
     return new Date();
   };
-
-  const [teamType, setTeamType] = useState<TeamType>(fixture?.teamType ?? TeamType.CLUBS);
-  const [homeTeam, setHomeTeam] = useState<Team | undefined>(fixture?.homeTeam);
-  const [awayTeam, setAwayTeam] = useState<Team | undefined>(fixture?.awayTeam);
-  const [stadium, setStadium] = useState<string>(fixture?.stadium ?? '');
-  const [tournament, setTournament] = useState<string>(fixture?.tournament ?? '');
+  const [teamType, setTeamType] = useState<TeamType>(TeamType.CLUBS);
+  const [homeTeam, setHomeTeam] = useState<Team | undefined>();
+  const [awayTeam, setAwayTeam] = useState<Team | undefined>();
+  const [stadium, setStadium] = useState<string>('');
+  const [tournament, setTournament] = useState<string>('');
   const [kickoffDateTime, setKickoffDateTime] = useState<Date>(getDefaultKickoffTime());
-  const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(fixture?.shouldPredictGoalScorer ?? false);
-  const [fixtureNickname, setFixtureNickname] = useState<string>(fixture?.fixtureNickname ?? '');
-  const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? true);
+  const [isPossibleToPredictGoalScorer, setIsPossibleToPredictGoalScorer] = useState<boolean>(false);
+  const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(false);
+  const [fixtureNickname, setFixtureNickname] = useState<string>('');
+  const [includeStats, setIncludeStats] = useState<boolean>(true);
 
   const [showSelectTeamModal, setShowSelectTeamModal] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const anyTeamsPlayersRegistered = isPredictGoalScorerPossibleByTeamNames([homeTeam?.name ?? '', awayTeam?.name ?? '']);
+
+    if (!anyTeamsPlayersRegistered && shouldPredictGoalScorer) {
+      setShouldPredictGoalScorer(false);
+    }
+
+    setIsPossibleToPredictGoalScorer(anyTeamsPlayersRegistered);
+  }, [homeTeam, awayTeam]);
 
   const isAddFixtureButtonDisabled = !homeTeam
     || hasInvalidTeamName(homeTeam?.name)
@@ -234,17 +240,26 @@ const CreateFixtureModal = ({
             />
             <EmphasisTypography variant="m">Inkludera statistik</EmphasisTypography>
           </OptionalInclusionContainer>
-          <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
-            <IconButton
-              icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShouldPredictGoalScorer(!shouldPredictGoalScorer);
-              }}
-              colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+          {isPossibleToPredictGoalScorer && homeTeam !== undefined && awayTeam !== undefined && (
+            <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
+              <IconButton
+                icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShouldPredictGoalScorer(!shouldPredictGoalScorer);
+                }}
+                colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+              />
+              <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
+            </OptionalInclusionContainer>
+          )}
+          {homeTeam !== undefined && awayTeam !== undefined && !isPossibleToPredictGoalScorer && (
+            <InfoDialogue
+              color="silver"
+              title="Tippa målskytt ej möjligt"
+              description="Målskytt kan endast tippas för utvalda lag som har spelare registrerade i systemet."
             />
-            <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
-          </OptionalInclusionContainer>
+          )}
         </Section>
         <Section flexDirection="row" alignItems="center" gap="xxs">
           <Button

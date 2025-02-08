@@ -13,6 +13,7 @@ import { Team } from '../../utils/Team';
 
 interface UpcomingFixturePreviewProps {
   fixture: Fixture;
+  alreadySelectedFixtures?: Array<Fixture>;
   onShowPredictionsClick?: () => void;
   onSelectFixture?: () => void;
   useShortNames?: boolean;
@@ -23,13 +24,14 @@ interface UpcomingFixturePreviewProps {
 }
 
 const UpcomingFixturePreview = ({
-  fixture, onShowPredictionsClick, onSelectFixture, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight, showDay,
+  fixture, onShowPredictionsClick, onSelectFixture, useShortNames, backgroundColor = theme.colors.silverLighter, alwaysClickable, hoverColor = theme.colors.silverLight, showDay, alreadySelectedFixtures,
 }: UpcomingFixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [isSelected, setIsSelected] = useState<boolean>(false);
+  const [isSelected, setIsSelected] = useState<boolean>(alreadySelectedFixtures?.some((selectedFixture) => selectedFixture.id === fixture.id) || false);
 
   const canViewPredictions = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
+  const isAlreadySelectedBefore = alreadySelectedFixtures && alreadySelectedFixtures.some((f) => f.id === fixture.id);
 
   const getKickoffTime = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
@@ -58,6 +60,10 @@ const UpcomingFixturePreview = ({
   ));
 
   const handleClick = () => {
+    if (isAlreadySelectedBefore) {
+      return;
+    }
+
     if (onSelectFixture) {
       setIsSelected(!isSelected);
       onSelectFixture();
@@ -92,7 +98,7 @@ const UpcomingFixturePreview = ({
         ) : (
           <MiddleSection>
             {isSelected && (
-              <CheckCircle size={24} color={theme.colors.primary} weight="fill" />
+              <CheckCircle size={24} color={isAlreadySelectedBefore ? theme.colors.silverDark : theme.colors.primary} weight="fill" />
             )}
             {showDay && !isSelected && (
               <EmphasisTypography variant="xs" color={theme.colors.textDefault}>

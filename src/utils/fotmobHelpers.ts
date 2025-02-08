@@ -2,7 +2,7 @@ import { Fixture, TeamType } from './Fixture';
 import {
   FotMobMatch, FotMobMatchesByDateLeague, FotMobMatchTeam, FotMobSquad, FotMobTeamsResponse,
 } from './Fotmob';
-import { getFixtureNickname } from './helpers';
+import { getFixtureNickname, isPredictGoalScorerPossibleByTeamNames } from './helpers';
 import {
   CountryEnum, ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
 } from './Players';
@@ -164,8 +164,6 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
 };
 
 export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum => {
-  console.log(fotMobId);
-
   switch (fotMobId) {
     case 55:
       return TournamentsEnum.SERIE_A;
@@ -226,9 +224,10 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
       return TournamentsEnum.NATIONS_LEAGUE;
     case 114:
     case 896100:
+    case 489:
       return TournamentsEnum.FRIENDLIES;
     default:
-      return TournamentsEnum.SERIE_A;
+      return TournamentsEnum.PLACEHOLDER;
   }
 };
 
@@ -284,7 +283,7 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
     teamType: TeamType.CLUBS,
     tournament: getTournamentNameByFotMobId(fotMobMatch.leagueId),
     includeStats: true,
-    shouldPredictGoalScorer: false,
+    shouldPredictGoalScorer: isPredictGoalScorerPossibleByTeamNames([homeTeam.name, awayTeam.name]),
     ...(fixtureNickname && { fixtureNickname }),
   };
 };

@@ -341,6 +341,8 @@ export const getTournamentIcon = (tournament: string) => {
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/50.png';
     case TournamentsEnum.FRIENDLIES:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/114.png';
+    case TournamentsEnum.PLACEHOLDER:
+      return 'https://cdn.pixabay.com/photo/2014/04/03/00/38/shield-308943_640.png';
     default:
       return '';
   }
@@ -409,3 +411,46 @@ export const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((a
   }
   return acc;
 }, [] as Array<FixtureGroup>);
+
+export const teamsWithRegisteredPlayers = [
+  'Arsenal',
+  'Aston Villa',
+  'Liverpool',
+  'Manchester City',
+  'Manchester United',
+  'Tottenham',
+  'Chelsea',
+  'Newcastle',
+  'Juventus',
+  'Inter',
+  'AC Milan',
+  'Roma',
+  'Fiorentina',
+  'Napoli',
+  'Atalanta',
+  'Bayern München',
+  'Borussia Dortmund',
+  'Bayer Leverkusen',
+  'Hamburger SV',
+  'Atletico Madrid',
+  'FC Barcelona',
+  'Real Madrid',
+  'Valencia',
+  'Paris Saint-Germain',
+  'Sverige',
+  'IFK Göteborg',
+];
+
+export const isPredictGoalScorerPossibleForFixture = (fixture: Fixture): boolean => {
+  if (teamsWithRegisteredPlayers.includes(fixture.homeTeam.name) || teamsWithRegisteredPlayers.includes(fixture.awayTeam.name)) {
+    return true;
+  }
+  return false;
+};
+
+export const isPredictGoalScorerPossibleByTeamNames = (teamNames: Array<string>): boolean => {
+  if (teamNames.some((team) => teamsWithRegisteredPlayers.includes(team))) {
+    return true;
+  }
+  return false;
+};

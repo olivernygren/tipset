@@ -28,7 +28,7 @@ import CustomDatePicker from '../input/DatePicker';
 import GamePredictor from '../game/GamePredictor';
 import { Player } from '../../utils/Players';
 import IconButton from '../buttons/IconButton';
-import CreateAndCorrectFixturePreview from '../game/CreateAndCorrectFixturePreview';
+import CreateFixturePreview from '../game/CreateFixturePreview';
 import CorrectPredictionsModal from './CorrectPredictionsModal';
 import FixtureResultPreview from '../game/FixtureResultPreview';
 import EditGameWeekView from './EditGameWeekView';
@@ -537,26 +537,17 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             Hitta matcher
           </Button>
         </Section>
-        <Section gap="xxs">
+        <Section gap="xs">
           {newGameWeekFixtures.length > 0 && (
             newGameWeekFixtures
               .sort((a, b) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-              .map((fixture, index) => (
-                <Section flexDirection="row" gap="xxs" alignItems="center">
-                  <CreateAndCorrectFixturePreview
-                    fixture={fixture}
-                    key={index}
-                    hidePredictions
-                    onClick={() => {
-                      setNewFixtureToEdit(fixture);
-                    }}
-                  />
-                  <IconButton
-                    icon={<XCircle size={24} weight="fill" />}
-                    colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
-                    onClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
-                  />
-                </Section>
+              .map((fixture) => (
+                <CreateFixturePreview
+                  fixture={fixture}
+                  key={Math.random() * 100}
+                  onEditClick={() => setNewFixtureToEdit(fixture)}
+                  onDeleteClick={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== fixture.id))}
+                />
               ))
           )}
         </Section>
@@ -882,7 +873,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           league={league}
           allNewGameWeekFixtures={newGameWeekFixtures}
           onUpdateAllNewGameWeekFixtures={setNewGameWeekFixtures}
-          fixture={null}
           minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
         />
       )}
@@ -942,6 +932,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         <FindOtherFixturesModal
           onClose={() => setFindOtherFixturesModalOpen(false)}
           onFixturesSelect={(fixtures) => handleAddExternalFixtures(fixtures)}
+          alreadySelectedFixtures={newGameWeekFixtures}
         />
       )}
     </>
@@ -971,6 +962,12 @@ const CreateFixtureCard = styled(motion.div)`
   box-sizing: border-box;
   border: 1px dashed ${theme.colors.silver};
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border: 1px solid ${theme.colors.silver};
+    background-color: ${theme.colors.silverLight};
+  }
 `;
 
 const FixturesGrid = styled.div`

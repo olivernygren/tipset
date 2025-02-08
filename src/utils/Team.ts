@@ -87,7 +87,7 @@ export enum TournamentsEnum {
   EUROS_QUALIFIERS = 'EM-kval',
   WORLD_CUP_QUALIFIERS = 'VM-kval',
   FRIENDLIES = 'Vänskapsmatcher',
-  PLACEHOLDER = 'Placeholder',
+  PLACEHOLDER = 'Okänd',
 }
 
 export const getTeamByNameAndLeague = (teamName: string, league: string) => Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
@@ -189,7 +189,7 @@ export const getTeamPrimaryColorByName = (teamName: string): string => {
 export const getStadiumByHomeTeam = (teamName: string, teamShortName: string, teamId: string): string => {
   const allTeams = getAllTeams();
   const team = allTeams.find((team: Team) => (team.id !== undefined && team.id === teamId) || team.name === teamName || team.shortName === teamShortName || team.fotMobName === teamName || team.fotMobName === teamShortName || team.name === teamShortName || team.shortName === teamName || team.fotMobName === teamName || team.fotMobName === teamShortName || teamName.includes(team.name) || teamShortName.includes(team.name));
-  return team?.stadium || team?.name || '';
+  return team?.stadium || teamName || '';
 };
 
 export const nationalTeams: Team[] = [
@@ -2243,7 +2243,8 @@ export const Teams: TeamsType = {
       teamPrimaryColor: '#d3122e',
     },
     {
-      name: 'PSV',
+      name: 'PSV Eindhoven',
+      shortName: 'PSV',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
       stadium: 'Philips Stadion',
       country: CountryEnum.NETHERLANDS,

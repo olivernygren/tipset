@@ -13,10 +13,10 @@ interface ContextMenuOptionProps {
 const ContextMenuOption = ({
   icon, label, onClick, color = theme.colors.primary,
 }: ContextMenuOptionProps) => (
-  <StyledContextMenuOption>
+  <StyledContextMenuOption onClick={onClick}>
     <Content>
       {icon}
-      <EmphasisTypography onClick={onClick} color={color}>{label}</EmphasisTypography>
+      <EmphasisTypography color={color}>{label}</EmphasisTypography>
     </Content>
   </StyledContextMenuOption>
 );

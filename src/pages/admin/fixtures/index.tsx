@@ -28,6 +28,7 @@ import ContextMenuOption from '../../../components/menu/ContextMenuOption';
 import CreateFixturesViaFotMobSnippetModal from '../../../components/game/CreateFixturesViaFotMobSnippetModal';
 import ActionsModal from '../../../components/modal/ActionsModal';
 import { getTeamsByTournament, TournamentsEnum } from '../../../utils/Team';
+import TextButton from '../../../components/buttons/TextButton';
 
 enum FilterType {
   DATE = 'DATE',
@@ -49,6 +50,7 @@ const AdminFixturesPage = () => {
   const [contextMenuOpen, setContextMenuOpen] = useState<boolean>(false);
   const [selectedFilters, setSelectedFilters] = useState<Array<{ type: FilterType; value: string }>>([]);
   const [confirmDeleteAllModalOpen, setConfirmDeleteAllModalOpen] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(false);
 
   const [createFixtureLoading, setCreateFixtureLoading] = useState<boolean>(false);
   const [deleteAllFixturesLoading, setDeleteAllFixturesLoading] = useState<boolean>(false);
@@ -202,6 +204,20 @@ const AdminFixturesPage = () => {
     }
   };
 
+  const handleDeleteSetOfFixtures = async (fixturesToDelete: Array<Fixture>) => {
+    try {
+      const fixturesDoc = doc(db, CollectionEnum.FIXTURES, responseDocId);
+      await updateDoc(fixturesDoc, {
+        fixtures: allFixtures.filter((f) => !fixturesToDelete.includes(f)),
+      });
+
+      successNotify(`${fixturesToDelete.length} ${fixturesToDelete.length === 1 ? 'match' : 'matcher'} raderades`);
+      fetchFixtures();
+    } catch (error) {
+      errorNotify('Något gick fel när matcherna skulle raderas');
+    }
+  };
+
   const getFixturesDateFormatted = (date: string) => {
     const fixtureDate = new Date(date);
     const day = fixtureDate.getDate();
@@ -273,6 +289,15 @@ const AdminFixturesPage = () => {
         <ActionBar>
           <HeadingsTypography variant="h5">Hantera matcher</HeadingsTypography>
           <HeaderButtons>
+            {editMode && (
+              <TextButton
+                size="s"
+                color="red"
+                onClick={() => setEditMode(false)}
+              >
+                Avsluta redigering
+              </TextButton>
+            )}
             <IconButton
               icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
               colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
@@ -292,6 +317,7 @@ const AdminFixturesPage = () => {
                 <ContextMenuOption
                   icon={<PencilSimple size={24} color={theme.colors.textDefault} />}
                   onClick={() => {
+                    setEditMode(true);
                     setContextMenuOpen(false);
                   }}
                   label="Redigera"
@@ -336,12 +362,22 @@ const AdminFixturesPage = () => {
           .map(([date, fixtures]) => (
             <FixturesContainer>
               <Section
+                flexDirection="row"
+                gap="xxs"
+                justifyContent="center"
                 padding={theme.spacing.xs}
                 backgroundColor={theme.colors.silverLight}
                 borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
                 alignItems="center"
               >
                 <EmphasisTypography variant="m" color={theme.colors.textDefault}>{getFixturesDateFormatted(date)}</EmphasisTypography>
+                {editMode && (
+                  <IconButton
+                    icon={<Trash size={20} weight="fill" />}
+                    colors={{ normal: theme.colors.red, hover: theme.colors.redDark, active: theme.colors.redDarker }}
+                    onClick={() => handleDeleteSetOfFixtures(fixtures)}
+                  />
+                )}
               </Section>
               {fixtures
                 .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())

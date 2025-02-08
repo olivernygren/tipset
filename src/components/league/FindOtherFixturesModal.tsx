@@ -36,9 +36,13 @@ enum SearchType {
 interface FindOtherFixturesModalProps {
   onClose: () => void;
   onFixturesSelect: (fixture: Array<Fixture>) => void;
+  alreadySelectedFixtures: Array<Fixture>;
+  minDate?: Date;
 }
 
-const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixturesModalProps) => {
+const FindOtherFixturesModal = ({
+  onClose, onFixturesSelect, minDate, alreadySelectedFixtures,
+}: FindOtherFixturesModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [searchType, setSearchType] = useState<SearchType>(SearchType.ALL);
@@ -59,8 +63,8 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       const data = await getDocs(collection(db, CollectionEnum.FIXTURES));
       const fixturesResponse = withDocumentIdOnObject<FixturesCollectionResponse>(data.docs[0]);
 
-      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= new Date());
-      // const fixturesSortedByTournament = upcomingFixtures.sort((a, b) => a.tournament.localeCompare(b.tournament));
+      const dateForUpcomingFixtures = minDate ?? new Date();
+      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= dateForUpcomingFixtures);
       const fixtureGroups = getFixtureGroups(upcomingFixtures);
 
       setAvailableFixtureGroups(fixtureGroups);
@@ -72,6 +76,9 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
   };
 
   const handleSelectFixture = (fixture: Fixture) => {
+    if (alreadySelectedFixtures.some((f) => f.id === fixture.id)) {
+      return;
+    }
     setSelectedFixtures((prev) => {
       const index = prev.findIndex((f) => f.id === fixture.id);
       if (index >= 0) {
@@ -80,10 +87,6 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       return [...prev, fixture];
     });
   };
-
-  // styla om matcherna som visas när man skapar sin gameweek
-  // Fixa filter i denna modal
-  // fixa filter på admin => Matcher
 
   return (
     <>
@@ -133,6 +136,7 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
                             alwaysClickable
                             showDay
                             onSelectFixture={() => handleSelectFixture(fixture)}
+                            alreadySelectedFixtures={alreadySelectedFixtures}
                           />
                           {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
                         </>
