@@ -18,6 +18,7 @@ export interface Team {
   federation?: FederationEnum;
   teamPrimaryColor?: string;
   players?: Player[];
+  isPlaceholder?: boolean;
 }
 
 export enum FederationEnum {
@@ -54,6 +55,7 @@ export enum LeagueEnum {
   SERBIAN_SUPER_LIGA = 'Serbian SuperLiga',
   AZERBAIJAN_PREMIER_LEAGUE = 'Azerbaijan Premier League',
   NATIONS = 'Landslag',
+  PLACEHOLDER = 'Placeholder',
 }
 
 export enum TournamentsEnum {
@@ -76,6 +78,7 @@ export enum TournamentsEnum {
   CONFERENCE_LEAGUE = 'UEFA Conference League',
   UEFA_SUPER_CUP = 'UEFA Super Cup',
   ALLSVENSKAN = 'Allsvenskan',
+  SVENSKA_CUPEN = 'Svenska Cupen',
   EREDIVISIE = 'Eredivisie',
   PRIMEIRA_LIGA = 'Primeira Liga',
   EUROS = 'EM',
@@ -83,6 +86,8 @@ export enum TournamentsEnum {
   NATIONS_LEAGUE = 'Nations League',
   EUROS_QUALIFIERS = 'EM-kval',
   WORLD_CUP_QUALIFIERS = 'VM-kval',
+  FRIENDLIES = 'Vänskapsmatcher',
+  PLACEHOLDER = 'Okänd',
 }
 
 export const getTeamByNameAndLeague = (teamName: string, league: string) => Teams[league as LeagueEnum].find((team: Team) => team.name === teamName);
@@ -126,11 +131,15 @@ export const getTeamsObjectByCountry = (): { [key: string]: Team[] } => {
   return teamsByCountry;
 };
 
+export const getTeamsByTournament = (tournament: string): Team[] => Teams[tournament as LeagueEnum].map((team: Team) => team);
+
 export const getAllTeams = (): Team[] => {
   const teams: Team[] = [];
   for (const league in Teams) {
     Teams[league as LeagueEnum].forEach((team: Team) => {
-      teams.push(team);
+      if (!team.isPlaceholder) {
+        teams.push(team);
+      }
     });
   }
   return teams;
@@ -180,7 +189,7 @@ export const getTeamPrimaryColorByName = (teamName: string): string => {
 export const getStadiumByHomeTeam = (teamName: string, teamShortName: string, teamId: string): string => {
   const allTeams = getAllTeams();
   const team = allTeams.find((team: Team) => (team.id !== undefined && team.id === teamId) || team.name === teamName || team.shortName === teamShortName || team.fotMobName === teamName || team.fotMobName === teamShortName || team.name === teamShortName || team.shortName === teamName || team.fotMobName === teamName || team.fotMobName === teamShortName || teamName.includes(team.name) || teamShortName.includes(team.name));
-  return team?.stadium || '';
+  return team?.stadium || teamName || '';
 };
 
 export const nationalTeams: Team[] = [
@@ -1162,6 +1171,11 @@ export const nationalTeams: Team[] = [
     countryCode: 'KSA',
     federation: FederationEnum.ASIA,
   },
+  {
+    name: 'Placeholder',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Flag_of_None_%28square%29.svg',
+    countryCode: 'NONE',
+  },
 ];
 
 type TeamsType = { [key: string]: Team[] };
@@ -1367,6 +1381,7 @@ export const Teams: TeamsType = {
       stadium: 'Tele2 Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#1261ae',
+      id: '9802',
     },
     {
       name: 'Hammarby IF',
@@ -1375,6 +1390,7 @@ export const Teams: TeamsType = {
       stadium: 'Tele2 Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#008000',
+      id: '8248',
     },
     {
       name: 'Malmö FF',
@@ -1383,6 +1399,7 @@ export const Teams: TeamsType = {
       stadium: 'Eleda Stadion',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#2b98db',
+      id: '10237',
     },
     {
       name: 'IFK Göteborg',
@@ -1390,6 +1407,7 @@ export const Teams: TeamsType = {
       stadium: 'Gamla Ullevi',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#2b519c',
+      id: '9893',
     },
     {
       name: 'AIK',
@@ -1397,6 +1415,7 @@ export const Teams: TeamsType = {
       stadium: 'Strawberry Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#023154',
+      id: '8349',
     },
     {
       name: 'IFK Norrköping',
@@ -1405,6 +1424,7 @@ export const Teams: TeamsType = {
       stadium: 'PlatinumCars Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#0052a0',
+      id: '8449',
     },
     {
       name: 'BK Häcken',
@@ -1413,6 +1433,7 @@ export const Teams: TeamsType = {
       stadium: 'Bravida Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#ffdf28',
+      id: '8428',
     },
     {
       name: 'IFK Värnamo',
@@ -1421,6 +1442,7 @@ export const Teams: TeamsType = {
       stadium: 'Finnvedsvallen',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#006ab3',
+      id: '6181',
     },
     // {
     //   name: 'Kalmar FF',
@@ -1435,6 +1457,7 @@ export const Teams: TeamsType = {
       stadium: 'Stora Valla',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#f80c04',
+      id: '6544',
     },
     {
       name: 'Elfsborg',
@@ -1442,6 +1465,7 @@ export const Teams: TeamsType = {
       stadium: 'Borås Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#f8d204',
+      id: '8014',
     },
     {
       name: 'GAIS',
@@ -1449,6 +1473,7 @@ export const Teams: TeamsType = {
       stadium: 'Gamla Ullevi',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '##398d50',
+      id: '8297',
     },
     // {
     //   name: 'Västerås SK',
@@ -1464,6 +1489,7 @@ export const Teams: TeamsType = {
       stadium: 'Myresjöhus Arena',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#dc362e',
+      id: '8641',
     },
     {
       name: 'Mjällby',
@@ -1471,6 +1497,7 @@ export const Teams: TeamsType = {
       stadium: 'Strandvallen',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#fed304',
+      id: '8127',
     },
     {
       name: 'Halmstad BK',
@@ -1479,6 +1506,7 @@ export const Teams: TeamsType = {
       stadium: 'Örjans Vall',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#0258a3',
+      id: '8310',
     },
     {
       name: 'IK Sirius',
@@ -1487,6 +1515,7 @@ export const Teams: TeamsType = {
       stadium: 'Studenternas IP',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#145caf',
+      id: '6694',
     },
     {
       name: 'Brommapojkarna',
@@ -1495,6 +1524,7 @@ export const Teams: TeamsType = {
       stadium: 'Grimsta IP',
       country: CountryEnum.SWEDEN,
       teamPrimaryColor: '#df1e1f',
+      id: '8501',
     },
   ],
   [LeagueEnum.LA_LIGA]: [
@@ -1509,6 +1539,7 @@ export const Teams: TeamsType = {
     {
       name: 'FC Barcelona',
       shortName: 'Barcelona',
+      fotMobName: 'Barcelona',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg',
       // stadium: 'Camp Nou',
       stadium: 'Estadi Olímpic Lluís Companys',
@@ -1542,6 +1573,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Real Sociedad',
+      shortName: 'R. Sociedad',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg',
       stadium: 'Estadio Anoeta',
       country: CountryEnum.SPAIN,
@@ -1610,6 +1642,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Deportivo Alavés',
+      fotMobName: 'Deportivo Alaves',
       shortName: 'Alavés',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f8/Deportivo_Alaves_logo_%282020%29.svg',
       stadium: 'Estadio de Mendizorroza',
@@ -1851,13 +1884,13 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Lecce',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/8/81/US_Lecce_Logo.png',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/9888.png',
       stadium: 'Stadio Via del Mare',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#012857',
     },
     {
-      name: 'Como 1907',
+      name: 'Como',
       shortName: 'Como',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Logo_Como_1907_-_2019.svg',
       stadium: 'Stadio Giuseppe Sinigaglia',
@@ -2093,6 +2126,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'AS Monaco',
+      fotMobName: 'Monaco',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
       stadium: 'Stade Louis II',
       country: CountryEnum.FRANCE,
@@ -2215,7 +2249,8 @@ export const Teams: TeamsType = {
       teamPrimaryColor: '#d3122e',
     },
     {
-      name: 'PSV',
+      name: 'PSV Eindhoven',
+      shortName: 'PSV',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
       stadium: 'Philips Stadion',
       country: CountryEnum.NETHERLANDS,
@@ -2384,4 +2419,22 @@ export const Teams: TeamsType = {
     },
   ],
   [LeagueEnum.NATIONS]: nationalTeams,
+  [LeagueEnum.PLACEHOLDER]: [
+    {
+      name: 'Placeholder A',
+      logoUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAMAAAAM7l6QAAAAaVBMVEUAAACWmo+YnJSOkoqgo52sr6m6vbYwMy4BAwAXGhWfopuEiIIEBgMgIh5NUEoMEAkBAwA+QT2rr6eDh4AEBQQEBwIcHxg9QDkSFA9XWlRzd3AoKycAAAADBQNna2QNEAsCBQBKTkYYGxYxc3abAAAAI3RSTlMAIyMjIx4ePyo5HioGPjkyHjkjIxcRRT4+Mio5IwsyKiMyMqsVmQMAAAEdSURBVCjPddLbtoIgFEBR2BcQSERN07LLOf//kVGpRNZ6Y0w2OFSRt9/n6xyHQ23CdztPRh+ZXV0WXS67LlxN6VslAUDBqM017M+LVqX2o7MWXhEzXnytq3m25BiBlHFYPkKwrFS5e/GJABEfthbXdFo4QlZcI5CZ7x6wTRvSloWNQ7llXLg6Wrl1V81cXBjlZ81x4ev4he3KwX9hNU4zd5olQizjev14p2bLFF9aenSC1FOdEUuhZoS3ULbK38Ra2WA+jVafExd/Ft5qQF3+RWqnG0mQ7if1HE7jnuORq/JYiKzBASamXuR1vZLr4arf/M/hoFASIUDLh3R0ul4zSRldJc29sW1Lafaj0DtWrp/Ej7qh9kMnfjfd8vUdUWkNqdfapjEAAAAASUVORK5CYII=',
+      stadium: 'Stadium',
+      country: CountryEnum.PLACEHOLDER,
+      isPlaceholder: true,
+      teamPrimaryColor: '#e9e9e9',
+    },
+    {
+      name: 'Placeholder B',
+      logoUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAMAAAAM7l6QAAAAaVBMVEUAAACWmo+YnJSOkoqgo52sr6m6vbYwMy4BAwAXGhWfopuEiIIEBgMgIh5NUEoMEAkBAwA+QT2rr6eDh4AEBQQEBwIcHxg9QDkSFA9XWlRzd3AoKycAAAADBQNna2QNEAsCBQBKTkYYGxYxc3abAAAAI3RSTlMAIyMjIx4ePyo5HioGPjkyHjkjIxcRRT4+Mio5IwsyKiMyMqsVmQMAAAEdSURBVCjPddLbtoIgFEBR2BcQSERN07LLOf//kVGpRNZ6Y0w2OFSRt9/n6xyHQ23CdztPRh+ZXV0WXS67LlxN6VslAUDBqM017M+LVqX2o7MWXhEzXnytq3m25BiBlHFYPkKwrFS5e/GJABEfthbXdFo4QlZcI5CZ7x6wTRvSloWNQ7llXLg6Wrl1V81cXBjlZ81x4ev4he3KwX9hNU4zd5olQizjev14p2bLFF9aenSC1FOdEUuhZoS3ULbK38Ra2WA+jVafExd/Ft5qQF3+RWqnG0mQ7if1HE7jnuORq/JYiKzBASamXuR1vZLr4arf/M/hoFASIUDLh3R0ul4zSRldJc29sW1Lafaj0DtWrp/Ej7qh9kMnfjfd8vUdUWkNqdfapjEAAAAASUVORK5CYII=',
+      stadium: 'Stadium',
+      country: CountryEnum.PLACEHOLDER,
+      isPlaceholder: true,
+      teamPrimaryColor: '#f9f9f9',
+    },
+  ],
 };

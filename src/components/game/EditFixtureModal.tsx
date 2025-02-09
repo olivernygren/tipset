@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import {
@@ -9,7 +9,7 @@ import { theme } from '../../theme';
 import { EmphasisTypography } from '../typography/Typography';
 import { Fixture, TeamType } from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
-import { hasInvalidTeamName } from '../../utils/helpers';
+import { hasInvalidTeamName, isPredictGoalScorerPossibleByTeamNames } from '../../utils/helpers';
 import Button from '../buttons/Button';
 import CustomDatePicker from '../input/DatePicker';
 import Input from '../input/Input';
@@ -20,6 +20,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import SelectTeamModal from './SelectTeamModal';
 import SelectTournamentModal from './SelectTournamentModal';
 import IconButton from '../buttons/IconButton';
+import InfoDialogue from '../info/InfoDialogue';
 
 interface CreateFixtureModalProps {
   onClose: () => void;
@@ -34,17 +35,28 @@ const EditFixtureModal = ({
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [homeTeam, setHomeTeam] = useState<Team | undefined>(fixture?.homeTeam);
-  const [awayTeam, setAwayTeam] = useState<Team | undefined>(fixture?.awayTeam);
+  const [homeTeam, setHomeTeam] = useState<Team>(fixture.homeTeam);
+  const [awayTeam, setAwayTeam] = useState<Team>(fixture.awayTeam);
   const [stadium, setStadium] = useState<string>(fixture?.stadium ?? '');
   const [tournament, setTournament] = useState<string>(fixture?.tournament ?? '');
   const [kickoffDateTime, setKickoffDateTime] = useState<Date>(fixture?.kickOffTime ? new Date(fixture.kickOffTime) : new Date());
+  const [isPossibleToPredictGoalScorer, setIsPossibleToPredictGoalScorer] = useState<boolean>(false);
   const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(fixture?.shouldPredictGoalScorer ?? false);
   const [fixtureNickname, setFixtureNickname] = useState<string>(fixture?.fixtureNickname ?? '');
   const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? true);
 
   const [showSelectTeamModal, setShowSelectTeamModal] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const anyTeamsPlayersRegistered = isPredictGoalScorerPossibleByTeamNames([homeTeam?.name ?? '', awayTeam?.name ?? '']);
+
+    if (!anyTeamsPlayersRegistered && shouldPredictGoalScorer) {
+      setShouldPredictGoalScorer(false);
+    }
+
+    setIsPossibleToPredictGoalScorer(anyTeamsPlayersRegistered);
+  }, [homeTeam, awayTeam]);
 
   const isAddFixtureButtonDisabled = !homeTeam
     || hasInvalidTeamName(homeTeam?.name)
@@ -70,16 +82,6 @@ const EditFixtureModal = ({
     setKickoffDateTime(date);
   };
 
-  const handleResetFixture = () => {
-    setHomeTeam(undefined);
-    setAwayTeam(undefined);
-    setStadium('');
-    setTournament('');
-    setKickoffDateTime(new Date());
-    setShouldPredictGoalScorer(false);
-    setFixtureNickname('');
-  };
-
   const handleSaveFixture = () => {
     const updatedFixture: Fixture = {
       ...fixture,
@@ -96,7 +98,6 @@ const EditFixtureModal = ({
     };
 
     onSave(updatedFixture);
-    handleResetFixture();
   };
 
   return (
@@ -171,17 +172,25 @@ const EditFixtureModal = ({
             />
             <EmphasisTypography variant="m">Inkludera statistik</EmphasisTypography>
           </OptionalInclusionContainer>
-          <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
-            <IconButton
-              icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShouldPredictGoalScorer(!shouldPredictGoalScorer);
-              }}
-              colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+          {isPossibleToPredictGoalScorer ? (
+            <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
+              <IconButton
+                icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShouldPredictGoalScorer(!shouldPredictGoalScorer);
+                }}
+                colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+              />
+              <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
+            </OptionalInclusionContainer>
+          ) : (
+            <InfoDialogue
+              color="silver"
+              title="Tippa målskytt ej möjligt"
+              description="Målskytt kan endast tippas för utvalda lag som har spelare registrerade i systemet."
             />
-            <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
-          </OptionalInclusionContainer>
+          )}
         </Section>
         <ButtonsContainer>
           <Button
@@ -193,7 +202,6 @@ const EditFixtureModal = ({
             onClick={() => {
               onDeleteFixture();
               onClose();
-              handleResetFixture();
             }}
           >
             Ta bort match

@@ -131,3 +131,8 @@ export interface FixturesCollectionResponse {
   documentId: string;
   fixtures: Array<Fixture>;
 }
+
+export interface FixtureGroup {
+  tournament: string;
+  fixtures: Array<Fixture>;
+}

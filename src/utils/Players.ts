@@ -81,6 +81,7 @@ export enum CountryEnum {
   MOLDOVA = 'Moldavien',
   ESTONIA = 'Estland',
   AZERBAIJAN = 'Azerbajdzjan',
+  PLACEHOLDER = 'Placeholder',
 }
 
 export enum PlayerStatusEnum {
@@ -89,6 +90,8 @@ export enum PlayerStatusEnum {
   MAY_BE_INJURED = 'MAY_BE_INJURED',
   SUSPENDED = 'SUSPENDED',
   ILL = 'ILL',
+  PERSONAL_ISSUES = 'PERSONAL_ISSUES',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export interface Player {

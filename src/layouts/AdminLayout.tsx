@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import AdminSidebar from '../components/sidebar/AdminSidebar';
 import { theme } from '../theme';
 import RootToast from '../components/toast/RootToast';
@@ -16,6 +16,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => (
         {children}
       </PageContent>
     </AdminPageLayout>
+    <GlobalStyle />
     <RootToast />
   </>
 );
@@ -32,6 +33,17 @@ const AdminPageLayout = styled.div`
 const PageContent = styled.div`
   overflow-y: auto;
   background-color: ${theme.colors.silverLighter};
+  max-height: calc(100dvh - 80px);
+`;
+
+const GlobalStyle = createGlobalStyle`
+  div#root {
+    max-height: calc(100dvh - 80px);
+  }
+
+  body {
+    overflow: hidden;
+  }
 `;
 
 export default AdminLayout;

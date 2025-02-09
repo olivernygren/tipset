@@ -1,72 +1,116 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
+  Globe,
   Plus,
+  ShieldPlus,
+  XCircle,
 } from '@phosphor-icons/react';
 import {
   collection, getDocs,
 } from 'firebase/firestore';
 import { useSingleEffect } from 'react-haiku';
-import { theme } from '../../theme';
+import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
-import { Team } from '../../utils/Team';
+import { Team, TournamentsEnum } from '../../utils/Team';
 import SelectTournamentModal from '../game/SelectTournamentModal';
-import { Fixture, FixturesCollectionResponse, TeamType } from '../../utils/Fixture';
+import {
+  Fixture, FixtureGroup, FixturesCollectionResponse, TeamType,
+} from '../../utils/Fixture';
 import SelectTeamModal from '../game/SelectTeamModal';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { getTournamentIcon, withDocumentIdOnObject } from '../../utils/helpers';
+import { getFixtureGroups, getTournamentIcon, withDocumentIdOnObject } from '../../utils/helpers';
 import { errorNotify } from '../../utils/toast/toastHelpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import { Divider } from '../Divider';
 import ActionsModal from '../modal/ActionsModal';
+import Button from '../buttons/Button';
+import IconButton from '../buttons/IconButton';
+import TextButton from '../buttons/TextButton';
 
-enum SearchType {
-  BY_TOURNAMENT = 'BY_TOURNAMENT',
-  BY_CLUB = 'BY_CLUB',
-  BY_NATIONAL_TEAM = 'BY_NATIONAL_TEAM',
-  ALL = 'ALL',
-}
-
-interface FixtureGroup {
-  tournament: string;
-  fixtures: Array<Fixture>;
-}
+// enum SearchType {
+//   BY_TOURNAMENT = 'BY_TOURNAMENT',
+//   BY_CLUB = 'BY_CLUB',
+//   BY_NATIONAL_TEAM = 'BY_NATIONAL_TEAM',
+//   ALL = 'ALL',
+// }
 
 interface FindOtherFixturesModalProps {
   onClose: () => void;
   onFixturesSelect: (fixture: Array<Fixture>) => void;
+  alreadySelectedFixtures: Array<Fixture>;
+  minDate?: Date;
 }
 
-const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixturesModalProps) => {
+const FindOtherFixturesModal = ({
+  onClose, onFixturesSelect, minDate, alreadySelectedFixtures,
+}: FindOtherFixturesModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
-  const [searchType, setSearchType] = useState<SearchType>(SearchType.ALL);
+  const [filterByTeams, setFilterByTeams] = useState<Array<Team>>([]);
+  const [filterByTournaments, setFilterByTournaments] = useState<Array<TournamentsEnum>>([]);
   const [showTournamentsModal, setShowTournamentsModal] = useState<boolean>(false);
   const [showTeamsModal, setShowTeamsModal] = useState<boolean>(false);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [selectedTournament, setSelectedTournament] = useState<string | null>(null);
-  const [availableFixtures, setAvailableFixtures] = useState<Array<FixtureGroup>>([]);
+  const [availableFixtureGroups, setAvailableFixtureGroups] = useState<Array<FixtureGroup>>([]);
+  const [allDefaultFixtureGroups, setAllDefaultFixtureGroups] = useState<Array<FixtureGroup>>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(true);
   const [selectedFixtures, setSelectedFixtures] = useState<Array<Fixture>>([]);
+
+  const dateForUpcomingFixtures = minDate ?? new Date();
 
   useSingleEffect(() => {
     fetchFixtures();
   });
+
+  useEffect(() => {
+    if (filterByTeams.length === 0 && filterByTournaments.length === 0) {
+      setAvailableFixtureGroups(availableFixtureGroups);
+      return;
+    }
+
+    const hasAppliedTournamentFilters = filterByTournaments.length > 0;
+    const hasAppliedTeamFilters = filterByTeams.length > 0;
+    const hasAppliedBothTypesOfFilters = hasAppliedTournamentFilters && hasAppliedTeamFilters;
+
+    const filteredFixtures = allDefaultFixtureGroups.map((fixtureGroup) => {
+      const filteredFixtures = fixtureGroup.fixtures.filter((f) => {
+        if (hasAppliedBothTypesOfFilters) {
+          return filterByTeams.some((t) => t.id === f.homeTeam.id || t.id === f.awayTeam.id || t.name === f.homeTeam.name || t.name === f.awayTeam.name) && filterByTournaments.includes(fixtureGroup.tournament as TournamentsEnum);
+        }
+
+        if (hasAppliedTournamentFilters) {
+          return filterByTournaments.includes(fixtureGroup.tournament as TournamentsEnum);
+        }
+
+        return filterByTeams.some((t) => t.id === f.homeTeam.id || t.id === f.awayTeam.id || t.name === f.homeTeam.name || t.name === f.awayTeam.name);
+      });
+
+      return {
+        ...fixtureGroup,
+        fixtures: filteredFixtures,
+      };
+    }).filter((fixtureGroup) => fixtureGroup.fixtures.length > 0);
+
+    setAvailableFixtureGroups(filteredFixtures);
+  }, [filterByTeams, filterByTournaments]);
 
   const fetchFixtures = async () => {
     try {
       const data = await getDocs(collection(db, CollectionEnum.FIXTURES));
       const fixturesResponse = withDocumentIdOnObject<FixturesCollectionResponse>(data.docs[0]);
 
-      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= new Date());
-      // const fixturesSortedByTournament = upcomingFixtures.sort((a, b) => a.tournament.localeCompare(b.tournament));
+      const upcomingFixtures = fixturesResponse.fixtures.filter((f) => new Date(f.kickOffTime) >= dateForUpcomingFixtures);
       const fixtureGroups = getFixtureGroups(upcomingFixtures);
 
-      setAvailableFixtures(fixtureGroups);
+      setAvailableFixtureGroups(fixtureGroups);
+
+      if (allDefaultFixtureGroups.length === 0) {
+        setAllDefaultFixtureGroups(fixtureGroups);
+      }
     } catch (err) {
       errorNotify('Något gick fel när matcherna skulle hämtas');
     } finally {
@@ -74,17 +118,10 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
     }
   };
 
-  const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((acc, fixture) => {
-    const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
-    if (tournamentIndex >= 0) {
-      acc[tournamentIndex].fixtures.push(fixture);
-    } else {
-      acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
-    }
-    return acc;
-  }, [] as Array<FixtureGroup>);
-
   const handleSelectFixture = (fixture: Fixture) => {
+    if (alreadySelectedFixtures.some((f) => f.id === fixture.id)) {
+      return;
+    }
     setSelectedFixtures((prev) => {
       const index = prev.findIndex((f) => f.id === fixture.id);
       if (index >= 0) {
@@ -94,9 +131,28 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
     });
   };
 
-  // styla om matcherna som visas när man skapar sin gameweek
-  // Fixa filter i denna modal
-  // fixa filter på admin => Matcher
+  const handleClearFilters = () => {
+    setFilterByTeams([]);
+    setFilterByTournaments([]);
+    setAvailableFixtureGroups(allDefaultFixtureGroups);
+  };
+
+  const handleRemoveFilter = (filter: string) => {
+    const combinedFilters = [...filterByTeams.map((t) => t.name), ...filterByTournaments];
+
+    if (combinedFilters.length === 1) {
+      handleClearFilters();
+      return;
+    }
+
+    if (filterByTournaments.includes(filter as TournamentsEnum)) {
+      setFilterByTournaments(filterByTournaments.filter((t) => t !== filter as TournamentsEnum));
+    }
+
+    if (filterByTeams.some((t) => t.name === filter)) {
+      setFilterByTeams(filterByTeams.filter((t) => t.name !== filter));
+    }
+  };
 
   return (
     <>
@@ -114,15 +170,83 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       >
         <ModalContent>
           {searchLoading && <NormalTypography variant="m" color={theme.colors.silverDark}>Laddar matcher...</NormalTypography>}
-          {availableFixtures.length > 0 && !searchLoading && (
+          {(availableFixtureGroups.length > 0 || [...filterByTeams, ...filterByTournaments].length > 0) && !searchLoading && (
             <MainContent>
-              <HeadingsTypography variant="h5">Tillgängliga matcher</HeadingsTypography>
+              <Header>
+                <HeadingsTypography variant="h5">Tillgängliga matcher</HeadingsTypography>
+                <Section flexDirection="row" gap="s" alignItems="center" fitContent>
+                  {(filterByTeams.length > 0 || filterByTournaments.length > 0) && !isMobile && (
+                    <TextButton
+                      icon={<XCircle size={20} color={theme.colors.red} weight="fill" />}
+                      color="red"
+                      onClick={handleClearFilters}
+                      noPadding
+                    >
+                      Rensa filter
+                    </TextButton>
+                  )}
+                  <Button
+                    variant="secondary"
+                    size="s"
+                    icon={<Globe size={20} color={theme.colors.primary} />}
+                    onClick={() => setShowTournamentsModal(true)}
+                  >
+                    Välj turneringar
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="s"
+                    icon={<ShieldPlus size={20} color={theme.colors.primary} />}
+                    onClick={() => setShowTeamsModal(true)}
+                  >
+                    Välj lag
+                  </Button>
+                </Section>
+                {(filterByTeams.length > 0 || filterByTournaments.length > 0) && isMobile && (
+                  <TextButton
+                    icon={<XCircle size={20} color={theme.colors.red} weight="fill" />}
+                    color="red"
+                    onClick={handleClearFilters}
+                    noPadding
+                  >
+                    Rensa filter
+                  </TextButton>
+                )}
+              </Header>
+              {[...filterByTeams, ...filterByTournaments].length > 0 && (
+                <>
+                  <Divider />
+                  <ActiveFiltersContainer>
+                    {filterByTournaments.map((tournament) => (
+                      <ActiveFilter>
+                        <EmphasisTypography variant="m" color={theme.colors.textDefault}>{tournament}</EmphasisTypography>
+                        <IconButton
+                          onClick={() => handleRemoveFilter(tournament)}
+                          colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.silverDarker }}
+                          icon={<XCircle size={20} weight="fill" />}
+                        />
+                      </ActiveFilter>
+                    ))}
+                    {filterByTeams.map((team) => (
+                      <ActiveFilter>
+                        <EmphasisTypography variant="m" color={theme.colors.textDefault}>{team.name}</EmphasisTypography>
+                        <IconButton
+                          onClick={() => handleRemoveFilter(team.name)}
+                          colors={{ normal: theme.colors.silverDark, hover: theme.colors.silverDarker, active: theme.colors.silverDarker }}
+                          icon={<XCircle size={20} weight="fill" />}
+                        />
+                      </ActiveFilter>
+                    ))}
+                  </ActiveFiltersContainer>
+                  <Divider />
+                </>
+              )}
               <AvailableFixturesContainer>
-                {availableFixtures.map((fixtureGroup) => (
+                {availableFixtureGroups.map((fixtureGroup) => (
                   <FixturesContainer>
                     <Section
                       flexDirection="row"
-                      padding={theme.spacing.xxs}
+                      padding={theme.spacing.xxxs}
                       backgroundColor={theme.colors.silverLight}
                       borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
                       alignItems="center"
@@ -146,6 +270,7 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
                             alwaysClickable
                             showDay
                             onSelectFixture={() => handleSelectFixture(fixture)}
+                            alreadySelectedFixtures={alreadySelectedFixtures}
                           />
                           {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
                         </>
@@ -155,7 +280,7 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
               </AvailableFixturesContainer>
             </MainContent>
           )}
-          {!searchLoading && availableFixtures.length === 0 && (
+          {!searchLoading && availableFixtureGroups.length === 0 && (
             <NormalTypography variant="m" color={theme.colors.silverDark}>Inga matcher tillgängliga</NormalTypography>
           )}
         </ModalContent>
@@ -163,16 +288,20 @@ const FindOtherFixturesModal = ({ onClose, onFixturesSelect }: FindOtherFixtures
       {showTournamentsModal && (
         <SelectTournamentModal
           onClose={() => setShowTournamentsModal(false)}
-          onSave={(tournament) => setSelectedTournament(tournament)}
+          onSaveMultiple={(tournaments) => setFilterByTournaments(tournaments)}
+          alreadySelectedTournaments={filterByTournaments}
           teamType={TeamType.ALL}
+          multiple
         />
       )}
       {showTeamsModal && (
         <SelectTeamModal
           onClose={() => setShowTeamsModal(false)}
-          onSave={(team) => setSelectedTeam(team)}
-          teamType={searchType === SearchType.BY_CLUB ? TeamType.CLUBS : TeamType.NATIONS}
-          value={selectedTeam ?? undefined}
+          onSaveMultipleTeams={(teams) => setFilterByTeams(teams)}
+          teamType={TeamType.ALL}
+          value={undefined}
+          alreadySelectedMultipleTeams={filterByTeams}
+          multiple
         />
       )}
     </>
@@ -186,17 +315,29 @@ const ModalContent = styled.div`
   flex-grow: 1;
 `;
 
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.s};
+  width: 100%;
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
 const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.s};
-  flex-grow: 1;
 `;
 
 const AvailableFixturesContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xs};
+  gap: ${theme.spacing.m};
   width: 100%;
   box-sizing: border-box;
 `;
@@ -212,6 +353,7 @@ const fadeIn = keyframes`
 
 const FixturesContainer = styled.div`
   display: flex;
+  /* gap: ${theme.spacing.s}; */
   flex-direction: column;
   width: 100%;
   position: relative;
@@ -221,6 +363,22 @@ const FixturesContainer = styled.div`
   overflow: hidden;
   border: 1px solid ${theme.colors.silverLight};
   animation: ${fadeIn} 0.4s ease;
+`;
+
+const ActiveFiltersContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.s};
+  flex-wrap: wrap;
+`;
+
+const ActiveFilter = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  align-items: center;
+  background-color: ${theme.colors.silverLighter};
+  padding: ${theme.spacing.xxxs} ${theme.spacing.xxs} ${theme.spacing.xxxs} ${theme.spacing.xs};
+  border-radius: 100px;
+  border: 1px solid ${theme.colors.silverLight};
 `;
 
 export default FindOtherFixturesModal;

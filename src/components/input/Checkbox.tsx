@@ -20,24 +20,24 @@ const Checkbox = ({
       disabled={disabled}
     />
     {label && (
-    <CheckboxText>{label}</CheckboxText>
+      <CheckboxText>{label}</CheckboxText>
     )}
   </CheckboxLabel>
 );
 
 const CheckboxInput = styled.input`
-  /* appearance: none; */
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid ${theme.colors.silver};
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
   margin-right: 8px;
 
   &:checked {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: ${theme.colors.primary};
+    border-color: ${theme.colors.primary};
   }
 `;
 

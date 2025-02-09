@@ -9,9 +9,11 @@ interface ContextMenuProps {
   positionX: 'left' | 'right';
   offsetX: number;
   offsetY: number;
+  overflow?: 'hidden' | 'visible';
 }
 
 interface StyledContextMenuProps {
+  overflow: 'hidden' | 'visible';
   positionY: 'top' | 'bottom';
   positionX: 'left' | 'right';
   offsetX: number;
@@ -19,13 +21,14 @@ interface StyledContextMenuProps {
 }
 
 const ContextMenu = ({
-  children, positionY, positionX, offsetX, offsetY,
+  children, positionY, positionX, offsetX, offsetY, overflow = 'hidden',
 }: ContextMenuProps) => (
   <StyledContextMenu
     positionY={positionY}
     positionX={positionX}
     offsetX={offsetX}
     offsetY={offsetY}
+    overflow={overflow}
     initial={{ opacity: 0, scale: 0.92 }}
     animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.92 }}
@@ -42,7 +45,7 @@ const StyledContextMenu = styled(motion.div)<StyledContextMenuProps>`
   z-index: 20;
   min-width: 200px;
   width: fit-content;
-  overflow: hidden;
+  overflow: ${({ overflow }) => overflow};
   top: ${({ positionY, offsetY }) => (positionY === 'top' ? `${-offsetY}px` : 'unset')};
   bottom: ${({ positionY, offsetY }) => (positionY === 'bottom' ? `${-offsetY}px` : 'unset')};
   left: ${({ positionX, offsetX }) => (positionX === 'left' ? `${-offsetX}px` : 'unset')};

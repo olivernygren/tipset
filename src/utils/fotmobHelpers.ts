@@ -1,11 +1,13 @@
 import { Fixture, TeamType } from './Fixture';
 import {
-  FotMobMatch, FotMobMatchesByDateLeague, FotMobSquad, FotMobTeamsResponse,
+  FotMobMatch, FotMobMatchesByDateLeague, FotMobMatchTeam, FotMobSquad, FotMobTeamsResponse,
 } from './Fotmob';
+import { getFixtureNickname, isPredictGoalScorerPossibleByTeamNames } from './helpers';
 import {
   CountryEnum, ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
 } from './Players';
 import {
+  getAllTeams,
   getStadiumByHomeTeam, nationalTeams, Team, TournamentsEnum,
 } from './Team';
 
@@ -141,25 +143,114 @@ export const getFotMobMatchesFromSelectedTournaments = (leaguesArray: Array<FotM
   return matches;
 };
 
+export const getFotMobMatchesFromTournamentsAndTeams = (
+  leaguesArray: Array<FotMobMatchesByDateLeague>,
+  tournaments: Array<number>,
+  teamIds: Array<number>,
+): Array<FotMobMatch> => {
+  const matchesSet = new Set<FotMobMatch>();
+  const isMatchInFuture = (match: FotMobMatch) => new Date(match.status.utcTime) > new Date();
+
+  leaguesArray.forEach((league) => {
+    league.matches.forEach((match) => {
+      if (isMatchInFuture(match) && (tournaments.includes(league.primaryId) || teamIds.includes(match.home.id) || teamIds.includes(match.away.id))) {
+        const matchWithLeagueId = { ...match, leagueId: league.parentLeagueId || league.primaryId };
+        matchesSet.add(matchWithLeagueId);
+      }
+    });
+  });
+
+  return Array.from(matchesSet);
+};
+
 export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum => {
   switch (fotMobId) {
     case 55:
       return TournamentsEnum.SERIE_A;
+    case 141:
+    case 893240:
+      return TournamentsEnum.COPPA_ITALIA;
+    case 222:
+      return TournamentsEnum.SUPERCOPPA_ITALIANA;
     case 47:
       return TournamentsEnum.PREMIER_LEAGUE;
+    case 48:
+      return TournamentsEnum.PREMIER_LEAGUE;
+    case 132:
+    case 894955:
+      return TournamentsEnum.FA_CUP;
+    case 133:
+      return TournamentsEnum.CARABAO_CUP;
     case 54:
       return TournamentsEnum.BUNDESLIGA;
+    case 146:
+      return TournamentsEnum.BUNDESLIGA_2;
+    case 209:
+    case 892581:
+      return TournamentsEnum.DFB_POKAL;
     case 53:
       return TournamentsEnum.LIGUE_1;
     case 87:
       return TournamentsEnum.LA_LIGA;
+    case 138:
+      return TournamentsEnum.COPA_DEL_REY;
+    case 139:
+      return TournamentsEnum.SUPERCOPA;
     case 42:
+    case 897488:
       return TournamentsEnum.CHAMPIONS_LEAGUE;
+    case 74:
+      return TournamentsEnum.UEFA_SUPER_CUP;
+    case 73:
+      return TournamentsEnum.EUROPA_LEAGUE;
+    case 10216:
+      return TournamentsEnum.CONFERENCE_LEAGUE;
     case 67:
       return TournamentsEnum.ALLSVENSKAN;
+    case 171:
+      return TournamentsEnum.SVENSKA_CUPEN;
+    case 61:
+      return TournamentsEnum.PRIMEIRA_LIGA;
+    case 57:
+      return TournamentsEnum.EREDIVISIE;
+    case 50:
+      return TournamentsEnum.EUROS;
+    case 77:
+      return TournamentsEnum.WORLD_CUP;
+    case 9806:
+    case 9807:
+    case 9808:
+    case 9809:
+      return TournamentsEnum.NATIONS_LEAGUE;
+    case 114:
+    case 896100:
+    case 489:
+      return TournamentsEnum.FRIENDLIES;
     default:
-      return TournamentsEnum.SERIE_A;
+      return TournamentsEnum.PLACEHOLDER;
   }
+};
+
+export const matchFotMobTeamWithRealTeam = (fotMobTeam: FotMobMatchTeam): Team | null => {
+  const allRealTeams = getAllTeams();
+
+  const matchingTeam = allRealTeams.find((realTeam) => (realTeam.id !== undefined && realTeam.id === fotMobTeam.id.toString()) || realTeam.fotMobName === fotMobTeam.longName || realTeam.fotMobName === fotMobTeam.name || realTeam.name === fotMobTeam.longName || realTeam.name === fotMobTeam.name || realTeam.shortName === fotMobTeam.name || realTeam.shortName === fotMobTeam.longName || realTeam.name.includes(fotMobTeam.name));
+
+  if (!matchingTeam) {
+    return null;
+  }
+
+  const {
+    id, name, shortName, logoUrl, stadium,
+  } = matchingTeam;
+
+  return {
+    id: id || fotMobTeam.id.toString(),
+    name,
+    logoUrl,
+    ...(stadium && { stadium }),
+    ...(shortName && { shortName }),
+  };
 };
 
 export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistingFixtureIds: Array<string>): Fixture | null => {
@@ -167,27 +258,32 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
     return null;
   }
 
-  const homeTeam: Team = {
+  const homeTeam: Team = matchFotMobTeamWithRealTeam(fotMobMatch.home) || {
     id: fotMobMatch.home.id.toString(),
     name: fotMobMatch.home.longName,
     shortName: fotMobMatch.home.name,
     logoUrl: `https://images.fotmob.com/image_resources/logo/teamlogo/${fotMobMatch.home.id}.png`,
   };
-  const awayTeam: Team = {
+
+  const awayTeam: Team = matchFotMobTeamWithRealTeam(fotMobMatch.away) || {
     id: fotMobMatch.away.id.toString(),
     name: fotMobMatch.away.longName,
     shortName: fotMobMatch.away.name,
     logoUrl: `https://images.fotmob.com/image_resources/logo/teamlogo/${fotMobMatch.away.id}.png`,
   };
+
+  const fixtureNickname = getFixtureNickname([homeTeam, awayTeam]);
+
   return {
     id: fotMobMatch.id.toString(),
     homeTeam,
     awayTeam,
     kickOffTime: fotMobMatch.status.utcTime,
-    stadium: getStadiumByHomeTeam(homeTeam.name, homeTeam.shortName!, homeTeam.id!),
+    stadium: homeTeam.stadium || getStadiumByHomeTeam(homeTeam.name, homeTeam.shortName!, homeTeam.id!),
     teamType: TeamType.CLUBS,
     tournament: getTournamentNameByFotMobId(fotMobMatch.leagueId),
     includeStats: true,
-    shouldPredictGoalScorer: false,
+    shouldPredictGoalScorer: isPredictGoalScorerPossibleByTeamNames([homeTeam.name, awayTeam.name]),
+    ...(fixtureNickname && { fixtureNickname }),
   };
 };

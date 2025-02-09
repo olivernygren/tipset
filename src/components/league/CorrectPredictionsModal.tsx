@@ -62,6 +62,7 @@ const CorrectPredictionsModal = ({
   const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
   const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
   const [isGoalScorersExpanded, setIsGoalScorersExpanded] = useState<boolean>(false);
+  const [hasAwardedPoints, setHasAwardedPoints] = useState<boolean>(false);
 
   const hasGoalScorers = goalScorers.length > 0;
 
@@ -264,6 +265,8 @@ const CorrectPredictionsModal = ({
   };
 
   const handleCalculateEveryonesPoints = () => {
+    setHasAwardedPoints(true);
+
     ongoingGameWeek?.games.predictions.forEach((prediction) => {
       if (prediction.fixtureId === gameId) {
         handleCalculatePoints(prediction);
@@ -587,7 +590,7 @@ const CorrectPredictionsModal = ({
           <Button
             onClick={handleSaveCorrectedPredictions}
             loading={savingLoading}
-            disabled={finalResult.homeGoals === '' || finalResult.awayGoals === ''}
+            disabled={finalResult.homeGoals === '' || finalResult.awayGoals === '' || !hasAwardedPoints}
             fullWidth={isMobile}
           >
             Spara

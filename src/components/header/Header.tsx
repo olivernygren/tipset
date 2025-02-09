@@ -80,7 +80,16 @@ const Header = () => {
               <RightSideItems>
                 {isSignedIn && (
                   <LoggedInUser>
-                    {user?.profilePicture && <Avatar src={`/images/${user?.profilePicture}.png`} alt="avatar" size={AvatarSize.M} showBorder objectFit="cover" />}
+                    {user?.profilePicture && (
+                      <Avatar
+                        src={`/images/${user?.profilePicture}.png`}
+                        alt="avatar"
+                        size={AvatarSize.M}
+                        showBorder
+                        customBorderWidth={1}
+                        objectFit="cover"
+                      />
+                    )}
                     <EmphasisTypography variant="m" color={theme.colors.textLight}>{`${user?.firstname} ${user?.lastname}`}</EmphasisTypography>
                   </LoggedInUser>
                 )}
