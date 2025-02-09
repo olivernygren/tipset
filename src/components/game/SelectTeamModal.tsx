@@ -23,23 +23,35 @@ import ClubAvatar from '../avatar/ClubAvatar';
 
 interface SelectTeamModalProps {
   value: Team | undefined;
-  onSave: (team: Team) => void;
+  onSave?: (team: Team) => void;
   onClose: () => void;
   teamType: TeamType;
   title?: string;
+  multiple?: boolean;
+  alreadySelectedMultipleTeams?: Array<Team>;
+  onSaveMultipleTeams?: (teams: Array<Team>) => void;
 }
 
 const SelectTeamModal = ({
-  value, onSave, onClose, teamType, title,
+  value, onSave, onClose, teamType, title, multiple, alreadySelectedMultipleTeams, onSaveMultipleTeams,
 }: SelectTeamModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const originalTeams = teamType === TeamType.NATIONS ? getAllNationsObject() : getTeamsObjectByCountry();
+
   const [teams, setTeams] = useState(originalTeams);
   const [selectedTeam, setSelectedTeam] = useState<Team | undefined>(value);
+  const [selectedMultipleTeams, setSelectedMultipleTeams] = useState<Array<Team>>(alreadySelectedMultipleTeams ?? []);
   const [searchValue, setSearchValue] = useState('');
   // const [showFilters, setShowFilters] = useState(false);
   const [expandedCountries, setExpandedCountries] = useState<Array<string>>(teamType === TeamType.NATIONS ? ['Landslag'] : []); // Object.keys(teams)
+
+  const isSelected = (team: Team) => {
+    if (multiple) {
+      return selectedMultipleTeams.some((t) => t.name === team.name);
+    }
+    return selectedTeam && selectedTeam.name === team.name;
+  };
 
   const handleSearch = (value: string) => {
     setExpandedCountries(Object.keys(originalTeams));
@@ -71,8 +83,29 @@ const SelectTeamModal = ({
     }
   };
 
+  const handleSelectTeam = (team: Team) => {
+    if (multiple) {
+      if (selectedMultipleTeams.some((t) => t.name === team.name)) {
+        setSelectedMultipleTeams(selectedMultipleTeams.filter((t) => t.name !== team.name));
+      } else {
+        setSelectedMultipleTeams([...selectedMultipleTeams, team]);
+      }
+    } else {
+      setSelectedTeam(team);
+    }
+  };
+
+  const handleSave = () => {
+    if (multiple) {
+      onSaveMultipleTeams?.(selectedMultipleTeams);
+    } else {
+      onSave?.(selectedTeam as Team);
+    }
+    onClose();
+  };
+
   const getTeam = (team: Team) => (
-    <TeamItem isSelected={selectedTeam?.name === team.name} onClick={() => setSelectedTeam(team)}>
+    <TeamItem isSelected={isSelected(team)} onClick={() => handleSelectTeam(team)}>
       <TeamInfo>
         {teamType === TeamType.NATIONS ? (
           <NationAvatar
@@ -93,19 +126,19 @@ const SelectTeamModal = ({
       </TeamInfo>
       <IconButtonContainer onClick={(e) => e.stopPropagation()}>
         <IconButton
-          icon={selectedTeam && selectedTeam.name === team.name ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
+          icon={isSelected(team) ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
           colors={
-          selectedTeam && selectedTeam.name === team.name ? {
-            normal: theme.colors.primary,
-            hover: theme.colors.primary,
-            active: theme.colors.primary,
-          } : {
-            normal: theme.colors.silverDarker,
-            hover: theme.colors.textDefault,
-            active: theme.colors.textDefault,
+            isSelected(team) ? {
+              normal: theme.colors.primary,
+              hover: theme.colors.primary,
+              active: theme.colors.primary,
+            } : {
+              normal: theme.colors.silverDarker,
+              hover: theme.colors.textDefault,
+              active: theme.colors.textDefault,
+            }
           }
-        }
-          onClick={() => setSelectedTeam(team)}
+          onClick={() => handleSelectTeam(team)}
         />
       </IconButtonContainer>
     </TeamItem>
@@ -149,7 +182,7 @@ const SelectTeamModal = ({
                 <HeadingsTypography variant="h4">
                   {country}
                 </HeadingsTypography>
-                {teamType === TeamType.CLUBS && (
+                {teamType !== TeamType.NATIONS && (
                   <NationAvatar
                     flagUrl={getFlagUrlByCountryName(country)}
                     nationName={country}
@@ -188,14 +221,11 @@ const SelectTeamModal = ({
             Avbryt
           </Button>
           <Button
-            onClick={() => {
-              onSave(selectedTeam as Team);
-              onClose();
-            }}
+            onClick={() => handleSave()}
             fullWidth
-            disabled={!selectedTeam}
+            disabled={!selectedTeam && !selectedMultipleTeams.length}
           >
-            Välj lag
+            {multiple ? `Välj lag (${selectedMultipleTeams.length})` : 'Välj lag'}
           </Button>
         </ButtonsContainer>
       </BottomContainer>
@@ -276,7 +306,7 @@ const CountryHeader = styled.div<{ isNation: boolean }>`
 
 const Country = styled.div`
   display: flex;
-  gap: ${theme.spacing.xxs};
+  gap: ${theme.spacing.xxxs};
   align-items: center;
   flex: 1;
 `;

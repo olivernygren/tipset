@@ -402,15 +402,41 @@ export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
   return teamNicknames[teamNames] || undefined;
 };
 
-export const getFixtureGroups = (fixtures: Array<Fixture>) => fixtures.reduce((acc, fixture) => {
-  const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
-  if (tournamentIndex >= 0) {
-    acc[tournamentIndex].fixtures.push(fixture);
-  } else {
-    acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
-  }
-  return acc;
-}, [] as Array<FixtureGroup>);
+export const getFixtureGroups = (fixtures: Array<Fixture>) => {
+  const tournamentOrder = [
+    TournamentsEnum.CHAMPIONS_LEAGUE,
+    TournamentsEnum.ALLSVENSKAN,
+    TournamentsEnum.PREMIER_LEAGUE,
+    TournamentsEnum.LA_LIGA,
+    TournamentsEnum.BUNDESLIGA,
+    TournamentsEnum.SERIE_A,
+    TournamentsEnum.LIGUE_1,
+  ];
+
+  const groupedFixtures = fixtures.reduce((acc, fixture) => {
+    const tournamentIndex = acc.findIndex((group) => group.tournament === fixture.tournament);
+    if (tournamentIndex >= 0) {
+      acc[tournamentIndex].fixtures.push(fixture);
+    } else {
+      acc.push({ tournament: fixture.tournament, fixtures: [fixture] });
+    }
+    return acc;
+  }, [] as Array<FixtureGroup>);
+
+  // Sort the tournaments based on the predefined order
+  groupedFixtures.sort((a, b) => {
+    const indexA = tournamentOrder.indexOf(a.tournament as TournamentsEnum);
+    const indexB = tournamentOrder.indexOf(b.tournament as TournamentsEnum);
+
+    // Assign a high index value to tournaments not found in the tournamentOrder array
+    const adjustedIndexA = indexA === -1 ? tournamentOrder.length : indexA;
+    const adjustedIndexB = indexB === -1 ? tournamentOrder.length : indexB;
+
+    return adjustedIndexA - adjustedIndexB;
+  });
+
+  return groupedFixtures;
+};
 
 export const teamsWithRegisteredPlayers = [
   'Arsenal',

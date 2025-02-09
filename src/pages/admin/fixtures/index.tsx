@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
+  ArrowClockwise,
   DotsThree, Funnel, MinusCircle, PencilSimple, Plus, Sparkle, Trash, WarningDiamond, X,
 } from '@phosphor-icons/react';
 import {
@@ -298,6 +299,11 @@ const AdminFixturesPage = () => {
                 Avsluta redigering
               </TextButton>
             )}
+            <IconButton
+              icon={<ArrowClockwise size={20} weight="bold" />}
+              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+              onClick={fetchFixtures}
+            />
             <IconButton
               icon={contextMenuOpen ? <X size={28} /> : <DotsThree size={28} weight="bold" />}
               colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}

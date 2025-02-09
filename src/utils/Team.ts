@@ -1171,6 +1171,11 @@ export const nationalTeams: Team[] = [
     countryCode: 'KSA',
     federation: FederationEnum.ASIA,
   },
+  {
+    name: 'Placeholder',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Flag_of_None_%28square%29.svg',
+    countryCode: 'NONE',
+  },
 ];
 
 type TeamsType = { [key: string]: Team[] };
@@ -1568,6 +1573,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Real Sociedad',
+      shortName: 'R. Sociedad',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg',
       stadium: 'Estadio Anoeta',
       country: CountryEnum.SPAIN,

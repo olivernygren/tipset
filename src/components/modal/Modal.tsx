@@ -131,6 +131,7 @@ const ModalContainer = styled.div<{ width: string, mobileBottomSheet?: boolean, 
     border-radius: ${theme.borderRadius.l};
     height: auto;
     animation: fadeIn 0.2s ease-in-out;
+    margin: 0 ${theme.spacing.m};
   }
 
   @keyframes fadeIn {

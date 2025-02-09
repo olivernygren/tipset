@@ -17,9 +17,12 @@ import { getTournamentIcon } from '../../utils/helpers';
 
 interface SelectTournamentModalProps {
   onClose: () => void;
-  onSave: (tournament: string) => void;
+  onSave?: (tournament: string) => void;
   defaultValue?: string;
   teamType: TeamType;
+  multiple?: boolean;
+  onSaveMultiple?: (tournaments: Array<TournamentsEnum>) => void;
+  alreadySelectedTournaments?: Array<TournamentsEnum>;
 }
 
 enum TournamentCountryFiltersEnum {
@@ -36,14 +39,17 @@ enum TournamentCountryFiltersEnum {
 }
 
 const SelectTournamentModal = ({
-  onClose, onSave, defaultValue, teamType,
+  onClose, onSave, defaultValue, teamType, multiple, onSaveMultiple, alreadySelectedTournaments,
 }:SelectTournamentModalProps) => {
   const originalTournaments = Object.values(TournamentsEnum);
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [tournaments, setTournaments] = useState(originalTournaments);
   const [selectedTournament, setSelectedTournament] = useState<string | undefined>(defaultValue);
+  const [selectedMultipleTournaments, setSelectedMultipleTournaments] = useState<Array<TournamentsEnum>>(alreadySelectedTournaments ?? []);
   const [searchValue, setSearchValue] = useState('');
+
+  const isSelected = (tournament: string) => ((selectedTournament && selectedTournament === tournament) || selectedMultipleTournaments.includes(tournament as TournamentsEnum));
 
   const getNationalTeamTournaments = () => originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.WORLD_CUP)
       || tournament.includes(TournamentsEnum.WORLD_CUP_QUALIFIERS)
@@ -88,10 +94,22 @@ const SelectTournamentModal = ({
     setTournaments(filteredTournaments);
   };
 
+  const handleTournamentClick = (tournament: string) => {
+    if (multiple) {
+      if (selectedMultipleTournaments.includes(tournament as TournamentsEnum)) {
+        setSelectedMultipleTournaments(selectedMultipleTournaments.filter((selectedTournament) => selectedTournament !== tournament));
+      } else {
+        setSelectedMultipleTournaments([...selectedMultipleTournaments, tournament as TournamentsEnum]);
+      }
+    } else {
+      setSelectedTournament(tournament);
+    }
+  };
+
   const getTournament = (tournament: string) => (
     <TournamentItem
-      isSelected={selectedTournament === tournament}
-      onClick={() => setSelectedTournament(tournament)}
+      isSelected={isSelected(tournament)}
+      onClick={() => handleTournamentClick(tournament)}
     >
       <TournamentInfo>
         <Avatar
@@ -99,29 +117,38 @@ const SelectTournamentModal = ({
           size={AvatarSize.S}
           objectFit="contain"
         />
-        <NormalTypography variant="m" onClick={() => setSelectedTournament(tournament)}>
+        <NormalTypography variant="m" onClick={() => handleTournamentClick(tournament)}>
           {tournament}
         </NormalTypography>
       </TournamentInfo>
       <IconButtonContainer onClick={(e) => e.stopPropagation()}>
         <IconButton
-          icon={selectedTournament && selectedTournament === tournament ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
+          icon={isSelected(tournament) ? <CheckCircle size={24} weight="fill" /> : <Circle size={24} />}
           colors={
-          selectedTournament && selectedTournament === tournament ? {
-            normal: theme.colors.primary,
-            hover: theme.colors.primary,
-            active: theme.colors.primary,
-          } : {
-            normal: theme.colors.silverDarker,
-            hover: theme.colors.textDefault,
-            active: theme.colors.textDefault,
-          }
+            isSelected(tournament) ? {
+              normal: theme.colors.primary,
+              hover: theme.colors.primary,
+              active: theme.colors.primary,
+            } : {
+              normal: theme.colors.silverDarker,
+              hover: theme.colors.textDefault,
+              active: theme.colors.textDefault,
+            }
         }
-          onClick={() => setSelectedTournament(tournament)}
+          onClick={() => handleTournamentClick(tournament)}
         />
       </IconButtonContainer>
     </TournamentItem>
   );
+
+  const handleSave = () => {
+    if (multiple && onSaveMultiple) {
+      onSaveMultiple(selectedMultipleTournaments);
+    } else if (onSave) {
+      onSave(selectedTournament as string);
+    }
+    onClose();
+  };
 
   return (
     <Modal
@@ -190,16 +217,11 @@ const SelectTournamentModal = ({
             Avbryt
           </Button>
           <Button
-            onClick={() => {
-              if (selectedTournament) {
-                onSave(selectedTournament);
-              }
-              onClose();
-            }}
+            onClick={() => handleSave()}
             fullWidth
-            disabled={!selectedTournament}
+            disabled={!selectedTournament && selectedMultipleTournaments.length === 0}
           >
-            Välj turnering
+            {multiple ? `Välj turneringar (${selectedMultipleTournaments.length})` : 'Välj turnering'}
           </Button>
         </ButtonsContainer>
       </BottomContainer>
