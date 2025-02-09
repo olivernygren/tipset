@@ -30,7 +30,7 @@ const UpcomingFixturePreview = ({
 
   const [isSelected, setIsSelected] = useState<boolean>(alreadySelectedFixtures?.some((selectedFixture) => selectedFixture.id === fixture.id) || false);
 
-  const canViewPredictions = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date());
+  const canViewPredictions = Boolean(fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date() && !alwaysClickable);
   const isAlreadySelectedBefore = alreadySelectedFixtures && alreadySelectedFixtures.some((f) => f.id === fixture.id);
 
   const getKickoffTime = (kickoffTime: string) => {
