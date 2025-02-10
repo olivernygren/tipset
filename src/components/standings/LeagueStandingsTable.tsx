@@ -46,9 +46,9 @@ const LeagueStandingsTable = ({
           <NormalTypography variant="m" color={theme.colors.primaryDark}>
             {position}
           </NormalTypography>
-          <NormalTypography variant="m" color={theme.colors.textDefault}>
+          <EmphasisTypography variant="m" color={theme.colors.textDefault}>
             {`${place.username} ${place.userId === currentUserId ? '(Du)' : ''}`}
-          </NormalTypography>
+          </EmphasisTypography>
         </Section>
         {!isMobileDevice && (
         <CenteredGridItem>

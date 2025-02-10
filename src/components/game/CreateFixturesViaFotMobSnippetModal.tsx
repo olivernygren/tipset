@@ -12,7 +12,7 @@ import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { Fixture, FixtureGroup } from '../../utils/Fixture';
-import { getFixtureGroups, getTournamentIcon, groupFixturesByDate } from '../../utils/helpers';
+import { getFixtureGroups, getTournamentIcon } from '../../utils/helpers';
 import { Section } from '../section/Section';
 import { EmphasisTypography, HeadingsTypography } from '../typography/Typography';
 import UpcomingFixturePreview from './UpcomingFixturePreview';
@@ -77,13 +77,13 @@ const CreateFixturesViaFotMobSnippetModal = ({
     }
   };
 
-  const getFixturesDateFormatted = (date: string) => {
-    const fixtureDate = new Date(date);
-    const day = fixtureDate.getDate();
-    const weekday = fixtureDate.toLocaleString('default', { weekday: 'long' }).replaceAll('.', '').charAt(0).toUpperCase() + fixtureDate.toLocaleString('default', { weekday: 'long' }).slice(1);
-    const month = fixtureDate.toLocaleString('default', { month: 'long' }).replaceAll('.', '');
-    return `${weekday} ${day} ${month}`;
-  };
+  // const getFixturesDateFormatted = (date: string) => {
+  //   const fixtureDate = new Date(date);
+  //   const day = fixtureDate.getDate();
+  //   const weekday = fixtureDate.toLocaleString('default', { weekday: 'long' }).replaceAll('.', '').charAt(0).toUpperCase() + fixtureDate.toLocaleString('default', { weekday: 'long' }).slice(1);
+  //   const month = fixtureDate.toLocaleString('default', { month: 'long' }).replaceAll('.', '');
+  //   return `${weekday} ${day} ${month}`;
+  // };
 
   return (
     <ActionsModal

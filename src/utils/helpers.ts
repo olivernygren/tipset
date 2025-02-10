@@ -359,6 +359,7 @@ export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
     'Valencia,Levante': 'Derbi Valenciano',
     'Valencia,Villarreal': 'Derbi de la Comunitat',
     'Manchester United,Liverpool': 'North West Derby',
+    'Liverpool,Everton': 'Merseyside Derby',
     'Manchester United,Manchester City': 'Manchester Derby',
     'Arsenal,Tottenham': 'North London Derby',
     'Crystal Palace,Brighton': 'M23 Derby',

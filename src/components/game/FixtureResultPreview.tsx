@@ -95,9 +95,9 @@ const FixtureResultPreview = ({
                   {`(${fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals})`}
                 </NormalTypography>
               )}
-              <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault}>
+              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault} noWrap>
                 {getResult()}
-              </NoWrapTypography>
+              </EmphasisTypography>
               {fixture.aggregateScore && fixture.finalResult && (
                 <NormalTypography variant="s" color={theme.colors.silverDark}>
                   {`(${fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals})`}
@@ -132,11 +132,11 @@ const FixtureResultPreview = ({
                   )}
                 </PointsIcons>
               )}
-              <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>
+              <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker} noWrap>
                 {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
                 {' '}
                 p
-              </NoWrapTypography>
+              </NormalTypography>
             </PointsContainer>
           )}
           {isMobile ? (
@@ -275,12 +275,6 @@ const PointsContainer = styled.div`
   width: fit-content;
   height: fit-content;
   gap: 6px;
-`;
-
-const NoWrapTypography = styled(NormalTypography)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const MobileButtonContainer = styled.div`

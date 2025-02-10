@@ -353,7 +353,6 @@ const fadeIn = keyframes`
 
 const FixturesContainer = styled.div`
   display: flex;
-  /* gap: ${theme.spacing.s}; */
   flex-direction: column;
   width: 100%;
   position: relative;

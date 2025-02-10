@@ -1,15 +1,15 @@
 import styled, { keyframes } from 'styled-components';
 import {
-  ArrowCircleRight, ArrowRight, CaretCircleLeft, CaretCircleRight, PencilSimple, PlusCircle,
+  ArrowCircleRight, CaretCircleLeft, CaretCircleRight, PencilSimple, PlusCircle,
 } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
-import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
+import {
+  LeagueGameWeek, LeagueTabs, PredictionLeague, PredictionLeagueStanding,
+} from '../../utils/League';
 import { theme, devices } from '../../theme';
 import Button from '../buttons/Button';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography, HeadingsTypography } from '../typography/Typography';
-// eslint-disable-next-line import/no-cycle
-import { LeagueTabs } from '../../pages/leagues/[leagueId]';
 import { Divider } from '../Divider';
 import { useUser } from '../../context/UserContext';
 import IconButton from '../buttons/IconButton';
@@ -20,7 +20,7 @@ import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import LeagueStandingsTable from '../standings/LeagueStandingsTable';
 import { groupFixturesByDate } from '../../utils/helpers';
-import TextButton from '../buttons/TextButton';
+// import EditLastRoundScoresModal from './EditLastRoundScoresModal';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -218,6 +218,14 @@ const LeagueOverview = ({
           <GridSection>
             <TableSectionHeader>
               <HeadingsTypography variant="h3">Tabell</HeadingsTypography>
+              {/* TODO: EDIT STANDINGS MANUALLY */}
+              {/* {(isCreator || hasAdminRights) && (
+                <IconButton
+                  icon={<PencilSimple size={24} />}
+                  onClick={() => {}}
+                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                />
+              )} */}
             </TableSectionHeader>
             {league.standings && league.standings.length > 0 ? (
               <LeagueStandingsTable
@@ -231,7 +239,16 @@ const LeagueOverview = ({
             )}
           </GridSection>
           <GridSection>
-            <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
+            <Section flexDirection="row" alignItems="center" justifyContent="space-between">
+              <HeadingsTypography variant="h3">Förra omgången</HeadingsTypography>
+              {/* {(isCreator || hasAdminRights) && previousGameWeek !== undefined && (
+                <IconButton
+                  icon={<PencilSimple size={24} />}
+                  onClick={() => setShowEditLastRoundModal(true)}
+                  colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                />
+              )} */}
+            </Section>
             {previousGameWeek ? (
               <PreviousRoundCard>
                 <Section

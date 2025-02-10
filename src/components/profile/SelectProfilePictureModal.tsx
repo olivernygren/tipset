@@ -94,6 +94,8 @@ const AvatarGrid = styled.div`
   gap: ${theme.spacing.m};
   margin-bottom: ${theme.spacing.m};
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   
   @media ${devices.tablet} {
     grid-template-columns: repeat(4, 1fr);

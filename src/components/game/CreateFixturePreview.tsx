@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-  Check,
-  CheckFat, PencilSimple, Trash, X,
+  Check, PencilSimple, Trash, X,
 } from '@phosphor-icons/react';
 import { Fixture, TeamType } from '../../utils/Fixture';
-import { devices, theme } from '../../theme';
+import { theme } from '../../theme';
 import ClubAvatar from '../avatar/ClubAvatar';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import NationAvatar from '../avatar/NationAvatar';
@@ -14,7 +13,6 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import { Team } from '../../utils/Team';
 import IconButton from '../buttons/IconButton';
 import { getTournamentIcon } from '../../utils/helpers';
-import Checkbox from '../input/Checkbox';
 import { Divider } from '../Divider';
 
 interface FixturePreviewProps {
@@ -28,15 +26,6 @@ const CreateFixturePreview = ({
   fixture, useShortNames, onEditClick, onDeleteClick,
 }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
-
-  const getKickoffFullDateTime = (kickoffTime: string) => {
-    const date = new Date(kickoffTime);
-    const day = date.getDate();
-    const month = date.toLocaleDateString('sv-SE', { month: 'short' }).replaceAll('.', '');
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    return `${day} ${month} ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
-  };
 
   const getKickoffTime = (kickoffTime: string) => {
     const date = new Date(kickoffTime);

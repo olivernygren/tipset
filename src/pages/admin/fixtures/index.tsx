@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import {
   ArrowClockwise,
   Calendar,
-  DotsThree, Funnel, Globe, MinusCircle, PencilSimple, Plus, ShieldPlus, Sparkle, Trash, WarningDiamond, X,
+  DotsThree, Globe, MinusCircle, PencilSimple, Plus, ShieldPlus, Sparkle, Trash, WarningDiamond, X,
   XCircle,
 } from '@phosphor-icons/react';
 import {
