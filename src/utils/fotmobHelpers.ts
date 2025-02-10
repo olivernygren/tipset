@@ -118,6 +118,8 @@ export const getFotMobGoalStatsUrl = (tournament: TournamentsEnum) => {
       return 'https://data.fotmob.com/stats/87/season/23686/goals.json';
     case TournamentsEnum.CHAMPIONS_LEAGUE:
       return 'https://data.fotmob.com/stats/42/season/24110/goals.json';
+    case TournamentsEnum.ALLSVENSKAN:
+      return 'https://data.fotmob.com/stats/67/season/22583/goals.json';
     default:
       return '';
   }
@@ -148,6 +150,22 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
   tournaments: Array<number>,
   teamIds: Array<number>,
 ): Array<FotMobMatch> => {
+  const specialFixturesToInclude = [
+    { team1: 'Ajax', team2: 'Feyenoord' },
+    { team1: 'Benfica', team2: 'Porto' },
+    { team1: 'Benfica', team2: 'Sporting CP' },
+    { team1: 'Celtic', team2: 'Rangers' },
+    { team1: 'Galatasaray', team2: 'Fenerbahce' },
+    { team1: 'Hamburger SV', team2: 'St. Pauli' },
+    { team1: 'Boca Juniors', team2: 'River Plate' },
+    { team1: 'Olympiacos', team2: 'Panathinaikos' },
+    { team1: 'Partizan Beograd', team2: 'Crvena Zvezda' },
+    { team1: 'Rapid Wien', team2: 'Austria Wien' },
+    { team1: 'Dinamo Zagreb', team2: 'Hajduk Split' },
+    { team1: 'Sparta Praha', team2: 'Slavia Praha' },
+    { team1: 'FC København', team2: 'Brøndby' },
+  ];
+
   const matchesSet = new Set<FotMobMatch>();
   const isMatchInFuture = (match: FotMobMatch) => new Date(match.status.utcTime) > new Date();
 
@@ -157,6 +175,15 @@ export const getFotMobMatchesFromTournamentsAndTeams = (
         const matchWithLeagueId = { ...match, leagueId: league.parentLeagueId || league.primaryId };
         matchesSet.add(matchWithLeagueId);
       }
+      specialFixturesToInclude.forEach((specialFixture) => {
+        if (
+          (match.home.name === specialFixture.team1 && match.away.name === specialFixture.team2)
+          || (match.home.name === specialFixture.team2 && match.away.name === specialFixture.team1)
+        ) {
+          const matchWithLeagueId = { ...match, leagueId: league.parentLeagueId || league.primaryId };
+          matchesSet.add(matchWithLeagueId);
+        }
+      });
     });
   });
 

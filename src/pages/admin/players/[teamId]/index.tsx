@@ -8,7 +8,7 @@ import {
   ArrowBendDoubleUpRight,
   Bandaids,
   CheckCircle,
-  DotsThree, PencilSimple, Plus, Rectangle, Trash, UsersFour, Virus, X,
+  DotsThree, HandHeart, PencilSimple, Plus, Question, Rectangle, Trash, UsersFour, Virus, X,
 } from '@phosphor-icons/react';
 import { db } from '../../../../config/firebase';
 import { CollectionEnum } from '../../../../utils/Firebase';
@@ -138,8 +138,10 @@ const PlayersByTeamPage = () => {
       case PlayerStatusEnum.INJURED:
         return theme.colors.redBleach;
       case PlayerStatusEnum.SUSPENDED:
+      case PlayerStatusEnum.UNKNOWN:
         return theme.colors.silverLighter;
       case PlayerStatusEnum.MAY_BE_INJURED:
+      case PlayerStatusEnum.PERSONAL_ISSUES:
         return theme.colors.goldBleach;
       case PlayerStatusEnum.ILL:
         return theme.colors.primaryFade;
@@ -152,7 +154,6 @@ const PlayersByTeamPage = () => {
     switch (status) {
       case PlayerStatusEnum.AVAILABLE:
         return null;
-        // return <CheckCircle size={20} color={theme.colors.silverDark} weight="fill" />;
       case PlayerStatusEnum.INJURED:
         return <Ambulance size={20} color={theme.colors.redDark} weight="fill" />;
       case PlayerStatusEnum.SUSPENDED:
@@ -161,8 +162,12 @@ const PlayersByTeamPage = () => {
         return <Bandaids size={20} color={theme.colors.goldDark} weight="fill" />;
       case PlayerStatusEnum.ILL:
         return <Virus size={20} color={theme.colors.primaryDark} weight="fill" />;
+      case PlayerStatusEnum.PERSONAL_ISSUES:
+        return <HandHeart size={20} color={theme.colors.goldDark} weight="fill" />;
+      case PlayerStatusEnum.UNKNOWN:
+        return <Question size={20} color={theme.colors.silverDark} weight="fill" />;
       default:
-        return <Ambulance size={20} color={theme.colors.red} />;
+        return <Ambulance size={20} color={theme.colors.red} weight="fill" />;
     }
   };
 

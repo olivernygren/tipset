@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import {
   Ambulance,
   Bandaids,
-  CheckCircle, Circle, Funnel, Info, Rectangle, SoccerBall, Virus, XCircle,
+  CheckCircle, Circle, Funnel, HandHeart, Info, Question, Rectangle, SoccerBall, Virus, XCircle,
 } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
@@ -180,11 +180,6 @@ const GoalScorerModal = ({
     }
   };
 
-  // const getGoalsScoredForPlayer = (playerName: string) => {
-  //   const playerRating = playerRatings.find((rating) => rating.playerName === playerName);
-  //   return playerRating ? playerRating.goals : 0;
-  // };
-
   const getPlayer = (player: Player) => (
     <PlayerItem
       key={player.id}
@@ -196,7 +191,7 @@ const GoalScorerModal = ({
       <PlayerInfo>
         <AvatarContainer>
           <Avatar
-            src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
+            src={player.externalPictureUrl ?? '/images/placeholder-fancy.png'}
             alt={player.name}
             size={AvatarSize.M}
             objectFit="cover"
@@ -230,17 +225,15 @@ const GoalScorerModal = ({
             {(player.status === PlayerStatusEnum.SUSPENDED) && (
               <Rectangle style={{ transform: 'rotate(90deg)' }} size={24} color={theme.colors.redDark} weight="fill" />
             )}
+            {(player.status === PlayerStatusEnum.PERSONAL_ISSUES) && (
+              <HandHeart size={24} color={theme.colors.goldDark} weight="fill" />
+            )}
+            {(player.status === PlayerStatusEnum.UNKNOWN) && (
+              <Question size={24} color={theme.colors.silverDarker} weight="fill" />
+            )}
           </IconContainer>
         ) : (
           <Flex>
-            {/* {playerExistsInRatings(player) && (
-              <GoalsScored>
-                <NormalTypography variant="s" color={theme.colors.silver}>
-                  {getGoalsScoredForPlayer(player.name)}
-                </NormalTypography>
-                <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
-              </GoalsScored>
-            )} */}
             {goalStats.find((p) => player.id === p.playerId || player.name === p.playerName) && (
               <GoalsScored>
                 <NormalTypography variant="s" color={theme.colors.silver}>

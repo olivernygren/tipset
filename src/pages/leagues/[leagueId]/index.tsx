@@ -28,7 +28,6 @@ import { useUser } from '../../../context/UserContext';
 import TextButton from '../../../components/buttons/TextButton';
 import Button from '../../../components/buttons/Button';
 import { getLeagueByInvitationCode, getSortedLeagueStandings } from '../../../utils/firebaseHelpers';
-// eslint-disable-next-line import/no-cycle
 import LeagueOverview from '../../../components/league/LeagueOverview';
 import FixturesView from '../../../components/league/FixturesView';
 import ParticipantsView from '../../../components/league/ParticipantsView';
@@ -88,7 +87,7 @@ const PredictionLeaguePage = () => {
       setLeague(leagueData);
       setInitialFetchLoading(false);
     } else {
-      console.log('No such document!');
+      errorNotify('Ligan kunde inte hittas');
     }
   };
 
@@ -96,12 +95,12 @@ const PredictionLeaguePage = () => {
     setDeleteLeagueLoading(true);
 
     if (!league) {
-      console.log('No league found');
+      errorNotify('Ett fel uppstod. Försök igen');
       return;
     }
 
     if (league.creatorId !== currentUserId) {
-      console.log('You are not the creator of this league');
+      errorNotify('Du har inte behörighet att radera denna liga');
       return;
     }
 
@@ -111,7 +110,7 @@ const PredictionLeaguePage = () => {
       setContextMenuOpen(false);
       navigate(`/${RoutesEnum.LEAGUES}`);
     } catch (error) {
-      console.log('Error deleting league', error);
+      errorNotify('Ett fel uppstod. Försök igen');
     } finally {
       setDeleteLeagueLoading(false);
     }
@@ -164,7 +163,6 @@ const PredictionLeaguePage = () => {
       });
       fetchLeagueData();
     } catch (e) {
-      console.error(e);
       errorNotify('Ett fel uppstod. Försök igen');
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
     }

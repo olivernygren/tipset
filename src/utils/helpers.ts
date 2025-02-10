@@ -212,6 +212,10 @@ export const getPlayerStatusName = (status: PlayerStatusEnum) => {
       return 'Möjligtvis skadad';
     case PlayerStatusEnum.ILL:
       return 'Sjuk';
+    case PlayerStatusEnum.UNKNOWN:
+      return 'Okänd';
+    case PlayerStatusEnum.PERSONAL_ISSUES:
+      return 'Personliga skäl';
     default:
       return '';
   }

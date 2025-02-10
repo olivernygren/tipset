@@ -67,6 +67,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [ongoingGameWeek, setOngoingGameWeek] = useState<LeagueGameWeek>();
   const [upcomingGameWeeks, setUpcomingGameWeeks] = useState<Array<LeagueGameWeek>>();
   const [previousGameWeeks, setPreviousGameWeeks] = useState<Array<LeagueGameWeek>>();
+  const [initiallyDisplayedPreviousGameWeeks, setInitiallyDisplayedPreviousGameWeeks] = useState<Array<LeagueGameWeek>>();
   const [createGameWeekError, setCreateGameWeekError] = useState<string | null>(null);
   const [showCreateGameWeekSection, setShowCreateGameWeekSection] = useState<boolean>(false);
   const [showCorrectGameWeekContent, setShowCorrectGameWeekContent] = useState<boolean>(false);
@@ -109,6 +110,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       setOngoingGameWeek(currentGameWeek);
       setUpcomingGameWeeks(comingGameWeeks.sort((a, b) => a.round - b.round));
       setPreviousGameWeeks(allPreviousGameWeeks);
+
+      setInitiallyDisplayedPreviousGameWeeks(allPreviousGameWeeks.slice(-3));
 
       if (currentGameWeek && user) {
         setPredictionStatuses(currentGameWeek.games.fixtures.map((fixture) => ({
@@ -619,6 +622,21 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     );
   };
 
+  const handleShowMoreGameWeeks = () => {
+    const currentlyDisplayedRounds = initiallyDisplayedPreviousGameWeeks?.map((gameWeek) => gameWeek.round) ?? [];
+    const next10Rounds = previousGameWeeks
+      ?.filter((gameWeek) => !currentlyDisplayedRounds.includes(gameWeek.round))
+      .slice(-10);
+
+    if (next10Rounds && initiallyDisplayedPreviousGameWeeks) {
+      setInitiallyDisplayedPreviousGameWeeks((prev) => [...prev as LeagueGameWeek[], ...next10Rounds]);
+    }
+
+    if (next10Rounds && next10Rounds.length < 10) {
+      setInitiallyDisplayedPreviousGameWeeks(previousGameWeeks);
+    }
+  };
+
   return (
     <>
       <Section gap="m">
@@ -819,9 +837,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           expandMobile
         >
           <HeadingsTypography variant="h4">Tidigare omgångar</HeadingsTypography>
-          {previousGameWeeks && previousGameWeeks.length > 0 ? (
+          {previousGameWeeks && previousGameWeeks.length > 0 && initiallyDisplayedPreviousGameWeeks && initiallyDisplayedPreviousGameWeeks.length > 0 ? (
             <>
-              {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
+              {initiallyDisplayedPreviousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
                 <PreviousRoundCard key={gameWeek.startDate.toString()}>
                   <Section
                     justifyContent="space-between"
@@ -877,6 +895,15 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </>
           ) : (
             <NormalTypography variant="m" color={theme.colors.textLight}>Inga tidigare omgångar</NormalTypography>
+          )}
+          {initiallyDisplayedPreviousGameWeeks && previousGameWeeks && initiallyDisplayedPreviousGameWeeks.length < previousGameWeeks.length && (
+            <Section padding={`${theme.spacing.xs} 0 0 0`} justifyContent="center">
+              <Button
+                onClick={handleShowMoreGameWeeks}
+              >
+                Visa fler
+              </Button>
+            </Section>
           )}
         </Section>
       </Section>
