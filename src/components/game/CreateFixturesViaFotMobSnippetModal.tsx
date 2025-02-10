@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { updateDoc, doc } from 'firebase/firestore';
-import { MinusCircle } from '@phosphor-icons/react';
+import { MinusCircle, WarningDiamond } from '@phosphor-icons/react';
 import { theme } from '../../theme';
 import {
   convertFotMobMatchToFixture, getFotMobMatchesFromTournamentsAndTeams,
@@ -21,6 +21,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import ActionsModal from '../modal/ActionsModal';
 import IconButton from '../buttons/IconButton';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
+import InfoDialogue from '../info/InfoDialogue';
 
 interface Props {
   onClose: () => void;
@@ -40,6 +41,7 @@ const CreateFixturesViaFotMobSnippetModal = ({
   const [creationLoading, setCreationLoading] = useState<boolean>(false);
   const [previewFixtures, setPreviewFixtures] = useState<Array<Fixture>>([]);
   const [availableFixtureGroups, setAvailableFixtureGroups] = useState<Array<FixtureGroup>>([]);
+  const [hasAttemptedCreation, setHasAttemptedCreation] = useState<boolean>(false);
 
   const handleCreateFixturesPreview = () => {
     const allFixtureIds = allFixtures.map((fixture) => fixture.id);
@@ -48,6 +50,7 @@ const CreateFixturesViaFotMobSnippetModal = ({
       .map((match: FotMobMatch) => convertFotMobMatchToFixture(match, allFixtureIds))
       .filter((fixture) => fixture !== null && fixture !== undefined) as Array<Fixture>;
 
+    setHasAttemptedCreation(true);
     setPreviewFixtures(fixtures);
     setAvailableFixtureGroups(getFixtureGroups(fixtures));
   };
@@ -121,32 +124,6 @@ const CreateFixturesViaFotMobSnippetModal = ({
             />
           </Section>
         )}
-        {/* {previewFixtures.length > 0 && Array.from(groupFixturesByDate(previewFixtures).entries())
-          .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
-          .map(([date, fixtures]) => (
-            <FixturesContainer>
-              <Section
-                padding={theme.spacing.xs}
-                backgroundColor={theme.colors.silverLight}
-                borderRadius={`${theme.borderRadius.m} ${theme.borderRadius.m} 0 0`}
-                alignItems="center"
-              >
-                <EmphasisTypography variant="m" color={theme.colors.textDefault}>{getFixturesDateFormatted(date)}</EmphasisTypography>
-              </Section>
-              {fixtures
-                .sort((a: Fixture, b: Fixture) => new Date(a.kickOffTime).getTime() - new Date(b.kickOffTime).getTime())
-                .map((fixture: Fixture, index: number, array: Array<any>) => (
-                  <>
-                    <UpcomingFixturePreview
-                      fixture={fixture}
-                      useShortNames={isMobile}
-                      backgroundColor={theme.colors.white}
-                    />
-                    {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
-                  </>
-                ))}
-            </FixturesContainer>
-          ))} */}
         {previewFixtures.length > 0 && availableFixtureGroups.map((fixtureGroup) => (
           <FixturesContainer>
             <Section
@@ -179,6 +156,14 @@ const CreateFixturesViaFotMobSnippetModal = ({
               ))}
           </FixturesContainer>
         ))}
+        {hasAttemptedCreation && previewFixtures.length === 0 && (
+          <InfoDialogue
+            color="red"
+            title="Ingen match skapades"
+            description="Inga matcher kunde skapas utifrån de filter som finns kring lag och turneringar."
+            icon={<WarningDiamond color={theme.colors.redDark} size={24} weight="fill" />}
+          />
+        )}
       </Content>
     </ActionsModal>
   );

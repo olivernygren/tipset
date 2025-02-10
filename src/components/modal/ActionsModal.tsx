@@ -58,7 +58,7 @@ const ActionsModal = ({
     mobileBottomSheet={mobileBottomSheet}
     noPadding
   >
-    <ModalContent noPadding={noPadding}>
+    <ModalContent noPadding={noPadding} headerDivider={headerDivider}>
       {message && message.length > 0 && (
         <NormalTypography variant="m" color={theme.colors.silverDarker}>
           {message}
@@ -87,16 +87,16 @@ const ActionsModal = ({
   </Modal>
 );
 
-const ModalContent = styled.div<{ noPadding?: boolean }>`
+const ModalContent = styled.div<{ noPadding?: boolean, headerDivider?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.m};
   flex-grow: 1;
   overflow-y: auto;
-  padding: ${({ noPadding }) => (noPadding ? '0' : `${theme.spacing.xxs} ${theme.spacing.m}`)};
+  padding: ${({ noPadding, headerDivider }: { noPadding?: boolean, headerDivider?: boolean }) => (noPadding ? '0' : `${headerDivider ? theme.spacing.m : theme.spacing.xxs} ${theme.spacing.m}`)};
   
   @media ${devices.tablet} {
-    padding: ${({ noPadding }) => (noPadding ? '0' : `${theme.spacing.xxs} ${theme.spacing.l}`)};
+    padding: ${({ noPadding, headerDivider }: { noPadding?: boolean, headerDivider?: boolean }) => (noPadding ? '0' : `${headerDivider ? theme.spacing.l : theme.spacing.xxs} ${theme.spacing.l}`)};
   }
 `;
 
