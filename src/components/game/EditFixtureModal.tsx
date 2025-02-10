@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import {
-  CheckCircle, CheckSquare, PlusCircle, Square,
+  CheckCircle, CheckSquare, Square,
   Trash,
 } from '@phosphor-icons/react';
 import { theme } from '../../theme';

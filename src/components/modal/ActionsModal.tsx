@@ -93,10 +93,10 @@ const ModalContent = styled.div<{ noPadding?: boolean }>`
   gap: ${theme.spacing.m};
   flex-grow: 1;
   overflow-y: auto;
-  padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.m)};
+  padding: ${({ noPadding }) => (noPadding ? '0' : `${theme.spacing.xxs} ${theme.spacing.m}`)};
   
   @media ${devices.tablet} {
-    padding: ${({ noPadding }) => (noPadding ? '0' : theme.spacing.l)};
+    padding: ${({ noPadding }) => (noPadding ? '0' : `${theme.spacing.xxs} ${theme.spacing.l}`)};
   }
 `;
 

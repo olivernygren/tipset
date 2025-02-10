@@ -30,6 +30,13 @@ export interface CreatePredictionLeagueInput {
   hasEnded: boolean;
 }
 
+export enum LeagueTabs {
+  OVERVIEW = 'OVERVIEW',
+  MATCHES = 'MATCHES',
+  PARTICIPANTS = 'PARTICIPANTS',
+  EDIT = 'EDIT',
+}
+
 export interface PredictionLeagueStanding {
   userId: string;
   username: string;

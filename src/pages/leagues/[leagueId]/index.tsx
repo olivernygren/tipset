@@ -14,7 +14,7 @@ import Page from '../../../components/Page';
 import { auth, db } from '../../../config/firebase';
 import { CollectionEnum } from '../../../utils/Firebase';
 import {
-  LeagueGameWeek, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
+  LeagueGameWeek, LeagueTabs, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
 } from '../../../utils/League';
 import { withDocumentIdOnObject } from '../../../utils/helpers';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../../components/typography/Typography';
@@ -39,13 +39,6 @@ import CustomSkeleton, { ParagraphSkeleton } from '../../../components/skeleton/
 import 'react-loading-skeleton/dist/skeleton.css';
 import Modal from '../../../components/modal/Modal';
 import Input from '../../../components/input/Input';
-
-export enum LeagueTabs {
-  OVERVIEW = 'OVERVIEW',
-  MATCHES = 'MATCHES',
-  PARTICIPANTS = 'PARTICIPANTS',
-  EDIT = 'EDIT',
-}
 
 const PredictionLeaguePage = () => {
   const navigate = useNavigate();
