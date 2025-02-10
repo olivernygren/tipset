@@ -1666,6 +1666,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'Leganés',
+      fotMobName: 'Leganes',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b8/Club_Deportivo_Legan%C3%A9s_logo.svg',
       stadium: 'Estadio Municipal de Butarque',
       country: CountryEnum.SPAIN,

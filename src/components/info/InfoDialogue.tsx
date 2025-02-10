@@ -16,16 +16,57 @@ interface InfoDialogueProps {
 const InfoDialogue = ({
   color = 'gold', title, description, icon,
 }: InfoDialogueProps) => {
-  const textColor = theme.colors[`${color}Darker`];
-  const bgColor = theme.colors[`${color}Fade`];
-  const borderColor = theme.colors[`${color}Light`];
+  const getTextColor = () => {
+    switch (color) {
+      case 'gold':
+        return theme.colors.goldDarker;
+      case 'primary':
+        return theme.colors.primaryDark;
+      case 'red':
+        return theme.colors.redDark;
+      case 'silver':
+        return theme.colors.silverDark;
+      default:
+        return theme.colors[`${color}Darker`];
+    }
+  };
+
+  const getBackgroundColor = () => {
+    switch (color) {
+      case 'gold':
+        return theme.colors.goldFade;
+      case 'primary':
+        return theme.colors.primaryFade;
+      case 'red':
+        return theme.colors.redFade;
+      case 'silver':
+        return theme.colors.silverBleach;
+      default:
+        return theme.colors[`${color}Fade`];
+    }
+  };
+
+  const getBorderColor = () => {
+    switch (color) {
+      case 'gold':
+        return theme.colors.goldLight;
+      case 'primary':
+        return theme.colors.primaryLighter;
+      case 'red':
+        return theme.colors.redLighter;
+      case 'silver':
+        return theme.colors.silverLight;
+      default:
+        return theme.colors[`${color}Light`];
+    }
+  };
 
   return (
-    <Container bgColor={bgColor} borderColor={borderColor}>
-      {icon || <Info size={24} color={textColor} weight="fill" />}
+    <Container bgColor={getBackgroundColor()} borderColor={getBorderColor()}>
+      {icon || <Info size={24} color={getTextColor()} weight="fill" />}
       <TextContainer>
-        <HeadingsTypography variant="h6" color={textColor}>{title}</HeadingsTypography>
-        <NormalTypography color={textColor}>{description}</NormalTypography>
+        <HeadingsTypography variant="h6" color={getTextColor()}>{title}</HeadingsTypography>
+        <NormalTypography color={getTextColor()}>{description}</NormalTypography>
       </TextContainer>
     </Container>
   );

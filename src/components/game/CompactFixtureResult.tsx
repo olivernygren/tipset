@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-  Coin, Eye, FireSimple, SoccerBall, Target,
+  Eye, FireSimple, SoccerBall, Target,
 } from '@phosphor-icons/react';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
