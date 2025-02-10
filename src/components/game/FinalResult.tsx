@@ -38,27 +38,27 @@ const FinalResult = ({
     <FixtureContainer>
       <Teams>
         <TeamContainer>
-          <EmphasisTypography variant={isMobile ? 's' : 'm'} align="right">
+          <NormalTypography variant={isMobile ? 's' : 'm'} align="right">
             {fixture.homeTeam.name}
-          </EmphasisTypography>
+          </NormalTypography>
           {getAvatar(fixture.homeTeam)}
         </TeamContainer>
         {!isMobile && (
         <ResultContainer>
-          <NoWrapTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault}>
+          <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault} noWrap>
             {fixture.finalResult?.homeTeamGoals ?? '?'}
             {' '}
             -
             {' '}
             {fixture.finalResult?.awayTeamGoals ?? '?'}
-          </NoWrapTypography>
+          </EmphasisTypography>
         </ResultContainer>
         )}
         <TeamContainer>
           {getAvatar(fixture.awayTeam)}
-          <EmphasisTypography variant={isMobile ? 's' : 'm'}>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>
             {fixture.awayTeam.name}
-          </EmphasisTypography>
+          </NormalTypography>
         </TeamContainer>
       </Teams>
       {isFullTime ? (
@@ -119,12 +119,6 @@ const ResultContainer = styled.div`
   width: fit-content;
   height: 100%;
   gap: ${theme.spacing.xxxs};
-`;
-
-const NoWrapTypography = styled(NormalTypography)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const FullTimeIndicator = styled.div<{ compact?: boolean }>`

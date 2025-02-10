@@ -228,7 +228,8 @@ export const getLastKickoffTimeInAllGameWeeks = (allGameWeeks: Array<LeagueGameW
   }, new Date(fixtures[0].kickOffTime));
 
   const day = new Date(latestKickoff);
-  day.setHours(23, 59, 59, 0);
+  day.setDate(day.getDate() + 1);
+  day.setHours(0, 0, 0, 0);
 
   return day;
 };
@@ -246,7 +247,8 @@ export const getLastKickoffTimeInGameWeek = (gameWeek?: LeagueGameWeek): Date =>
   }, new Date(fixtures[0].kickOffTime));
 
   const day = new Date(latestKickoff);
-  day.setHours(23, 59, 59, 0);
+  day.setDate(day.getDate() + 1);
+  day.setHours(0, 0, 0, 0);
 
   return day;
 };

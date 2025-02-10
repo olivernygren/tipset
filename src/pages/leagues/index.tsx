@@ -24,7 +24,7 @@ import Input from '../../components/input/Input';
 import { QueryEnum } from '../../utils/Routes';
 import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
 import { useUser } from '../../context/UserContext';
-import { successNotify } from '../../utils/toast/toastHelpers';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../../components/tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import IconButton from '../../components/buttons/IconButton';
@@ -53,6 +53,9 @@ const PredictionLeaguesPage = () => {
 
   const currentUserId = user?.documentId ?? '';
   // const currentUserId = auth.currentUser?.uid ?? '';
+  const noLeaguesAvailableForUser = Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0;
+  const showAvailableLeagues = !fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0;
+  const notLoggedIn = !user && !fetchLoading && !userLoading;
 
   useEffect(() => {
     if (currentUserId) {
@@ -74,7 +77,7 @@ const PredictionLeaguesPage = () => {
       setParticipantLeagues(allParticipantLeagues);
       setCreatorLeagues(allCreatorLeagues);
     } catch (err) {
-      console.error(err);
+      errorNotify('Ett fel uppstod när ligorna skulle hämtas');
     } finally {
       setFetchLoading(false);
     }
@@ -116,10 +119,10 @@ const PredictionLeaguesPage = () => {
       setShowJoinLeagueModal(false);
       fetchLeagues();
     } catch (e) {
-      console.error(e);
+      errorNotify('Ett fel uppstod när ligan skulle skapas');
+    } finally {
+      setCreateLeagueLoading(false);
     }
-
-    setCreateLeagueLoading(false);
   };
 
   const handleJoinLeague = async () => {
@@ -157,7 +160,7 @@ const PredictionLeaguesPage = () => {
     }
 
     if (leagueData.hasEnded) {
-      setShowJoinLeagueError('Ligan har redan avslutats');
+      setShowJoinLeagueError('Ligan har avslutats');
       setJoinLeagueLoading(null);
       return;
     }
@@ -167,6 +170,7 @@ const PredictionLeaguesPage = () => {
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
       correctResults: 0,
+      // oddsBonusPoints: 0,
     };
 
     try {
@@ -175,14 +179,13 @@ const PredictionLeaguesPage = () => {
         standings: [...leagueData.standings, newParticipantStandingsObj],
       });
       setShowJoinLeagueModal(false);
-      successNotify(`Du har gått med i ${leagueData.name}`);
+      successNotify(`Du har gått med i ligan ${leagueData.name}`);
       fetchLeagues();
     } catch (e) {
-      console.error(e);
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
+    } finally {
+      setJoinLeagueLoading(null);
     }
-
-    setJoinLeagueLoading(null);
   };
 
   const getLeagueCard = (league: PredictionLeague) => {
@@ -307,11 +310,11 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {!user && !fetchLoading && !userLoading && (
+        {notLoggedIn && (
           <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
         )}
         {fetchLoading && Boolean(user) && getSkeletonLoader()}
-        {!fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
+        {showAvailableLeagues && (
           <>
             {creatorLeagues.length > 0 && (
               <Section gap="s">
@@ -339,7 +342,7 @@ const PredictionLeaguesPage = () => {
             )}
           </>
         )}
-        {Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
+        {noLeaguesAvailableForUser && (
           <>
             <NormalTypography variant="m">Du är inte med i några ligor ännu.</NormalTypography>
             <Section flexDirection="row" gap="l">
@@ -348,7 +351,7 @@ const PredictionLeaguesPage = () => {
                 <Input
                   label="Ange inbjudningskod"
                   type="text"
-                  placeholder="t.ex. KNT342G9"
+                  placeholder="t.ex. KNT3G9"
                   value={joinLeagueCodeValue}
                   onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
                   fullWidth={isMobile}
@@ -394,11 +397,13 @@ const PredictionLeaguesPage = () => {
               maxLength={30}
             />
             <Input
-              label="Beskrivning"
+              label="Beskrivning (valfritt)"
               type="text"
               value={newLeagueDescription}
               onChange={(e) => setNewLeagueDescription(e.currentTarget.value)}
               fullWidth
+              maxLength={100}
+              maxLengthInvisible
             />
             <ModalButtons>
               <Button variant="secondary" onClick={() => setShowCreateLeagueModal(false)} fullWidth>
@@ -428,7 +433,7 @@ const PredictionLeaguesPage = () => {
             <Input
               label="Inbjudningskod"
               type="text"
-              placeholder="t.ex. DHU8M2GL"
+              placeholder="t.ex. DHU8C2"
               value={joinLeagueCodeValueInModal}
               onChange={(e) => setJoinLeagueCodeValueInModal(e.currentTarget.value)}
               fullWidth

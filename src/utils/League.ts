@@ -1,6 +1,6 @@
 import { Fixture, Prediction } from './Fixture';
 
-export const leagueMaximumParticipants = 20;
+export const leagueMaximumParticipants = 24;
 
 export interface PredictionLeague {
   documentId: string;
