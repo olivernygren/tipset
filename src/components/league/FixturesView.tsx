@@ -736,9 +736,6 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               <HeadingsTypography variant="h4">Nästa omgång</HeadingsTypography>
               {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
                 <Section flexDirection="row" alignItems="center" gap="xs" fitContent>
-                  <NormalTypography variant="m" color={theme.colors.silverDark}>
-                    {`Kan tippas tidigast ${getNextGameWeekStartDate()}`}
-                  </NormalTypography>
                   {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
                     <Tag
                       text={`Omgång ${upcomingGameWeeks[0].round}`}
@@ -757,6 +754,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                 </Section>
               )}
             </Section>
+            {upcomingGameWeeks && upcomingGameWeeks.length > 0 && (
+              <>
+                <Divider />
+                <Section flexDirection="row" alignItems="center" gap="xxs" justifyContent="center">
+                  <NormalTypography variant="m" color={theme.colors.silverDark} align="center">
+                    {`Kan tippas tidigast ${getNextGameWeekStartDate()}`}
+                  </NormalTypography>
+                </Section>
+              </>
+            )}
             {upcomingGameWeeks && upcomingGameWeeks.length > 0 ? (
               <>
                 {editUpcomingGameWeekViewOpen ? (
@@ -794,6 +801,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               </>
             ) : (
               <NormalTypography variant="m" color={theme.colors.textLight}>Ingen kommande omgång</NormalTypography>
+            )}
+            {upcomingGameWeeks && upcomingGameWeeks.length > 1 && (
+              <Section flexDirection="row" alignItems="center" gap="xxs" justifyContent="center">
+                <EmphasisTypography variant="m" color={theme.colors.textDefault}>
+                  {`+ ${upcomingGameWeeks.length - 1} ytterligare omgång${upcomingGameWeeks.length > 2 ? 'ar' : ''}`}
+                </EmphasisTypography>
+              </Section>
             )}
           </Section>
         )}

@@ -20,7 +20,6 @@ import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import LeagueStandingsTable from '../standings/LeagueStandingsTable';
 import { groupFixturesByDate } from '../../utils/helpers';
-// import EditLastRoundScoresModal from './EditLastRoundScoresModal';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -38,11 +37,11 @@ const LeagueOverview = ({
 
   const [currentGameWeek, setCurrentGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
   const [previousGameWeek, setPreviousGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
-  const [upcomingGameWeek, setUpcomingGameWeek] = useState<LeagueGameWeek | undefined>(undefined);
+  const [upcomingGameWeeks, setUpcomingGameWeeks] = useState<Array<LeagueGameWeek>>([]);
   const [showCurrentFixturePredictionsModal, setShowCurrentFixturePredictionModal] = useState<string | null>(null);
   const [showPreviousFixturePredictionsModal, setShowPreviousFixturePredictionsModal] = useState<string | null>(null);
   const [displayedFixtures, setDisplayedFixtures] = useState<Array<Fixture>>([]);
-  const [showingNextGameWeek, setShowingNextGameWeek] = useState<boolean>(false);
+  const [selectedRound, setSelectedRound] = useState<number | undefined>();
 
   useEffect(() => {
     if (league && league.gameWeeks && league.gameWeeks.length > 0) {
@@ -53,6 +52,7 @@ const LeagueOverview = ({
 
       if (currentGameWeek) {
         setCurrentGameWeek(currentGameWeek);
+        setSelectedRound(currentGameWeek.round);
         setDisplayedFixtures(currentGameWeek.games.fixtures);
       }
 
@@ -67,14 +67,14 @@ const LeagueOverview = ({
         setPreviousGameWeek(previousGameWeek);
       }
 
-      const upcomingGameWeek = league.gameWeeks
-        .find((gameWeek) => {
+      const upcomingGameWeeks = league.gameWeeks
+        .filter((gameWeek) => {
           const now = new Date();
           return new Date(gameWeek.startDate) > now;
         });
 
-      if (upcomingGameWeek) {
-        setUpcomingGameWeek(upcomingGameWeek);
+      if (upcomingGameWeeks) {
+        setUpcomingGameWeeks(upcomingGameWeeks);
       }
     }
   }, []);
@@ -93,8 +93,8 @@ const LeagueOverview = ({
   };
 
   const getNextGameWeekStartDate = () => {
-    if (!upcomingGameWeek) return '';
-    const startDate = new Date(upcomingGameWeek.startDate);
+    if (!upcomingGameWeeks.length) return '';
+    const startDate = new Date(upcomingGameWeeks[0].startDate);
     const day = startDate.getDate();
     const month = startDate.toLocaleString('default', { month: 'short' }).replaceAll('.', '');
     const hours = `${startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}`;
@@ -110,14 +110,26 @@ const LeagueOverview = ({
     return `${weekday} ${day} ${month}`;
   };
 
-  const handleShowNextGameWeek = () => {
-    setShowingNextGameWeek(true);
-    setDisplayedFixtures(upcomingGameWeek?.games.fixtures ?? []);
+  const handleShowNextGameWeek = (round: number) => {
+    if (selectedRound) {
+      setSelectedRound(round);
+    }
+    if (upcomingGameWeeks.length > 0) {
+      const nextGameWeek = upcomingGameWeeks.find((gameWeek) => gameWeek.round === round);
+      setDisplayedFixtures(nextGameWeek?.games.fixtures ?? []);
+    }
   };
 
-  const handleShowCurrentGameWeek = () => {
-    setShowingNextGameWeek(false);
-    setDisplayedFixtures(currentGameWeek?.games.fixtures ?? []);
+  const handleShowPreviousGameWeek = (round: number) => {
+    if (selectedRound) {
+      setSelectedRound(round);
+    }
+    if (round === currentGameWeek?.round) {
+      setDisplayedFixtures(currentGameWeek?.games.fixtures ?? []);
+    } else {
+      const previousGameWeek = league.gameWeeks?.find((gameWeek) => gameWeek.round === round);
+      setDisplayedFixtures(previousGameWeek?.games.fixtures ?? []);
+    }
   };
 
   return (
@@ -131,34 +143,34 @@ const LeagueOverview = ({
             </>
           ) : (
             <>
-              <Section justifyContent="space-between" alignItems="center" flexDirection="row">
+              <CurrentGameWeekHeader>
                 <HeadingsTypography variant="h3">
-                  {showingNextGameWeek ? 'Nästa omgång' : 'Aktuell omgång'}
+                  {selectedRound === currentGameWeek?.round ? 'Aktuell omgång' : 'Kommande omgång'}
                 </HeadingsTypography>
-                {upcomingGameWeek && upcomingGameWeek.games.fixtures && upcomingGameWeek.games.fixtures.length > 0 && (
-                  <Section gap="xxxs" alignItems="center" flexDirection="row" fitContent>
+                {upcomingGameWeeks.length > 0 && displayedFixtures && displayedFixtures.length > 0 && (
+                  <CurrentRoundSwitchContainer>
                     <IconButton
                       icon={<CaretCircleLeft size={28} weight="fill" />}
-                      onClick={handleShowCurrentGameWeek}
+                      onClick={() => handleShowPreviousGameWeek((selectedRound ?? 1) - 1)}
                       colors={{
                         normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silverLight,
                       }}
-                      disabled={!showingNextGameWeek}
+                      disabled={selectedRound === currentGameWeek?.round}
                     />
                     <EmphasisTypography variant="m" color={theme.colors.textDefault}>
-                      {`Omgång ${showingNextGameWeek ? upcomingGameWeek.round : currentGameWeek?.round}`}
+                      {`Omgång ${selectedRound}`}
                     </EmphasisTypography>
                     <IconButton
                       icon={<CaretCircleRight size={28} weight="fill" />}
-                      onClick={handleShowNextGameWeek}
+                      onClick={() => handleShowNextGameWeek((selectedRound ?? 1) + 1)}
                       colors={{
                         normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker, disabled: theme.colors.silverLight,
                       }}
-                      disabled={showingNextGameWeek}
+                      disabled={selectedRound === upcomingGameWeeks[upcomingGameWeeks.length - 1]?.round}
                     />
-                  </Section>
+                  </CurrentRoundSwitchContainer>
                 )}
-              </Section>
+              </CurrentGameWeekHeader>
               {currentGameWeek && (
                 <Section gap="xxxs" height="100%">
                   <FixturesContainer>
@@ -178,7 +190,11 @@ const LeagueOverview = ({
                             <>
                               <UpcomingFixturePreview
                                 fixture={fixture}
-                                onShowPredictionsClick={() => setShowCurrentFixturePredictionModal(fixture.id)}
+                                onShowPredictionsClick={() => {
+                                  if (fixture.kickOffTime && new Date(fixture.kickOffTime) < new Date()) {
+                                    setShowCurrentFixturePredictionModal(fixture.id);
+                                  }
+                                }}
                                 useShortNames={isMobile}
                               />
                               {index !== array.length - 1 && <Divider color={theme.colors.silverLight} />}
@@ -187,7 +203,7 @@ const LeagueOverview = ({
                       </UpcomingFixturesDateContainer>
                     ))}
                   </FixturesContainer>
-                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && !showingNextGameWeek && (
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && !selectedRound && (
                     <MarginTopButton>
                       <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight="fill" size={24} color={theme.colors.white} />}>
                         Tippa matcher
@@ -196,10 +212,10 @@ const LeagueOverview = ({
                   )}
                 </Section>
               )}
-              {!currentGameWeek && upcomingGameWeek && (
+              {!currentGameWeek && upcomingGameWeeks && (
                 <NormalTypography variant="m" color={theme.colors.textLight}>{`Nästa omgång kan tippas tidigast ${getNextGameWeekStartDate()}`}</NormalTypography>
               )}
-              {!currentGameWeek && !upcomingGameWeek && (
+              {!currentGameWeek && !upcomingGameWeeks && (
                 <>
                   <NormalTypography variant="m" color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
                   {isCreator && (
@@ -372,6 +388,38 @@ const GridSection = styled.div`
   @media ${devices.tablet} {
     border-radius: ${theme.borderRadius.l};
     padding: ${theme.spacing.m};
+  }
+`;
+
+const CurrentGameWeekHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xs};
+  
+  @media ${devices.tablet} {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
+
+const CurrentRoundSwitchContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing.xxxs};
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  border: 1px solid ${theme.colors.silverLight};
+  padding: ${theme.spacing.xxxs};
+  border-radius: ${theme.borderRadius.m};
+  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLighter};
+  
+  @media ${devices.tablet} {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    width: fit-content;
   }
 `;
 
