@@ -947,6 +947,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onClose={() => setFindOtherFixturesModalOpen(false)}
           onFixturesSelect={(fixtures) => handleAddExternalFixtures(fixtures)}
           alreadySelectedFixtures={newGameWeekFixtures}
+          minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
         />
       )}
     </>

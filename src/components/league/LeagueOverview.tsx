@@ -203,7 +203,7 @@ const LeagueOverview = ({
                       </UpcomingFixturesDateContainer>
                     ))}
                   </FixturesContainer>
-                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && !selectedRound && (
+                  {currentGameWeek.games.fixtures.length > 0 && currentGameWeek.games.fixtures.some((fixture) => fixture.kickOffTime && new Date(fixture.kickOffTime) > new Date()) && selectedRound === currentGameWeek.round && (
                     <MarginTopButton>
                       <Button onClick={() => onChangeTab(LeagueTabs.MATCHES)} endIcon={<ArrowCircleRight weight="fill" size={24} color={theme.colors.white} />}>
                         Tippa matcher
