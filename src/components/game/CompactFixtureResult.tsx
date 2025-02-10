@@ -53,10 +53,10 @@ const CompactFixtureResult = ({
         </EmphasisTypography>
       </FullTimeContainer>
       <ResultContainer>
-        <EmphasisTypography variant="s" color={theme.colors.white}>
+        <EmphasisTypography variant="s" color={theme.colors.white} align="center">
           {fixture.finalResult ? fixture.finalResult.homeTeamGoals : '?'}
         </EmphasisTypography>
-        <EmphasisTypography variant="s" color={theme.colors.white}>
+        <EmphasisTypography variant="s" color={theme.colors.white} align="center">
           {fixture.finalResult ? fixture.finalResult.awayTeamGoals : '?'}
         </EmphasisTypography>
       </ResultContainer>
@@ -148,6 +148,7 @@ const ResultContainer = styled.div`
   justify-content: center;
   gap: ${theme.spacing.xxxs};
   box-sizing: border-box;
+  align-items: center;
 `;
 
 const Teams = styled.div`
