@@ -23,7 +23,8 @@ const LeagueStandingsTable = ({
   const getUserLatestGameWeekTotalPoints = (userId: string) => {
     if (!league || !league.gameWeeks) return 0;
 
-    const previousGameWeek = currentGameWeek ? league.gameWeeks[league.gameWeeks.length - 2] : league.gameWeeks[league.gameWeeks.length - 1];
+    const currentGameWeekRound = currentGameWeek?.round;
+    const previousGameWeek = league.gameWeeks.find((gameWeek) => currentGameWeekRound !== undefined && gameWeek.round === currentGameWeekRound - 1);
     const currentGameWeekHasStarted = currentGameWeek && currentGameWeek?.games.predictions.some((g) => g.points !== undefined);
     const pointsHaveBeenAwarded = Boolean(currentGameWeekHasStarted || (previousGameWeek && previousGameWeek?.games.predictions.some((g) => g.points !== undefined)));
 
@@ -51,11 +52,11 @@ const LeagueStandingsTable = ({
           </EmphasisTypography>
         </Section>
         {!isMobileDevice && (
-        <CenteredGridItem>
-          <NormalTypography variant="m" color={theme.colors.textLight}>
-            {league.gameWeeks && league.gameWeeks.length > 0 ? `${getUserLatestGameWeekTotalPoints(place.userId) > 0 ? '+' : '±'}${getUserLatestGameWeekTotalPoints(place.userId)}` : '-'}
-          </NormalTypography>
-        </CenteredGridItem>
+          <CenteredGridItem>
+            <NormalTypography variant="m" color={theme.colors.textLight}>
+              {league.gameWeeks && league.gameWeeks.length > 0 ? `${Number(getUserLatestGameWeekTotalPoints(place.userId)) > 0 ? '+' : '±'}${getUserLatestGameWeekTotalPoints(place.userId)}` : '-'}
+            </NormalTypography>
+          </CenteredGridItem>
         )}
         <CenteredGridItem>
           <NormalTypography variant="m" color={theme.colors.textLight}>
