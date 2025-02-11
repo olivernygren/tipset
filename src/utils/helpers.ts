@@ -1,6 +1,6 @@
 import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import {
-  Fixture, FixtureGroup, PredictionOutcomeEnum, PredictionStatus,
+  Fixture, FixtureGroup, LeagueScoringSystemValues, PredictionOutcomeEnum, PredictionStatus,
 } from './Fixture';
 import { LeagueGameWeek } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
@@ -97,7 +97,7 @@ export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
   }
 };
 
-export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: LeagueGameWeek | undefined, userId: string, teams?: Array<string>): Array<Player> => {
+export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: LeagueGameWeek | undefined, userId: string): Array<Player> => {
   if (!previousGameWeek) {
     return [];
   }
@@ -486,4 +486,38 @@ export const isPredictGoalScorerPossibleByTeamNames = (teamNames: Array<string>)
     return true;
   }
   return false;
+};
+
+export const bullseyeScoringSystem: LeagueScoringSystemValues = {
+  correctResult: 1,
+  correctOutcome: 1,
+  correctGoalScorerDefender: 5,
+  correctGoalScorerMidfielder: 3,
+  correctGoalScorerForward: 2,
+  correctGoalDifference: 1,
+  correctGoalsByTeam: 1,
+  oddsBetween3And4: 1,
+  oddsBetween4And6: 2,
+  oddsBetween6And10: 3,
+  oddsAvobe10: 5,
+  goalFest: 0,
+  underdogBonus: 0,
+  firstTeamToScore: 0,
+};
+
+export const gamblerScoringSystem: LeagueScoringSystemValues = {
+  correctResult: 0,
+  correctOutcome: 2,
+  correctGoalScorerDefender: 5,
+  correctGoalScorerMidfielder: 3,
+  correctGoalScorerForward: 2,
+  correctGoalDifference: 1,
+  correctGoalsByTeam: 1,
+  oddsBetween3And4: 2,
+  oddsBetween4And6: 4,
+  oddsBetween6And10: 6,
+  oddsAvobe10: 10,
+  goalFest: 3,
+  underdogBonus: 1,
+  firstTeamToScore: 1,
 };

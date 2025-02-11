@@ -64,6 +64,7 @@ export interface FixtureInput {
 }
 
 export interface PredictionPoints {
+  correctResultBool?: boolean;
   correctResult: number;
   correctOutcome: number;
   correctGoalScorer: number;
@@ -72,6 +73,23 @@ export interface PredictionPoints {
   correctGoalsByAwayTeam: number;
   oddsBonus: number;
   total: number;
+}
+
+export interface LeagueScoringSystemValues {
+  correctResult: number;
+  correctOutcome: number;
+  correctGoalScorerDefender: number;
+  correctGoalScorerMidfielder: number;
+  correctGoalScorerForward: number;
+  correctGoalDifference: number;
+  correctGoalsByTeam: number;
+  oddsBetween3And4: number;
+  oddsBetween4And6: number;
+  oddsBetween6And10: number;
+  oddsAvobe10: number;
+  goalFest: number;
+  underdogBonus: number;
+  firstTeamToScore: number;
 }
 
 export interface Prediction {

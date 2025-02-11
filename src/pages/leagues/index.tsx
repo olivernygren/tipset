@@ -6,13 +6,18 @@ import {
 import { motion } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
 import {
+  CheckCircle,
+  Circle,
   Medal, PlusCircle, UserPlus, Users,
 } from '@phosphor-icons/react';
-import { auth, db } from '../../config/firebase';
+import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
 import {
-  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
+  generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject, gamblerScoringSystem,
+  bullseyeScoringSystem,
+} from '../../utils/helpers';
+import {
+  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, ScoringSystemTemplates, leagueMaximumParticipants,
 } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -30,6 +35,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import IconButton from '../../components/buttons/IconButton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CustomSkeleton, { ParagraphSkeleton } from '../../components/skeleton/CustomSkeleton';
+import { Divider } from '../../components/Divider';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -50,9 +56,9 @@ const PredictionLeaguesPage = () => {
   const [leagueCardHovered, setLeagueCardHovered] = useState<string | undefined>(undefined);
   const [createLeagueLoading, setCreateLeagueLoading] = useState<boolean>(false);
   const [joinLeagueLoading, setJoinLeagueLoading] = useState<string | null>(null);
+  const [selectedScoringSystem, setSelectedScoringSystem] = useState<ScoringSystemTemplates>(ScoringSystemTemplates.GAMBLER);
 
   const currentUserId = user?.documentId ?? '';
-  // const currentUserId = auth.currentUser?.uid ?? '';
   const noLeaguesAvailableForUser = Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0;
   const showAvailableLeagues = !fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0;
   const notLoggedIn = !user && !fetchLoading && !userLoading;
@@ -89,18 +95,18 @@ const PredictionLeaguesPage = () => {
     const today = new Date();
     const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
 
-    if (newLeagueName.length === 0) return;
+    if (newLeagueName.length === 0 || !currentUserId) return;
 
     const newLeague: CreatePredictionLeagueInput = {
       name: newLeagueName,
       description: newLeagueDescription,
-      creatorId: auth.currentUser?.uid ?? '',
-      participants: [auth.currentUser?.uid ?? ''],
+      creatorId: currentUserId ?? '',
+      participants: [currentUserId ?? ''],
       inviteCode: generateLeagueInviteCode(),
       createdAt: new Date().toISOString(),
       invitedUsers: [],
       standings: [{
-        userId: auth.currentUser?.uid ?? '',
+        userId: currentUserId ?? '',
         username: (user?.lastname ? `${user?.firstname} ${user?.lastname}` : user?.firstname) ?? '?',
         points: 0,
         correctResults: 0,
@@ -108,6 +114,7 @@ const PredictionLeaguesPage = () => {
       }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
       hasEnded: false,
+      scoringSystem: selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? gamblerScoringSystem : bullseyeScoringSystem,
     };
 
     try {
@@ -382,10 +389,10 @@ const PredictionLeaguesPage = () => {
       </Section>
       {showCreateLeagueModal && (
         <Modal
-          size="s"
+          size="m"
           title="Skapa liga"
           onClose={() => setShowCreateLeagueModal(false)}
-          mobileBottomSheet
+          mobileFullScreen
         >
           <Section gap="m">
             <Input
@@ -405,6 +412,47 @@ const PredictionLeaguesPage = () => {
               maxLength={100}
               maxLengthInvisible
             />
+            <Section gap="s">
+              <Section gap="xxs">
+                <EmphasisTypography variant="m">Välj poängsystem</EmphasisTypography>
+                <NormalTypography variant="s" color={theme.colors.silverDark}>Välj vilket poängsystem som ska användas i ligan. Detta kan justeras manuellt senare.</NormalTypography>
+              </Section>
+              <ScoringSystemSelector>
+                <ScoringSystemOption
+                  selected={selectedScoringSystem === ScoringSystemTemplates.GAMBLER}
+                  onClick={() => setSelectedScoringSystem(ScoringSystemTemplates.GAMBLER)}
+                >
+                  {selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? (
+                    <CheckCircle size={24} weight="fill" color={theme.colors.primary} />
+                  ) : (
+                    <Circle size={24} color={theme.colors.silverDark} />
+                  )}
+                  <Section gap="xxxs">
+                    <EmphasisTypography variant="m" color={theme.colors.textDefault}>“Gambler”</EmphasisTypography>
+                    <NormalTypography variant="s" color={selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? theme.colors.primaryDark : theme.colors.silverDark}>
+                      Ger lite större utdelningar och gynnar de som vågar satsa på ett oväntat resultat.
+                    </NormalTypography>
+                  </Section>
+                </ScoringSystemOption>
+                <Divider color={theme.colors.silver} />
+                <ScoringSystemOption
+                  selected={selectedScoringSystem === ScoringSystemTemplates.BULLSEYE}
+                  onClick={() => setSelectedScoringSystem(ScoringSystemTemplates.BULLSEYE)}
+                >
+                  {selectedScoringSystem === ScoringSystemTemplates.BULLSEYE ? (
+                    <CheckCircle size={24} weight="fill" color={theme.colors.primary} />
+                  ) : (
+                    <Circle size={24} color={theme.colors.silverDark} />
+                  )}
+                  <Section gap="xxxs">
+                    <EmphasisTypography variant="m">“Bullseye”</EmphasisTypography>
+                    <NormalTypography variant="s" color={selectedScoringSystem === ScoringSystemTemplates.BULLSEYE ? theme.colors.primaryDark : theme.colors.silverDark}>
+                      Ger lite mindre utdelningar och gynnar de som prickar exakt rätt.
+                    </NormalTypography>
+                  </Section>
+                </ScoringSystemOption>
+              </ScoringSystemSelector>
+            </Section>
             <ModalButtons>
               <Button variant="secondary" onClick={() => setShowCreateLeagueModal(false)} fullWidth>
                 Avbryt
@@ -536,6 +584,35 @@ const PointsContainer = styled.div<{ isHovered: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const ScoringSystemSelector = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: ${theme.colors.silverBleach};
+  border: 1px solid ${theme.colors.silver};
+  border-radius: ${theme.borderRadius.m};
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const ScoringSystemOption = styled.div<{ selected: boolean }>`
+  display: flex;
+  align-items: flex-start;
+  gap: ${theme.spacing.xs};
+  padding: ${theme.spacing.xs};
+  background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.white)};
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  > section {
+    padding-top: 2px;
+  }
+
+  &:hover {
+    background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.silverLighter)};
+  }
 `;
 
 export default PredictionLeaguesPage;

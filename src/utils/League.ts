@@ -1,4 +1,4 @@
-import { Fixture, Prediction } from './Fixture';
+import { Fixture, LeagueScoringSystemValues, Prediction } from './Fixture';
 
 export const leagueMaximumParticipants = 24;
 
@@ -15,6 +15,8 @@ export interface PredictionLeague {
   deadlineToJoin: Date;
   gameWeeks?: Array<LeagueGameWeek>;
   hasEnded?: boolean;
+  slackChannelUrl?: string;
+  scoringSystem?: LeagueScoringSystemValues;
 }
 
 export interface CreatePredictionLeagueInput {
@@ -28,6 +30,8 @@ export interface CreatePredictionLeagueInput {
   standings: Array<PredictionLeagueStanding>;
   deadlineToJoin: string;
   hasEnded: boolean;
+  slackChannelUrl?: string;
+  scoringSystem?: LeagueScoringSystemValues;
 }
 
 export enum LeagueTabs {
@@ -66,4 +70,9 @@ export interface LeagueGameWeekInput {
   games: LeagueGameWeekFixtures;
   hasBeenCorrected?: boolean;
   hasEnded?: boolean;
+}
+
+export enum ScoringSystemTemplates {
+  BULLSEYE = 'BULLSEYE',
+  GAMBLER = 'GAMBLER',
 }

@@ -11,7 +11,7 @@ import { useHover } from 'react-haiku';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import {
-  Fixture, FixtureOutcomeEnum, Prediction, PredictionPoints, TeamType,
+  Fixture, FixtureOutcomeEnum, LeagueScoringSystemValues, Prediction, PredictionPoints, TeamType,
 } from '../../utils/Fixture';
 import { Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
@@ -47,6 +47,7 @@ interface GamePredictorProps {
   isLeagueCreator?: boolean;
   awardedPoints?: PredictionPoints;
   particpantsThatPredicted?: Array<string>;
+  leagueScoringSystem?: LeagueScoringSystemValues;
 }
 
 const GamePredictor = ({
@@ -65,6 +66,7 @@ const GamePredictor = ({
   numberOfParticipantsPredicted,
   awardedPoints,
   particpantsThatPredicted,
+  leagueScoringSystem,
 }: GamePredictorProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
   const { hovered: homeWinHovered, ref: homeWinRef } = useHover();
@@ -608,6 +610,7 @@ const GamePredictor = ({
           onClose={() => setIsSelectGoalScorerModalOpen(false)}
           initialSelectedPlayers={[predictedPlayerToScore]}
           previousGameWeekPredictedGoalScorers={previousGameWeekPredictedGoalScorers}
+          leagueScoringSystem={leagueScoringSystem}
         />
       )}
     </>

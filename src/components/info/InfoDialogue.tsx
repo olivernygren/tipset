@@ -63,7 +63,9 @@ const InfoDialogue = ({
 
   return (
     <Container bgColor={getBackgroundColor()} borderColor={getBorderColor()}>
-      {icon || <Info size={24} color={getTextColor()} weight="fill" />}
+      <IconContainer>
+        {icon || <Info size={24} color={getTextColor()} weight="fill" />}
+      </IconContainer>
       <TextContainer>
         <HeadingsTypography variant="h6" color={getTextColor()}>{title}</HeadingsTypography>
         <NormalTypography color={getTextColor()}>{description}</NormalTypography>
@@ -88,6 +90,10 @@ const TextContainer = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.xxxs};
   margin-top: 2px;
+`;
+
+const IconContainer = styled.div`
+  min-width: 24px;
 `;
 
 export default InfoDialogue;

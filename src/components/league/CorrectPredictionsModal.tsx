@@ -26,7 +26,7 @@ import Button from '../buttons/Button';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import {
-  defenderGoalPoints, forwardGoalPoints, getGeneralPositionShorthand, getPlayerPositionColor, midfielderGoalPoints, withDocumentIdOnObject,
+  getGeneralPositionShorthand, getPlayerPositionColor, bullseyeScoringSystem, withDocumentIdOnObject,
 } from '../../utils/helpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import MobilePredictionCard from '../cards/MobilePredictionCard';
@@ -65,6 +65,7 @@ const CorrectPredictionsModal = ({
   const [hasAwardedPoints, setHasAwardedPoints] = useState<boolean>(false);
 
   const hasGoalScorers = goalScorers.length > 0;
+  const scoringSystem = league.scoringSystem ?? bullseyeScoringSystem;
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -214,11 +215,11 @@ const CorrectPredictionsModal = ({
 
     switch (predictedPlayerToScore.position.general) {
       case GeneralPositionEnum.DF:
-        return defenderGoalPoints;
+        return scoringSystem.correctGoalScorerDefender;
       case GeneralPositionEnum.MF:
-        return midfielderGoalPoints;
+        return scoringSystem.correctGoalScorerMidfielder;
       case GeneralPositionEnum.FW:
-        return forwardGoalPoints;
+        return scoringSystem.correctGoalScorerForward;
       default:
         return 0;
     }
@@ -230,16 +231,30 @@ const CorrectPredictionsModal = ({
     const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
     if (!fixture || !fixture.odds) return 0;
 
+    // const {
+    //   correctResult,
+    //   correctOutcome,
+    //   correctGoalScorerDefender,
+    //   correctGoalScorerMidfielder,
+    //   correctGoalScorerForward,
+    //   correctGoalDifference,
+    //   correctGoalsByTeam,
+    //   oddsBetween3And4,
+    //   oddsBetween4And6,
+    //   oddsBetween6And10,
+    //   oddsAvobe10,
+    // } = bullseyeScoringSystem;
+
     const homeWinOdds = parseFloat(fixture.odds.homeWin);
     const drawOdds = parseFloat(fixture.odds.draw);
     const awayWinOdds = parseFloat(fixture.odds.awayWin);
 
     const getBonusPointsFromOdds = (odds: number): number => {
       if (odds >= 1 && odds <= 2.99) return 0;
-      if (odds >= 3.0 && odds <= 3.99) return 1;
-      if (odds >= 4.0 && odds <= 5.99) return 2;
-      if (odds >= 6.0 && odds <= 9.99) return 3;
-      if (odds >= 10) return 5;
+      if (odds >= 3.0 && odds <= 3.99) return scoringSystem.oddsBetween3And4;
+      if (odds >= 4.0 && odds <= 5.99) return scoringSystem.oddsBetween4And6;
+      if (odds >= 6.0 && odds <= 9.99) return scoringSystem.oddsBetween6And10;
+      if (odds >= 10) return scoringSystem.oddsAvobe10;
       return 0;
     };
 
@@ -305,14 +320,16 @@ const CorrectPredictionsModal = ({
     const wasAwayWin = parseInt(finalResult.homeGoals) < parseInt(finalResult.awayGoals);
     const wasDraw = parseInt(finalResult.homeGoals) === parseInt(finalResult.awayGoals);
 
+    const correctOutcome = (homeWinPredicted && wasHomeWin) || (awayWinPredicted && wasAwayWin) || (drawPredicted && wasDraw);
+
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
 
     const oddsBonusPoints = getOddsBonusPoints(prediction);
 
-    if (homeWinPredicted && wasHomeWin) {
-      totalPoints += 1;
-      pointDistribution.correctOutcome += 1;
+    if (correctOutcome) {
+      totalPoints += scoringSystem.correctOutcome;
+      pointDistribution.correctOutcome += scoringSystem.correctOutcome;
 
       if (oddsBonusPoints > 0) {
         totalPoints += oddsBonusPoints;
@@ -320,44 +337,44 @@ const CorrectPredictionsModal = ({
       }
     }
 
-    if (awayWinPredicted && wasAwayWin) {
-      totalPoints += 1;
-      pointDistribution.correctOutcome += 1;
+    // if (awayWinPredicted && wasAwayWin) {
+    //   totalPoints += scoringSystem.correctOutcome;
+    //   pointDistribution.correctOutcome += scoringSystem.correctOutcome;
 
-      if (oddsBonusPoints > 0) {
-        totalPoints += oddsBonusPoints;
-        pointDistribution.oddsBonus += oddsBonusPoints;
-      }
-    }
+    //   if (oddsBonusPoints > 0) {
+    //     totalPoints += oddsBonusPoints;
+    //     pointDistribution.oddsBonus += oddsBonusPoints;
+    //   }
+    // }
 
-    if (drawPredicted && wasDraw) {
-      totalPoints += 1;
-      pointDistribution.correctOutcome += 1;
+    // if (drawPredicted && wasDraw) {
+    //   totalPoints += scoringSystem.correctOutcome;
+    //   pointDistribution.correctOutcome += scoringSystem.correctOutcome;
 
-      if (oddsBonusPoints > 0) {
-        totalPoints += oddsBonusPoints;
-        pointDistribution.oddsBonus += oddsBonusPoints;
-      }
-    }
+    //   if (oddsBonusPoints > 0) {
+    //     totalPoints += oddsBonusPoints;
+    //     pointDistribution.oddsBonus += oddsBonusPoints;
+    //   }
+    // }
 
     if (correctHomeGoals) {
-      totalPoints += 1;
-      pointDistribution.correctGoalsByHomeTeam += 1;
+      totalPoints += scoringSystem.correctGoalsByTeam;
+      pointDistribution.correctGoalsByHomeTeam += scoringSystem.correctGoalsByTeam;
     }
 
     if (correctAwayGoals) {
-      totalPoints += 1;
-      pointDistribution.correctGoalsByAwayTeam += 1;
+      totalPoints += scoringSystem.correctGoalsByTeam;
+      pointDistribution.correctGoalsByAwayTeam += scoringSystem.correctGoalsByTeam;
     }
 
     if (correctHomeGoals && correctAwayGoals) {
-      totalPoints += 1;
-      pointDistribution.correctResult += 1;
+      totalPoints += scoringSystem.correctResult;
+      pointDistribution.correctResult += scoringSystem.correctResult;
     }
 
     if (correctGoalDifference) {
-      totalPoints += 1;
-      pointDistribution.correctGoalDifference += 1;
+      totalPoints += scoringSystem.correctGoalDifference;
+      pointDistribution.correctGoalDifference += scoringSystem.correctGoalDifference;
     }
 
     if (correctPlayerPrediction) {
@@ -606,6 +623,7 @@ const CorrectPredictionsModal = ({
           onSave={(players) => handleSelectGoalScorers(players)}
           multiple
           initialSelectedPlayers={[...homeTeamPlayers, ...awayTeamPlayers].filter((player) => goalScorers.includes(player.name))}
+          leagueScoringSystem={league.scoringSystem}
         />
       )}
     </>
