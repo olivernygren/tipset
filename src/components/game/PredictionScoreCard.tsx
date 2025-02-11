@@ -7,7 +7,7 @@ import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { UserProfilePicture } from '../typography/UserName';
-import { AvatarSize } from '../avatar/Avatar';
+import Avatar, { AvatarSize } from '../avatar/Avatar';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import IconButton from '../buttons/IconButton';
@@ -103,7 +103,17 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
       <MainContent>
         <UserInfo>
           {!isMobile && (
-            <UserProfilePicture userId={prediction.userId} size={AvatarSize.M} />
+            prediction.userProfilePictureUrl ? (
+              <Avatar
+                src={prediction.userProfilePictureUrl && prediction.userProfilePictureUrl.length > 0 ? `/images/${prediction.userProfilePictureUrl}.png` : '/images/generic.png'}
+                size={AvatarSize.M}
+                objectFit="cover"
+                showBorder
+                customBorderWidth={1}
+              />
+            ) : (
+              <UserProfilePicture userId={prediction.userId} size={AvatarSize.M} />
+            )
           )}
           <EmphasisTypography variant="m">{prediction.username}</EmphasisTypography>
         </UserInfo>

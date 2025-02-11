@@ -333,6 +333,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     const predictionInput: PredictionInput = {
       userId: user.documentId,
       username: `${user.firstname} ${user.lastname}`,
+      userProfilePictureUrl: user.profilePicture,
       fixtureId: fixture.id,
       homeGoals: parseInt(homeGoals),
       awayGoals: parseInt(awayGoals),
@@ -885,6 +886,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             <FixtureResultPreview
                               fixture={fixture}
                               predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                              onTogglePredictionsModalOpen={() => {
+                                if (showFixturePredictionsModal === fixture.id) {
+                                  setShowFixturePredictionsModal(null);
+                                } else {
+                                  setShowFixturePredictionsModal(fixture.id);
+                                }
+                              }}
                             />
                           )}
                           {!isMobile && index < array.length - 1 && <Divider />}

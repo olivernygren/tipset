@@ -95,6 +95,7 @@ export interface LeagueScoringSystemValues {
 export interface Prediction {
   userId: string;
   username?: string;
+  userProfilePictureUrl?: string;
   fixtureId: string;
   homeGoals: number;
   awayGoals: number;
@@ -106,6 +107,7 @@ export interface Prediction {
 export interface PredictionInput {
   userId: string;
   username?: string;
+  userProfilePictureUrl?: string;
   fixtureId: string;
   homeGoals: number;
   awayGoals: number;
