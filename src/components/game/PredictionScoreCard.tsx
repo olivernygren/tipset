@@ -27,7 +27,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const oddsBonusPointsAwarded = Boolean(prediction.points?.oddsBonus);
-  const correctResultPredicted = Boolean(prediction.points?.correctResult);
+  const correctResultPredicted = Boolean(prediction.points?.correctResult) || Boolean(prediction.points?.correctResultBool);
   const correctGoalScorerPredicted = Boolean(prediction.points?.correctGoalScorer);
 
   const getOddsForPredictedOutcome = () => {
@@ -68,11 +68,19 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     if (!points || points === 0) return null;
 
     const isOddsBonus = label.includes('Oddsbonus');
+    const isGoalScorer = label.includes('Korrekt målskytt');
+    const isCorrectResult = label.includes('Korrekt resultat');
 
     return (
       <TableRow topBorder>
         {isOddsBonus && (
           <FireSimple size={20} color={theme.colors.silverDark} />
+        )}
+        {isGoalScorer && (
+          <SoccerBall size={20} color={theme.colors.silverDark} weight="fill" />
+        )}
+        {isCorrectResult && (
+          <Target size={20} color={theme.colors.silverDark} />
         )}
         <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
         <EmphasisTypography variant="m" color={theme.colors.primary}>
@@ -202,10 +210,10 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
               <EmphasisTypography variant="m" color={theme.colors.primaryDark}>Poängfördelning</EmphasisTypography>
             </Section>
             {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
-            {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
             {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
             {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
             {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
+            {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
             {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
             {prediction.goalScorer && (
               <>

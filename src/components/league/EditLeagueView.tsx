@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { updateDoc, doc } from 'firebase/firestore';
 import styled from 'styled-components';
-import { PredictionLeague } from '../../utils/League';
+import { LeagueScoringSystemValues, PredictionLeague } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -84,6 +84,26 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
     }
 
     setEndLeagueLoading(false);
+  };
+
+  const handleSaveScoringSystem = async (scoringSystem: LeagueScoringSystemValues) => {
+    setUpdateLoading(true);
+
+    const updatedLeague = {
+      ...league,
+      scoringSystem,
+    };
+
+    try {
+      await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
+      setEditScoringSystemModalOpen(false);
+      successNotify('Poängsystemet uppdaterat');
+      refetchLeague();
+    } catch (error) {
+      errorNotify('Ett fel uppstod');
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   return (
@@ -186,8 +206,9 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       {editScoringSystemModalOpen && (
         <EditLeagueScoringSystemModal
           onClose={() => setEditScoringSystemModalOpen(false)}
-          onSave={() => refetchLeague()}
+          onSave={(scoringSystem) => handleSaveScoringSystem(scoringSystem)}
           scoringSystem={league.scoringSystem}
+          saveLoading={updateLoading}
         />
       )}
       {showEndLeagueConfirmationModal && (

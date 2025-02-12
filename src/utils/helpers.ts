@@ -500,9 +500,9 @@ export const bullseyeScoringSystem: LeagueScoringSystemValues = {
   oddsBetween4And6: 2,
   oddsBetween6And10: 3,
   oddsAvobe10: 5,
-  goalFest: 0,
-  underdogBonus: 0,
-  firstTeamToScore: 0,
+  goalFest: 0, // TODO: Update
+  underdogBonus: 0, // TODO: Update
+  firstTeamToScore: 0, // TODO: Update
 };
 
 export const gamblerScoringSystem: LeagueScoringSystemValues = {

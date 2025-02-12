@@ -146,7 +146,7 @@ const CorrectPredictionsModal = ({
     const updatedStandings = league.standings.map((standing) => {
       const pointsDistribution = pointsDistributions.find((d) => d.participantId === standing.userId);
       const points = pointsDistribution?.points;
-      const predictedCorrectResult = pointsDistribution?.points?.correctResult;
+      const predictedCorrectResult = pointsDistribution?.points?.correctResult || pointsDistribution?.points?.correctResultBool;
 
       // Find the fixture to check if it already has a final result
       const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
@@ -158,7 +158,7 @@ const CorrectPredictionsModal = ({
         // Calculate the previously awarded points
         const previousPointsDistribution = ongoingGameWeek.games.predictions.find((p) => p.userId === standing.userId && p.fixtureId === gameId);
         previousPoints = previousPointsDistribution?.points?.total || 0;
-        previousCorrectResults = previousPointsDistribution?.points?.correctResult ? 1 : 0;
+        previousCorrectResults = (previousPointsDistribution?.points?.correctResult || previousPointsDistribution?.points?.correctResultBool) ? 1 : 0;
         previousOddsBonus = previousPointsDistribution?.points?.oddsBonus || 0;
       }
 
@@ -230,20 +230,6 @@ const CorrectPredictionsModal = ({
 
     const fixture = ongoingGameWeek.games.fixtures.find((f) => f.id === gameId);
     if (!fixture || !fixture.odds) return 0;
-
-    // const {
-    //   correctResult,
-    //   correctOutcome,
-    //   correctGoalScorerDefender,
-    //   correctGoalScorerMidfielder,
-    //   correctGoalScorerForward,
-    //   correctGoalDifference,
-    //   correctGoalsByTeam,
-    //   oddsBetween3And4,
-    //   oddsBetween4And6,
-    //   oddsBetween6And10,
-    //   oddsAvobe10,
-    // } = bullseyeScoringSystem;
 
     const homeWinOdds = parseFloat(fixture.odds.homeWin);
     const drawOdds = parseFloat(fixture.odds.draw);
@@ -337,26 +323,6 @@ const CorrectPredictionsModal = ({
       }
     }
 
-    // if (awayWinPredicted && wasAwayWin) {
-    //   totalPoints += scoringSystem.correctOutcome;
-    //   pointDistribution.correctOutcome += scoringSystem.correctOutcome;
-
-    //   if (oddsBonusPoints > 0) {
-    //     totalPoints += oddsBonusPoints;
-    //     pointDistribution.oddsBonus += oddsBonusPoints;
-    //   }
-    // }
-
-    // if (drawPredicted && wasDraw) {
-    //   totalPoints += scoringSystem.correctOutcome;
-    //   pointDistribution.correctOutcome += scoringSystem.correctOutcome;
-
-    //   if (oddsBonusPoints > 0) {
-    //     totalPoints += oddsBonusPoints;
-    //     pointDistribution.oddsBonus += oddsBonusPoints;
-    //   }
-    // }
-
     if (correctHomeGoals) {
       totalPoints += scoringSystem.correctGoalsByTeam;
       pointDistribution.correctGoalsByHomeTeam += scoringSystem.correctGoalsByTeam;
@@ -370,6 +336,7 @@ const CorrectPredictionsModal = ({
     if (correctHomeGoals && correctAwayGoals) {
       totalPoints += scoringSystem.correctResult;
       pointDistribution.correctResult += scoringSystem.correctResult;
+      pointDistribution.correctResultBool = true;
     }
 
     if (correctGoalDifference) {

@@ -350,7 +350,7 @@ const GamePredictor = ({
   const getCardHeaderContent = () => {
     if (game.finalResult && awardedPoints) {
       const correctGoalScorerPredicted = awardedPoints.correctGoalScorer > 0;
-      const correctResultPredicted = awardedPoints.correctResult > 0;
+      const correctResultPredicted = awardedPoints.correctResult > 0 || awardedPoints.correctResultBool;
       const oddsBonusPointsAwarded = awardedPoints.oddsBonus > 0;
 
       return (
