@@ -20,11 +20,12 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import TextButton from '../buttons/TextButton';
 import Tag from '../tag/Tag';
 import { Section } from '../section/Section';
-import { Fixture, LeagueScoringSystemValues } from '../../utils/Fixture';
+import { Fixture } from '../../utils/Fixture';
 import { getFlagUrlByCountryName, TournamentsEnum } from '../../utils/Team';
 import NationAvatar from '../avatar/NationAvatar';
 import { FotMobStatListItem } from '../../utils/Fotmob';
 import { getFotMobGoalStatsUrl } from '../../utils/fotmobHelpers';
+import { LeagueScoringSystemValues } from '../../utils/League';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;

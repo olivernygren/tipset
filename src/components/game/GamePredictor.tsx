@@ -11,7 +11,7 @@ import { useHover } from 'react-haiku';
 import { Section } from '../section/Section';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import {
-  Fixture, FixtureOutcomeEnum, LeagueScoringSystemValues, Prediction, PredictionPoints, TeamType,
+  Fixture, Prediction, PredictionPoints, TeamType,
 } from '../../utils/Fixture';
 import { Player } from '../../utils/Players';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
@@ -29,8 +29,9 @@ import IconButton from '../buttons/IconButton';
 import Tag from '../tag/Tag';
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { withDocumentIdOnObject } from '../../utils/helpers';
+import { bullseyeScoringSystem, withDocumentIdOnObject } from '../../utils/helpers';
 import Tooltip from '../tooltip/Tooltip';
+import { LeagueScoringSystemValues } from '../../utils/League';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -197,12 +198,14 @@ const GamePredictor = ({
       const drawOdds = parseFloat(game.odds.draw);
       const awayWinOdds = parseFloat(game.odds.awayWin);
 
+      const leagueScoringSystemToUse = leagueScoringSystem ?? bullseyeScoringSystem;
+
       const getBonusPointsFromOdds = (odds: number): number => {
         if (odds >= 1 && odds <= 2.99) return 0;
-        if (odds >= 3.0 && odds <= 3.99) return 1;
-        if (odds >= 4.0 && odds <= 5.99) return 2;
-        if (odds >= 6.0 && odds <= 9.99) return 3;
-        if (odds >= 10) return 5;
+        if (odds >= 3.0 && odds <= 3.99) return leagueScoringSystemToUse.oddsBetween3And4;
+        if (odds >= 4.0 && odds <= 5.99) return leagueScoringSystemToUse.oddsBetween4And6;
+        if (odds >= 6.0 && odds <= 9.99) return leagueScoringSystemToUse.oddsBetween6And10;
+        if (odds >= 10) return leagueScoringSystemToUse.oddsAvobe10;
         return 0;
       };
 

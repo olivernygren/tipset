@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { updateDoc, doc } from 'firebase/firestore';
 import styled from 'styled-components';
-import { CaretRight } from '@phosphor-icons/react';
 import { PredictionLeague } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
@@ -11,14 +10,13 @@ import CustomDatePicker from '../input/DatePicker';
 import Button from '../buttons/Button';
 import { CollectionEnum } from '../../utils/Firebase';
 import { db } from '../../config/firebase';
-import Modal from '../modal/Modal';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import Textarea from '../textarea/Textarea';
 import { Divider } from '../Divider';
-import IconButton from '../buttons/IconButton';
 import ActionsModal from '../modal/ActionsModal';
 import InfoDialogue from '../info/InfoDialogue';
+import EditLeagueScoringSystemModal from './EditLeagueScoringSystemModal';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -36,6 +34,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [showEndLeagueConfirmationModal, setShowEndLeagueConfirmationModal] = useState<boolean>(false);
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
   const [editBasicInformationModalOpen, setEditBasicInformationModalOpen] = useState<boolean>(false);
+  const [editScoringSystemModalOpen, setEditScoringSystemModalOpen] = useState<boolean>(false);
 
   if (!isCreator) return null;
 
@@ -121,7 +120,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
                 </ContainerText>
                 <Button
                   variant="secondary"
-                  onClick={() => setEditBasicInformationModalOpen(true)}
+                  onClick={() => setEditScoringSystemModalOpen(true)}
                   size="m"
                 >
                   Uppdatera
@@ -184,12 +183,23 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
           </Section>
         </ActionsModal>
       )}
+      {editScoringSystemModalOpen && (
+        <EditLeagueScoringSystemModal
+          onClose={() => setEditScoringSystemModalOpen(false)}
+          onSave={() => refetchLeague()}
+          scoringSystem={league.scoringSystem}
+        />
+      )}
       {showEndLeagueConfirmationModal && (
-        <Modal
+        <ActionsModal
           size="m"
-          onClose={() => setShowEndLeagueConfirmationModal(false)}
+          onCancelClick={() => setShowEndLeagueConfirmationModal(false)}
           title="Avsluta ligan"
+          onActionClick={handleEndLeague}
+          actionButtonLabel="Avsluta ligan"
+          actionButtonColor="red"
           mobileBottomSheet
+          loading={endLeagueLoading}
         >
           <Section gap="m">
             <InfoDialogue
@@ -199,25 +209,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
             />
             <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
           </Section>
-          <Section gap="xs" flexDirection="row" alignItems="center">
-            <Button
-              variant="secondary"
-              onClick={() => setShowEndLeagueConfirmationModal(false)}
-              fullWidth
-            >
-              Avbryt
-            </Button>
-            <Button
-              variant="primary"
-              color="red"
-              onClick={handleEndLeague}
-              fullWidth
-              loading={endLeagueLoading}
-            >
-              Avsluta ligan
-            </Button>
-          </Section>
-        </Modal>
+        </ActionsModal>
       )}
     </>
   );

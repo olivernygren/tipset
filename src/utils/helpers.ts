@@ -1,8 +1,8 @@
 import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import {
-  Fixture, FixtureGroup, LeagueScoringSystemValues, PredictionOutcomeEnum, PredictionStatus,
+  Fixture, FixtureGroup, PredictionOutcomeEnum, PredictionStatus,
 } from './Fixture';
-import { LeagueGameWeek } from './League';
+import { LeagueGameWeek, LeagueScoringSystemValues } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import {
   ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,

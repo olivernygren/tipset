@@ -1,4 +1,4 @@
-import { Fixture, LeagueScoringSystemValues, Prediction } from './Fixture';
+import { Fixture, Prediction } from './Fixture';
 
 export const leagueMaximumParticipants = 24;
 
@@ -17,6 +17,23 @@ export interface PredictionLeague {
   hasEnded?: boolean;
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
+}
+
+export interface LeagueScoringSystemValues {
+  correctResult: number;
+  correctOutcome: number;
+  correctGoalScorerDefender: number;
+  correctGoalScorerMidfielder: number;
+  correctGoalScorerForward: number;
+  correctGoalDifference: number;
+  correctGoalsByTeam: number;
+  oddsBetween3And4: number;
+  oddsBetween4And6: number;
+  oddsBetween6And10: number;
+  oddsAvobe10: number;
+  goalFest: number;
+  underdogBonus: number;
+  firstTeamToScore: number;
 }
 
 export interface CreatePredictionLeagueInput {

@@ -434,7 +434,7 @@ const PredictionLeaguesPage = () => {
                     </NormalTypography>
                   </Section>
                 </ScoringSystemOption>
-                <Divider color={theme.colors.silver} />
+                <Divider />
                 <ScoringSystemOption
                   selected={selectedScoringSystem === ScoringSystemTemplates.BULLSEYE}
                   onClick={() => setSelectedScoringSystem(ScoringSystemTemplates.BULLSEYE)}
@@ -590,7 +590,7 @@ const ScoringSystemSelector = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${theme.colors.silverBleach};
-  border: 1px solid ${theme.colors.silver};
+  border: 1px solid ${theme.colors.silverLight};
   border-radius: ${theme.borderRadius.m};
   overflow: hidden;
   width: 100%;
@@ -602,7 +602,7 @@ const ScoringSystemOption = styled.div<{ selected: boolean }>`
   align-items: flex-start;
   gap: ${theme.spacing.xs};
   padding: ${theme.spacing.xs};
-  background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.white)};
+  background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.silverBleach)};
   cursor: pointer;
   transition: background-color 0.2s;
 
@@ -611,7 +611,7 @@ const ScoringSystemOption = styled.div<{ selected: boolean }>`
   }
 
   &:hover {
-    background-color: ${({ selected }) => (selected ? theme.colors.primaryBleach : theme.colors.silverLighter)};
+    background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.silverLighter)};
   }
 `;
 

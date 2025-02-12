@@ -87,7 +87,7 @@ const StyledTextarea = styled.textarea<StyledTextareaProps>`
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 500};
   border: ${({ noBorder }) => (noBorder ? 'none' : `1px solid ${theme.colors.silver}`)};
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   font-size: 16px;
   font-family: ${theme.fontFamily}, sans-serif;
   outline: none;

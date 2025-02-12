@@ -957,16 +957,24 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               Inga extra poäng för odds från 1.00 till 2.99
             </NormalTypography>
             <NormalTypography variant="m">
-              1 poäng för odds mellan 3.00 och 3.99
+              {league.scoringSystem?.oddsBetween3And4}
+              {' '}
+              poäng för odds mellan 3.00 och 3.99
             </NormalTypography>
             <NormalTypography variant="m">
-              2 poäng för odds mellan 4.00 och 5.99
+              {league.scoringSystem?.oddsBetween4And6}
+              {' '}
+              poäng för odds mellan 4.00 och 5.99
             </NormalTypography>
             <NormalTypography variant="m">
-              3 poäng för odds mellan 6.00 och 9.99
+              {league.scoringSystem?.oddsBetween6And10}
+              {' '}
+              poäng för odds mellan 6.00 och 9.99
             </NormalTypography>
             <NormalTypography variant="m">
-              5 poäng för odds 10.00 eller högre
+              {league.scoringSystem?.oddsAvobe10}
+              {' '}
+              poäng för odds 10.00 eller högre
             </NormalTypography>
           </Section>
         </Modal>
