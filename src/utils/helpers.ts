@@ -2,7 +2,7 @@ import { QueryDocumentSnapshot, DocumentData, DocumentSnapshot } from 'firebase/
 import {
   Fixture, FixtureGroup, PredictionOutcomeEnum, PredictionStatus,
 } from './Fixture';
-import { LeagueGameWeek } from './League';
+import { LeagueGameWeek, LeagueScoringSystemValues } from './League';
 import { ProfilePictureEnum } from '../components/avatar/Avatar';
 import {
   ExactPositionEnum, GeneralPositionEnum, Player, PlayerStatusEnum,
@@ -97,7 +97,7 @@ export const getProfilePictureUrl = (picture: ProfilePictureEnum) => {
   }
 };
 
-export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: LeagueGameWeek | undefined, userId: string, teams?: Array<string>): Array<Player> => {
+export const getUserPreviousGameWeekPrecitedGoalScorers = (previousGameWeek: LeagueGameWeek | undefined, userId: string): Array<Player> => {
   if (!previousGameWeek) {
     return [];
   }
@@ -212,6 +212,10 @@ export const getPlayerStatusName = (status: PlayerStatusEnum) => {
       return 'Möjligtvis skadad';
     case PlayerStatusEnum.ILL:
       return 'Sjuk';
+    case PlayerStatusEnum.UNKNOWN:
+      return 'Okänd';
+    case PlayerStatusEnum.PERSONAL_ISSUES:
+      return 'Personliga skäl';
     default:
       return '';
   }
@@ -228,7 +232,8 @@ export const getLastKickoffTimeInAllGameWeeks = (allGameWeeks: Array<LeagueGameW
   }, new Date(fixtures[0].kickOffTime));
 
   const day = new Date(latestKickoff);
-  day.setHours(23, 59, 59, 0);
+  day.setDate(day.getDate() + 1);
+  day.setHours(0, 0, 0, 0);
 
   return day;
 };
@@ -246,7 +251,8 @@ export const getLastKickoffTimeInGameWeek = (gameWeek?: LeagueGameWeek): Date =>
   }, new Date(fixtures[0].kickOffTime));
 
   const day = new Date(latestKickoff);
-  day.setHours(23, 59, 59, 0);
+  day.setDate(day.getDate() + 1);
+  day.setHours(0, 0, 0, 0);
 
   return day;
 };
@@ -480,4 +486,38 @@ export const isPredictGoalScorerPossibleByTeamNames = (teamNames: Array<string>)
     return true;
   }
   return false;
+};
+
+export const bullseyeScoringSystem: LeagueScoringSystemValues = {
+  correctResult: 1,
+  correctOutcome: 1,
+  correctGoalScorerDefender: 5,
+  correctGoalScorerMidfielder: 3,
+  correctGoalScorerForward: 2,
+  correctGoalDifference: 1,
+  correctGoalsByTeam: 1,
+  oddsBetween3And4: 1,
+  oddsBetween4And6: 2,
+  oddsBetween6And10: 3,
+  oddsAvobe10: 5,
+  goalFest: 0, // TODO: Update
+  underdogBonus: 0, // TODO: Update
+  firstTeamToScore: 0, // TODO: Update
+};
+
+export const gamblerScoringSystem: LeagueScoringSystemValues = {
+  correctResult: 0,
+  correctOutcome: 2,
+  correctGoalScorerDefender: 5,
+  correctGoalScorerMidfielder: 3,
+  correctGoalScorerForward: 2,
+  correctGoalDifference: 1,
+  correctGoalsByTeam: 1,
+  oddsBetween3And4: 2,
+  oddsBetween4And6: 4,
+  oddsBetween6And10: 6,
+  oddsAvobe10: 10,
+  goalFest: 3,
+  underdogBonus: 1,
+  firstTeamToScore: 1,
 };

@@ -132,6 +132,12 @@ const LeagueOverview = ({
     }
   };
 
+  const getCurrentGameWeekHeading = () => {
+    if (!currentGameWeek) return 'Aktuell omgång';
+    if (selectedRound === currentGameWeek.round) return 'Aktuell omgång';
+    return 'Kommande omgång';
+  };
+
   return (
     <>
       <Wrapper>
@@ -145,7 +151,7 @@ const LeagueOverview = ({
             <>
               <CurrentGameWeekHeader>
                 <HeadingsTypography variant="h3">
-                  {selectedRound === currentGameWeek?.round ? 'Aktuell omgång' : 'Kommande omgång'}
+                  {getCurrentGameWeekHeading()}
                 </HeadingsTypography>
                 {upcomingGameWeeks.length > 0 && displayedFixtures && displayedFixtures.length > 0 && (
                   <CurrentRoundSwitchContainer>
@@ -212,10 +218,10 @@ const LeagueOverview = ({
                   )}
                 </Section>
               )}
-              {!currentGameWeek && upcomingGameWeeks && (
+              {!currentGameWeek && upcomingGameWeeks.length > 0 && (
                 <NormalTypography variant="m" color={theme.colors.textLight}>{`Nästa omgång kan tippas tidigast ${getNextGameWeekStartDate()}`}</NormalTypography>
               )}
-              {!currentGameWeek && !upcomingGameWeeks && (
+              {!currentGameWeek && upcomingGameWeeks.length === 0 && (
                 <>
                   <NormalTypography variant="m" color={theme.colors.textLight}>Ingen omgång är aktiv just nu</NormalTypography>
                   {isCreator && (

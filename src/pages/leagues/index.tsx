@@ -6,13 +6,18 @@ import {
 import { motion } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
 import {
+  CheckCircle,
+  Circle,
   Medal, PlusCircle, UserPlus, Users,
 } from '@phosphor-icons/react';
-import { auth, db } from '../../config/firebase';
+import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
-import { generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject } from '../../utils/helpers';
 import {
-  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, leagueMaximumParticipants,
+  generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject, gamblerScoringSystem,
+  bullseyeScoringSystem,
+} from '../../utils/helpers';
+import {
+  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, ScoringSystemTemplates, leagueMaximumParticipants,
 } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -24,12 +29,13 @@ import Input from '../../components/input/Input';
 import { QueryEnum } from '../../utils/Routes';
 import { getLeagueByInvitationCode } from '../../utils/firebaseHelpers';
 import { useUser } from '../../context/UserContext';
-import { successNotify } from '../../utils/toast/toastHelpers';
+import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import Tag from '../../components/tag/Tag';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import IconButton from '../../components/buttons/IconButton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CustomSkeleton, { ParagraphSkeleton } from '../../components/skeleton/CustomSkeleton';
+import { Divider } from '../../components/Divider';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -50,9 +56,12 @@ const PredictionLeaguesPage = () => {
   const [leagueCardHovered, setLeagueCardHovered] = useState<string | undefined>(undefined);
   const [createLeagueLoading, setCreateLeagueLoading] = useState<boolean>(false);
   const [joinLeagueLoading, setJoinLeagueLoading] = useState<string | null>(null);
+  const [selectedScoringSystem, setSelectedScoringSystem] = useState<ScoringSystemTemplates>(ScoringSystemTemplates.GAMBLER);
 
   const currentUserId = user?.documentId ?? '';
-  // const currentUserId = auth.currentUser?.uid ?? '';
+  const noLeaguesAvailableForUser = Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0;
+  const showAvailableLeagues = !fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0;
+  const notLoggedIn = !user && !fetchLoading && !userLoading;
 
   useEffect(() => {
     if (currentUserId) {
@@ -74,7 +83,7 @@ const PredictionLeaguesPage = () => {
       setParticipantLeagues(allParticipantLeagues);
       setCreatorLeagues(allCreatorLeagues);
     } catch (err) {
-      console.error(err);
+      errorNotify('Ett fel uppstod när ligorna skulle hämtas');
     } finally {
       setFetchLoading(false);
     }
@@ -86,18 +95,18 @@ const PredictionLeaguesPage = () => {
     const today = new Date();
     const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
 
-    if (newLeagueName.length === 0) return;
+    if (newLeagueName.length === 0 || !currentUserId) return;
 
     const newLeague: CreatePredictionLeagueInput = {
       name: newLeagueName,
       description: newLeagueDescription,
-      creatorId: auth.currentUser?.uid ?? '',
-      participants: [auth.currentUser?.uid ?? ''],
+      creatorId: currentUserId ?? '',
+      participants: [currentUserId ?? ''],
       inviteCode: generateLeagueInviteCode(),
       createdAt: new Date().toISOString(),
       invitedUsers: [],
       standings: [{
-        userId: auth.currentUser?.uid ?? '',
+        userId: currentUserId ?? '',
         username: (user?.lastname ? `${user?.firstname} ${user?.lastname}` : user?.firstname) ?? '?',
         points: 0,
         correctResults: 0,
@@ -105,6 +114,7 @@ const PredictionLeaguesPage = () => {
       }],
       deadlineToJoin: oneMonthFromNow.toISOString(),
       hasEnded: false,
+      scoringSystem: selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? gamblerScoringSystem : bullseyeScoringSystem,
     };
 
     try {
@@ -116,10 +126,10 @@ const PredictionLeaguesPage = () => {
       setShowJoinLeagueModal(false);
       fetchLeagues();
     } catch (e) {
-      console.error(e);
+      errorNotify('Ett fel uppstod när ligan skulle skapas');
+    } finally {
+      setCreateLeagueLoading(false);
     }
-
-    setCreateLeagueLoading(false);
   };
 
   const handleJoinLeague = async () => {
@@ -157,7 +167,7 @@ const PredictionLeaguesPage = () => {
     }
 
     if (leagueData.hasEnded) {
-      setShowJoinLeagueError('Ligan har redan avslutats');
+      setShowJoinLeagueError('Ligan har avslutats');
       setJoinLeagueLoading(null);
       return;
     }
@@ -167,6 +177,7 @@ const PredictionLeaguesPage = () => {
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
       correctResults: 0,
+      // oddsBonusPoints: 0,
     };
 
     try {
@@ -175,14 +186,13 @@ const PredictionLeaguesPage = () => {
         standings: [...leagueData.standings, newParticipantStandingsObj],
       });
       setShowJoinLeagueModal(false);
-      successNotify(`Du har gått med i ${leagueData.name}`);
+      successNotify(`Du har gått med i ligan ${leagueData.name}`);
       fetchLeagues();
     } catch (e) {
-      console.error(e);
       setShowJoinLeagueError('Ett fel uppstod. Försök igen');
+    } finally {
+      setJoinLeagueLoading(null);
     }
-
-    setJoinLeagueLoading(null);
   };
 
   const getLeagueCard = (league: PredictionLeague) => {
@@ -307,11 +317,11 @@ const PredictionLeaguesPage = () => {
         </Section>
       </PageHeader>
       <Section gap="l" padding={`${theme.spacing.m} 0`}>
-        {!user && !fetchLoading && !userLoading && (
+        {notLoggedIn && (
           <NormalTypography variant="m" color={theme.colors.silverDarker}>Logga in för att se och gå med i ligor</NormalTypography>
         )}
         {fetchLoading && Boolean(user) && getSkeletonLoader()}
-        {!fetchLoading && !userLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length > 0 && (
+        {showAvailableLeagues && (
           <>
             {creatorLeagues.length > 0 && (
               <Section gap="s">
@@ -339,7 +349,7 @@ const PredictionLeaguesPage = () => {
             )}
           </>
         )}
-        {Boolean(user) && !userLoading && !fetchLoading && [...creatorLeagues, ...participantLeagues, ...endedLeagues].length === 0 && (
+        {noLeaguesAvailableForUser && (
           <>
             <NormalTypography variant="m">Du är inte med i några ligor ännu.</NormalTypography>
             <Section flexDirection="row" gap="l">
@@ -348,7 +358,7 @@ const PredictionLeaguesPage = () => {
                 <Input
                   label="Ange inbjudningskod"
                   type="text"
-                  placeholder="t.ex. KNT342G9"
+                  placeholder="t.ex. KNT3G9"
                   value={joinLeagueCodeValue}
                   onChange={(e) => setJoinLeagueCodeValue(e.currentTarget.value)}
                   fullWidth={isMobile}
@@ -379,10 +389,10 @@ const PredictionLeaguesPage = () => {
       </Section>
       {showCreateLeagueModal && (
         <Modal
-          size="s"
+          size="m"
           title="Skapa liga"
           onClose={() => setShowCreateLeagueModal(false)}
-          mobileBottomSheet
+          mobileFullScreen
         >
           <Section gap="m">
             <Input
@@ -394,12 +404,55 @@ const PredictionLeaguesPage = () => {
               maxLength={30}
             />
             <Input
-              label="Beskrivning"
+              label="Beskrivning (valfritt)"
               type="text"
               value={newLeagueDescription}
               onChange={(e) => setNewLeagueDescription(e.currentTarget.value)}
               fullWidth
+              maxLength={100}
+              maxLengthInvisible
             />
+            <Section gap="s">
+              <Section gap="xxs">
+                <EmphasisTypography variant="m">Välj poängsystem</EmphasisTypography>
+                <NormalTypography variant="s" color={theme.colors.silverDark}>Välj vilket poängsystem som ska användas i ligan. Detta kan justeras manuellt senare.</NormalTypography>
+              </Section>
+              <ScoringSystemSelector>
+                <ScoringSystemOption
+                  selected={selectedScoringSystem === ScoringSystemTemplates.GAMBLER}
+                  onClick={() => setSelectedScoringSystem(ScoringSystemTemplates.GAMBLER)}
+                >
+                  {selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? (
+                    <CheckCircle size={24} weight="fill" color={theme.colors.primary} />
+                  ) : (
+                    <Circle size={24} color={theme.colors.silverDark} />
+                  )}
+                  <Section gap="xxxs">
+                    <EmphasisTypography variant="m" color={theme.colors.textDefault}>“Gambler”</EmphasisTypography>
+                    <NormalTypography variant="s" color={selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? theme.colors.primaryDark : theme.colors.silverDark}>
+                      Ger lite större utdelningar och gynnar de som vågar satsa på ett oväntat resultat.
+                    </NormalTypography>
+                  </Section>
+                </ScoringSystemOption>
+                <Divider />
+                <ScoringSystemOption
+                  selected={selectedScoringSystem === ScoringSystemTemplates.BULLSEYE}
+                  onClick={() => setSelectedScoringSystem(ScoringSystemTemplates.BULLSEYE)}
+                >
+                  {selectedScoringSystem === ScoringSystemTemplates.BULLSEYE ? (
+                    <CheckCircle size={24} weight="fill" color={theme.colors.primary} />
+                  ) : (
+                    <Circle size={24} color={theme.colors.silverDark} />
+                  )}
+                  <Section gap="xxxs">
+                    <EmphasisTypography variant="m">“Bullseye”</EmphasisTypography>
+                    <NormalTypography variant="s" color={selectedScoringSystem === ScoringSystemTemplates.BULLSEYE ? theme.colors.primaryDark : theme.colors.silverDark}>
+                      Ger lite mindre utdelningar och gynnar de som prickar exakt rätt.
+                    </NormalTypography>
+                  </Section>
+                </ScoringSystemOption>
+              </ScoringSystemSelector>
+            </Section>
             <ModalButtons>
               <Button variant="secondary" onClick={() => setShowCreateLeagueModal(false)} fullWidth>
                 Avbryt
@@ -428,7 +481,7 @@ const PredictionLeaguesPage = () => {
             <Input
               label="Inbjudningskod"
               type="text"
-              placeholder="t.ex. DHU8M2GL"
+              placeholder="t.ex. DHU8C2"
               value={joinLeagueCodeValueInModal}
               onChange={(e) => setJoinLeagueCodeValueInModal(e.currentTarget.value)}
               fullWidth
@@ -531,6 +584,35 @@ const PointsContainer = styled.div<{ isHovered: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const ScoringSystemSelector = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: ${theme.colors.silverBleach};
+  border: 1px solid ${theme.colors.silverLight};
+  border-radius: ${theme.borderRadius.m};
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const ScoringSystemOption = styled.div<{ selected: boolean }>`
+  display: flex;
+  align-items: flex-start;
+  gap: ${theme.spacing.xs};
+  padding: ${theme.spacing.xs};
+  background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.silverBleach)};
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  > section {
+    padding-top: 2px;
+  }
+
+  &:hover {
+    background-color: ${({ selected }) => (selected ? theme.colors.primaryFade : theme.colors.silverLighter)};
+  }
 `;
 
 export default PredictionLeaguesPage;

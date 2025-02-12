@@ -740,6 +740,7 @@ const EditFixtureStatsModalContent = ({
               </RotatingIcon>
             </DropdownHeader>
             <DropdownContent>
+              <NormalTypography color={theme.colors.silverDarker}>Lägg till resultat från ett eventuellt första möte i utslagsrundan.</NormalTypography>
               <StandingsInputsRow>
                 {getAvatar(fixture.homeTeam)}
                 <GoalsInput

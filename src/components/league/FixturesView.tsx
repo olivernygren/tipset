@@ -67,6 +67,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
   const [ongoingGameWeek, setOngoingGameWeek] = useState<LeagueGameWeek>();
   const [upcomingGameWeeks, setUpcomingGameWeeks] = useState<Array<LeagueGameWeek>>();
   const [previousGameWeeks, setPreviousGameWeeks] = useState<Array<LeagueGameWeek>>();
+  const [initiallyDisplayedPreviousGameWeeks, setInitiallyDisplayedPreviousGameWeeks] = useState<Array<LeagueGameWeek>>();
   const [createGameWeekError, setCreateGameWeekError] = useState<string | null>(null);
   const [showCreateGameWeekSection, setShowCreateGameWeekSection] = useState<boolean>(false);
   const [showCorrectGameWeekContent, setShowCorrectGameWeekContent] = useState<boolean>(false);
@@ -109,6 +110,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       setOngoingGameWeek(currentGameWeek);
       setUpcomingGameWeeks(comingGameWeeks.sort((a, b) => a.round - b.round));
       setPreviousGameWeeks(allPreviousGameWeeks);
+
+      setInitiallyDisplayedPreviousGameWeeks(allPreviousGameWeeks.slice(-3));
 
       if (currentGameWeek && user) {
         setPredictionStatuses(currentGameWeek.games.fixtures.map((fixture) => ({
@@ -330,6 +333,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     const predictionInput: PredictionInput = {
       userId: user.documentId,
       username: `${user.firstname} ${user.lastname}`,
+      userProfilePictureUrl: user.profilePicture,
       fixtureId: fixture.id,
       homeGoals: parseInt(homeGoals),
       awayGoals: parseInt(awayGoals),
@@ -463,10 +467,11 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               numberOfParticipantsPredicted={ongoingGameWeek.games.predictions.filter((p) => p.fixtureId === fixture.id).length}
               // anyFixtureHasPredictGoalScorer={ongoingGameWeek.games.fixtures.some((f) => f.shouldPredictGoalScorer)}
               isLeagueCreator={isCreator}
-              previousGameWeekPredictedGoalScorers={getUserPreviousGameWeekPrecitedGoalScorers(getLastGameWeek(previousGameWeeks), user?.documentId ?? '', [fixture.homeTeam.name, fixture.awayTeam.name])}
+              previousGameWeekPredictedGoalScorers={getUserPreviousGameWeekPrecitedGoalScorers(getLastGameWeek(previousGameWeeks), user?.documentId ?? '')}
               onShowStats={() => setIsStatsModalOpen(fixture)}
               awardedPoints={ongoingGameWeek.games.predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points}
               particpantsThatPredicted={ongoingGameWeek.games.predictions.filter((p) => p.fixtureId === fixture.id).map((p) => p.username).filter((username): username is string => username !== undefined)}
+              leagueScoringSystem={league.scoringSystem}
             />
           ))}
       </FixturesGrid>
@@ -617,6 +622,21 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
         )}
       </>
     );
+  };
+
+  const handleShowMoreGameWeeks = () => {
+    const currentlyDisplayedRounds = initiallyDisplayedPreviousGameWeeks?.map((gameWeek) => gameWeek.round) ?? [];
+    const next10Rounds = previousGameWeeks
+      ?.filter((gameWeek) => !currentlyDisplayedRounds.includes(gameWeek.round))
+      .slice(-10);
+
+    if (next10Rounds && initiallyDisplayedPreviousGameWeeks) {
+      setInitiallyDisplayedPreviousGameWeeks((prev) => [...prev as LeagueGameWeek[], ...next10Rounds]);
+    }
+
+    if (next10Rounds && next10Rounds.length < 10) {
+      setInitiallyDisplayedPreviousGameWeeks(previousGameWeeks);
+    }
   };
 
   return (
@@ -819,9 +839,9 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           expandMobile
         >
           <HeadingsTypography variant="h4">Tidigare omgångar</HeadingsTypography>
-          {previousGameWeeks && previousGameWeeks.length > 0 ? (
+          {previousGameWeeks && previousGameWeeks.length > 0 && initiallyDisplayedPreviousGameWeeks && initiallyDisplayedPreviousGameWeeks.length > 0 ? (
             <>
-              {previousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
+              {initiallyDisplayedPreviousGameWeeks.sort((a, b) => b.round - a.round).map((gameWeek) => (
                 <PreviousRoundCard key={gameWeek.startDate.toString()}>
                   <Section
                     justifyContent="space-between"
@@ -866,6 +886,13 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                             <FixtureResultPreview
                               fixture={fixture}
                               predictions={gameWeek.games.predictions.filter((prediction) => prediction.fixtureId === fixture.id)}
+                              onTogglePredictionsModalOpen={() => {
+                                if (showFixturePredictionsModal === fixture.id) {
+                                  setShowFixturePredictionsModal(null);
+                                } else {
+                                  setShowFixturePredictionsModal(fixture.id);
+                                }
+                              }}
                             />
                           )}
                           {!isMobile && index < array.length - 1 && <Divider />}
@@ -877,6 +904,15 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </>
           ) : (
             <NormalTypography variant="m" color={theme.colors.textLight}>Inga tidigare omgångar</NormalTypography>
+          )}
+          {initiallyDisplayedPreviousGameWeeks && previousGameWeeks && initiallyDisplayedPreviousGameWeeks.length < previousGameWeeks.length && (
+            <Section padding={`${theme.spacing.xs} 0 0 0`} justifyContent="center">
+              <Button
+                onClick={handleShowMoreGameWeeks}
+              >
+                Visa fler
+              </Button>
+            </Section>
           )}
         </Section>
       </Section>
@@ -921,16 +957,24 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               Inga extra poäng för odds från 1.00 till 2.99
             </NormalTypography>
             <NormalTypography variant="m">
-              1 poäng för odds mellan 3.00 och 3.99
+              {league.scoringSystem?.oddsBetween3And4}
+              {' '}
+              poäng för odds mellan 3.00 och 3.99
             </NormalTypography>
             <NormalTypography variant="m">
-              2 poäng för odds mellan 4.00 och 5.99
+              {league.scoringSystem?.oddsBetween4And6}
+              {' '}
+              poäng för odds mellan 4.00 och 5.99
             </NormalTypography>
             <NormalTypography variant="m">
-              3 poäng för odds mellan 6.00 och 9.99
+              {league.scoringSystem?.oddsBetween6And10}
+              {' '}
+              poäng för odds mellan 6.00 och 9.99
             </NormalTypography>
             <NormalTypography variant="m">
-              5 poäng för odds 10.00 eller högre
+              {league.scoringSystem?.oddsAvobe10}
+              {' '}
+              poäng för odds 10.00 eller högre
             </NormalTypography>
           </Section>
         </Modal>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 import {
   Eye, FireSimple, SoccerBall, Target,
@@ -12,8 +12,6 @@ import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import TextButton from '../buttons/TextButton';
 import { useUser } from '../../context/UserContext';
-// eslint-disable-next-line import/no-cycle
-import PredictionsModal from '../league/PredictionsModal';
 import IconButton from '../buttons/IconButton';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { Team } from '../../utils/Team';
@@ -21,10 +19,11 @@ import { Team } from '../../utils/Team';
 interface FixtureResultPreviewProps {
   fixture: Fixture;
   predictions?: Array<Prediction>;
+  onTogglePredictionsModalOpen: () => void;
 }
 
 const FixtureResultPreview = ({
-  fixture, predictions,
+  fixture, predictions, onTogglePredictionsModalOpen,
 }: FixtureResultPreviewProps) => {
   const { user } = useUser();
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
@@ -32,14 +31,8 @@ const FixtureResultPreview = ({
 
   const useShortTeamNames = isTablet;
   const oddsBonusPointsAwarded = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.oddsBonus);
-  const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult);
+  const correctResultPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResult) || Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctResultBool);
   const correctGoalScorerPredicted = Boolean(predictions?.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.correctGoalScorer);
-
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
 
   const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
@@ -60,111 +53,96 @@ const FixtureResultPreview = ({
 
     const finalScoreString = `${fixture.finalResult.homeTeamGoals ?? '?'} - ${fixture.finalResult.awayTeamGoals ?? '?'}`;
 
-    // if (fixture.aggregateScore) {
-    //   const homeTeamTotalGoals = fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals;
-    //   const awayTeamTotalGoals = fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals;
-    //   return `(${homeTeamTotalGoals}) ${fixture.finalResult.homeTeamGoals} - ${fixture.finalResult.awayTeamGoals} (${awayTeamTotalGoals})`;
-    // }
-
     return finalScoreString;
   };
 
   return (
-    <>
-      <FixtureContainer>
-        {fixture.finalResult ? (
-          <FullTimeIndicator>
-            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.white}>FT</EmphasisTypography>
-          </FullTimeIndicator>
-        ) : (
-          <KickOffTime>
-            <EmphasisTypography variant="s" color={theme.colors.white}>LIVE</EmphasisTypography>
-          </KickOffTime>
-        )}
-        <Teams>
-          <TeamContainer>
-            <NormalTypography variant={isMobile ? 's' : 'm'}>
-              {useShortTeamNames ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
-            </NormalTypography>
-            {getAvatar(fixture.homeTeam)}
-          </TeamContainer>
-          {!isMobile && (
-            <ResultContainer>
-              {fixture.aggregateScore && fixture.finalResult && (
-                <NormalTypography variant="s" color={theme.colors.silverDark}>
-                  {`(${fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals})`}
-                </NormalTypography>
-              )}
-              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault} noWrap>
-                {getResult()}
-              </EmphasisTypography>
-              {fixture.aggregateScore && fixture.finalResult && (
-                <NormalTypography variant="s" color={theme.colors.silverDark}>
-                  {`(${fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals})`}
-                </NormalTypography>
-              )}
-            </ResultContainer>
-          )}
-          <TeamContainer>
-            {getAvatar(fixture.awayTeam)}
-            <NormalTypography variant={isMobile ? 's' : 'm'}>
-              {useShortTeamNames ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}
-            </NormalTypography>
-          </TeamContainer>
-        </Teams>
-        <Section
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="flex-end"
-        >
-          {predictions && (
-            <PointsContainer>
-              {(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) && (
-                <PointsIcons>
-                  {correctGoalScorerPredicted && (
-                    <SoccerBall size={16} color={theme.colors.silverDarker} weight="fill" />
-                  )}
-                  {oddsBonusPointsAwarded && (
-                    <FireSimple size={16} color={theme.colors.silverDarker} />
-                  )}
-                  {correctResultPredicted && (
-                    <Target size={16} color={theme.colors.silverDarker} />
-                  )}
-                </PointsIcons>
-              )}
-              <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker} noWrap>
-                {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
-                {' '}
-                p
-              </NormalTypography>
-            </PointsContainer>
-          )}
-          {isMobile ? (
-            <MobileButtonContainer>
-              <IconButton
-                icon={<Eye size={24} />}
-                onClick={handleOpenModal}
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                disabled={!predictions || predictions.length === 0}
-              />
-            </MobileButtonContainer>
-          ) : (
-            <TextButton
-              onClick={handleOpenModal}
-            >
-              Se allas tips
-            </TextButton>
-          )}
-        </Section>
-      </FixtureContainer>
-      {modalOpen && (
-        <PredictionsModal
-          onClose={() => setModalOpen(false)}
-          predictions={predictions ?? []}
-          fixture={fixture}
-        />
+    <FixtureContainer>
+      {fixture.finalResult ? (
+        <FullTimeIndicator>
+          <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.white}>FT</EmphasisTypography>
+        </FullTimeIndicator>
+      ) : (
+        <KickOffTime>
+          <EmphasisTypography variant="s" color={theme.colors.white}>LIVE</EmphasisTypography>
+        </KickOffTime>
       )}
-    </>
+      <Teams>
+        <TeamContainer>
+          <NormalTypography variant={isMobile ? 's' : 'm'}>
+            {useShortTeamNames ? (fixture.homeTeam.shortName ?? fixture.homeTeam.name) : fixture.homeTeam.name}
+          </NormalTypography>
+          {getAvatar(fixture.homeTeam)}
+        </TeamContainer>
+        {!isMobile && (
+        <ResultContainer>
+          {fixture.aggregateScore && fixture.finalResult && (
+          <NormalTypography variant="s" color={theme.colors.silverDark}>
+            {`(${fixture.aggregateScore.homeTeamGoals + fixture.finalResult.homeTeamGoals})`}
+          </NormalTypography>
+          )}
+          <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault} noWrap>
+            {getResult()}
+          </EmphasisTypography>
+          {fixture.aggregateScore && fixture.finalResult && (
+          <NormalTypography variant="s" color={theme.colors.silverDark}>
+            {`(${fixture.aggregateScore.awayTeamGoals + fixture.finalResult.awayTeamGoals})`}
+          </NormalTypography>
+          )}
+        </ResultContainer>
+        )}
+        <TeamContainer>
+          {getAvatar(fixture.awayTeam)}
+          <NormalTypography variant={isMobile ? 's' : 'm'}>
+            {useShortTeamNames ? (fixture.awayTeam.shortName ?? fixture.awayTeam.name) : fixture.awayTeam.name}
+          </NormalTypography>
+        </TeamContainer>
+      </Teams>
+      <Section
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="flex-end"
+      >
+        {predictions && (
+        <PointsContainer>
+          {(oddsBonusPointsAwarded || correctResultPredicted || correctGoalScorerPredicted) && (
+          <PointsIcons>
+            {correctGoalScorerPredicted && (
+            <SoccerBall size={16} color={theme.colors.silverDarker} weight="fill" />
+            )}
+            {oddsBonusPointsAwarded && (
+            <FireSimple size={16} color={theme.colors.silverDarker} />
+            )}
+            {correctResultPredicted && (
+            <Target size={16} color={theme.colors.silverDarker} />
+            )}
+          </PointsIcons>
+          )}
+          <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker} noWrap>
+            {predictions.find((p) => p.fixtureId === fixture.id && p.userId === user?.documentId)?.points?.total ?? '0'}
+            {' '}
+            p
+          </NormalTypography>
+        </PointsContainer>
+        )}
+        {isMobile ? (
+          <MobileButtonContainer>
+            <IconButton
+              icon={<Eye size={24} />}
+              onClick={onTogglePredictionsModalOpen}
+              colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+              disabled={!predictions || predictions.length === 0}
+            />
+          </MobileButtonContainer>
+        ) : (
+          <TextButton
+            onClick={onTogglePredictionsModalOpen}
+          >
+            Se allas tips
+          </TextButton>
+        )}
+      </Section>
+    </FixtureContainer>
   );
 };
 

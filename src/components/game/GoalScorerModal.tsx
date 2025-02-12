@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import {
   Ambulance,
   Bandaids,
-  CheckCircle, Circle, Funnel, Info, Rectangle, SoccerBall, Virus, XCircle,
+  CheckCircle, Circle, Funnel, HandHeart, Info, Question, Rectangle, SoccerBall, Virus, XCircle,
 } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
 import Button from '../buttons/Button';
@@ -13,9 +13,7 @@ import {
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import { devices, theme } from '../../theme';
 import IconButton from '../buttons/IconButton';
-import {
-  defenderGoalPoints, forwardGoalPoints, getSortedPlayerByPosition, midfielderGoalPoints,
-} from '../../utils/helpers';
+import { getSortedPlayerByPosition, bullseyeScoringSystem } from '../../utils/helpers';
 import Avatar, { AvatarSize } from '../avatar/Avatar';
 import Input from '../input/Input';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
@@ -27,6 +25,7 @@ import { getFlagUrlByCountryName, TournamentsEnum } from '../../utils/Team';
 import NationAvatar from '../avatar/NationAvatar';
 import { FotMobStatListItem } from '../../utils/Fotmob';
 import { getFotMobGoalStatsUrl } from '../../utils/fotmobHelpers';
+import { LeagueScoringSystemValues } from '../../utils/League';
 
 interface GoalScorerModalProps {
   onSave: (players: Array<Player | undefined>) => void;
@@ -37,6 +36,7 @@ interface GoalScorerModalProps {
   initialSelectedPlayers?: Array<Player | undefined>;
   multiple?: boolean;
   previousGameWeekPredictedGoalScorers?: Array<Player>;
+  leagueScoringSystem?: LeagueScoringSystemValues;
 }
 
 enum FilterEnum {
@@ -62,6 +62,7 @@ const GoalScorerModal = ({
   homeTeamPlayers,
   awayTeamPlayers,
   fixture,
+  leagueScoringSystem,
 }: GoalScorerModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -80,6 +81,8 @@ const GoalScorerModal = ({
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorers?.some((selectedPlayer) => selectedPlayer.id === player.id && playersToShow.some((playerToShow) => playerToShow.id === player.id));
   const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
+
+  const scoringSystem = leagueScoringSystem ?? bullseyeScoringSystem;
 
   useEffect(() => {
     const fetchGoalStats = async (): Promise<{ homeTeamPlayersStats: Array<FotMobStatListItem>, awayTeamPlayersStats: Array<FotMobStatListItem> }> => {
@@ -180,11 +183,6 @@ const GoalScorerModal = ({
     }
   };
 
-  // const getGoalsScoredForPlayer = (playerName: string) => {
-  //   const playerRating = playerRatings.find((rating) => rating.playerName === playerName);
-  //   return playerRating ? playerRating.goals : 0;
-  // };
-
   const getPlayer = (player: Player) => (
     <PlayerItem
       key={player.id}
@@ -196,7 +194,7 @@ const GoalScorerModal = ({
       <PlayerInfo>
         <AvatarContainer>
           <Avatar
-            src={player.externalPictureUrl ?? player.picture ?? '/images/placeholder-fancy.png'}
+            src={player.externalPictureUrl ?? '/images/placeholder-fancy.png'}
             alt={player.name}
             size={AvatarSize.M}
             objectFit="cover"
@@ -230,17 +228,15 @@ const GoalScorerModal = ({
             {(player.status === PlayerStatusEnum.SUSPENDED) && (
               <Rectangle style={{ transform: 'rotate(90deg)' }} size={24} color={theme.colors.redDark} weight="fill" />
             )}
+            {(player.status === PlayerStatusEnum.PERSONAL_ISSUES) && (
+              <HandHeart size={24} color={theme.colors.goldDark} weight="fill" />
+            )}
+            {(player.status === PlayerStatusEnum.UNKNOWN) && (
+              <Question size={24} color={theme.colors.silverDarker} weight="fill" />
+            )}
           </IconContainer>
         ) : (
           <Flex>
-            {/* {playerExistsInRatings(player) && (
-              <GoalsScored>
-                <NormalTypography variant="s" color={theme.colors.silver}>
-                  {getGoalsScoredForPlayer(player.name)}
-                </NormalTypography>
-                <SoccerBall size={16} color={theme.colors.silver} weight="fill" />
-              </GoalsScored>
-            )} */}
             {goalStats.find((p) => player.id === p.playerId || player.name === p.playerName) && (
               <GoalsScored>
                 <NormalTypography variant="s" color={theme.colors.silver}>
@@ -394,7 +390,7 @@ const GoalScorerModal = ({
         )}
         {selectedFilters.includes(FilterEnum.DEFENDERS) && defenders.length > 0 && (
           <PositionContainer>
-            <HeadingsTypography variant="h5">{`Försvarare (${defenderGoalPoints}p)`}</HeadingsTypography>
+            <HeadingsTypography variant="h5">{`Försvarare (${scoringSystem.correctGoalScorerDefender}p)`}</HeadingsTypography>
             <PlayerList>
               {defenders.map((player) => getPlayer(player))}
             </PlayerList>
@@ -402,7 +398,7 @@ const GoalScorerModal = ({
         )}
         {selectedFilters.includes(FilterEnum.MIDFIELDERS) && midfielders.length > 0 && (
           <PositionContainer>
-            <HeadingsTypography variant="h5">{`Mittfältare (${midfielderGoalPoints}p)`}</HeadingsTypography>
+            <HeadingsTypography variant="h5">{`Mittfältare (${scoringSystem.correctGoalScorerMidfielder}p)`}</HeadingsTypography>
             <PlayerList>
               {midfielders.map((player) => getPlayer(player))}
             </PlayerList>
@@ -410,7 +406,7 @@ const GoalScorerModal = ({
         )}
         {selectedFilters.includes(FilterEnum.FORWARDS) && forwards.length > 0 && (
           <PositionContainer>
-            <HeadingsTypography variant="h5">{`Anfallare (${forwardGoalPoints}p)`}</HeadingsTypography>
+            <HeadingsTypography variant="h5">{`Anfallare (${scoringSystem.correctGoalScorerForward}p)`}</HeadingsTypography>
             <PlayerList>
               {forwards.map((player) => getPlayer(player))}
             </PlayerList>

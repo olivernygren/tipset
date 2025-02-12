@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/home';
-import TestPage from './pages/test';
 import LoginPage from './pages/login';
 import Header from './components/header/Header';
 import AdminPage from './pages/admin';
@@ -39,10 +38,6 @@ const App = () => {
     {
       pageComponentElement: <HomePage />,
       path: '/',
-    },
-    {
-      pageComponentElement: <TestPage />,
-      path: `/${RoutesEnum.TEST}`,
     },
     {
       pageComponentElement: <LoginPage />,

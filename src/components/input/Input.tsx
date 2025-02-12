@@ -24,6 +24,10 @@ interface InputProps {
   noBorder?: boolean;
   autoFocus?: boolean;
   customHeight?: string;
+  error?: boolean;
+  helperText?: string;
+  min?: number;
+  max?: number;
 }
 
 interface StyledInputProps {
@@ -36,10 +40,11 @@ interface StyledInputProps {
   customPadding?: string;
   noBorder?: boolean;
   customHeight?: string;
+  error?: boolean;
 }
 
 const Input = ({
-  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight,
+  value, onChange, type, maxLength, maxWidth, placeholder, disabled, label, fullWidth, textAlign, fontSize, fontWeight, name, compact, customPadding, noBorder, maxLengthInvisible, autoFocus, customHeight, error, helperText, min, max,
 }: InputProps) => (
   <Section gap="xxxs">
     {label && (
@@ -65,6 +70,9 @@ const Input = ({
       noBorder={noBorder}
       autoFocus={autoFocus}
       customHeight={customHeight}
+      error={error}
+      min={min}
+      max={max}
     />
     {maxLength && !maxLengthInvisible && (
       <NormalTypography variant="s" color={theme.colors.textLight}>
@@ -74,6 +82,11 @@ const Input = ({
         {maxLength}
         {' '}
         tecken
+      </NormalTypography>
+    )}
+    {helperText && helperText.length > 0 && (
+      <NormalTypography variant="xs" color={error ? theme.colors.redDark : theme.colors.textLight}>
+        {helperText}
       </NormalTypography>
     )}
   </Section>
@@ -86,8 +99,8 @@ const StyledInput = styled.input<StyledInputProps>`
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 500};
-  border: ${({ noBorder }) => (noBorder ? 'none' : `1px solid ${theme.colors.silver}`)};
-  border-radius: ${theme.borderRadius.s};
+  border: ${({ noBorder, error }) => (noBorder ? 'none' : `1px solid ${error ? theme.colors.red : theme.colors.silverDark}`)};
+  border-radius: ${theme.borderRadius.m};
   font-size: 16px;
   font-family: ${theme.fontFamily}, sans-serif;
   outline: none;
@@ -97,7 +110,7 @@ const StyledInput = styled.input<StyledInputProps>`
   height: ${({ compact }) => (compact ? '40px' : '48px')};
 
   &:focus {
-    border-color: ${theme.colors.primary};
+    border-color: ${({ error }) => (error ? theme.colors.redDark : theme.colors.primary)};
   }
 
   &::placeholder {

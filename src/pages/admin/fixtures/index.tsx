@@ -600,7 +600,7 @@ const ActionBar = styled.div`
   align-items: center;
   justify-content: space-between;
   background-color: ${theme.colors.white};
-  padding: ${theme.spacing.xxs} ${theme.spacing.s};
+  padding: ${theme.spacing.xs} ${theme.spacing.s};
   border-radius: ${theme.borderRadius.l};
   width: 100%;
   box-sizing: border-box;

@@ -1,6 +1,6 @@
 import { Fixture, Prediction } from './Fixture';
 
-export const leagueMaximumParticipants = 20;
+export const leagueMaximumParticipants = 24;
 
 export interface PredictionLeague {
   documentId: string;
@@ -15,6 +15,25 @@ export interface PredictionLeague {
   deadlineToJoin: Date;
   gameWeeks?: Array<LeagueGameWeek>;
   hasEnded?: boolean;
+  slackChannelUrl?: string;
+  scoringSystem?: LeagueScoringSystemValues;
+}
+
+export interface LeagueScoringSystemValues {
+  correctResult: number;
+  correctOutcome: number;
+  correctGoalScorerDefender: number;
+  correctGoalScorerMidfielder: number;
+  correctGoalScorerForward: number;
+  correctGoalDifference: number;
+  correctGoalsByTeam: number;
+  oddsBetween3And4: number;
+  oddsBetween4And6: number;
+  oddsBetween6And10: number;
+  oddsAvobe10: number;
+  goalFest: number;
+  underdogBonus: number;
+  firstTeamToScore: number;
 }
 
 export interface CreatePredictionLeagueInput {
@@ -28,6 +47,8 @@ export interface CreatePredictionLeagueInput {
   standings: Array<PredictionLeagueStanding>;
   deadlineToJoin: string;
   hasEnded: boolean;
+  slackChannelUrl?: string;
+  scoringSystem?: LeagueScoringSystemValues;
 }
 
 export enum LeagueTabs {
@@ -66,4 +87,9 @@ export interface LeagueGameWeekInput {
   games: LeagueGameWeekFixtures;
   hasBeenCorrected?: boolean;
   hasEnded?: boolean;
+}
+
+export enum ScoringSystemTemplates {
+  BULLSEYE = 'BULLSEYE',
+  GAMBLER = 'GAMBLER',
 }

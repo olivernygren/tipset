@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { updateDoc, doc } from 'firebase/firestore';
 import styled from 'styled-components';
-import { PredictionLeague } from '../../utils/League';
+import { LeagueScoringSystemValues, PredictionLeague } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
 import { HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -10,9 +10,13 @@ import CustomDatePicker from '../input/DatePicker';
 import Button from '../buttons/Button';
 import { CollectionEnum } from '../../utils/Firebase';
 import { db } from '../../config/firebase';
-import Modal from '../modal/Modal';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
+import Textarea from '../textarea/Textarea';
+import { Divider } from '../Divider';
+import ActionsModal from '../modal/ActionsModal';
+import InfoDialogue from '../info/InfoDialogue';
+import EditLeagueScoringSystemModal from './EditLeagueScoringSystemModal';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -27,8 +31,10 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [description, setDescription] = useState<string>(league.description);
   const [deadlineToJoin, setDeadlineToJoin] = useState(new Date(league.deadlineToJoin));
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [showEndLeagueConfirmationModal, setShowEndLeagueConfirmationModal] = useState(false);
+  const [showEndLeagueConfirmationModal, setShowEndLeagueConfirmationModal] = useState<boolean>(false);
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
+  const [editBasicInformationModalOpen, setEditBasicInformationModalOpen] = useState<boolean>(false);
+  const [editScoringSystemModalOpen, setEditScoringSystemModalOpen] = useState<boolean>(false);
 
   if (!isCreator) return null;
 
@@ -44,14 +50,14 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
 
     try {
       await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
+      setEditBasicInformationModalOpen(false);
       successNotify('Ligan uppdaterad');
       refetchLeague();
     } catch (error) {
       errorNotify('Ett fel uppstod');
-      console.error(error);
+    } finally {
+      setUpdateLoading(false);
     }
-
-    setUpdateLoading(false);
   };
 
   const handleEndLeague = async () => {
@@ -75,96 +81,156 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       successNotify('Ligan avslutad');
     } catch (error) {
       errorNotify('Ett fel uppstod');
-      console.error(error);
     }
 
     setEndLeagueLoading(false);
+  };
+
+  const handleSaveScoringSystem = async (scoringSystem: LeagueScoringSystemValues) => {
+    setUpdateLoading(true);
+
+    const updatedLeague = {
+      ...league,
+      scoringSystem,
+    };
+
+    try {
+      await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
+      setEditScoringSystemModalOpen(false);
+      successNotify('Poängsystemet uppdaterat');
+      refetchLeague();
+    } catch (error) {
+      errorNotify('Ett fel uppstod');
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   return (
     <>
       <Section
         backgroundColor={theme.colors.white}
-        padding={theme.spacing.m}
+        padding={`${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.xxxs} ${theme.spacing.m}`}
         gap="m"
         borderRadius={theme.borderRadius.m}
       >
-        <HeadingsTypography variant="h4">Redigera liga</HeadingsTypography>
-        <Section gap="s">
-          <InputContainer>
-            <Input
-              label="Namn"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-            />
-            <Input
+        <HeadingsTypography variant="h3">Redigera liga</HeadingsTypography>
+        <Section>
+          <Divider />
+          <Container>
+            <ContainerText>
+              <HeadingsTypography variant="h5">Grundinformation</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.silverDark}>Redigera namn, beskrivning och deadline att gå med i ligan.</NormalTypography>
+            </ContainerText>
+            <Button
+              variant="secondary"
+              onClick={() => setEditBasicInformationModalOpen(true)}
+              size="m"
+            >
+              Redigera
+            </Button>
+          </Container>
+          <Divider />
+          {!league.hasEnded && (
+            <>
+              <Container>
+                <ContainerText>
+                  <HeadingsTypography variant="h5">Poängsystem</HeadingsTypography>
+                  <NormalTypography variant="m" color={theme.colors.silverDark}>Uppdatera poängutdelning för matcher.</NormalTypography>
+                </ContainerText>
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditScoringSystemModalOpen(true)}
+                  size="m"
+                >
+                  Uppdatera
+                </Button>
+              </Container>
+              <Divider />
+              <Container>
+                <ContainerText>
+                  <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
+                  <NormalTypography variant="m" color={theme.colors.silverDark}>Avsluta ligan om det inte ska tippas några fler omgångar.</NormalTypography>
+                </ContainerText>
+                <Button
+                  color="red"
+                  onClick={() => setShowEndLeagueConfirmationModal(true)}
+                  fullWidth={isMobile}
+                >
+                  Avsluta liga
+                </Button>
+              </Container>
+            </>
+          )}
+        </Section>
+      </Section>
+      {editBasicInformationModalOpen && (
+        <ActionsModal
+          title="Grundinformation"
+          onCancelClick={() => setEditBasicInformationModalOpen(false)}
+          onActionClick={handleUpdateLeague}
+          actionButtonLabel="Spara"
+          size="m"
+          mobileFullScreen
+          loading={updateLoading}
+          actionButtonDisabled={name.length === 0}
+          headerDivider
+        >
+          <Section gap="m">
+            <InputContainer>
+              <Input
+                label="Namn"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                fullWidth
+                maxLength={30}
+              />
+              <CustomDatePicker
+                label="Deadline att gå med"
+                selectedDate={deadlineToJoin}
+                onChange={(date) => setDeadlineToJoin(date!)}
+                fullWidth
+                minDate={new Date()}
+              />
+            </InputContainer>
+            <Textarea
               label="Beskrivning"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
+              maxLength={100}
             />
-            <CustomDatePicker
-              label="Deadline att gå med"
-              selectedDate={deadlineToJoin}
-              onChange={(date) => setDeadlineToJoin(date!)}
-              fullWidth
-              minDate={new Date()}
-            />
-          </InputContainer>
-          <Button
-            variant="primary"
-            onClick={handleUpdateLeague}
-            loading={updateLoading}
-            disabled={name.length === 0}
-            fullWidth={isMobile}
-          >
-            Spara
-          </Button>
-        </Section>
-        {!league.hasEnded && (
-          <EndLeagueContainer>
-            <Section gap={isMobile ? 's' : 'xxs'}>
-              <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
-              <NormalTypography variant="m" color={theme.colors.silverDark}>Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng.</NormalTypography>
-            </Section>
-            <Button
-              color="red"
-              onClick={() => setShowEndLeagueConfirmationModal(true)}
-              fullWidth={isMobile}
-            >
-              Avsluta liga
-            </Button>
-          </EndLeagueContainer>
-        )}
-      </Section>
-      {showEndLeagueConfirmationModal && (
-        <Modal
-          size="s"
-          onClose={() => setShowEndLeagueConfirmationModal(false)}
-          title="Avsluta ligan"
-          mobileBottomSheet
-        >
-          <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
-          <Section gap="xs" flexDirection="row" alignItems="center">
-            <Button
-              variant="secondary"
-              onClick={() => setShowEndLeagueConfirmationModal(false)}
-              fullWidth
-            >
-              Avbryt
-            </Button>
-            <Button
-              variant="primary"
-              color="red"
-              onClick={handleEndLeague}
-              fullWidth
-              loading={endLeagueLoading}
-            >
-              Avsluta ligan
-            </Button>
           </Section>
-        </Modal>
+        </ActionsModal>
+      )}
+      {editScoringSystemModalOpen && (
+        <EditLeagueScoringSystemModal
+          onClose={() => setEditScoringSystemModalOpen(false)}
+          onSave={(scoringSystem) => handleSaveScoringSystem(scoringSystem)}
+          scoringSystem={league.scoringSystem}
+          saveLoading={updateLoading}
+        />
+      )}
+      {showEndLeagueConfirmationModal && (
+        <ActionsModal
+          size="m"
+          onCancelClick={() => setShowEndLeagueConfirmationModal(false)}
+          title="Avsluta ligan"
+          onActionClick={handleEndLeague}
+          actionButtonLabel="Avsluta ligan"
+          actionButtonColor="red"
+          mobileBottomSheet
+          loading={endLeagueLoading}
+        >
+          <Section gap="m">
+            <InfoDialogue
+              title="Avsluta liga"
+              description="Att avsluta en liga innebär att inga fler omgångar kan skapas och inga fler poäng kommer delas ut. Du kommer fortfarande kunna se ligans tidigare omgångar och allas poäng."
+              color="red"
+            />
+            <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
+          </Section>
+        </ActionsModal>
       )}
     </>
   );
@@ -179,27 +245,24 @@ const InputContainer = styled.div`
   @media ${devices.tablet} {
     flex-direction: row;
     gap: ${theme.spacing.m};
-    align-items: center;
+    align-items: flex-start;
     box-sizing: border-box;
   }
 `;
 
-const EndLeagueContainer = styled.div`
+const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.m};
+  align-items: center;
   width: 100%;
   box-sizing: border-box;
-  border-radius: ${theme.borderRadius.l};
-  border: 1px solid ${theme.colors.silverLight};
-  padding: ${theme.spacing.s};
-  background-color: ${theme.colors.silverBleach};
-  align-items: center;
+  padding: ${theme.spacing.m} 0;
+`;
 
-  @media ${devices.tablet} {
-    flex-direction: row;
-    gap: ${theme.spacing.s};
-  }
+const ContainerText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xxs};
+  flex: 1;
 `;
 
 export default EditLeagueView;

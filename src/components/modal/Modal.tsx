@@ -100,7 +100,7 @@ const Backdrop = styled.div<{ mobileBottomSheet?: boolean }>`
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 100;
   animation: fadeIn 0.2s ease;
-  
+
   @media ${devices.tablet} {
     align-items: center;
   }
@@ -125,7 +125,7 @@ const ModalContainer = styled.div<{ width: string, mobileBottomSheet?: boolean, 
   border-radius: ${({ mobileBottomSheet, mobileFullScreen }) => getBorderRadius(mobileBottomSheet, mobileFullScreen)};
   ${({ mobileFullScreen }) => mobileFullScreen && 'height: 100dvh;'}
   animation: slideIn 0.2s ease;
-  
+
   @media ${devices.tablet} {
     max-height: 85vh;
     border-radius: ${theme.borderRadius.l};
@@ -181,7 +181,7 @@ const Header = styled.div<{ headerDivider?: boolean }>`
   ${HeadingsTypography} {
     flex: 1;
   }
-  
+
   ${({ headerDivider }) => headerDivider && css`
     border-bottom: 1px solid ${theme.colors.silverLight};
     padding-bottom: ${theme.spacing.s};

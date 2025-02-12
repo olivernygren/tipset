@@ -83,6 +83,7 @@ const EditPlayerStatusModal = ({
             noPadding
             objectFit="cover"
             backgroundColor={theme.colors.silverLight}
+            customBorderWidth={1}
           />
           <EmphasisTypography variant="m">{player?.name}</EmphasisTypography>
         </Section>

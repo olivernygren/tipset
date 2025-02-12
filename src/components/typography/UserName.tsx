@@ -61,6 +61,7 @@ export const UserProfilePicture = ({ userId, size }: UserProfilePictureProps) =>
       size={size ?? AvatarSize.M}
       objectFit="cover"
       showBorder
+      customBorderWidth={1}
     />
   );
 };
