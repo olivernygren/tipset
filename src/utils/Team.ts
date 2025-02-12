@@ -2128,6 +2128,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'AS Monaco',
+      shortName: 'Monaco',
       fotMobName: 'Monaco',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
       stadium: 'Stade Louis II',

@@ -31,6 +31,7 @@ import ActionsModal from '../modal/ActionsModal';
 import Button from '../buttons/Button';
 import IconButton from '../buttons/IconButton';
 import TextButton from '../buttons/TextButton';
+import { LeagueScoringSystemValues } from '../../utils/League';
 
 // enum SearchType {
 //   BY_TOURNAMENT = 'BY_TOURNAMENT',
@@ -44,10 +45,11 @@ interface FindOtherFixturesModalProps {
   onFixturesSelect: (fixture: Array<Fixture>) => void;
   alreadySelectedFixtures: Array<Fixture>;
   minDate?: Date;
+  leagueScoringSystem?: LeagueScoringSystemValues;
 }
 
 const FindOtherFixturesModal = ({
-  onClose, onFixturesSelect, minDate, alreadySelectedFixtures,
+  onClose, onFixturesSelect, minDate, alreadySelectedFixtures, leagueScoringSystem,
 }: FindOtherFixturesModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -122,12 +124,19 @@ const FindOtherFixturesModal = ({
     if (alreadySelectedFixtures.some((f) => f.id === fixture.id)) {
       return;
     }
+
+    const includFirstTeamToScoreyDefault = leagueScoringSystem && leagueScoringSystem.firstTeamToScore > 0;
+    const modifiedFixture = {
+      ...fixture,
+      ...(includFirstTeamToScoreyDefault && { shouldPredictFirstTeamToScore: true }),
+    };
+
     setSelectedFixtures((prev) => {
       const index = prev.findIndex((f) => f.id === fixture.id);
       if (index >= 0) {
         return prev.filter((f) => f.id !== fixture.id);
       }
-      return [...prev, fixture];
+      return [...prev, modifiedFixture];
     });
   };
 

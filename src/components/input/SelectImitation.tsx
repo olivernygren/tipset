@@ -88,7 +88,7 @@ const getBackgroundColor = (bgColor: string | undefined, disabled?: boolean) => 
 const StyledSelectImitation = styled.div<StyledSelectImitationProps>`
   background-color: ${({ disabled, bgColor }) => getBackgroundColor(bgColor, disabled)};
   ${({ borderless, disabled }) => !borderless && `border: 1px solid ${disabled ? theme.colors.silverLight : theme.colors.silver};`};
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   display: inline-flex;
   align-items: center;
   justify-content: space-between;

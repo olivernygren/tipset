@@ -64,7 +64,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
   justify-content: space-between;
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'fit-content')};
   border: 1px solid #ccc;
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   padding-right: ${theme.spacing.xs};
   box-sizing: border-box;
 
@@ -77,7 +77,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
 
     > input {
       padding: ${theme.spacing.xxs} ${theme.spacing.xs};
-      border-radius: ${theme.borderRadius.s};
+      border-radius: ${theme.borderRadius.m};
       font-size: 16px;
       font-weight: 500;
       border: none;
@@ -96,7 +96,7 @@ const DatePickerWrapper = styled.div<{ fullWidth?: boolean }>`
     font-size: 14px;
     background-color: ${theme.colors.white};
     border: 1px solid ${theme.colors.silver};
-    border-radius: ${theme.borderRadius.s};
+    border-radius: ${theme.borderRadius.m};
     display: inline-flex;
     min-height: 273px;
 

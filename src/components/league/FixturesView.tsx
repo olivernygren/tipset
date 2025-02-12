@@ -16,6 +16,7 @@ import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import { useUser } from '../../context/UserContext';
 import {
+  FirstTeamToScore,
   Fixture, PredictionInput, PredictionStatus,
 } from '../../utils/Fixture';
 import {
@@ -283,6 +284,23 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setPredictionStatuses(updatedPredictionStatuses);
   };
 
+  const handleUpdateFirstTeamToScore = (fixtureId: string, firstTeamToScore: FirstTeamToScore) => {
+    const fixture = predictionStatuses.find((fixture) => fixture.fixtureId === fixtureId);
+
+    if (!fixture || league.hasEnded || !firstTeamToScore) return;
+
+    const updatedPredictionStatuses = predictionStatuses.map((prediction) => {
+      if (prediction.fixtureId === fixtureId) {
+        return {
+          ...prediction,
+          status: PredictionStatus.UPDATED,
+        };
+      }
+      return prediction;
+    });
+    setPredictionStatuses(updatedPredictionStatuses);
+  };
+
   const handleEndGameWeek = async () => {
     if (!league || !ongoingGameWeek) return;
 
@@ -318,7 +336,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
     setEndGameWeekLoading(false);
   };
 
-  const handleSavePrediction = async (fixture: Fixture, homeGoals: string, awayGoals: string, playerToScore?: Player | null) => {
+  const handleSavePrediction = async (fixture: Fixture, homeGoals: string, awayGoals: string, playerToScore?: Player | null, firstTeamToScore?: FirstTeamToScore) => {
     if (!user || !user.documentId || !ongoingGameWeek) return;
 
     if (!homeGoals || !awayGoals || parseInt(homeGoals) < 0 || parseInt(awayGoals) < 0 || league.hasEnded) return;
@@ -339,6 +357,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
       awayGoals: parseInt(awayGoals),
       outcome: getPredictionOutcome(parseInt(homeGoals), parseInt(awayGoals)),
       ...((playerToScore && fixture.shouldPredictGoalScorer) && { goalScorer: playerToScore }),
+      ...((firstTeamToScore && fixture.shouldPredictFirstTeamToScore) && { firstTeamToScore }),
     };
 
     try {
@@ -443,6 +462,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onClose={() => setEditGameWeekViewOpen(false)}
           refetch={refetchLeague}
           minDate={new Date(ongoingGameWeek.startDate)}
+          league={league}
         />
       );
     }
@@ -460,7 +480,8 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
               game={fixture}
               onResultUpdate={() => handleUpdatePredictionScoreline(fixture.id)}
               onPlayerPredictionUpdate={(_, playerToScore) => handleUpdatePlayerPrediction(fixture.id, playerToScore)}
-              onSave={(homeGoals, awayGoals, playerToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore)}
+              onFirstTeamToScoreUpdate={(_, firstTeamToScore) => handleUpdateFirstTeamToScore(fixture.id, firstTeamToScore)}
+              onSave={(homeGoals, awayGoals, playerToScore, firstTeamToScore) => handleSavePrediction(fixture, homeGoals, awayGoals, playerToScore, firstTeamToScore)}
               hasPredicted={ongoingGameWeek.games.predictions.some((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               predictionValue={ongoingGameWeek.games.predictions.find((prediction) => prediction.userId === user?.documentId && prediction.fixtureId === fixture.id)}
               loading={predictionLoading === fixture.id}
@@ -792,6 +813,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     onClose={() => setEditUpcomingGameWeekViewOpen(false)}
                     refetch={refetchLeague}
                     minDate={ongoingGameWeek ? getLastKickoffTimeInGameWeek(ongoingGameWeek) : new Date()}
+                    league={league}
                   />
                 ) : (
                   Array.from(groupFixturesByDate(upcomingGameWeekFixtures).entries()).map(([date, fixtures]) => (
@@ -936,6 +958,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           }}
           onDeleteFixture={() => setNewGameWeekFixtures(newGameWeekFixtures.filter((f) => f.id !== newFixtureToEdit.id))}
           minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
+          league={league}
         />
       )}
       {isStatsModalOpen && (
@@ -992,6 +1015,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
           onFixturesSelect={(fixtures) => handleAddExternalFixtures(fixtures)}
           alreadySelectedFixtures={newGameWeekFixtures}
           minDate={ongoingGameWeek ? getLastKickoffTimeInAllGameWeeks(league.gameWeeks ?? []) : new Date()}
+          leagueScoringSystem={league.scoringSystem}
         />
       )}
     </>

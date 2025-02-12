@@ -53,9 +53,12 @@ const CreateFixtureModal = ({
   const [shouldPredictGoalScorer, setShouldPredictGoalScorer] = useState<boolean>(false);
   const [fixtureNickname, setFixtureNickname] = useState<string>('');
   const [includeStats, setIncludeStats] = useState<boolean>(true);
+  const [includeFirstTeamToScore, setIncludeFirstTeamToScore] = useState<boolean>(true);
 
   const [showSelectTeamModal, setShowSelectTeamModal] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState<boolean>(false);
+
+  const canIncludeFirstTeamToScore = league?.scoringSystem?.firstTeamToScore !== undefined && league?.scoringSystem?.firstTeamToScore > 0;
 
   useEffect(() => {
     const anyTeamsPlayersRegistered = isPredictGoalScorerPossibleByTeamNames([homeTeam?.name ?? '', awayTeam?.name ?? '']);
@@ -105,6 +108,7 @@ const CreateFixtureModal = ({
       tournament,
       kickOffTime: new Date(kickoffDateTime).toISOString(),
       shouldPredictGoalScorer,
+      shouldPredictFirstTeamToScore: includeFirstTeamToScore,
       ...(fixtureNickname && { fixtureNickname }),
       teamType,
       includeStats,
@@ -141,6 +145,8 @@ const CreateFixtureModal = ({
     setTournament('');
     setKickoffDateTime(new Date());
     setShouldPredictGoalScorer(false);
+    setIncludeStats(true);
+    setIncludeFirstTeamToScore(league?.scoringSystem?.firstTeamToScore !== undefined && league?.scoringSystem?.firstTeamToScore > 0);
     setFixtureNickname('');
   };
 
@@ -240,6 +246,19 @@ const CreateFixtureModal = ({
             />
             <EmphasisTypography variant="m">Inkludera statistik</EmphasisTypography>
           </OptionalInclusionContainer>
+          {canIncludeFirstTeamToScore && (
+            <OptionalInclusionContainer onClick={() => setIncludeFirstTeamToScore(!includeFirstTeamToScore)}>
+              <IconButton
+                icon={includeFirstTeamToScore ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIncludeFirstTeamToScore(!includeFirstTeamToScore);
+                }}
+                colors={includeFirstTeamToScore ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+              />
+              <EmphasisTypography variant="m">Tippa första lag att göra mål</EmphasisTypography>
+            </OptionalInclusionContainer>
+          )}
           {isPossibleToPredictGoalScorer && homeTeam !== undefined && awayTeam !== undefined && (
             <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
               <IconButton

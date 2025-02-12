@@ -17,6 +17,7 @@ import IconButton from '../buttons/IconButton';
 import {
   Prediction, FixtureResult, PredictionPoints, TeamType,
   Fixture,
+  FirstTeamToScore,
 } from '../../utils/Fixture';
 import { Divider } from '../Divider';
 import {
@@ -55,6 +56,7 @@ const CorrectPredictionsModal = ({
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [finalResult, setFinalResult] = useState<{ homeGoals: string, awayGoals: string }>({ homeGoals: savedFinalResult?.homeTeamGoals.toString() ?? '', awayGoals: savedFinalResult?.awayTeamGoals.toString() ?? '' });
+  const [firstTeamToScore, setFirstTeamToScore] = useState<FirstTeamToScore | undefined>(savedFinalResult?.firstTeamToScore);
   const [goalScorers, setGoalScorers] = useState<Array<string>>(savedFinalResult?.goalScorers ?? []);
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
   const [savingLoading, setSavingLoading] = useState<boolean>(false);
@@ -288,6 +290,9 @@ const CorrectPredictionsModal = ({
       correctGoalDifference: 0,
       correctGoalsByHomeTeam: 0,
       correctGoalsByAwayTeam: 0,
+      firstTeamToScore: 0,
+      underdogBonus: 0,
+      goalFest: 0,
       oddsBonus: 0,
       total: 0,
     };
@@ -307,6 +312,7 @@ const CorrectPredictionsModal = ({
     const wasDraw = parseInt(finalResult.homeGoals) === parseInt(finalResult.awayGoals);
 
     const correctOutcome = (homeWinPredicted && wasHomeWin) || (awayWinPredicted && wasAwayWin) || (drawPredicted && wasDraw);
+    const correctFirstTeamToScore = fixture?.shouldPredictFirstTeamToScore && prediction.firstTeamToScore === firstTeamToScore;
 
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
@@ -348,6 +354,11 @@ const CorrectPredictionsModal = ({
       const playerPoints = getPlayerToScorePoints(prediction.goalScorer);
       totalPoints += playerPoints;
       pointDistribution.correctGoalScorer += playerPoints;
+    }
+
+    if (correctFirstTeamToScore) {
+      totalPoints += scoringSystem.firstTeamToScore;
+      pointDistribution.firstTeamToScore += scoringSystem.firstTeamToScore;
     }
 
     pointDistribution.total = totalPoints;

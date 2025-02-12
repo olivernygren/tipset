@@ -17,6 +17,7 @@ export interface PredictionLeague {
   hasEnded?: boolean;
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
+  preferences?: LeaguePreferences;
 }
 
 export interface LeagueScoringSystemValues {
@@ -36,6 +37,13 @@ export interface LeagueScoringSystemValues {
   firstTeamToScore: number;
 }
 
+export interface LeaguePreferences {
+  odds: boolean;
+  goalScorers: boolean;
+  firstTeamToScore: boolean;
+  // chips: boolean;
+}
+
 export interface CreatePredictionLeagueInput {
   name: string;
   description: string;
@@ -49,6 +57,7 @@ export interface CreatePredictionLeagueInput {
   hasEnded: boolean;
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
+  preferences?: LeaguePreferences;
 }
 
 export enum LeagueTabs {

@@ -130,6 +130,19 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               Redigera
             </Button>
           </Container>
+          {/* <Container>
+            <ContainerText>
+              <HeadingsTypography variant="h5">Matchpreferenser</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.silverDark}>Redigera dina preferenser för matcherna som ska tippas för att underlätta skapandet.</NormalTypography>
+            </ContainerText>
+            <Button
+              variant="secondary"
+              onClick={() => setEditBasicInformationModalOpen(true)}
+              size="m"
+            >
+              Redigera
+            </Button>
+          </Container> */}
           <Divider />
           {!league.hasEnded && (
             <>

@@ -99,7 +99,7 @@ const StyledInput = styled.input<StyledInputProps>`
   text-align: ${({ textAlign }) => textAlign || 'left'};
   font-size: ${({ fontSize }) => fontSize || '16px'} !important;
   font-weight: ${({ fontWeight }) => fontWeight || 500};
-  border: ${({ noBorder, error }) => (noBorder ? 'none' : `1px solid ${error ? theme.colors.red : theme.colors.silverDark}`)};
+  border: ${({ noBorder, error }) => (noBorder ? 'none' : `1px solid ${error ? theme.colors.red : theme.colors.silver}`)};
   border-radius: ${theme.borderRadius.m};
   font-size: 16px;
   font-family: ${theme.fontFamily}, sans-serif;
