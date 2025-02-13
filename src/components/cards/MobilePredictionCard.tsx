@@ -1,10 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Fixture, Prediction } from '../../utils/Fixture';
+import {
+  FirstTeamToScore, Fixture, Prediction, TeamType,
+} from '../../utils/Fixture';
 import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import UserName from '../typography/UserName';
 import { Divider } from '../Divider';
+import { Team } from '../../utils/Team';
+import { AvatarSize } from '../avatar/Avatar';
+import ClubAvatar from '../avatar/ClubAvatar';
+import NationAvatar from '../avatar/NationAvatar';
 
 interface MobilePredictionCardProps {
   prediction: Prediction;
@@ -16,51 +22,84 @@ interface MobilePredictionCardProps {
 
 const MobilePredictionCard = ({
   prediction, hasPredictedResult, points, oddsBonus, fixture,
-}: MobilePredictionCardProps) => (
-  <Card>
-    <HeadingContainer>
-      <HeadingsTypography variant="h4" color={theme.colors.primary}>
-        {prediction.username ? prediction.username : (
-          <UserName userId={prediction.userId} />
-        )}
-      </HeadingsTypography>
-    </HeadingContainer>
-    <Row>
-      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Utfall</EmphasisTypography>
-      <Outcome>
-        <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '-'}</NormalTypography>
-      </Outcome>
-    </Row>
-    <Divider />
-    <Row>
-      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Resultat</EmphasisTypography>
-      <NormalTypography variant="m">{hasPredictedResult ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
-    </Row>
-    <Divider />
-    {fixture?.shouldPredictGoalScorer && (
-      <>
-        <Row>
-          <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
-          {prediction.goalScorer ? (
-            <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
-          ) : (
-            <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen</NormalTypography>
+}: MobilePredictionCardProps) => {
+  const getAvatar = (team: Team) => (fixture?.teamType === TeamType.CLUBS ? (
+    <ClubAvatar
+      logoUrl={team.logoUrl}
+      clubName={team.name}
+      size={AvatarSize.M}
+      noPadding
+      shape="square"
+    />
+  ) : (
+    <NationAvatar
+      flagUrl={team.logoUrl}
+      nationName={team.name}
+      size={AvatarSize.M}
+    />
+  ));
+
+  return (
+    <Card>
+      <HeadingContainer>
+        <HeadingsTypography variant="h4" color={theme.colors.primary}>
+          {prediction.username ? prediction.username : (
+            <UserName userId={prediction.userId} />
           )}
-        </Row>
-        <Divider />
-      </>
-    )}
-    <Row>
-      <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Oddsbonus</EmphasisTypography>
-      <NormalTypography variant="m">{oddsBonus}</NormalTypography>
-    </Row>
-    <Divider />
-    <Row>
-      <HeadingsTypography variant="h6" color={theme.colors.primary}>Totalpoäng</HeadingsTypography>
-      <NormalTypography variant="m" color={theme.colors.primary}>{points}</NormalTypography>
-    </Row>
-  </Card>
-);
+        </HeadingsTypography>
+      </HeadingContainer>
+      <Row>
+        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Utfall</EmphasisTypography>
+        <Outcome>
+          <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult ? prediction.outcome : '-'}</NormalTypography>
+        </Outcome>
+      </Row>
+      <Divider />
+      <Row>
+        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Resultat</EmphasisTypography>
+        <NormalTypography variant="m">{hasPredictedResult ? `${prediction.homeGoals} - ${prediction.awayGoals}` : 'Ej tippat'}</NormalTypography>
+      </Row>
+      <Divider />
+      {fixture?.shouldPredictFirstTeamToScore && (
+        <>
+          <Row>
+            <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Första målet</EmphasisTypography>
+            {prediction.goalScorer ? (
+              <NormalTypography variant="m">
+                {prediction.firstTeamToScore === FirstTeamToScore.HOME_TEAM ? getAvatar(fixture.homeTeam) : getAvatar(fixture.awayTeam)}
+              </NormalTypography>
+            ) : (
+              <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen</NormalTypography>
+            )}
+          </Row>
+          <Divider />
+        </>
+      )}
+      {fixture?.shouldPredictGoalScorer && (
+        <>
+          <Row>
+            <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
+            {prediction.goalScorer ? (
+              <NormalTypography variant="m">{prediction.goalScorer.name}</NormalTypography>
+            ) : (
+              <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen</NormalTypography>
+            )}
+          </Row>
+          <Divider />
+        </>
+      )}
+      <Row>
+        <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Oddsbonus</EmphasisTypography>
+        <NormalTypography variant="m">{oddsBonus}</NormalTypography>
+      </Row>
+      <Divider />
+      <Row>
+        <HeadingsTypography variant="h6" color={theme.colors.primary}>Totalpoäng</HeadingsTypography>
+        <NormalTypography variant="m" color={theme.colors.primary}>{points}</NormalTypography>
+      </Row>
+    </Card>
+  );
+};
 
 const Card = styled.div`
   display: flex;

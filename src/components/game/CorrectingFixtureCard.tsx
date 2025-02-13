@@ -72,11 +72,12 @@ const CorrectingFixtureCard = ({ fixture, onClick }: FixturePreviewProps) => {
       <Divider />
       <BottomContainer>
         <TextButton
+          size={isMobile ? 's' : 'm'}
           onClick={onClick}
           noPadding
           icon={fixture.finalResult
-            ? <ArrowUUpLeft size={20} weight="bold" color={theme.colors.primary} />
-            : <CheckCircle size={20} weight="fill" color={theme.colors.primary} />}
+            ? <ArrowUUpLeft size={isMobile ? 16 : 20} weight="bold" color={theme.colors.primary} />
+            : <CheckCircle size={isMobile ? 16 : 20} weight="fill" color={theme.colors.primary} />}
         >
           {fixture.finalResult ? 'Ändra' : 'Rätta'}
         </TextButton>
@@ -89,20 +90,13 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
   border-radius: ${theme.borderRadius.m};
   background-color: ${theme.colors.silverLighter};
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  /* padding: ${theme.spacing.xxxs} ${theme.spacing.xxs}; */
-  /* cursor: pointer; */
   border: 1px solid ${theme.colors.silverLight};
   box-shadow: 0px 2px 0px 0px ${theme.colors.silverLight};
-
-  /* @media ${devices.tablet} {
-    padding: 0 0 0 ${theme.spacing.s};
-  } */
 `;
 
 const Teams = styled.div`
@@ -149,9 +143,13 @@ const BottomContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: ${theme.spacing.xxs};
-  padding: ${theme.spacing.xs} ${theme.spacing.xxs};
   width: 100%;
   box-sizing: border-box;
+  padding: ${theme.spacing.xxs};
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.xs} ${theme.spacing.xxs};
+  }
 `;
 
 export default CorrectingFixtureCard;

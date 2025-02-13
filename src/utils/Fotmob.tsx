@@ -179,6 +179,7 @@ export interface FotMobMatchTeam {
 }
 
 export interface FotMobMatchStatus {
+  aggregatedStr?: string;
   cancelled: boolean;
   finished: boolean;
   started: boolean;

@@ -3,9 +3,11 @@ import styled from 'styled-components';
 import {
   collection, getDocs, query, where,
 } from 'firebase/firestore';
-import { CaretDown, CaretUp } from '@phosphor-icons/react';
+import { CaretDown, CaretUp, Prohibit } from '@phosphor-icons/react';
 import Modal from '../modal/Modal';
-import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
+import {
+  FirstTeamToScore, Fixture, Prediction, TeamType,
+} from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import PredictionScoreCard from '../game/PredictionScoreCard';
 import SimpleFixturePredictionCard from '../cards/SimpleFixturePredictionCard';
@@ -24,6 +26,7 @@ import { Team } from '../../utils/Team';
 import IconButton from '../buttons/IconButton';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
+import { Section } from '../section/Section';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -103,11 +106,11 @@ const PredictionsModal = ({
     );
   };
 
-  const getTeamAvatar = (team: Team) => (fixture?.teamType === TeamType.CLUBS ? (
+  const getTeamAvatar = (team: Team, customSize?: AvatarSize) => (fixture?.teamType === TeamType.CLUBS ? (
     <ClubAvatar
       logoUrl={team.logoUrl}
       clubName={team.name}
-      size={AvatarSize.XS}
+      size={customSize || AvatarSize.XS}
       shape="square"
       noPadding
     />
@@ -115,7 +118,7 @@ const PredictionsModal = ({
     <NationAvatar
       flagUrl={team.logoUrl}
       nationName={team.name}
-      size={AvatarSize.XS}
+      size={customSize || AvatarSize.XS}
     />
   ));
 
@@ -128,21 +131,22 @@ const PredictionsModal = ({
       mobileBottomSheet
     >
       <Content>
-        {fixture && (
-          isMobile ? (
-            <CompactFixtureResult
-              fixture={fixture}
-              predictions={predictions}
-              showButtonsAndPoints={false}
-            />
-          ) : (
-            <FinalResult fixture={fixture} />
-          )
-        )}
-        {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
+        <Section gap="s">
+          {fixture && (
+            isMobile ? (
+              <CompactFixtureResult
+                fixture={fixture}
+                predictions={predictions}
+                showButtonsAndPoints={false}
+              />
+            ) : (
+              <FinalResult fixture={fixture} />
+            )
+          )}
+          {fixture && gameHasFinished && fixture.shouldPredictGoalScorer && (
           <GoalScorersContainer isExpanded={isGoalScorersExpanded}>
             <GoalScorersMainContent>
-              <HeadingsTypography variant="h5">Målskyttar</HeadingsTypography>
+              <HeadingsTypography variant={isMobile ? 'h6' : 'h5'}>Målskyttar</HeadingsTypography>
               <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
                 {hasGoalScorers ? (
                   fixture?.finalResult?.goalScorers?.map((scorer, index) => (
@@ -174,7 +178,24 @@ const PredictionsModal = ({
               ))}
             </ExpandedGoalScorers>
           </GoalScorersContainer>
-        )}
+          )}
+          {fixture?.shouldPredictFirstTeamToScore && fixture.finalResult?.firstTeamToScore && (
+          <FirstTeamToScoreContainer>
+            <HeadingsTypography variant={isMobile ? 'h6' : 'h5'}>Första lag att göra mål</HeadingsTypography>
+            <Section gap="xxs" flexDirection="row" alignItems="center" fitContent>
+              <FirstTeamToScoreLogo>
+                {fixture.finalResult?.firstTeamToScore === FirstTeamToScore.NONE ? (
+                  <Section padding={theme.spacing.xxs}>
+                    <Prohibit size={32} color={theme.colors.textDefault} />
+                  </Section>
+                ) : (
+                  getTeamAvatar(fixture.finalResult.firstTeamToScore === FirstTeamToScore.HOME_TEAM ? fixture.homeTeam : fixture.awayTeam, AvatarSize.M)
+                )}
+              </FirstTeamToScoreLogo>
+            </Section>
+          </FirstTeamToScoreContainer>
+          )}
+        </Section>
         <PredictionsContainer>
           {gameHasFinished && (
             <HeadingsTypography variant="h5">
@@ -249,12 +270,16 @@ const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   border-radius: ${theme.borderRadius.m};
   padding: 0 ${theme.spacing.xs};
   box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
-  max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '60px')};
+  min-height: 62px;
+  max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '62px')};
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
   transition: max-height 0.6s cubic-bezier(.39,-0.15,.46,.94);
   
   @media ${devices.tablet} {
-    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
+    min-height: 72px;
+    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '72px')};
     padding: ${theme.spacing.xxs} ${theme.spacing.s} ${theme.spacing.xxs} ${theme.spacing.s};
   }
 `;
@@ -291,6 +316,30 @@ const GoalScorerTeamAvatar = styled.div`
   bottom: 6px;
   right: 6px;
   z-index: 1;
+`;
+
+const FirstTeamToScoreContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${theme.spacing.xxs};
+  border: 1px solid ${theme.colors.silverLight};
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.m};
+  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
+  width: 100%;
+  box-sizing: border-box;
+  padding: ${theme.spacing.xs};
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.s};
+  }
+`;
+
+const FirstTeamToScoreLogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default PredictionsModal;

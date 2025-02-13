@@ -9,6 +9,7 @@ import {
 } from './Players';
 import { Team, TournamentsEnum } from './Team';
 import { theme } from '../theme';
+import { FotMobMatch } from './Fotmob';
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;

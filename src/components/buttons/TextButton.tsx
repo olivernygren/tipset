@@ -37,7 +37,7 @@ const TextButton = ({
         <SpinnerGap size={24} color={theme.colors[color] || theme.colors.primary} />
       </RotationalSpinner>
     ) : (
-      <EmphasisTypography variant="m" color={disabled ? theme.colors.silver : (theme.colors[color] || theme.colors.primary)} align="center">
+      <EmphasisTypography variant={size} color={disabled ? theme.colors.silver : (theme.colors[color] || theme.colors.primary)} align="center">
         {children}
       </EmphasisTypography>
     )}

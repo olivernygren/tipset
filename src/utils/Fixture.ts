@@ -28,8 +28,8 @@ export interface FixtureResult {
 }
 
 export interface Fixture {
-  documentId?: string;
   id: string;
+  centralFixtureReferenceId?: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
@@ -59,6 +59,7 @@ export enum FirstTeamToScore {
 
 export interface FixtureInput {
   id: string;
+  centralFixtureReferenceId?: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;

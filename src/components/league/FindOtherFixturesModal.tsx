@@ -33,13 +33,6 @@ import IconButton from '../buttons/IconButton';
 import TextButton from '../buttons/TextButton';
 import { LeagueScoringSystemValues } from '../../utils/League';
 
-// enum SearchType {
-//   BY_TOURNAMENT = 'BY_TOURNAMENT',
-//   BY_CLUB = 'BY_CLUB',
-//   BY_NATIONAL_TEAM = 'BY_NATIONAL_TEAM',
-//   ALL = 'ALL',
-// }
-
 interface FindOtherFixturesModalProps {
   onClose: () => void;
   onFixturesSelect: (fixture: Array<Fixture>) => void;
@@ -125,10 +118,10 @@ const FindOtherFixturesModal = ({
       return;
     }
 
-    const includFirstTeamToScoreyDefault = leagueScoringSystem && leagueScoringSystem.firstTeamToScore > 0;
+    const includFirstTeamToScoreByDefault = leagueScoringSystem && leagueScoringSystem.firstTeamToScore > 0;
     const modifiedFixture = {
       ...fixture,
-      ...(includFirstTeamToScoreyDefault && { shouldPredictFirstTeamToScore: true }),
+      ...(includFirstTeamToScoreByDefault && { shouldPredictFirstTeamToScore: true }),
     };
 
     setSelectedFixtures((prev) => {

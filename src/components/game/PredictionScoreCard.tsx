@@ -14,7 +14,8 @@ import IconButton from '../buttons/IconButton';
 import { Team } from '../../utils/Team';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { Section } from '../section/Section';
-import { getGeneralPositionShorthand } from '../../utils/helpers';
+import { getGeneralPositionShorthand, getPredictionOutcome } from '../../utils/helpers';
+import Tooltip from '../tooltip/Tooltip';
 
 interface PredictionScoreCardProps {
   prediction: Prediction;
@@ -64,30 +65,61 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     }
   };
 
-  const getTableRow = (label: string, points: number | undefined) => {
-    if (!points || points === 0) return null;
+  const getFirstTeamToScore = () => {
+    if (fixture && prediction.points?.firstTeamToScore) {
+      return fixture.homeTeam.name;
+    }
+    if (fixture && !prediction.points?.firstTeamToScore) {
+      return fixture.awayTeam.name;
+    }
+    return 'Inget lag (0-0)';
+  };
+
+  const getTableRow = (label: string, userPrediction: string, points: number | undefined) => {
+    if (!points || points === 0 || !fixture) return null;
 
     const isOddsBonus = label.includes('Oddsbonus');
     const isGoalScorer = label.includes('Korrekt målskytt');
     const isCorrectResult = label.includes('Korrekt resultat');
+    const isOutcome = label.includes('Korrekt utfall (1X2)');
+    const isFirstTeamToScore = label.includes('Första lag att göra mål');
+
+    const firstTeamToScoreAvatar = userPrediction === fixture?.homeTeam.name ? getAvatar(fixture.homeTeam) : getAvatar(fixture.awayTeam);
 
     return (
       <TableRow topBorder>
-        {isOddsBonus && (
-          <FireSimple size={20} color={theme.colors.silverDark} />
-        )}
-        {isGoalScorer && (
-          <SoccerBall size={20} color={theme.colors.silverDark} weight="fill" />
-        )}
-        {isCorrectResult && (
-          <Target size={20} color={theme.colors.silverDark} />
-        )}
-        <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
-        <EmphasisTypography variant="m" color={theme.colors.primary}>
-          {points}
-          {' '}
-          p
-        </EmphasisTypography>
+        <Section flexDirection="row" gap="xxs" alignItems="center">
+          {isOddsBonus && (
+            <FireSimple size={20} color={theme.colors.silverDark} />
+          )}
+          {isGoalScorer && (
+            <SoccerBall size={20} color={theme.colors.silverDark} weight="fill" />
+          )}
+          {isCorrectResult && (
+            <Target size={20} color={theme.colors.silverDark} />
+          )}
+          <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
+        </Section>
+        <CenterAdjustedTableCell>
+          {isOutcome && (
+            <PredictedOutcome>
+              <NormalTypography variant="s" color={theme.colors.textDefault} align="center">{userPrediction}</NormalTypography>
+            </PredictedOutcome>
+          )}
+          {isFirstTeamToScore && (
+            firstTeamToScoreAvatar
+          )}
+          {!isOutcome && !isFirstTeamToScore && (
+            <NormalTypography variant="s" color={theme.colors.textDefault} align="center">{userPrediction}</NormalTypography>
+          )}
+        </CenterAdjustedTableCell>
+        <RightAdjustedTableCell>
+          <EmphasisTypography variant="m" color={theme.colors.primary}>
+            {points}
+            {' '}
+            p
+          </EmphasisTypography>
+        </RightAdjustedTableCell>
       </TableRow>
     );
   };
@@ -206,18 +238,25 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
         )}
         {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
           <>
-            <Section padding={`${theme.spacing.xxs} 0 ${theme.spacing.xxxs} 0`}>
+            <TableRow>
               <EmphasisTypography variant="m" color={theme.colors.primaryDark}>Poängfördelning</EmphasisTypography>
-            </Section>
-            {getTableRow('Korrekt utfall (1X2)', prediction.points?.correctOutcome)}
-            {getTableRow('Korrekt antal mål av hemmalag', prediction.points?.correctGoalsByHomeTeam)}
-            {getTableRow('Korrekt antal mål av bortalag', prediction.points?.correctGoalsByAwayTeam)}
-            {getTableRow('Korrekt målskillnad', prediction.points?.correctGoalDifference)}
-            {getTableRow('Korrekt resultat', prediction.points?.correctResult)}
-            {getTableRow(`Oddsbonus (${getOddsForPredictedOutcome()})`, prediction.points?.oddsBonus)}
+              <CenterAdjustedTableCell>
+                <Tooltip show text="Du" arrowPosition="bottom" size="small" />
+              </CenterAdjustedTableCell>
+              <RightAdjustedTableCell>
+                <NormalTypography variant="m" color={theme.colors.textDefault}>Poäng</NormalTypography>
+              </RightAdjustedTableCell>
+            </TableRow>
+            {getTableRow('Korrekt utfall (1X2)', getPredictionOutcome(prediction.homeGoals, prediction.awayGoals), prediction.points?.correctOutcome)}
+            {getTableRow('Korrekt antal mål av hemmalag', prediction.homeGoals.toString(), prediction.points?.correctGoalsByHomeTeam)}
+            {getTableRow('Korrekt antal mål av bortalag', prediction.awayGoals.toString(), prediction.points?.correctGoalsByAwayTeam)}
+            {getTableRow('Korrekt målskillnad', (prediction.homeGoals - prediction.awayGoals).toString(), prediction.points?.correctGoalDifference)}
+            {getTableRow('Första lag att göra mål', getFirstTeamToScore(), prediction.points?.firstTeamToScore)}
+            {getTableRow('Korrekt resultat', `${prediction.homeGoals} - ${prediction.awayGoals}`, prediction.points?.correctResult)}
+            {getTableRow('Oddsbonus', getOddsForPredictedOutcome() ?? '-', prediction.points?.oddsBonus)}
             {prediction.goalScorer && (
               <>
-                {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.points?.correctGoalScorer)}
+                {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.goalScorer.name, prediction.points?.correctGoalScorer)}
               </>
             )}
           </>
@@ -304,8 +343,8 @@ const PointsBadge = styled.div`
 `;
 
 const TableRow = styled.div<{ topBorder?: boolean }>`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 100px 32px;
   align-items: center;
   gap: ${theme.spacing.xxs};
   width: 100%;
@@ -315,6 +354,10 @@ const TableRow = styled.div<{ topBorder?: boolean }>`
 
   ${NormalTypography} {
     flex: 1;
+  }
+
+  @media ${devices.tablet} {
+    grid-template-columns: 1fr 200px 100px;
   }
 `;
 
@@ -354,6 +397,39 @@ const PredictedGoalScorer = styled.div`
   display: flex;
   gap: ${theme.spacing.xxxs};
   align-items: center;
+`;
+
+const CenterAdjustedTableCell = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  width: 100px;
+  box-sizing: border-box;
+  
+  @media ${devices.tablet} {
+    width: 200px;
+  }
+`;
+
+const RightAdjustedTableCell = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: ${theme.spacing.xs};
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
+const PredictedOutcome = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: ${theme.borderRadius.s};
+  background-color: ${theme.colors.silverLight};
+  border: 1px solid ${theme.colors.silver};
 `;
 
 export default PredictionScoreCard;

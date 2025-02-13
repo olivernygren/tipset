@@ -7,12 +7,12 @@ import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { Team } from '../../utils/Team';
 import { AvatarSize } from '../avatar/Avatar';
-import { devices, theme } from '../../theme';
+import { theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 
 interface FirstTeamToScoreModalProps {
-  fixture: Fixture;
+  fixture?: Fixture;
   selectedTeamValue?: FirstTeamToScore;
   onSave: (selectedTeam: FirstTeamToScore) => void;
   onClose: () => void;
@@ -31,7 +31,7 @@ const FirstTeamToScoreModal = ({
     }
   };
 
-  const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
+  const getAvatar = (team: Team) => (fixture?.teamType === TeamType.CLUBS ? (
     <ClubAvatar
       logoUrl={team.logoUrl}
       clubName={team.name}
@@ -46,6 +46,8 @@ const FirstTeamToScoreModal = ({
       size={isMobile ? AvatarSize.M : AvatarSize.XL}
     />
   ));
+
+  if (!fixture) return null;
 
   return (
     <ActionsModal
@@ -107,13 +109,6 @@ const FirstTeamToScoreModal = ({
               </CheckIconContainer>
             )}
           </AvatarContainer>
-          {/* <Button
-            onClick={() => setselectedTeam(FirstTeamToScore.NONE)}
-            variant={selectedTeam === FirstTeamToScore.NONE ? 'primary' : 'secondary'}
-            // fullWidth
-          >
-            Inget mål (0-0)
-          </Button> */}
           <AvatarContainer onClick={() => setselectedTeam(FirstTeamToScore.AWAY_TEAM)} isSelected={selectedTeam === FirstTeamToScore.AWAY_TEAM}>
             {getAvatar(fixture.awayTeam)}
             <NormalTypography variant="s" color={theme.colors.textDefault}>
