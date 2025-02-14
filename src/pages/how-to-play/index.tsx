@@ -32,10 +32,11 @@ const HowToPlayPage = () => (
       <Divider color={theme.colors.silver} />
       <Section gap="s">
         <HeadingsTypography variant="h3">Ligor</HeadingsTypography>
-        <NormalTypography variant="m">En liga kan bestå av mellan 1 till 20 deltagare. När en liga skapas sätts en deadline för att kunna gå med. Det går alltså inte att gå med i en liga efter denna deadline.</NormalTypography>
+        <NormalTypography variant="m">En liga kan bestå av mellan 1 till 24 deltagare. När en liga skapas sätts en deadline för att kunna gå med. Det går alltså inte att gå med i en liga efter denna deadline.</NormalTypography>
         <NormalTypography variant="m">Det är skaparen av ligan som är ansvarig för att skapa omgångar (välja matcher) samt att rätta dessa efter de spelats. Rättning sker manuellt genom en uträkningsalgoritm. Skaparen kan alltså själv inte bestämma antal poäng som deltagarna får. Poängen du får läggs ihop för varje omgång och kan följas i tabellen.</NormalTypography>
         <NormalTypography variant="m">Varje omgång kan bestå av 1 till 24 matcher. Alla deltagare ska tippa resultat i varje match. I enskilda matcher kan man även tippa målskytt i matchen. En liga kan bestå av max 100 omgångar.</NormalTypography>
         <NormalTypography variant="m">Först efter avsparkstiden i en enskild match kan du se vad alla andra deltagare har tippat. När en match har rättats kan du se vad alla deltagare fick för poäng i matchen.</NormalTypography>
+        <NormalTypography variant="m">Rättning av matcher samt skapande av omgångar sköts manuellt av ligans skapare.</NormalTypography>
       </Section>
     </Container>
   </Page>

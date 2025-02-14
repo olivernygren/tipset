@@ -66,7 +66,7 @@ const EditLeagueScoringSystemModal = ({
       case 'correctOutcome':
         return { min: 1, max: 3 };
       case 'correctResult':
-        return { min: 0, max: 1 };
+        return { min: 0, max: 2 };
       case 'correctGoalDifference':
         return { min: 0, max: 1 };
       case 'correctGoalsByTeam':
@@ -78,13 +78,13 @@ const EditLeagueScoringSystemModal = ({
       case 'correctGoalScorerForward':
         return { min: 0, max: 3 };
       case 'oddsBetween3And4':
-        return { min: 0, max: 3 };
+        return { min: 0, max: 2 };
       case 'oddsBetween4And6':
         return { min: 0, max: 6 };
       case 'oddsBetween6And10':
         return { min: 0, max: 10 };
       case 'oddsAvobe10':
-        return { min: 0, max: 16 };
+        return { min: 0, max: 15 };
       case 'firstTeamToScore':
         return { min: 0, max: 3 };
       case 'goalFest':

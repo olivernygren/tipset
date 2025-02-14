@@ -98,11 +98,6 @@ const PredictionsModal = ({
             backgroundColor={theme.colors.white}
             customBorderWidth={1}
           />
-          {showTeam && (
-            <GoalScorerTeamAvatar>
-              {getTeamAvatar(homeTeamPlayers.some((player) => player.name === name) ? fixture.homeTeam : fixture.awayTeam)}
-            </GoalScorerTeamAvatar>
-          )}
         </AvatarContainer>
       );
     }
