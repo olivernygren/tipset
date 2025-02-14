@@ -144,8 +144,4 @@ const Outcome = styled.div`
   border-radius: ${theme.borderRadius.s};
 `;
 
-const ButtonContainer = styled.div`
-  margin-top: ${theme.spacing.s};
-`;
-
 export default MobilePredictionCard;
