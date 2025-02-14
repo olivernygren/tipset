@@ -185,9 +185,7 @@ const PredictionsModal = ({
             <Section gap="xxs" flexDirection="row" alignItems="center" fitContent>
               <FirstTeamToScoreLogo>
                 {fixture.finalResult?.firstTeamToScore === FirstTeamToScore.NONE ? (
-                  <Section padding={theme.spacing.xxs}>
-                    <Prohibit size={32} color={theme.colors.textDefault} />
-                  </Section>
+                  <Prohibit size={32} color={theme.colors.textDefault} />
                 ) : (
                   getTeamAvatar(fixture.finalResult.firstTeamToScore === FirstTeamToScore.HOME_TEAM ? fixture.homeTeam : fixture.awayTeam, AvatarSize.M)
                 )}

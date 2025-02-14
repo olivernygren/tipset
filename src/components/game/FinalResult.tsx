@@ -24,13 +24,13 @@ const FinalResult = ({
     <ClubAvatar
       logoUrl={team.logoUrl}
       clubName={team.name}
-      size={AvatarSize.XS}
+      size={AvatarSize.S}
     />
   ) : (
     <NationAvatar
       flagUrl={team.logoUrl}
       nationName={team.name}
-      size={AvatarSize.XS}
+      size={AvatarSize.S}
     />
   ));
 

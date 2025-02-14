@@ -31,6 +31,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   const { hovered: goalFestHovered, ref: goalFestInfoRef } = useHover();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [showTooltipMobile, setShowTooltipMobile] = useState<'underdog' | 'goalFest' | null>(null);
 
   const oddsBonusPointsAwarded = Boolean(prediction.points?.oddsBonus);
   const correctResultPredicted = Boolean(prediction.points?.correctResult) || Boolean(prediction.points?.correctResultBool);
@@ -71,6 +72,16 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     }
   };
 
+  const handleShowInfoTooltip = (type: 'underdog' | 'goalFest') => {
+    if (!isMobile) return;
+
+    if (showTooltipMobile === type) {
+      setShowTooltipMobile(null);
+    } else {
+      setShowTooltipMobile(type);
+    }
+  };
+
   const getFirstTeamToScore = () => {
     if (fixture && prediction.points?.firstTeamToScore) {
       return fixture.homeTeam.name;
@@ -100,7 +111,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     const isOutcome = label.includes('Korrekt utfall (1X2)');
     const isFirstTeamToScore = label.includes('Första lag att göra mål');
     const isUnderdogBonus = label.includes('Underdog bonus');
-    const isGoalFest = label.includes('Målfest');
+    const isGoalFest = label.includes('Målfestbonus');
 
     const firstTeamToScoreAvatar = userPrediction === fixture?.homeTeam.name ? getAvatar(fixture.homeTeam) : getAvatar(fixture.awayTeam);
 
@@ -121,18 +132,18 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           )}
           <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
           {isUnderdogBonus && (
-            <InfoIconWrapper ref={underdogInfoRef as React.RefObject<HTMLDivElement>}>
+            <InfoIconWrapper ref={underdogInfoRef as React.RefObject<HTMLDivElement>} onClick={() => handleShowInfoTooltip('underdog')}>
               <Info size={20} color={theme.colors.silver} weight="fill" />
               <InfoIconTooltipContainer>
-                <Tooltip show={underdogBonusHovered} text="Ensam att tippa korrekt resultat" arrowPosition="bottom" size="small" />
+                <Tooltip show={underdogBonusHovered || (isMobile && showTooltipMobile === 'underdog')} text="Ensam att tippa korrekt resultat" arrowPosition="bottom" size="small" />
               </InfoIconTooltipContainer>
             </InfoIconWrapper>
           )}
           {isGoalFest && (
-            <InfoIconWrapper ref={goalFestInfoRef as React.RefObject<HTMLDivElement>}>
+            <InfoIconWrapper ref={goalFestInfoRef as React.RefObject<HTMLDivElement>} onClick={() => handleShowInfoTooltip('goalFest')}>
               <Info size={20} color={theme.colors.silver} weight="fill" />
               <InfoIconTooltipContainer>
-                <Tooltip show={goalFestHovered} text="Korret resultat med > 4 mål" arrowPosition="bottom" size="small" />
+                <Tooltip show={goalFestHovered || (isMobile && showTooltipMobile === 'goalFest')} text="Korrekt resultat med > 4 mål" arrowPosition="bottom" size="small" />
               </InfoIconTooltipContainer>
             </InfoIconWrapper>
           )}
@@ -299,7 +310,7 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
             {getTableRow('Korrekt målskillnad', (prediction.homeGoals - prediction.awayGoals).toString(), prediction.points?.correctGoalDifference)}
             {getTableRow('Första lag att göra mål', getFirstTeamToScore(), prediction.points?.firstTeamToScore)}
             {getTableRow('Underdog bonus', '✓', prediction.points?.underdogBonus)}
-            {getTableRow('Målfest', `${(prediction.homeGoals + prediction.awayGoals).toString()} mål`, prediction.points?.goalFest)}
+            {getTableRow('Målfestbonus', `${(prediction.homeGoals + prediction.awayGoals).toString()} mål`, prediction.points?.goalFest)}
             {getTableRow('Oddsbonus', getOddsForPredictedOutcome() ?? '-', prediction.points?.oddsBonus)}
             {prediction.goalScorer && (
               <>
