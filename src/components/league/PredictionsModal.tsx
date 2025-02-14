@@ -84,7 +84,28 @@ const PredictionsModal = ({
     const combinedPlayers = [...homeTeamPlayers, ...awayTeamPlayers];
     const playerObj = combinedPlayers.find((player) => player.name === name);
 
-    if (!playerObj || !fixture) return null;
+    if (!fixture) return null;
+
+    if (!playerObj) {
+      return (
+        <AvatarContainer index={index}>
+          <Avatar
+            src="/images/placeholder-fancy.png"
+            alt="Placeholder"
+            size={AvatarSize.M}
+            objectFit="cover"
+            showBorder
+            backgroundColor={theme.colors.white}
+            customBorderWidth={1}
+          />
+          {showTeam && (
+            <GoalScorerTeamAvatar>
+              {getTeamAvatar(homeTeamPlayers.some((player) => player.name === name) ? fixture.homeTeam : fixture.awayTeam)}
+            </GoalScorerTeamAvatar>
+          )}
+        </AvatarContainer>
+      );
+    }
 
     return (
       <AvatarContainer index={index}>

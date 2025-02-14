@@ -71,7 +71,7 @@ export const getGeneralPositionShorthand = (position: string) => {
     case 'Goalkeeper':
       return 'MV';
     default:
-      return '';
+      return '?';
   }
 };
 
