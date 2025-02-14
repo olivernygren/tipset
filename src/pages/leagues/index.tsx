@@ -177,7 +177,7 @@ const PredictionLeaguesPage = () => {
       username: user.lastname ? `${user.firstname} ${user.lastname}` : user.firstname,
       points: 0,
       correctResults: 0,
-      // oddsBonusPoints: 0,
+      oddsBonusPoints: 0,
     };
 
     try {

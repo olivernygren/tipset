@@ -32,13 +32,14 @@ import FindOtherFixturesModal from './FindOtherFixturesModal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
+  league?: PredictionLeague;
   minDate?: Date;
   onClose: () => void;
   refetch: () => void;
 }
 
 const EditGameWeekView = ({
-  gameWeek, onClose, refetch, minDate,
+  gameWeek, onClose, refetch, minDate, league,
 }: EditGameWeekViewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -180,6 +181,7 @@ const EditGameWeekView = ({
       <FixtureItem
         key={fixture.id}
         onClick={() => setEditFixture(fixture)}
+        isLastItem={index === gameWeekFixtures.length - 1}
       >
         <Teams>
           <TeamContainer isHomeTeam>
@@ -225,18 +227,18 @@ const EditGameWeekView = ({
             </EmphasisTypography>
             <Icons>
               <IconButton
-                icon={<Trash size={20} weight="fill" />}
+                icon={<Trash size={24} weight="fill" />}
                 colors={{ normal: theme.colors.red, hover: theme.colors.redDark }}
                 onClick={() => setConfirmDeleteGameWeekModalOpen(true)}
               />
               <IconButton
-                icon={selectAddFixtureMethodMenuOpen ? <XCircle size={20} weight="fill" /> : <PlusCircle size={20} weight="fill" />}
+                icon={selectAddFixtureMethodMenuOpen ? <XCircle size={24} weight="fill" /> : <PlusCircle size={24} weight="fill" />}
                 colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
                 onClick={() => setSelectAddFixtureMethodMenuOpen(!selectAddFixtureMethodMenuOpen)}
               />
             </Icons>
             {selectAddFixtureMethodMenuOpen && (
-              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 8} offsetX={-24}>
+              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 4} offsetX={-12}>
                 <ContextMenuOption
                   icon={<MagnifyingGlass size={24} color={theme.colors.textDefault} />}
                   onClick={() => {
@@ -286,6 +288,7 @@ const EditGameWeekView = ({
           onSave={(fixtureInput) => handleUpdateFixture(fixtureInput)}
           onDeleteFixture={handleDeleteFixture}
           minDate={minDate}
+          league={league}
         />
       )}
       {showCreateFixtureModal && (
@@ -305,6 +308,7 @@ const EditGameWeekView = ({
           }}
           minDate={minDate}
           alreadySelectedFixtures={gameWeekFixtures}
+          leagueScoringSystem={league?.scoringSystem}
         />
       )}
       {confirmDeleteGameWeekModalOpen && (
@@ -349,7 +353,7 @@ const FixtureList = styled.div`
   box-sizing: border-box;
   background-color: ${theme.colors.silverLighter};
   border-radius: ${theme.borderRadius.l};
-  overflow: hidden;
+  /* overflow: hidden; */
   border: 1px solid ${theme.colors.silverLight};
 `;
 
@@ -363,9 +367,10 @@ const FixtureListHeader = styled.div`
   position: relative;
   padding: ${theme.spacing.xxs} ${theme.spacing.xs};
   position: relative;
+  border-radius: 11px 11px 0 0;
 `;
 
-const FixtureItem = styled.div`
+const FixtureItem = styled.div<{ isLastItem?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -376,6 +381,10 @@ const FixtureItem = styled.div`
   padding: ${theme.spacing.xs} 0;
   transition: all 0.2s ease;
   cursor: pointer;
+
+  ${({ isLastItem }) => isLastItem && css`
+    border-radius: 0 0 11px 11px;
+  `}
 
   &:hover {
     background-color: ${theme.colors.silverLight};

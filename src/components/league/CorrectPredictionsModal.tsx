@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import {
+  ArrowsLeftRight,
   Calculator, CaretDown, CaretUp,
+  PencilSimple,
+  Prohibit,
 } from '@phosphor-icons/react';
 import {
   collection, doc, getDoc, getDocs, query, updateDoc, where,
@@ -17,6 +20,7 @@ import IconButton from '../buttons/IconButton';
 import {
   Prediction, FixtureResult, PredictionPoints, TeamType,
   Fixture,
+  FirstTeamToScore,
 } from '../../utils/Fixture';
 import { Divider } from '../Divider';
 import {
@@ -38,6 +42,7 @@ import GoalScorerModal from '../game/GoalScorerModal';
 import { Team } from '../../utils/Team';
 import GoalsInput from '../game/GoalsInput';
 import TextButton from '../buttons/TextButton';
+import FirstTeamToScoreModal from '../game/FirstTeamToScoreModal';
 
 interface PredictionsModalProps {
   onClose: () => void;
@@ -55,10 +60,12 @@ const CorrectPredictionsModal = ({
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
   const [finalResult, setFinalResult] = useState<{ homeGoals: string, awayGoals: string }>({ homeGoals: savedFinalResult?.homeTeamGoals.toString() ?? '', awayGoals: savedFinalResult?.awayTeamGoals.toString() ?? '' });
+  const [firstTeamToScore, setFirstTeamToScore] = useState<FirstTeamToScore | undefined>(savedFinalResult?.firstTeamToScore);
   const [goalScorers, setGoalScorers] = useState<Array<string>>(savedFinalResult?.goalScorers ?? []);
   const [pointsDistributions, setPointsDistributions] = useState<Array<{ participantId: string, points: PredictionPoints }>>([]);
   const [savingLoading, setSavingLoading] = useState<boolean>(false);
-  const [showSelectGoalScorerModal, setShowSelectGoalScorerModal] = useState(false);
+  const [showSelectGoalScorerModal, setShowSelectGoalScorerModal] = useState<boolean>(false);
+  const [showFirstTeamToScoreModal, setShowFirstTeamToScoreModal] = useState<boolean>(false);
   const [homeTeamPlayers, setHomeTeamPlayers] = useState<Array<Player>>([]);
   const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
   const [isGoalScorersExpanded, setIsGoalScorersExpanded] = useState<boolean>(false);
@@ -112,6 +119,7 @@ const CorrectPredictionsModal = ({
       homeTeamGoals: parseInt(finalResult.homeGoals),
       awayTeamGoals: parseInt(finalResult.awayGoals),
       goalScorers,
+      ...(fixture?.shouldPredictFirstTeamToScore && { firstTeamToScore }),
     };
 
     const updatedPredictions = ongoingGameWeek.games.predictions.map((prediction) => {
@@ -288,6 +296,9 @@ const CorrectPredictionsModal = ({
       correctGoalDifference: 0,
       correctGoalsByHomeTeam: 0,
       correctGoalsByAwayTeam: 0,
+      firstTeamToScore: 0,
+      underdogBonus: 0,
+      goalFest: 0,
       oddsBonus: 0,
       total: 0,
     };
@@ -307,6 +318,9 @@ const CorrectPredictionsModal = ({
     const wasDraw = parseInt(finalResult.homeGoals) === parseInt(finalResult.awayGoals);
 
     const correctOutcome = (homeWinPredicted && wasHomeWin) || (awayWinPredicted && wasAwayWin) || (drawPredicted && wasDraw);
+    const correctFirstTeamToScore = fixture?.shouldPredictFirstTeamToScore && prediction.firstTeamToScore === firstTeamToScore;
+    const isGoalFest = parseInt(finalResult.homeGoals) + parseInt(finalResult.awayGoals) >= 5;
+    const isUnderdogBonus = getIsUnderdogBonus(prediction);
 
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
@@ -350,6 +364,21 @@ const CorrectPredictionsModal = ({
       pointDistribution.correctGoalScorer += playerPoints;
     }
 
+    if (correctFirstTeamToScore) {
+      totalPoints += scoringSystem.firstTeamToScore;
+      pointDistribution.firstTeamToScore += scoringSystem.firstTeamToScore;
+    }
+
+    if (isGoalFest && scoringSystem.goalFest > 0) {
+      totalPoints += scoringSystem.goalFest;
+      pointDistribution.goalFest += scoringSystem.goalFest;
+    }
+
+    if (isUnderdogBonus && scoringSystem.underdogBonus > 0) {
+      totalPoints += scoringSystem.underdogBonus;
+      pointDistribution.underdogBonus += scoringSystem.underdogBonus;
+    }
+
     pointDistribution.total = totalPoints;
 
     setPointsDistributions((oldstate) => {
@@ -373,6 +402,16 @@ const CorrectPredictionsModal = ({
     if (hasSavedPointsForUser) return prediction?.points?.total;
 
     return '-';
+  };
+
+  const getIsUnderdogBonus = (prediction: Prediction) => {
+    const allPredictionsForFixture = ongoingGameWeek?.games.predictions.filter((p) => p.fixtureId === gameId);
+    if (!allPredictionsForFixture) return false;
+
+    const correctPredictions = allPredictionsForFixture.filter((p) => p.homeGoals === parseInt(finalResult.homeGoals) && p.awayGoals === parseInt(finalResult.awayGoals));
+    const isOnlyCorrectPrediction = correctPredictions.length === 1 && correctPredictions[0].homeGoals === prediction.homeGoals && correctPredictions[0].awayGoals === prediction.awayGoals;
+
+    return isOnlyCorrectPrediction;
   };
 
   const getTeamAvatar = (team: Team, customSize?: AvatarSize) => {
@@ -435,7 +474,7 @@ const CorrectPredictionsModal = ({
           {ongoingGameWeek.games.fixtures
             .filter((fixture) => fixture.id === gameId)
             .map((fixture) => (
-              <Section key={fixture.id} gap="m">
+              <Section key={fixture.id} gap="s">
                 <FixtureResultWrapper>
                   {!isMobile && (
                     <Section gap="xxxs">
@@ -461,6 +500,13 @@ const CorrectPredictionsModal = ({
                   <GoalScorersContainer isExpanded={isGoalScorersExpanded}>
                     <GoalScorersMainContent>
                       <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
+                      {(!hasGoalScorers || !isMobile) && (
+                        <IconButton
+                          icon={<PencilSimple size={24} />}
+                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                          onClick={() => setShowSelectGoalScorerModal(true)}
+                        />
+                      )}
                       <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
                         {hasGoalScorers && (
                           goalScorers.map((scorer, index) => (
@@ -468,13 +514,6 @@ const CorrectPredictionsModal = ({
                           ))
                         )}
                       </GoalScorersAvatars>
-                      {(!hasGoalScorers || !isMobile) && (
-                        <IconButton
-                          icon={<PlusCircle size={32} weight="fill" />}
-                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                          onClick={() => setShowSelectGoalScorerModal(true)}
-                        />
-                      )}
                       {hasGoalScorers && (
                         <IconButton
                           icon={isGoalScorersExpanded ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
@@ -502,11 +541,40 @@ const CorrectPredictionsModal = ({
                           onClick={() => setShowSelectGoalScorerModal(true)}
                           fullWidth
                         >
-                          Lägg till målskyttar
+                          Ändra målskyttar
                         </TextButton>
                       )}
                     </ExpandedGoalScorers>
                   </GoalScorersContainer>
+                )}
+                {fixture.shouldPredictFirstTeamToScore && (
+                  <FirstTeamToScoreContainer hasSelectedTeam={firstTeamToScore !== undefined}>
+                    <HeadingsTypography variant="h6">Första lag att göra mål</HeadingsTypography>
+                    {firstTeamToScore ? (
+                      <Section gap={isMobile ? undefined : 'xxs'} flexDirection="row" alignItems="center" fitContent>
+                        <IconButton
+                          icon={<ArrowsLeftRight size={24} color={theme.colors.primary} />}
+                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                          onClick={() => setShowFirstTeamToScoreModal(true)}
+                        />
+                        <FirstTeamToScoreLogo>
+                          {firstTeamToScore === FirstTeamToScore.HOME_TEAM && getTeamAvatar(fixture.homeTeam, AvatarSize.M)}
+                          {firstTeamToScore === FirstTeamToScore.AWAY_TEAM && getTeamAvatar(fixture.awayTeam, AvatarSize.M)}
+                          {firstTeamToScore === FirstTeamToScore.NONE && (
+                            <Section padding={theme.spacing.xxs}>
+                              <Prohibit size={32} color={theme.colors.textDefault} />
+                            </Section>
+                          )}
+                        </FirstTeamToScoreLogo>
+                      </Section>
+                    ) : (
+                      <IconButton
+                        icon={<PlusCircle size={32} weight="fill" />}
+                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                        onClick={() => setShowFirstTeamToScoreModal(true)}
+                      />
+                    )}
+                  </FirstTeamToScoreContainer>
                 )}
               </Section>
             ))}
@@ -528,7 +596,7 @@ const CorrectPredictionsModal = ({
             <>
               <TableHeader>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Deltagare</NormalTypography>
-                <NormalTypography variant="s" color={theme.colors.textLight}>Utgång</NormalTypography>
+                <NormalTypography variant="s" color={theme.colors.textLight}>Utfall</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Resultat</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>Målgörare</NormalTypography>
                 <NormalTypography variant="s" color={theme.colors.textLight}>varav bonus</NormalTypography>
@@ -591,6 +659,17 @@ const CorrectPredictionsModal = ({
           multiple
           initialSelectedPlayers={[...homeTeamPlayers, ...awayTeamPlayers].filter((player) => goalScorers.includes(player.name))}
           leagueScoringSystem={league.scoringSystem}
+        />
+      )}
+      {showFirstTeamToScoreModal && (
+        <FirstTeamToScoreModal
+          fixture={fixture}
+          onClose={() => setShowFirstTeamToScoreModal(false)}
+          onSave={(team) => {
+            setFirstTeamToScore(team);
+            setShowFirstTeamToScoreModal(false);
+          }}
+          selectedTeamValue={firstTeamToScore}
         />
       )}
     </>
@@ -673,7 +752,7 @@ const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
   padding: 0 ${theme.spacing.xs};
-  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
+  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLighter};
   max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '60px')};
   overflow: hidden;
   transition: max-height 0.6s cubic-bezier(.39,-0.15,.46,.94);
@@ -681,7 +760,7 @@ const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   box-sizing: border-box;
   
   @media ${devices.tablet} {
-    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
+    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '58px')};
   }
 `;
 
@@ -749,6 +828,32 @@ const GoalScorerCard = styled.div`
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.m};
   border: 1px solid ${theme.colors.silverLight};
+`;
+
+const FirstTeamToScoreContainer = styled.div<{ hasSelectedTeam: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${theme.spacing.xxs};
+  border: 1px solid ${theme.colors.silverLight};
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.m};
+  box-shadow: 0px 2px 0px 0px ${theme.colors.silverLighter};
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 60px;
+
+  ${({ hasSelectedTeam }) => (hasSelectedTeam ? css`
+    padding: ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xxs} ${theme.spacing.xs};
+  ` : css`
+    padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  `)}
+`;
+
+const FirstTeamToScoreLogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default CorrectPredictionsModal;

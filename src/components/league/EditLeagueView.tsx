@@ -126,10 +126,24 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               variant="secondary"
               onClick={() => setEditBasicInformationModalOpen(true)}
               size="m"
+              fullWidth={isMobile}
             >
               Redigera
             </Button>
           </Container>
+          {/* <Container>
+            <ContainerText>
+              <HeadingsTypography variant="h5">Matchpreferenser</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.silverDark}>Redigera dina preferenser för matcherna som ska tippas för att underlätta skapandet.</NormalTypography>
+            </ContainerText>
+            <Button
+              variant="secondary"
+              onClick={() => setEditBasicInformationModalOpen(true)}
+              size="m"
+            >
+              Redigera
+            </Button>
+          </Container> */}
           <Divider />
           {!league.hasEnded && (
             <>
@@ -142,6 +156,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
                   variant="secondary"
                   onClick={() => setEditScoringSystemModalOpen(true)}
                   size="m"
+                  fullWidth={isMobile}
                 >
                   Uppdatera
                 </Button>
@@ -252,10 +267,17 @@ const InputContainer = styled.div`
 
 const Container = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   width: 100%;
+  gap: ${theme.spacing.s};
   box-sizing: border-box;
   padding: ${theme.spacing.m} 0;
+  
+  @media ${devices.tablet} {
+    align-items: center;
+    flex-direction: row;
+    /* padding: ${theme.spacing.m} 0; */
+  }
 `;
 
 const ContainerText = styled.div`

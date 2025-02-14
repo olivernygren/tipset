@@ -79,7 +79,7 @@ const SelectWrapper = styled.div<StyledSelectProps>`
   position: relative;
   background-color: ${theme.colors.white};
 
-  border-radius: ${theme.borderRadius.s};
+  border-radius: ${theme.borderRadius.m};
   border: 1px solid ${({ disabled }) => (disabled ? theme.colors.silverLight : theme.colors.silver)};
   box-sizing: border-box;
 

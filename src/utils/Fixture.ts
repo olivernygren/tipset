@@ -24,11 +24,12 @@ export interface FixtureResult {
   homeTeamGoals: number;
   awayTeamGoals: number;
   goalScorers?: Array<string>;
+  firstTeamToScore?: FirstTeamToScore;
 }
 
 export interface Fixture {
-  documentId?: string;
   id: string;
+  centralFixtureReferenceId?: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
@@ -38,6 +39,7 @@ export interface Fixture {
   kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
+  shouldPredictFirstTeamToScore?: boolean;
   goalScorerFromTeam?: Array<string> | null;
   teamType: TeamType;
   previewStats?: FixturePreviewStats;
@@ -47,8 +49,17 @@ export interface Fixture {
   aggregateScore?: FixtureResult;
 }
 
+export enum FirstTeamToScore {
+  HOME_TEAM = 'homeTeam',
+  AWAY_TEAM = 'awayTeam',
+  NONE = 'none',
+}
+
+// Hur blir det med NONE (0-0) ?
+
 export interface FixtureInput {
   id: string;
+  centralFixtureReferenceId?: string;
   homeTeam: Team;
   awayTeam: Team;
   stadium: string;
@@ -56,6 +67,7 @@ export interface FixtureInput {
   kickOffTime: string;
   finalResult?: FixtureResult;
   shouldPredictGoalScorer?: boolean;
+  shouldPredictFirstTeamToScore?: boolean;
   goalScorerFromTeam?: Array<string> | null; // team names
   teamType: TeamType;
   includeStats?: boolean;
@@ -71,6 +83,9 @@ export interface PredictionPoints {
   correctGoalDifference: number;
   correctGoalsByHomeTeam: number;
   correctGoalsByAwayTeam: number;
+  firstTeamToScore: number;
+  underdogBonus: number;
+  goalFest: number;
   oddsBonus: number;
   total: number;
 }
@@ -85,6 +100,7 @@ export interface Prediction {
   outcome: PredictionOutcomeEnum;
   points?: PredictionPoints;
   goalScorer?: Player;
+  firstTeamToScore?: FirstTeamToScore;
 }
 
 export interface PredictionInput {
@@ -97,6 +113,7 @@ export interface PredictionInput {
   outcome: PredictionOutcomeEnum;
   points?: PredictionPoints;
   goalScorer?: Player;
+  firstTeamToScore?: FirstTeamToScore;
 }
 
 export enum PredictionStatus {

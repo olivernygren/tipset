@@ -1,3 +1,4 @@
+import { generateRandomID } from './firebaseHelpers';
 import { Fixture, TeamType } from './Fixture';
 import {
   FotMobMatch, FotMobMatchesByDateLeague, FotMobMatchTeam, FotMobSquad, FotMobTeamsResponse,
@@ -258,6 +259,16 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
   }
 };
 
+export const getFotMobFixtureAggregateScore = (match: FotMobMatch) => {
+  if (match.status.aggregatedStr) {
+    const splitResult = match.status.aggregatedStr.split('-');
+    const homeGoals = parseInt(splitResult[0], 10);
+    const awayGoals = parseInt(splitResult[1], 10);
+    return { homeGoals, awayGoals };
+  }
+  return null;
+};
+
 export const matchFotMobTeamWithRealTeam = (fotMobTeam: FotMobMatchTeam): Team | null => {
   const allRealTeams = getAllTeams();
 
@@ -301,8 +312,11 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
 
   const fixtureNickname = getFixtureNickname([homeTeam, awayTeam]);
 
+  const fixtureAggregateScore = getFotMobFixtureAggregateScore(fotMobMatch);
+
   return {
     id: fotMobMatch.id.toString(),
+    centralFixtureReferenceId: generateRandomID(),
     homeTeam,
     awayTeam,
     kickOffTime: fotMobMatch.status.utcTime,
@@ -312,5 +326,6 @@ export const convertFotMobMatchToFixture = (fotMobMatch: FotMobMatch, allExistin
     includeStats: true,
     shouldPredictGoalScorer: isPredictGoalScorerPossibleByTeamNames([homeTeam.name, awayTeam.name]),
     ...(fixtureNickname && { fixtureNickname }),
+    ...(fixtureAggregateScore && { aggregateScore: { homeTeamGoals: fixtureAggregateScore.homeGoals, awayTeamGoals: fixtureAggregateScore.awayGoals } }),
   };
 };

@@ -12,14 +12,17 @@ interface TooltipProps {
   textColor?: string;
   endIcon?: React.ReactNode;
   show: boolean;
+  arrowPosition?: 'top' | 'bottom';
+  size?: 'small' | 'default';
 }
 
 interface StyledTooltipProps {
   backgroundColor?: string;
+  size?: 'small' | 'default';
 }
 
 const Tooltip = ({
-  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white, endIcon, show,
+  text, textWeight = 'emphasis', textSize = 's', backgroundColor = theme.colors.textDefault, textColor = theme.colors.white, endIcon, show, arrowPosition = 'top', size = 'default',
 }: TooltipProps) => (
   <CSSTransition
     in={show}
@@ -27,8 +30,8 @@ const Tooltip = ({
     classNames="fade"
     unmountOnExit
   >
-    <StyledTooltip backgroundColor={backgroundColor}>
-      <TooltipPoint backgroundColor={backgroundColor} />
+    <StyledTooltip backgroundColor={backgroundColor} size={size}>
+      {arrowPosition === 'top' && <TopTooltipPoint backgroundColor={backgroundColor} size={size} />}
       {textWeight === 'emphasis' ? (
         <EmphasisTypography variant={textSize} color={textColor} align="center" noWrap>
           {text}
@@ -39,6 +42,7 @@ const Tooltip = ({
         </NormalTypography>
       )}
       {endIcon}
+      {arrowPosition === 'bottom' && <BottomTooltipPoint backgroundColor={backgroundColor} size={size} />}
     </StyledTooltip>
   </CSSTransition>
 );
@@ -66,8 +70,9 @@ const StyledTooltip = styled.div<StyledTooltipProps>`
   gap: ${theme.spacing.xxxs};
   align-items: center;
   justify-content: center;
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
-  border-radius: ${theme.borderRadius.m};
+  /* padding: ${theme.spacing.xxs} ${theme.spacing.xs}; */
+  padding: ${({ size }) => (size === 'small' ? `${theme.spacing.xxxs} ${theme.spacing.xxs}` : `${theme.spacing.xxs} ${theme.spacing.xs}`)};
+  border-radius: ${({ size }) => (size === 'small' ? theme.borderRadius.xs : theme.borderRadius.m)};
   background-color: ${({ backgroundColor }) => backgroundColor};
   position: relative;
   max-width: 500px;
@@ -83,14 +88,26 @@ const StyledTooltip = styled.div<StyledTooltipProps>`
   }
 `;
 
-const TooltipPoint = styled.div<StyledTooltipProps>`
+const TopTooltipPoint = styled.div<StyledTooltipProps>`
   position: absolute;
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid ${({ backgroundColor }) => backgroundColor};
-  top: -8px; /* Adjust based on your tooltip position */
+  border-left: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid transparent;
+  border-right: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid transparent;
+  border-bottom: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid ${({ backgroundColor }) => backgroundColor};
+  top: ${({ size }) => (size === 'small' ? '-4px' : '-8px')};
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
+const BottomTooltipPoint = styled.div<StyledTooltipProps>`
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid transparent;
+  border-right: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid transparent;
+  border-top: ${({ size }) => (size === 'small' ? '4px' : '8px')} solid ${({ backgroundColor }) => backgroundColor};
+  bottom: ${({ size }) => (size === 'small' ? '-4px' : '-8px')};
   left: 50%;
   transform: translateX(-50%);
 `;

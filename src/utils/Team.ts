@@ -45,6 +45,7 @@ export enum LeagueEnum {
   EREDIVISIE = 'Eredivisie',
   PRIMEIRA_LIGA = 'Primeira Liga',
   TURKISH_SUPER_LIG = 'Süper Lig',
+  GREEK_SUPER_LEAGUE = 'Super League 1',
   BELGIAN_PRO_LEAGUE = 'Belgian Pro League',
   UKRAINIAN_PREMIER_LEAGUE = 'Ukrainian Premier League',
   SCOTTISH_PREMIERSHIP = 'Scottish Premiership',
@@ -1907,7 +1908,7 @@ export const Teams: TeamsType = {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg',
       stadium: 'Allianz Arena',
       country: CountryEnum.GERMANY,
-      teamPrimaryColor: '#ed0137',
+      teamPrimaryColor: '#ed0038',
       id: '9823',
     },
     {
@@ -2128,6 +2129,7 @@ export const Teams: TeamsType = {
     },
     {
       name: 'AS Monaco',
+      shortName: 'Monaco',
       fotMobName: 'Monaco',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
       stadium: 'Stade Louis II',
@@ -2330,6 +2332,36 @@ export const Teams: TeamsType = {
       country: CountryEnum.TURKEY,
       teamPrimaryColor: '#080808',
       id: '10188',
+    },
+  ],
+  [LeagueEnum.GREEK_SUPER_LEAGUE]: [
+    {
+      name: 'Olympiakos',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/8638.png',
+      stadium: 'Georgios Karaiskakis Stadium',
+      country: CountryEnum.GREECE,
+      teamPrimaryColor: '#ed1b24',
+    },
+    {
+      name: 'PAOK',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/8619.png',
+      stadium: 'Toumba Stadium',
+      country: CountryEnum.GREECE,
+      teamPrimaryColor: '#040404',
+    },
+    {
+      name: 'AEK Athens',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/8563.png',
+      stadium: 'Olympic Stadium',
+      country: CountryEnum.GREECE,
+      teamPrimaryColor: '#ffd300',
+    },
+    {
+      name: 'Panathinaikos',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/10200.png',
+      stadium: 'Olympic Stadium',
+      country: CountryEnum.GREECE,
+      teamPrimaryColor: '#00793e',
     },
   ],
   [LeagueEnum.BELGIAN_PRO_LEAGUE]: [
