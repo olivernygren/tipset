@@ -144,9 +144,9 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               Redigera
             </Button>
           </Container> */}
-          <Divider />
           {!league.hasEnded && (
             <>
+              <Divider />
               <Container>
                 <ContainerText>
                   <HeadingsTypography variant="h5">Poängsystem</HeadingsTypography>
