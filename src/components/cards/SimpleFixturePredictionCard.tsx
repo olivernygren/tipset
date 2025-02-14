@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
+import {
+  FirstTeamToScore, Fixture, Prediction, TeamType,
+} from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, NormalTypography } from '../typography/Typography';
 import UserName, { UserProfilePicture } from '../typography/UserName';
@@ -17,6 +19,19 @@ interface SimpleFixturePredictionCardProps {
 
 const SimpleFixturePredictionCard = ({ prediction, fixture }: SimpleFixturePredictionCardProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const getFirstTeamToScore = () => {
+    if (prediction.firstTeamToScore === FirstTeamToScore.HOME_TEAM) {
+      return fixture?.homeTeam.name;
+    }
+    if (prediction.firstTeamToScore === FirstTeamToScore.AWAY_TEAM) {
+      return fixture?.awayTeam.name;
+    }
+    if (prediction.firstTeamToScore === FirstTeamToScore.NONE) {
+      return 'Inget lag (0-0)';
+    }
+    return 'Inte tippat';
+  };
 
   return (
     <Card>
@@ -65,23 +80,35 @@ const SimpleFixturePredictionCard = ({ prediction, fixture }: SimpleFixturePredi
         </PredictionContainer>
         )}
       </CardTopRow>
-      {fixture && fixture.shouldPredictGoalScorer && <Divider />}
+      {fixture && fixture.shouldPredictFirstTeamToScore && (
+        <>
+          <Divider />
+          <GoalScorerContainer>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>Första lag att göra mål</EmphasisTypography>
+            <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>{getFirstTeamToScore()}</NormalTypography>
+          </GoalScorerContainer>
+        </>
+      )}
       {fixture && fixture.shouldPredictGoalScorer && (
-        <GoalScorerContainer>
-          <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
-          <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>{prediction.goalScorer?.name ?? 'Ingen målskytt'}</NormalTypography>
-        </GoalScorerContainer>
+        <>
+          <Divider />
+          <GoalScorerContainer>
+            <EmphasisTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>Målskytt</EmphasisTypography>
+            <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDarker}>{prediction.goalScorer?.name ?? 'Ingen målskytt'}</NormalTypography>
+          </GoalScorerContainer>
+        </>
       )}
     </Card>
   );
 };
 
 const Card = styled.div`
-  background-color: ${theme.colors.silverLighter};
+  background-color: ${theme.colors.silverBleach};
   border-radius: ${theme.borderRadius.m};
   width: 100%;
   box-sizing: border-box;
   border: 1px solid ${theme.colors.silverLight};
+  box-shadow: 0px 3px 0px 0px ${theme.colors.silverLighter};
 `;
 
 const CardTopRow = styled.div`

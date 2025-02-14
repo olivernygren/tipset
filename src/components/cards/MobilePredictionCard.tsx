@@ -39,6 +39,29 @@ const MobilePredictionCard = ({
     />
   ));
 
+  const getFirstTeamToScore = () => {
+    if (!fixture) return '-';
+
+    if (prediction.firstTeamToScore === FirstTeamToScore.HOME_TEAM) {
+      return getAvatar(fixture.homeTeam);
+    }
+    if (prediction.firstTeamToScore === FirstTeamToScore.AWAY_TEAM) {
+      return getAvatar(fixture.awayTeam);
+    }
+    if (prediction.firstTeamToScore === FirstTeamToScore.NONE) {
+      return (
+        <NormalTypography variant="m">
+          Inget lag (0-0)
+        </NormalTypography>
+      );
+    }
+    return (
+      <NormalTypography variant="m">
+        Inte tippat
+      </NormalTypography>
+    );
+  };
+
   return (
     <Card>
       <HeadingContainer>
@@ -65,9 +88,7 @@ const MobilePredictionCard = ({
           <Row>
             <EmphasisTypography variant="m" color={theme.colors.silverDarker}>Första målet</EmphasisTypography>
             {prediction.goalScorer ? (
-              <NormalTypography variant="m">
-                {prediction.firstTeamToScore === FirstTeamToScore.HOME_TEAM ? getAvatar(fixture.homeTeam) : getAvatar(fixture.awayTeam)}
-              </NormalTypography>
+              getFirstTeamToScore()
             ) : (
               <NormalTypography variant="m" color={theme.colors.textLighter}>Ingen</NormalTypography>
             )}

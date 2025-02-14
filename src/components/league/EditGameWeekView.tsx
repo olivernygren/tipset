@@ -180,7 +180,7 @@ const EditGameWeekView = ({
     <>
       <FixtureItem
         key={fixture.id}
-        onClick={() => setEditFixture(fixture)}
+        onClick={fixture.finalResult ? () => errorNotify('Matchen har redan rättats') : () => setEditFixture(fixture)}
         isLastItem={index === gameWeekFixtures.length - 1}
       >
         <Teams>
