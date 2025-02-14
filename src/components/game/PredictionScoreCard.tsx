@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
-  CaretDown, CaretUp, FireSimple, SoccerBall, Target,
+  CaretDown, CaretUp, Confetti, FireSimple, Info, SoccerBall, Target,
 } from '@phosphor-icons/react';
+import { useHover } from 'react-haiku';
 import { Fixture, Prediction, TeamType } from '../../utils/Fixture';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
@@ -16,6 +17,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import { Section } from '../section/Section';
 import { getGeneralPositionShorthand, getPredictionOutcome } from '../../utils/helpers';
 import Tooltip from '../tooltip/Tooltip';
+import { Divider } from '../Divider';
 
 interface PredictionScoreCardProps {
   prediction: Prediction;
@@ -25,11 +27,15 @@ interface PredictionScoreCardProps {
 const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
+  const { hovered: underdogBonusHovered, ref: underdogInfoRef } = useHover();
+  const { hovered: goalFestHovered, ref: goalFestInfoRef } = useHover();
+
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const oddsBonusPointsAwarded = Boolean(prediction.points?.oddsBonus);
   const correctResultPredicted = Boolean(prediction.points?.correctResult) || Boolean(prediction.points?.correctResultBool);
   const correctGoalScorerPredicted = Boolean(prediction.points?.correctGoalScorer);
+  const goalFestAwarded = Boolean(prediction.points?.goalFest);
 
   const getOddsForPredictedOutcome = () => {
     let predictedOutcome;
@@ -75,6 +81,16 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     return 'Inget lag (0-0)';
   };
 
+  const getGoalScorerName = () => {
+    if (prediction.goalScorer) {
+      if (isMobile) {
+        return `${prediction.goalScorer.name.split(' ')[0].charAt(0)}. ${prediction.goalScorer.name.split(' ')[1]}`;
+      }
+      return prediction.goalScorer.name;
+    }
+    return 'Ingen målskytt';
+  };
+
   const getTableRow = (label: string, userPrediction: string, points: number | undefined) => {
     if (!points || points === 0 || !fixture) return null;
 
@@ -83,22 +99,43 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
     const isCorrectResult = label.includes('Korrekt resultat');
     const isOutcome = label.includes('Korrekt utfall (1X2)');
     const isFirstTeamToScore = label.includes('Första lag att göra mål');
+    const isUnderdogBonus = label.includes('Underdog bonus');
+    const isGoalFest = label.includes('Målfest');
 
     const firstTeamToScoreAvatar = userPrediction === fixture?.homeTeam.name ? getAvatar(fixture.homeTeam) : getAvatar(fixture.awayTeam);
 
     return (
       <TableRow topBorder>
         <Section flexDirection="row" gap="xxs" alignItems="center">
-          {isOddsBonus && (
+          {isOddsBonus && !isMobile && (
             <FireSimple size={20} color={theme.colors.silverDark} />
           )}
-          {isGoalScorer && (
+          {isGoalScorer && !isMobile && (
             <SoccerBall size={20} color={theme.colors.silverDark} weight="fill" />
           )}
-          {isCorrectResult && (
+          {isCorrectResult && !isMobile && (
             <Target size={20} color={theme.colors.silverDark} />
           )}
+          {isGoalFest && !isMobile && (
+            <Confetti size={20} color={theme.colors.silverDark} weight="fill" />
+          )}
           <NormalTypography variant="s" color={theme.colors.textDefault}>{label}</NormalTypography>
+          {isUnderdogBonus && (
+            <InfoIconWrapper ref={underdogInfoRef as React.RefObject<HTMLDivElement>}>
+              <Info size={20} color={theme.colors.silver} weight="fill" />
+              <InfoIconTooltipContainer>
+                <Tooltip show={underdogBonusHovered} text="Ensam att tippa korrekt resultat" arrowPosition="bottom" size="small" />
+              </InfoIconTooltipContainer>
+            </InfoIconWrapper>
+          )}
+          {isGoalFest && (
+            <InfoIconWrapper ref={goalFestInfoRef as React.RefObject<HTMLDivElement>}>
+              <Info size={20} color={theme.colors.silver} weight="fill" />
+              <InfoIconTooltipContainer>
+                <Tooltip show={goalFestHovered} text="Korret resultat med > 4 mål" arrowPosition="bottom" size="small" />
+              </InfoIconTooltipContainer>
+            </InfoIconWrapper>
+          )}
         </Section>
         <CenterAdjustedTableCell>
           {isOutcome && (
@@ -175,6 +212,11 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
                 <SoccerBall size={20} color={theme.colors.primaryDark} weight="fill" />
               </PointsBadge>
             )}
+            {goalFestAwarded && (
+              <PointsBadge>
+                <Confetti size={20} color={theme.colors.primaryDark} weight="fill" />
+              </PointsBadge>
+            )}
           </>
           )}
         </PointsBadges>
@@ -222,41 +264,46 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
           </PredictionContainer>
         )}
         {isMobile && fixture && fixture.shouldPredictGoalScorer && (
-          <PredictedGoalScorerSection>
-            <EmphasisTypography variant="s" color={theme.colors.textDefault}>Målskytt:</EmphasisTypography>
-            <PredictedGoalScorer>
-              {prediction.goalScorer ? (
-                <>
-                  <SoccerBall size={16} color={theme.colors.silverDark} weight="fill" />
-                  <NormalTypography variant="s" color={theme.colors.silverDark}>{prediction.goalScorer?.name}</NormalTypography>
-                </>
-              ) : (
-                <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen målskytt tippad</NormalTypography>
-              )}
-            </PredictedGoalScorer>
-          </PredictedGoalScorerSection>
+          <>
+            <PredictedGoalScorerSection>
+              <EmphasisTypography variant="s" color={theme.colors.textDefault}>Målskytt:</EmphasisTypography>
+              <PredictedGoalScorer>
+                {prediction.goalScorer ? (
+                  <>
+                    <SoccerBall size={16} color={theme.colors.silverDark} weight="fill" />
+                    <NormalTypography variant="s" color={theme.colors.silverDark}>{getGoalScorerName()}</NormalTypography>
+                  </>
+                ) : (
+                  <NormalTypography variant="s" color={theme.colors.silverDark}>Ingen målskytt tippad</NormalTypography>
+                )}
+              </PredictedGoalScorer>
+            </PredictedGoalScorerSection>
+            <Divider />
+          </>
         )}
         {prediction.points && prediction.points.total && prediction.points.total > 0 ? (
           <>
             <TableRow>
               <EmphasisTypography variant="m" color={theme.colors.primaryDark}>Poängfördelning</EmphasisTypography>
               <CenterAdjustedTableCell>
-                <Tooltip show text="Du" arrowPosition="bottom" size="small" />
+                <Tooltip show text={prediction.username?.split(' ')[0] ?? 'Tippat'} arrowPosition="bottom" size="small" />
               </CenterAdjustedTableCell>
               <RightAdjustedTableCell>
-                <NormalTypography variant="m" color={theme.colors.textDefault}>Poäng</NormalTypography>
+                <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.textDefault}>Poäng</NormalTypography>
               </RightAdjustedTableCell>
             </TableRow>
+            {getTableRow('Korrekt resultat', `${prediction.homeGoals} - ${prediction.awayGoals}`, prediction.points?.correctResult)}
             {getTableRow('Korrekt utfall (1X2)', getPredictionOutcome(prediction.homeGoals, prediction.awayGoals), prediction.points?.correctOutcome)}
             {getTableRow('Korrekt antal mål av hemmalag', prediction.homeGoals.toString(), prediction.points?.correctGoalsByHomeTeam)}
             {getTableRow('Korrekt antal mål av bortalag', prediction.awayGoals.toString(), prediction.points?.correctGoalsByAwayTeam)}
             {getTableRow('Korrekt målskillnad', (prediction.homeGoals - prediction.awayGoals).toString(), prediction.points?.correctGoalDifference)}
             {getTableRow('Första lag att göra mål', getFirstTeamToScore(), prediction.points?.firstTeamToScore)}
-            {getTableRow('Korrekt resultat', `${prediction.homeGoals} - ${prediction.awayGoals}`, prediction.points?.correctResult)}
+            {getTableRow('Underdog bonus', '✓', prediction.points?.underdogBonus)}
+            {getTableRow('Målfest', `${(prediction.homeGoals + prediction.awayGoals).toString()} mål`, prediction.points?.goalFest)}
             {getTableRow('Oddsbonus', getOddsForPredictedOutcome() ?? '-', prediction.points?.oddsBonus)}
             {prediction.goalScorer && (
               <>
-                {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, prediction.goalScorer.name, prediction.points?.correctGoalScorer)}
+                {getTableRow(`Korrekt målskytt (${getGeneralPositionShorthand(prediction.goalScorer.position.general)})`, getGoalScorerName(), prediction.points?.correctGoalScorer)}
               </>
             )}
           </>
@@ -352,10 +399,6 @@ const TableRow = styled.div<{ topBorder?: boolean }>`
   ${({ topBorder }) => topBorder && `border-top: 1px solid ${theme.colors.silverLight};`}
   padding-top: ${theme.spacing.xs};
 
-  ${NormalTypography} {
-    flex: 1;
-  }
-
   @media ${devices.tablet} {
     grid-template-columns: 1fr 200px 100px;
   }
@@ -430,6 +473,23 @@ const PredictedOutcome = styled.div`
   border-radius: ${theme.borderRadius.s};
   background-color: ${theme.colors.silverLight};
   border: 1px solid ${theme.colors.silver};
+`;
+
+const InfoIconWrapper = styled.div`
+  height: fit-content;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: help;
+`;
+
+const InfoIconTooltipContainer = styled.div`
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 export default PredictionScoreCard;

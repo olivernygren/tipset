@@ -319,6 +319,8 @@ const CorrectPredictionsModal = ({
 
     const correctOutcome = (homeWinPredicted && wasHomeWin) || (awayWinPredicted && wasAwayWin) || (drawPredicted && wasDraw);
     const correctFirstTeamToScore = fixture?.shouldPredictFirstTeamToScore && prediction.firstTeamToScore === firstTeamToScore;
+    const isGoalFest = parseInt(finalResult.homeGoals) + parseInt(finalResult.awayGoals) >= 5;
+    const isUnderdogBonus = getIsUnderdogBonus(prediction);
 
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
     const correctPlayerPrediction = hasPredictedGoalScorer && prediction.goalScorer && goalScorers.includes(prediction.goalScorer.name);
@@ -367,6 +369,16 @@ const CorrectPredictionsModal = ({
       pointDistribution.firstTeamToScore += scoringSystem.firstTeamToScore;
     }
 
+    if (isGoalFest && scoringSystem.goalFest > 0) {
+      totalPoints += scoringSystem.goalFest;
+      pointDistribution.goalFest += scoringSystem.goalFest;
+    }
+
+    if (isUnderdogBonus && scoringSystem.underdogBonus > 0) {
+      totalPoints += scoringSystem.underdogBonus;
+      pointDistribution.underdogBonus += scoringSystem.underdogBonus;
+    }
+
     pointDistribution.total = totalPoints;
 
     setPointsDistributions((oldstate) => {
@@ -390,6 +402,16 @@ const CorrectPredictionsModal = ({
     if (hasSavedPointsForUser) return prediction?.points?.total;
 
     return '-';
+  };
+
+  const getIsUnderdogBonus = (prediction: Prediction) => {
+    const allPredictionsForFixture = ongoingGameWeek?.games.predictions.filter((p) => p.fixtureId === gameId);
+    if (!allPredictionsForFixture) return false;
+
+    const correctPredictions = allPredictionsForFixture.filter((p) => p.homeGoals === parseInt(finalResult.homeGoals) && p.awayGoals === parseInt(finalResult.awayGoals));
+    const isOnlyCorrectPrediction = correctPredictions.length === 1 && correctPredictions[0].homeGoals === prediction.homeGoals && correctPredictions[0].awayGoals === prediction.awayGoals;
+
+    return isOnlyCorrectPrediction;
   };
 
   const getTeamAvatar = (team: Team, customSize?: AvatarSize) => {
@@ -478,13 +500,6 @@ const CorrectPredictionsModal = ({
                   <GoalScorersContainer isExpanded={isGoalScorersExpanded}>
                     <GoalScorersMainContent>
                       <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
-                      <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
-                        {hasGoalScorers && (
-                          goalScorers.map((scorer, index) => (
-                            getPlayerAvatarByName(scorer, index)
-                          ))
-                        )}
-                      </GoalScorersAvatars>
                       {(!hasGoalScorers || !isMobile) && (
                         <IconButton
                           icon={<PencilSimple size={24} />}
@@ -492,6 +507,13 @@ const CorrectPredictionsModal = ({
                           onClick={() => setShowSelectGoalScorerModal(true)}
                         />
                       )}
+                      <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
+                        {hasGoalScorers && (
+                          goalScorers.map((scorer, index) => (
+                            getPlayerAvatarByName(scorer, index)
+                          ))
+                        )}
+                      </GoalScorersAvatars>
                       {hasGoalScorers && (
                         <IconButton
                           icon={isGoalScorersExpanded ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
@@ -738,7 +760,7 @@ const GoalScorersContainer = styled.div<{ isExpanded: boolean }>`
   box-sizing: border-box;
   
   @media ${devices.tablet} {
-    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '56px')};
+    max-height: ${({ isExpanded }) => (isExpanded ? '1000px' : '58px')};
   }
 `;
 

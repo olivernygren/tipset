@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import React, { useEffect, useState } from 'react';
 import {
-  ChartBar, CheckCircle, FireSimple, MapPin, PlusCircle, Prohibit, SoccerBall, Target,
+  ChartBar, CheckCircle, Confetti, FireSimple, MapPin, PlusCircle, Prohibit, SoccerBall, Target,
   XCircle,
 } from '@phosphor-icons/react';
 import styled, { css, keyframes } from 'styled-components';
@@ -413,6 +413,7 @@ const GamePredictor = ({
       const correctGoalScorerPredicted = awardedPoints.correctGoalScorer > 0;
       const correctResultPredicted = awardedPoints.correctResult > 0 || awardedPoints.correctResultBool;
       const oddsBonusPointsAwarded = awardedPoints.oddsBonus > 0;
+      const goalFestBonusPointsAwarded = awardedPoints.goalFest > 0;
 
       return (
         <Section flexDirection="row" alignItems="center" gap="xs" justifyContent="center">
@@ -438,6 +439,9 @@ const GamePredictor = ({
                   )}
                   {correctResultPredicted && (
                     <Target size={18} />
+                  )}
+                  {goalFestBonusPointsAwarded && (
+                    <Confetti size={18} weight="fill" />
                   )}
                 </PointsIcons>
               ) : undefined}
@@ -562,8 +566,10 @@ const GamePredictor = ({
         </GameWrapper>
         {game.odds && (
           <>
-            {/* <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} /> */}
-            <OddsContainer hasPredicted={hasPredicted}>
+            {!(game.shouldPredictFirstTeamToScore && game.shouldPredictGoalScorer) && (
+              <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+            )}
+            <OddsContainer hasPredicted={hasPredicted} hasDivider={!(game.shouldPredictFirstTeamToScore && game.shouldPredictGoalScorer)}>
               <OddsWrapper>
                 {!isMobile && getPotentialOddsBonusPointsTooltip('home')}
                 <OddsTextWrapper
@@ -658,14 +664,17 @@ const GamePredictor = ({
             <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
           </>
         )}
-        <GoalScorerSection
-          shouldPredictGoalScorer={game.shouldPredictGoalScorer}
-          disabled={kickoffTimeHasPassed}
-          onClick={kickoffTimeHasPassed || !game.shouldPredictGoalScorer ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
-          hasPredicted={hasPredicted}
-          hasChosen={predictedPlayerToScore !== undefined}
-        >
-          {game.shouldPredictGoalScorer ? (
+        {game.shouldPredictGoalScorer && (
+          <>
+            <GoalScorerSection
+              shouldPredictGoalScorer={game.shouldPredictGoalScorer}
+              disabled={kickoffTimeHasPassed}
+              onClick={kickoffTimeHasPassed || !game.shouldPredictGoalScorer ? (() => {}) : () => setIsSelectGoalScorerModalOpen(true)}
+              hasPredicted={hasPredicted}
+              hasChosen={predictedPlayerToScore !== undefined}
+            >
+              <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
+              {/* {game.shouldPredictGoalScorer ? (
             <EmphasisTypography variant={isMobile ? 's' : 'm'} color={hasPredicted ? theme.colors.white : theme.colors.textDefault}>{isMobile ? 'Välj målskytt' : 'Välj målskytt i matchen'}</EmphasisTypography>
           ) : (
             <Section flexDirection="row" alignItems="center" justifyContent="center">
@@ -673,38 +682,41 @@ const GamePredictor = ({
                 Ingen målskytt ska tippas
               </EmphasisTypography>
             </Section>
-          )}
-          {game.shouldPredictGoalScorer && (
-            <GoalScorer>
-              {predictedPlayerToScore ? (
-                <AvatarWrapper>
-                  <Avatar
-                    src={predictedPlayerToScore.externalPictureUrl ?? predictedPlayerToScore.picture ?? '/images/placeholder-fancy.png'}
-                    alt={predictedPlayerToScore.name}
-                    size={AvatarSize.M}
-                    title={predictedPlayerToScore.name}
-                    objectFit="cover"
-                    showBorder
-                    customBorderWidth={1}
-                    backgroundColor={theme.colors.silverLight}
-                  />
-                  {predictedCorrectGoalScorer && (
+          )} */}
+              {game.shouldPredictGoalScorer && (
+              <GoalScorer>
+                {predictedPlayerToScore ? (
+                  <AvatarWrapper>
+                    <Avatar
+                      src={predictedPlayerToScore.externalPictureUrl ?? predictedPlayerToScore.picture ?? '/images/placeholder-fancy.png'}
+                      alt={predictedPlayerToScore.name}
+                      size={AvatarSize.M}
+                      title={predictedPlayerToScore.name}
+                      objectFit="cover"
+                      showBorder
+                      customBorderWidth={1}
+                      backgroundColor={theme.colors.silverLight}
+                    />
+                    {predictedCorrectGoalScorer && (
                     <GoalScorerIconWrapper wasCorrect>
                       <CheckCircle color={theme.colors.gold} size={16} weight="fill" />
                     </GoalScorerIconWrapper>
-                  )}
-                  {predictedIncorrectGoalScorer && (
+                    )}
+                    {predictedIncorrectGoalScorer && (
                     <GoalScorerIconWrapper>
                       <XCircle color={theme.colors.red} size={16} weight="fill" />
                     </GoalScorerIconWrapper>
-                  )}
-                </AvatarWrapper>
-              ) : (
-                <PlusCircle color={getGoalScorerIconButtonColor()} size={30} weight="fill" />
+                    )}
+                  </AvatarWrapper>
+                ) : (
+                  <PlusCircle color={getGoalScorerIconButtonColor()} size={30} weight="fill" />
+                )}
+              </GoalScorer>
               )}
-            </GoalScorer>
-          )}
-        </GoalScorerSection>
+            </GoalScorerSection>
+            <Divider color={hasPredicted ? theme.colors.primaryLight : theme.colors.silverLighter} />
+          </>
+        )}
         {!kickoffTimeHasPassed && (
           <SaveButtonSection hasPredicted={hasPredicted}>
             <Button
@@ -916,9 +928,12 @@ const TagsSection = styled.div`
   }
 `;
 
-const OddsContainer = styled.div<{ hasPredicted?: boolean }>`
-  padding-bottom: 12px;
-  /* padding: 6px 0; */
+const OddsContainer = styled.div<{ hasPredicted?: boolean, hasDivider?: boolean }>`
+  ${({ hasDivider }) => (hasDivider ? css`
+    padding: 6px 0;
+  ` : css`
+    padding-bottom: 12px;
+  `)};
   border-radius: ${theme.borderRadius.s};
   align-items: center;
   display: grid;
