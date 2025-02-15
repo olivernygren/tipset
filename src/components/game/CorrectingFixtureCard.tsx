@@ -23,6 +23,8 @@ interface FixturePreviewProps {
 const CorrectingFixtureCard = ({ fixture, onClick }: FixturePreviewProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
+  const fixtureHasKickedOff = new Date(fixture.kickOffTime) < new Date();
+
   const getAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (
     <ClubAvatar
       logoUrl={team.logoUrl}
@@ -71,16 +73,22 @@ const CorrectingFixtureCard = ({ fixture, onClick }: FixturePreviewProps) => {
       </Teams>
       <Divider />
       <BottomContainer>
-        <TextButton
-          size={isMobile ? 's' : 'm'}
-          onClick={onClick}
-          noPadding
-          icon={fixture.finalResult
-            ? <ArrowUUpLeft size={isMobile ? 16 : 20} weight="bold" color={theme.colors.primary} />
-            : <CheckCircle size={isMobile ? 16 : 20} weight="fill" color={theme.colors.primary} />}
-        >
-          {fixture.finalResult ? 'Ändra' : 'Rätta'}
-        </TextButton>
+        {fixtureHasKickedOff ? (
+          <TextButton
+            size={isMobile ? 's' : 'm'}
+            onClick={onClick}
+            noPadding
+            icon={fixture.finalResult
+              ? <ArrowUUpLeft size={isMobile ? 16 : 20} weight="bold" color={theme.colors.primary} />
+              : <CheckCircle size={isMobile ? 16 : 20} weight="fill" color={theme.colors.primary} />}
+          >
+            {fixture.finalResult ? 'Ändra' : 'Rätta'}
+          </TextButton>
+        ) : (
+          <NormalTypography variant={isMobile ? 's' : 'm'} color={theme.colors.silverDark}>
+            Matchen har inte börjat
+          </NormalTypography>
+        )}
       </BottomContainer>
     </Container>
   );

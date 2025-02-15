@@ -500,13 +500,11 @@ const CorrectPredictionsModal = ({
                   <GoalScorersContainer isExpanded={isGoalScorersExpanded}>
                     <GoalScorersMainContent>
                       <HeadingsTypography variant="h6">Målskyttar</HeadingsTypography>
-                      {(!isMobile) && (
-                        <IconButton
-                          icon={hasGoalScorers ? <PencilSimple size={24} /> : <PlusCircle size={32} weight="fill" />}
-                          colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
-                          onClick={() => setShowSelectGoalScorerModal(true)}
-                        />
-                      )}
+                      <IconButton
+                        icon={hasGoalScorers ? <PencilSimple size={24} /> : <PlusCircle size={32} weight="fill" />}
+                        colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
+                        onClick={() => setShowSelectGoalScorerModal(true)}
+                      />
                       {hasGoalScorers && (
                         <GoalScorersAvatars hasGoalScorers={hasGoalScorers}>
                           {goalScorers.map((scorer, index) => (
