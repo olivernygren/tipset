@@ -403,7 +403,7 @@ const PredictionLeaguePage = () => {
                     colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                     onClick={() => setContextMenuOpen(!contextMenuOpen)}
                     showBorder
-                    backgroundColor={{ normal: theme.colors.white }}
+                    backgroundColor={{ normal: theme.colors.white, hover: theme.colors.white, active: theme.colors.white }}
                   />
                   {contextMenuOpen && (
                     <ContextMenu onClose={() => setContextMenuOpen(false)} positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
