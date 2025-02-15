@@ -279,10 +279,10 @@ const PlayersByTeamPage = () => {
             colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
             onClick={() => setContextMenuOpen(!contextMenuOpen)}
             showBorder
-            backgroundColor={theme.colors.white}
+            backgroundColor={{ normal: theme.colors.white }}
           />
           {contextMenuOpen && (
-            <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 3) + 12} offsetX={0}>
+            <ContextMenu onClose={() => setContextMenuOpen(false)} positionX="right" positionY="bottom" offsetY={(48 * 3) + 12} offsetX={0}>
               <ContextMenuOption
                 icon={<PencilSimple size={24} color={theme.colors.textDefault} />}
                 onClick={() => {

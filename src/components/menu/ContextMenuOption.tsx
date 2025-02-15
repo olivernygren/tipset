@@ -12,14 +12,21 @@ interface ContextMenuOptionProps {
 
 const ContextMenuOption = ({
   icon, label, onClick, color = theme.colors.primary,
-}: ContextMenuOptionProps) => (
-  <StyledContextMenuOption onClick={onClick}>
-    <Content>
-      {icon}
-      <EmphasisTypography color={color}>{label}</EmphasisTypography>
-    </Content>
-  </StyledContextMenuOption>
-);
+}: ContextMenuOptionProps) => {
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    onClick();
+  };
+
+  return (
+    <StyledContextMenuOption onClick={(e) => handleClick(e)}>
+      <Content>
+        {icon}
+        <EmphasisTypography color={color}>{label}</EmphasisTypography>
+      </Content>
+    </StyledContextMenuOption>
+  );
+};
 
 const StyledContextMenuOption = styled.div`
   width: 100%;

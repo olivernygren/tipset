@@ -376,7 +376,14 @@ const AdminFixturesPage = () => {
                   Välj datum
                 </Button>
                 {datePickerMenuOpen && (
-                  <ContextMenu positionX="right" positionY="bottom" offsetY={116} offsetX={0} overflow="visible">
+                  <ContextMenu
+                    onClose={() => setDatePickerMenuOpen(false)}
+                    positionX="right"
+                    positionY="bottom"
+                    offsetY={116}
+                    offsetX={0}
+                    overflow="visible"
+                  >
                     <DatePickerContainer>
                       <CustomDatePicker
                         label="Datum"
@@ -412,7 +419,7 @@ const AdminFixturesPage = () => {
               onClick={() => setContextMenuOpen(!contextMenuOpen)}
             />
             {contextMenuOpen && (
-              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * getContextMenuOffsetY()) - 8} offsetX={-24}>
+              <ContextMenu onClose={() => setContextMenuOpen(false)} positionX="right" positionY="bottom" offsetY={(48 * getContextMenuOffsetY()) - 8} offsetX={-24}>
                 {/* <ContextMenuOption
                   icon={<Funnel size={24} color={theme.colors.textDefault} />}
                   onClick={() => {

@@ -271,7 +271,7 @@ const PredictionLeaguesPage = () => {
               <IconButton
                 icon={<PlusCircle size={28} />}
                 onClick={() => setShowCreateLeagueModal(true)}
-                backgroundColor={theme.colors.primary}
+                backgroundColor={{ normal: theme.colors.primary }}
                 colors={{
                   normal: theme.colors.white,
                   disabled: theme.colors.silverLight,

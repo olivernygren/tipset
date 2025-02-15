@@ -184,7 +184,7 @@ const MobileOptionContainer = styled.div<{ isSelected?: boolean }>`
   border-radius: ${theme.borderRadius.m};
   padding: ${theme.spacing.xs};
   background-color: ${({ isSelected }) => (isSelected ? theme.colors.primaryFade : theme.colors.silverBleach)};
-  border: 1px solid ${({ isSelected }) => (isSelected ? theme.colors.primary : theme.colors.silverLight)};
+  border: 1px solid ${({ isSelected }) => (isSelected ? theme.colors.primaryLight : theme.colors.silverLight)};
 `;
 
 export default FirstTeamToScoreModal;

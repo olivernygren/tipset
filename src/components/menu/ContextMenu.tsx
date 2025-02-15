@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { useClickOutside } from 'react-haiku';
 import { theme } from '../../theme';
 
 interface ContextMenuProps {
@@ -10,6 +11,7 @@ interface ContextMenuProps {
   offsetX: number;
   offsetY: number;
   overflow?: 'hidden' | 'visible';
+  onClose: () => void;
 }
 
 interface StyledContextMenuProps {
@@ -21,21 +23,28 @@ interface StyledContextMenuProps {
 }
 
 const ContextMenu = ({
-  children, positionY, positionX, offsetX, offsetY, overflow = 'hidden',
-}: ContextMenuProps) => (
-  <StyledContextMenu
-    positionY={positionY}
-    positionX={positionX}
-    offsetX={offsetX}
-    offsetY={offsetY}
-    overflow={overflow}
-    initial={{ opacity: 0, scale: 0.92 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.92 }}
-  >
-    {children}
-  </StyledContextMenu>
-);
+  children, positionY, positionX, offsetX, offsetY, overflow = 'hidden', onClose,
+}: ContextMenuProps) => {
+  const ref = useRef(null);
+
+  useClickOutside(ref, onClose);
+
+  return (
+    <StyledContextMenu
+      ref={ref}
+      positionY={positionY}
+      positionX={positionX}
+      offsetX={offsetX}
+      offsetY={offsetY}
+      overflow={overflow}
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.92 }}
+    >
+      {children}
+    </StyledContextMenu>
+  );
+};
 
 const StyledContextMenu = styled(motion.div)<StyledContextMenuProps>`
   background-color: ${theme.colors.white};

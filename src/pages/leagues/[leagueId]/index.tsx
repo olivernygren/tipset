@@ -403,10 +403,10 @@ const PredictionLeaguePage = () => {
                     colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDarker }}
                     onClick={() => setContextMenuOpen(!contextMenuOpen)}
                     showBorder
-                    backgroundColor={theme.colors.white}
+                    backgroundColor={{ normal: theme.colors.white }}
                   />
                   {contextMenuOpen && (
-                    <ContextMenu positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
+                    <ContextMenu onClose={() => setContextMenuOpen(false)} positionX="right" positionY="bottom" offsetY={48 + 12} offsetX={0}>
                       <ContextMenuOption
                         icon={<Trash size={24} color={theme.colors.red} />}
                         onClick={() => setConfirmDeleteModal(true)}
@@ -653,6 +653,12 @@ const MobileTabsButton = styled.div`
 `;
 
 const MobileMenuIcon = styled.div<{ isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: fit-content;
+  
   > svg {
     transition: transform 0.2s;
     transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {
-  ArrowLeft, CheckCircle, Hammer, MagnifyingGlass, PlusCircle, Trash,
-  XCircle,
+  ArrowLeft, ChartBar, CheckCircle, DotsThree, Hammer, MagnifyingGlass, PencilSimple, Trash,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
 import { Section } from '../section/Section';
@@ -29,6 +28,7 @@ import Modal from '../modal/Modal';
 import ContextMenu from '../menu/ContextMenu';
 import ContextMenuOption from '../menu/ContextMenuOption';
 import FindOtherFixturesModal from './FindOtherFixturesModal';
+import FixtureStatsModal from '../game/FixtureStatsModal';
 
 interface EditGameWeekViewProps {
   gameWeek: LeagueGameWeek;
@@ -51,8 +51,10 @@ const EditGameWeekView = ({
   const [showCreateFixtureModal, setShowCreateFixtureModal] = useState<boolean>(false);
   const [gameWeekStartDate, setGameWeekStartDate] = useState<Date | null>(new Date(gameWeek.startDate));
   const [confirmDeleteGameWeekModalOpen, setConfirmDeleteGameWeekModalOpen] = useState<boolean>(false);
-  const [selectAddFixtureMethodMenuOpen, setSelectAddFixtureMethodMenuOpen] = useState<boolean>(false);
   const [findExternalFixturesModalOpen, setFindExternalFixturesModalOpen] = useState<boolean>(false);
+  const [showFixtureContextMenu, setShowFixtureContextMenu] = useState<string | null>(null);
+  const [showGameWeekContextMenu, setShowGameWeekShowContextMenu] = useState<boolean>(false);
+  const [showEditStatsModal, setShowEditStatsModal] = useState<string | null>(null);
 
   const handleUpdateFixture = (updatedFixture: FixtureInput) => {
     const updatedFixtures = gameWeekFixtures.map((fixture) => {
@@ -69,16 +71,17 @@ const EditGameWeekView = ({
     setEditFixture(null);
   };
 
-  const handleDeleteFixture = () => {
-    const hasBeenCorrected = gameWeekFixtures.some((fixture) => fixture.id === editFixture?.id && Boolean(fixture.finalResult));
+  const handleDeleteFixture = (fixture?: Fixture) => {
+    const fixtureToUse = fixture || editFixture;
+    const hasBeenCorrected = gameWeekFixtures.some((fixture) => fixture.id === fixtureToUse?.id && Boolean(fixture.finalResult));
 
     if (hasBeenCorrected) {
       errorNotify('Matchen har redan gett poängutdelning');
       return;
     }
 
-    const updatedFixtures = gameWeekFixtures.filter((fixture) => fixture.id !== editFixture?.id);
-    const updatedPredictions = gameWeek.games.predictions.filter((prediction) => prediction.fixtureId !== editFixture?.id);
+    const updatedFixtures = gameWeekFixtures.filter((fixture) => fixture.id !== fixtureToUse?.id);
+    const updatedPredictions = gameWeek.games.predictions.filter((prediction) => prediction.fixtureId !== fixtureToUse?.id);
 
     setGameWeekFixtures(updatedFixtures);
     setGameWeekPredictions(updatedPredictions);
@@ -173,37 +176,105 @@ const EditGameWeekView = ({
     const month = date.toLocaleDateString('sv-SE', { month: 'short' }).replace('.', '');
     const hours = date.getHours();
     const minutes = date.getMinutes();
+
+    if (isMobile) {
+      return `${day} ${month}`;
+    }
+
     return `${day} ${month} ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   };
 
-  const getFixtureItem = (fixture: Fixture, index: number) => (
-    <>
-      <FixtureItem
-        key={fixture.id}
-        onClick={fixture.finalResult ? () => errorNotify('Matchen har redan rättats') : () => setEditFixture(fixture)}
-        isLastItem={index === gameWeekFixtures.length - 1}
-      >
-        <Teams>
-          <TeamContainer isHomeTeam>
-            <NormalTypography variant={isMobile ? 's' : 'm'} align="right">
-              {isMobile && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}
-            </NormalTypography>
-            {getTeamAvatar(fixture.homeTeam, fixture)}
-          </TeamContainer>
-          <NormalTypography variant={isMobile ? 'xs' : 's'} color={theme.colors.textLight}>
-            {getKickoffTime(fixture.kickOffTime)}
-          </NormalTypography>
-          <TeamContainer>
-            {getTeamAvatar(fixture.awayTeam, fixture)}
-            <NormalTypography variant={isMobile ? 's' : 'm'}>
-              {isMobile && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}
-            </NormalTypography>
-          </TeamContainer>
-        </Teams>
-      </FixtureItem>
-      {index < gameWeekFixtures.length - 1 && <Divider />}
-    </>
+  const getFixtureContextMenu = (fixture: Fixture) => (
+    <ContextMenu
+      positionX="right"
+      positionY="top"
+      offsetY={-4}
+      offsetX={isMobile ? -48 : -56}
+      onClose={() => setShowFixtureContextMenu(null)}
+    >
+      <ContextMenuOption
+        icon={<Hammer size={24} color={theme.colors.textDefault} />}
+        onClick={() => {
+          setEditFixture(fixture);
+          setShowFixtureContextMenu(null);
+        }}
+        label="Redigera match"
+        color={theme.colors.textDefault}
+      />
+      {fixture.includeStats && (
+        <ContextMenuOption
+          icon={<ChartBar size={24} color={theme.colors.textDefault} />}
+          onClick={() => {
+            setShowEditStatsModal(fixture.id);
+            setShowFixtureContextMenu(null);
+          }}
+          label="Matchstatistik"
+          color={theme.colors.textDefault}
+        />
+      )}
+      <ContextMenuOption
+        icon={<Trash size={24} color={theme.colors.red} />}
+        onClick={() => {
+          handleDeleteFixture(fixture);
+          setShowFixtureContextMenu(null);
+        }}
+        label="Ta bort"
+        color={theme.colors.red}
+      />
+    </ContextMenu>
   );
+
+  const getFixtureItem = (fixture: Fixture, index: number) => {
+    const fixtureHasKickedOff = new Date(fixture.kickOffTime) < new Date();
+    return (
+      <>
+        <FixtureItem
+          key={fixture.id}
+          isLastItem={index === gameWeekFixtures.length - 1}
+          useHoverEffect={false}
+        >
+          <Teams>
+            <TeamContainer isHomeTeam>
+              <NormalTypography variant={isMobile ? 's' : 'm'} align="right">
+                {isMobile && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}
+              </NormalTypography>
+              {getTeamAvatar(fixture.homeTeam, fixture)}
+            </TeamContainer>
+            <NormalTypography variant={isMobile ? 'xs' : 's'} color={theme.colors.textLight}>
+              {getKickoffTime(fixture.kickOffTime)}
+            </NormalTypography>
+            <TeamContainer>
+              {getTeamAvatar(fixture.awayTeam, fixture)}
+              <NormalTypography variant={isMobile ? 's' : 'm'}>
+                {isMobile && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}
+              </NormalTypography>
+            </TeamContainer>
+          </Teams>
+          {!fixtureHasKickedOff && (
+            <>
+              <ContextMenuButtonWrapper>
+                <IconButton
+                  icon={<DotsThree size={24} weight="bold" />}
+                  colors={{ normal: theme.colors.silverDarker, hover: theme.colors.textDefault }}
+                  backgroundColor={{ normal: showFixtureContextMenu === fixture.id ? theme.colors.silverLight : 'transparent', hover: theme.colors.silverLight }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (showFixtureContextMenu === fixture.id) {
+                      setShowFixtureContextMenu(null);
+                    } else {
+                      setShowFixtureContextMenu(fixture.id);
+                    }
+                  }}
+                />
+              </ContextMenuButtonWrapper>
+              {showFixtureContextMenu === fixture.id && getFixtureContextMenu(fixture)}
+            </>
+          )}
+        </FixtureItem>
+        {index < gameWeekFixtures.length - 1 && <Divider />}
+      </>
+    );
+  };
 
   return (
     <>
@@ -225,37 +296,46 @@ const EditGameWeekView = ({
             >
               {`Redigera omgång ${gameWeek.round}`}
             </EmphasisTypography>
-            <Icons>
-              <IconButton
-                icon={<Trash size={24} weight="fill" />}
-                colors={{ normal: theme.colors.red, hover: theme.colors.redDark }}
-                onClick={() => setConfirmDeleteGameWeekModalOpen(true)}
-              />
-              <IconButton
-                icon={selectAddFixtureMethodMenuOpen ? <XCircle size={24} weight="fill" /> : <PlusCircle size={24} weight="fill" />}
-                colors={{ normal: theme.colors.primary, hover: theme.colors.primaryDark }}
-                onClick={() => setSelectAddFixtureMethodMenuOpen(!selectAddFixtureMethodMenuOpen)}
-              />
-            </Icons>
-            {selectAddFixtureMethodMenuOpen && (
-              <ContextMenu positionX="right" positionY="bottom" offsetY={(48 * 2) - 4} offsetX={-12}>
+            <IconButton
+              icon={<PencilSimple size={24} />}
+              colors={{ normal: theme.colors.textDefault, hover: theme.colors.textDefault }}
+              backgroundColor={{ normal: showGameWeekContextMenu ? theme.colors.silver : 'transparent', hover: theme.colors.silver }}
+              onClick={() => setShowGameWeekShowContextMenu(!showGameWeekContextMenu)}
+            />
+            {showGameWeekContextMenu && (
+              <ContextMenu
+                onClose={() => setShowGameWeekShowContextMenu(false)}
+                positionX="right"
+                positionY="top"
+                offsetY={(48 * 2) + 4}
+                offsetX={isMobile ? -48 : -56}
+              >
                 <ContextMenuOption
                   icon={<MagnifyingGlass size={24} color={theme.colors.textDefault} />}
                   onClick={() => {
                     setFindExternalFixturesModalOpen(true);
-                    setSelectAddFixtureMethodMenuOpen(false);
+                    setShowGameWeekShowContextMenu(false);
                   }}
-                  label="Hitta matcher"
+                  label="Hitta fler matcher"
                   color={theme.colors.textDefault}
                 />
                 <ContextMenuOption
                   icon={<Hammer size={24} color={theme.colors.textDefault} />}
                   onClick={() => {
                     setShowCreateFixtureModal(true);
-                    setSelectAddFixtureMethodMenuOpen(false);
+                    setShowGameWeekShowContextMenu(false);
                   }}
-                  label="Lägg till manuellt"
+                  label="Lägg till match"
                   color={theme.colors.textDefault}
+                />
+                <ContextMenuOption
+                  icon={<Trash size={24} color={theme.colors.red} />}
+                  onClick={() => {
+                    setConfirmDeleteGameWeekModalOpen(true);
+                    setShowGameWeekShowContextMenu(false);
+                  }}
+                  label="Ta bort omgång"
+                  color={theme.colors.red}
                 />
               </ContextMenu>
             )}
@@ -341,6 +421,16 @@ const EditGameWeekView = ({
           </ModalButtons>
         </Modal>
       )}
+      {showEditStatsModal && league && (
+        <FixtureStatsModal
+          fixture={gameWeekFixtures.find((fixture) => fixture.id === showEditStatsModal)!}
+          onClose={() => setShowEditStatsModal(null)}
+          league={league}
+          refetchLeague={refetch}
+          ongoingGameWeek={gameWeek}
+          isLeagueCreator
+        />
+      )}
     </>
   );
 };
@@ -353,24 +443,27 @@ const FixtureList = styled.div`
   box-sizing: border-box;
   background-color: ${theme.colors.silverLighter};
   border-radius: ${theme.borderRadius.l};
-  /* overflow: hidden; */
   border: 1px solid ${theme.colors.silverLight};
 `;
 
 const FixtureListHeader = styled.div`
   display: grid;
-  grid-template-columns: 64px 1fr 64px;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
   background-color: ${theme.colors.silverLight};
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  padding: ${theme.spacing.xxs} ${theme.spacing.xs};
+  padding: ${theme.spacing.xxs} ${theme.spacing.xxxs};
   position: relative;
   border-radius: 11px 11px 0 0;
+  
+  @media ${devices.tablet} {
+    padding: ${theme.spacing.xxxs} ${theme.spacing.xs};
+  }
 `;
 
-const FixtureItem = styled.div<{ isLastItem?: boolean }>`
+const FixtureItem = styled.div<{ isLastItem?: boolean, useHoverEffect?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,16 +472,19 @@ const FixtureItem = styled.div<{ isLastItem?: boolean }>`
   box-sizing: border-box;
   position: relative;
   padding: ${theme.spacing.xs} 0;
+  position: relative;
   transition: all 0.2s ease;
-  cursor: pointer;
+  /* cursor: pointer; */
 
   ${({ isLastItem }) => isLastItem && css`
     border-radius: 0 0 11px 11px;
   `}
 
-  &:hover {
-    background-color: ${theme.colors.silverLight};
-  }
+  ${({ useHoverEffect }) => useHoverEffect && css`
+    &:hover {
+      background-color: ${theme.colors.silverLight};
+    }
+  `}
   
   @media ${devices.tablet} {
     padding: ${theme.spacing.xxxs} 0;
@@ -421,17 +517,21 @@ const TeamContainer = styled.div<{ isHomeTeam?: boolean }>`
   `}
 `;
 
-const Icons = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.xxxs};
-  margin-left: auto;
-`;
-
 const ModalButtons = styled.div`
   display: flex;
   gap: ${theme.spacing.xs};
   justify-content: center;
+`;
+
+const ContextMenuButtonWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  
+  @media ${devices.tablet} {
+    right: 12px;
+  }
 `;
 
 export default EditGameWeekView;

@@ -104,7 +104,7 @@ const ButtonsContainer = styled.div<{ divider?: boolean }>`
   display: flex;
   gap: ${theme.spacing.s};
   align-items: center;
-  padding: ${theme.spacing.m};
+  padding: ${theme.spacing.m} ${theme.spacing.m} ${theme.spacing.l} ${theme.spacing.m};
   ${({ divider }) => divider && `border-top: 1px solid ${theme.colors.silverLight};`}
   
   @media ${devices.tablet} {
