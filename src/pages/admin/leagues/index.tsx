@@ -63,6 +63,7 @@ const AdminLeaguesPage = () => {
       preferences: {
         odds: true, goalScorers: true, firstTeamToScore: false,
       },
+      useExtraChansen: false,
     };
 
     try {

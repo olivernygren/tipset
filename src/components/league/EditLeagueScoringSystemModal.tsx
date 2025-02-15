@@ -39,6 +39,7 @@ const EditLeagueScoringSystemModal = ({
     firstTeamToScore: scoringSystem?.firstTeamToScore || bullseyeScoringSystem.firstTeamToScore,
     goalFest: scoringSystem?.goalFest || bullseyeScoringSystem.goalFest,
     underdogBonus: scoringSystem?.underdogBonus || bullseyeScoringSystem.underdogBonus,
+    extrachansen: scoringSystem?.extrachansen || bullseyeScoringSystem.extrachansen,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>(Object.keys(scoringSystemValues).reduce((acc, key) => ({ ...acc, [key]: '' }), {}));
 
@@ -90,6 +91,8 @@ const EditLeagueScoringSystemModal = ({
       case 'goalFest':
         return { min: 0, max: 4 };
       case 'underdogBonus':
+        return { min: 0, max: 6 };
+      case 'extrachansen':
         return { min: 0, max: 6 };
       default:
         return { min: 0, max: 1 };
@@ -276,6 +279,12 @@ const EditLeagueScoringSystemModal = ({
             label: 'Korrekt målskytt (anfallare)',
             description: 'Antal poäng som delas ut för att ha tippat rätt målskytt bland anfallare.',
             value: 'correctGoalScorerForward',
+          })}
+          <Divider />
+          {getPointsAdjustmentContainer({
+            label: 'Extrachansen',
+            description: 'Antal poäng som delas ut till vinnaren av varje omgång i Extrachansen.',
+            value: 'extrachansen',
           })}
           <Divider />
           {getPointsAdjustmentContainer({

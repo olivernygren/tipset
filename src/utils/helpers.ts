@@ -504,6 +504,7 @@ export const bullseyeScoringSystem: LeagueScoringSystemValues = {
   goalFest: 0, // TODO: Update
   underdogBonus: 0, // TODO: Update
   firstTeamToScore: 0, // TODO: Update
+  extrachansen: 0,
 };
 
 export const gamblerScoringSystem: LeagueScoringSystemValues = {
@@ -521,4 +522,5 @@ export const gamblerScoringSystem: LeagueScoringSystemValues = {
   goalFest: 3,
   underdogBonus: 1,
   firstTeamToScore: 1,
+  extrachansen: 0,
 };

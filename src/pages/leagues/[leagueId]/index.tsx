@@ -5,7 +5,7 @@ import {
 } from 'firebase/firestore';
 import {
   Alarm,
-  ArrowLeft, CaretDown, CheckCircle, DotsThree, PencilSimple, RocketLaunch, SoccerBall, SquaresFour, Trash, UserList,
+  ArrowLeft, CaretDown, CheckCircle, DotsThree, Highlighter, PencilSimple, RocketLaunch, SoccerBall, SquaresFour, Trash, UserList,
   X,
 } from '@phosphor-icons/react';
 import styled, { css } from 'styled-components';
@@ -38,6 +38,7 @@ import CustomSkeleton, { ParagraphSkeleton } from '../../../components/skeleton/
 import 'react-loading-skeleton/dist/skeleton.css';
 import Modal from '../../../components/modal/Modal';
 import Input from '../../../components/input/Input';
+import ExtraChansenView from '../../../components/league/ExtraChansenView';
 
 const PredictionLeaguePage = () => {
   const navigate = useNavigate();
@@ -73,7 +74,14 @@ const PredictionLeaguePage = () => {
       setSortedLeagueStandings(getSortedLeagueStandings(league.standings));
 
       if (league.creatorId === currentUserId || hasAdminRights) {
-        setTabs([LeagueTabs.OVERVIEW, LeagueTabs.MATCHES, LeagueTabs.PARTICIPANTS, LeagueTabs.EDIT]);
+        setTabs([
+          LeagueTabs.OVERVIEW,
+          LeagueTabs.MATCHES,
+          ...(league.useExtraChansen ? [LeagueTabs.EXTRACHANSEN] : []),
+          // LeagueTabs.EXTRACHANSEN,
+          LeagueTabs.PARTICIPANTS,
+          LeagueTabs.EDIT,
+        ]);
       }
     }
   }, [currentUserId, initialFetchLoading, league]);
@@ -176,6 +184,8 @@ const PredictionLeaguePage = () => {
         return 'Översikt';
       case LeagueTabs.MATCHES:
         return 'Matcher';
+      case LeagueTabs.EXTRACHANSEN:
+        return 'Extrachansen';
       case LeagueTabs.PARTICIPANTS:
         return 'Deltagare';
       case LeagueTabs.EDIT:
@@ -276,6 +286,8 @@ const PredictionLeaguePage = () => {
         return <SquaresFour size={20} color={isActive ? theme.colors.white : theme.colors.textLight} weight={isActive ? 'fill' : 'regular'} />;
       case LeagueTabs.MATCHES:
         return <SoccerBall size={20} weight="fill" color={isActive ? theme.colors.white : theme.colors.textLight} />;
+      case LeagueTabs.EXTRACHANSEN:
+        return <Highlighter size={20} weight="fill" color={isActive ? theme.colors.white : theme.colors.textLight} />;
       case LeagueTabs.PARTICIPANTS:
         return <UserList size={20} color={isActive ? theme.colors.white : theme.colors.textLight} weight={isActive ? 'fill' : 'regular'} />;
       case LeagueTabs.EDIT:
@@ -305,6 +317,14 @@ const PredictionLeaguePage = () => {
       case LeagueTabs.MATCHES:
         return (
           <FixturesView
+            league={league}
+            isCreator={isCreator}
+            refetchLeague={fetchLeagueData}
+          />
+        );
+      case LeagueTabs.EXTRACHANSEN:
+        return (
+          <ExtraChansenView
             league={league}
             isCreator={isCreator}
             refetchLeague={fetchLeagueData}
@@ -439,27 +459,27 @@ const PredictionLeaguePage = () => {
                     </MobileMenuIcon>
                   </MobileTabsButton>
                   {mobileTabsMenuOpen && (
-                  <MobileTabsOptionsMenu
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {tabs.map((tab) => (
-                      <MobileMenuOption
-                        isActive={activeTab === tab}
-                        onClick={() => {
-                          setActiveTab(tab);
-                          setMobileTabsMenuOpen(false);
-                        }}
-                      >
-                        <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
-                          {getTabText(tab)}
-                        </EmphasisTypography>
-                        {getTabIcon(tab, activeTab === tab)}
-                      </MobileMenuOption>
-                    ))}
-                  </MobileTabsOptionsMenu>
+                    <MobileTabsOptionsMenu
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {tabs.map((tab) => (
+                        <MobileMenuOption
+                          isActive={activeTab === tab}
+                          onClick={() => {
+                            setActiveTab(tab);
+                            setMobileTabsMenuOpen(false);
+                          }}
+                        >
+                          <EmphasisTypography variant="m" color={activeTab === tab ? theme.colors.white : theme.colors.textDefault}>
+                            {getTabText(tab)}
+                          </EmphasisTypography>
+                          {getTabIcon(tab, activeTab === tab)}
+                        </MobileMenuOption>
+                      ))}
+                    </MobileTabsOptionsMenu>
                   )}
                 </MobileTabs>
               ) : (

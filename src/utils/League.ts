@@ -18,6 +18,7 @@ export interface PredictionLeague {
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
+  useExtraChansen?: boolean;
 }
 
 export interface LeagueScoringSystemValues {
@@ -35,6 +36,7 @@ export interface LeagueScoringSystemValues {
   goalFest: number;
   underdogBonus: number;
   firstTeamToScore: number;
+  extrachansen: number;
 }
 
 export interface LeaguePreferences {
@@ -58,11 +60,13 @@ export interface CreatePredictionLeagueInput {
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
+  useExtraChansen?: boolean;
 }
 
 export enum LeagueTabs {
   OVERVIEW = 'OVERVIEW',
   MATCHES = 'MATCHES',
+  EXTRACHANSEN = 'EXTRACHANSEN',
   PARTICIPANTS = 'PARTICIPANTS',
   EDIT = 'EDIT',
 }

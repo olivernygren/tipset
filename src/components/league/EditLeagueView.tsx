@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { LeagueScoringSystemValues, PredictionLeague } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { Section } from '../section/Section';
-import { HeadingsTypography, NormalTypography } from '../typography/Typography';
+import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../typography/Typography';
 import Input from '../input/Input';
 import CustomDatePicker from '../input/DatePicker';
 import Button from '../buttons/Button';
@@ -17,6 +17,7 @@ import { Divider } from '../Divider';
 import ActionsModal from '../modal/ActionsModal';
 import InfoDialogue from '../info/InfoDialogue';
 import EditLeagueScoringSystemModal from './EditLeagueScoringSystemModal';
+import Toggle from '../toggle/Toggle';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -35,6 +36,8 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
   const [editBasicInformationModalOpen, setEditBasicInformationModalOpen] = useState<boolean>(false);
   const [editScoringSystemModalOpen, setEditScoringSystemModalOpen] = useState<boolean>(false);
+  const [editExtrachansenModalOpen, setEditExtrachansenModalOpen] = useState<boolean>(false);
+  const [useExtraChansen, setUseExtraChansen] = useState<boolean>(league.useExtraChansen ?? false);
 
   if (!isCreator) return null;
 
@@ -106,6 +109,30 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
     }
   };
 
+  const handleSaveExtrachansen = async () => {
+    setUpdateLoading(true);
+
+    const updatedLeague = {
+      ...league,
+      useExtraChansen,
+      scoringSystem: {
+        ...league.scoringSystem,
+        extrachansen: useExtraChansen ? 4 : 0,
+      },
+    };
+
+    try {
+      await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), updatedLeague);
+      successNotify(useExtraChansen ? 'Extrachansen tillagd' : 'Extrachansen dold');
+      setEditExtrachansenModalOpen(false);
+      refetchLeague();
+    } catch (error) {
+      errorNotify('Ett fel uppstod');
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
   return (
     <>
       <Section
@@ -129,6 +156,21 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               fullWidth={isMobile}
             >
               Redigera
+            </Button>
+          </Container>
+          <Divider />
+          <Container>
+            <ContainerText>
+              <HeadingsTypography variant="h5">Extrachansen</HeadingsTypography>
+              <NormalTypography variant="m" color={theme.colors.silverDark}>Extrachansen kan inkluderas som ett extra-spel till varje omgång.</NormalTypography>
+            </ContainerText>
+            <Button
+              variant="secondary"
+              onClick={() => setEditExtrachansenModalOpen(true)}
+              size="m"
+              fullWidth={isMobile}
+            >
+              Läs mer
             </Button>
           </Container>
           {/* <Container>
@@ -247,6 +289,34 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
           </Section>
         </ActionsModal>
       )}
+      {editExtrachansenModalOpen && (
+        <ActionsModal
+          size="m"
+          onCancelClick={() => setEditExtrachansenModalOpen(false)}
+          onActionClick={handleSaveExtrachansen}
+          actionButtonLabel="Spara"
+          title="Extrachansen"
+          loading={updateLoading}
+          mobileFullScreen
+        >
+          <Section gap="m">
+            <NormalTypography variant="m">Extrachansen är ett extra-spel som kan inkluderas i varje omgång. Det går ut på att tippa utfallet (1/X/2) i 3-5 matcher som inte ingår i den ordinarie omgången, där vinnaren tar hem x poäng. En extra chans att plocka poäng helt enkelt!</NormalTypography>
+            <InfoDialogue
+              title="Tips"
+              description="Du kan justera antal poäng som delas ut för vinnaren av varje omgång i Extrachansen under Poängsystem."
+              color="silver"
+            />
+            <ToggleContainer>
+              <EmphasisTypography variant="m">Inkludera Extrachansen</EmphasisTypography>
+              <Toggle
+                isSelected={useExtraChansen}
+                size="m"
+                onToggle={() => setUseExtraChansen(!useExtraChansen)}
+              />
+            </ToggleContainer>
+          </Section>
+        </ActionsModal>
+      )}
     </>
   );
 };
@@ -285,6 +355,18 @@ const ContainerText = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.xxs};
   flex: 1;
+`;
+
+const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding: ${theme.spacing.xs};
+  background-color: ${theme.colors.silverBleach};
+  border-radius: ${theme.borderRadius.m};
+  border: 1px solid ${theme.colors.silverLight};
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export default EditLeagueView;
