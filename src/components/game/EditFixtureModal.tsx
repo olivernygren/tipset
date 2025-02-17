@@ -30,10 +30,11 @@ interface CreateFixtureModalProps {
   fixture: Fixture;
   minDate?: Date;
   league?: PredictionLeague;
+  isAdminFixturesPage?: boolean;
 }
 
 const EditFixtureModal = ({
-  onClose, onSave, onDeleteFixture, fixture, minDate, league,
+  onClose, onSave, onDeleteFixture, fixture, minDate, league, isAdminFixturesPage,
 }: CreateFixtureModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -166,51 +167,53 @@ const EditFixtureModal = ({
             fullWidth
           />
         </Section>
-        <Section gap="xs" padding={`${theme.spacing.xxs} 0`}>
-          <OptionalInclusionContainer onClick={() => setIncludeStats(!includeStats)}>
-            <IconButton
-              icon={includeStats ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIncludeStats(!includeStats);
-              }}
-              colors={includeStats ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
-            />
-            <EmphasisTypography variant="m">Inkludera statistik</EmphasisTypography>
-          </OptionalInclusionContainer>
-          {canIncludeFirstTeamToScore && (
-            <OptionalInclusionContainer onClick={() => setIncludeFirstTeamToScore(!includeFirstTeamToScore)}>
+        {!isAdminFixturesPage && (
+          <Section gap="xs" padding={`${theme.spacing.xxs} 0`}>
+            <OptionalInclusionContainer onClick={() => setIncludeStats(!includeStats)}>
               <IconButton
-                icon={includeFirstTeamToScore ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                icon={includeStats ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIncludeFirstTeamToScore(!includeFirstTeamToScore);
+                  setIncludeStats(!includeStats);
                 }}
-                colors={includeFirstTeamToScore ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+                colors={includeStats ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
               />
-              <EmphasisTypography variant="m">Tippa första lag att göra mål</EmphasisTypography>
+              <EmphasisTypography variant="m">Inkludera statistik</EmphasisTypography>
             </OptionalInclusionContainer>
-          )}
-          {isPossibleToPredictGoalScorer ? (
-            <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
-              <IconButton
-                icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShouldPredictGoalScorer(!shouldPredictGoalScorer);
-                }}
-                colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+            {canIncludeFirstTeamToScore && (
+              <OptionalInclusionContainer onClick={() => setIncludeFirstTeamToScore(!includeFirstTeamToScore)}>
+                <IconButton
+                  icon={includeFirstTeamToScore ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIncludeFirstTeamToScore(!includeFirstTeamToScore);
+                  }}
+                  colors={includeFirstTeamToScore ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+                />
+                <EmphasisTypography variant="m">Tippa första lag att göra mål</EmphasisTypography>
+              </OptionalInclusionContainer>
+            )}
+            {isPossibleToPredictGoalScorer ? (
+              <OptionalInclusionContainer onClick={() => setShouldPredictGoalScorer(!shouldPredictGoalScorer)}>
+                <IconButton
+                  icon={shouldPredictGoalScorer ? <CheckSquare size={24} color={undefined} weight="fill" /> : <Square size={24} color={undefined} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShouldPredictGoalScorer(!shouldPredictGoalScorer);
+                  }}
+                  colors={shouldPredictGoalScorer ? { normal: theme.colors.primary, hover: theme.colors.primaryDark, active: theme.colors.primaryDark } : { normal: theme.colors.silver, hover: theme.colors.silverDark, active: theme.colors.silverDark }}
+                />
+                <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
+              </OptionalInclusionContainer>
+            ) : (
+              <InfoDialogue
+                color="silver"
+                title="Tippa målskytt ej möjligt"
+                description="Målskytt kan endast tippas för utvalda lag som har spelare registrerade i systemet."
               />
-              <EmphasisTypography variant="m" noWrap>Tippa målskytt</EmphasisTypography>
-            </OptionalInclusionContainer>
-          ) : (
-            <InfoDialogue
-              color="silver"
-              title="Tippa målskytt ej möjligt"
-              description="Målskytt kan endast tippas för utvalda lag som har spelare registrerade i systemet."
-            />
-          )}
-        </Section>
+            )}
+          </Section>
+        )}
         <ButtonsContainer>
           <Button
             color="red"
