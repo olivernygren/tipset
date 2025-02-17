@@ -25,7 +25,7 @@ const CustomDatePicker = ({
   registerLocale('sv', sv);
 
   const handleChange = (date: Date | null) => {
-    if (date !== null && minDate !== undefined && date >= minDate) {
+    if (date !== null && ((minDate !== undefined && date >= minDate) || !minDate)) {
       onChange(date);
     }
   };

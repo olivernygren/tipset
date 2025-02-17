@@ -80,7 +80,7 @@ const GoalScorerModal = ({
 
   const isPlayerIsSelected = (player: Player) => selectedGoalScorers.some((selectedPlayer) => selectedPlayer && selectedPlayer.id === player.id);
   const wasLastWeeksSelectedGoalScorer = (player: Player) => previousGameWeekPredictedGoalScorers?.some((selectedPlayer) => selectedPlayer.id === player.id && playersToShow.some((playerToShow) => playerToShow.id === player.id));
-  const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED;
+  const isPlayerItemDisabled = (player: Player) => wasLastWeeksSelectedGoalScorer(player) || player.isInjured || player.isSuspended || player.status === PlayerStatusEnum.INJURED || player.status === PlayerStatusEnum.SUSPENDED || player.status === PlayerStatusEnum.PERSONAL_ISSUES || player.status === PlayerStatusEnum.UNKNOWN;
 
   const scoringSystem = leagueScoringSystem ?? bullseyeScoringSystem;
 

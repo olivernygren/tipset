@@ -540,6 +540,7 @@ const AdminFixturesPage = () => {
           onClose={() => setEditFixture(null)}
           onSave={(fixtureInput) => handleUpdateFixture(fixtureInput)}
           onDeleteFixture={handleDeleteFixture}
+          isAdminFixturesPage
         />
       )}
       {createFixturesFromFotMobSnippetModalOpen && (

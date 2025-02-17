@@ -36,6 +36,8 @@ const CompactFixtureResult = ({
       logoUrl={team.logoUrl}
       clubName={team.name}
       size={AvatarSize.XS}
+      noPadding
+      shape="square"
     />
   ) : (
     <NationAvatar
@@ -146,9 +148,9 @@ const ResultContainer = styled.div`
   flex-direction: column;
   background-color: ${theme.colors.primary};
   justify-content: center;
-  gap: 2px;
   box-sizing: border-box;
   align-items: center;
+  gap: 2px;
 `;
 
 const Teams = styled.div`
@@ -163,7 +165,7 @@ const Teams = styled.div`
   
   @media ${devices.tablet} {
     padding: 2px 6px;
-    gap: 0;
+    gap: ${theme.spacing.xxxs};
   }
 `;
 
