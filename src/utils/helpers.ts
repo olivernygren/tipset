@@ -133,6 +133,8 @@ export const getIsBottomOfLeague = (position: number, tournament: TournamentsEnu
     case TournamentsEnum.CHAMPIONS_LEAGUE:
     case TournamentsEnum.EUROPA_LEAGUE:
       return position >= 36;
+    case TournamentsEnum.SVENSKA_CUPEN:
+      return position >= 4;
     default:
       return false;
   }
