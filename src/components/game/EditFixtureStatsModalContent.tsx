@@ -740,20 +740,22 @@ const EditFixtureStatsModalContent = ({
               </RotatingIcon>
             </DropdownHeader>
             <DropdownContent>
-              <NormalTypography color={theme.colors.silverDarker}>Lägg till resultat från ett eventuellt första möte i utslagsrundan.</NormalTypography>
-              <StandingsInputsRow>
-                {getAvatar(fixture.homeTeam)}
-                <GoalsInput
-                  goals={homeTeamAggregateScore}
-                  onInputChange={(value) => setHomeTeamAggregateScore(value)}
-                />
-                <NormalTypography variant="m">–</NormalTypography>
-                <GoalsInput
-                  goals={awayTeamAggregateScore}
-                  onInputChange={(value) => setAwayTeamAggregateScore(value)}
-                />
-                {getAvatar(fixture.awayTeam)}
-              </StandingsInputsRow>
+              <Section gap="s">
+                <NormalTypography color={theme.colors.silverDarker}>Lägg till resultat från ett eventuellt första möte i utslagsrundan.</NormalTypography>
+                <StandingsInputsRow>
+                  {getAvatar(fixture.homeTeam)}
+                  <GoalsInput
+                    goals={homeTeamAggregateScore}
+                    onInputChange={(value) => setHomeTeamAggregateScore(value)}
+                  />
+                  <NormalTypography variant="m">–</NormalTypography>
+                  <GoalsInput
+                    goals={awayTeamAggregateScore}
+                    onInputChange={(value) => setAwayTeamAggregateScore(value)}
+                  />
+                  {getAvatar(fixture.awayTeam)}
+                </StandingsInputsRow>
+              </Section>
             </DropdownContent>
           </Dropdown>
         </DropdownsContainer>
