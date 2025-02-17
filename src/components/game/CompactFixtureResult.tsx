@@ -150,7 +150,11 @@ const ResultContainer = styled.div`
   justify-content: center;
   box-sizing: border-box;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+
+  @media ${devices.tablet} {
+    gap: 2px;
+  }
 `;
 
 const Teams = styled.div`
@@ -164,14 +168,14 @@ const Teams = styled.div`
   gap: 2px;
   
   @media ${devices.tablet} {
-    padding: 2px 6px;
+    padding: 2px ${theme.spacing.xxs};
     gap: ${theme.spacing.xxxs};
   }
 `;
 
 const TeamWrapper = styled.div`
   display: flex;
-  gap: ${theme.spacing.xxxs};
+  gap: ${theme.spacing.xxs};
   align-items: center;
 `;
 
