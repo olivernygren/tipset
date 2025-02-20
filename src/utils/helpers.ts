@@ -324,6 +324,8 @@ export const getTournamentIcon = (tournament: string) => {
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/146.png';
     case TournamentsEnum.LIGUE_1:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/53.png';
+    case TournamentsEnum.COUPE_DE_FRANCE:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/134.png';
     case TournamentsEnum.CHAMPIONS_LEAGUE:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/42.png';
     case TournamentsEnum.EUROPA_LEAGUE:

@@ -75,6 +75,7 @@ export enum TournamentsEnum {
   BUNDESLIGA_2 = '2. Bundesliga',
   DFB_POKAL = 'DFB-Pokal',
   LIGUE_1 = 'Ligue 1',
+  COUPE_DE_FRANCE = 'Coupe de France',
   CHAMPIONS_LEAGUE = 'UEFA Champions League',
   EUROPA_LEAGUE = 'UEFA Europa League',
   CONFERENCE_LEAGUE = 'UEFA Conference League',
