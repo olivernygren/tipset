@@ -218,6 +218,8 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
       return TournamentsEnum.DFB_POKAL;
     case 53:
       return TournamentsEnum.LIGUE_1;
+    case 134:
+      return TournamentsEnum.COUPE_DE_FRANCE;
     case 87:
       return TournamentsEnum.LA_LIGA;
     case 138:
