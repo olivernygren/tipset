@@ -68,7 +68,7 @@ const SelectTournamentModal = ({
       case TournamentCountryFiltersEnum.GERMANY:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.BUNDESLIGA) || tournament.includes(TournamentsEnum.DFB_POKAL) || tournament.includes(TournamentsEnum.BUNDESLIGA_2));
       case TournamentCountryFiltersEnum.FRANCE:
-        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.LIGUE_1));
+        return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.LIGUE_1) || tournament.includes(TournamentsEnum.COUPE_DE_FRANCE));
       case TournamentCountryFiltersEnum.EUROPE:
         return originalTournaments.filter((tournament) => tournament.includes(TournamentsEnum.CHAMPIONS_LEAGUE) || tournament.includes(TournamentsEnum.EUROPA_LEAGUE) || tournament.includes(TournamentsEnum.CONFERENCE_LEAGUE) || tournament.includes(TournamentsEnum.UEFA_SUPER_CUP));
       case TournamentCountryFiltersEnum.SWEDEN:
