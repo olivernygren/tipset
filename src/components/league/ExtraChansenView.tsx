@@ -1,9 +1,12 @@
 import React from 'react';
+import styled from 'styled-components';
+import { Info } from '@phosphor-icons/react';
 import { theme } from '../../theme';
 import { Section } from '../section/Section';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { HeadingsTypography } from '../typography/Typography';
 import { PredictionLeague } from '../../utils/League';
+import TextButton from '../buttons/TextButton';
 
 interface ExtraChansenViewProps {
   league: PredictionLeague;
@@ -22,9 +25,25 @@ const ExtraChansenView = ({ league, refetchLeague, isCreator }: ExtraChansenView
       gap="s"
       expandMobile
     >
-      <HeadingsTypography variant="h3">Extrachansen</HeadingsTypography>
+      <Header>
+        <HeadingsTypography variant="h3">Extrachansen</HeadingsTypography>
+        <TextButton
+          icon={<Info color={theme.colors.primary} size={24} />}
+          noPadding
+        >
+          Vad är extrachansen?
+        </TextButton>
+      </Header>
     </Section>
   );
 };
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+`;
 
 export default ExtraChansenView;
