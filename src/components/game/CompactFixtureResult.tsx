@@ -150,10 +150,10 @@ const ResultContainer = styled.div`
   justify-content: center;
   box-sizing: border-box;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 
   @media ${devices.tablet} {
-    gap: 2px;
+    gap: 4px;
   }
 `;
 

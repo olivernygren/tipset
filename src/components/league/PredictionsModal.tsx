@@ -313,7 +313,7 @@ const GoalScorersMainContent = styled.div`
 const GoalScorersAvatars = styled.div<{ hasGoalScorers: boolean }>`
   display: flex;
   align-items: center;
-  padding-top: ${theme.spacing.xxxs};
+  padding-top: ${({ hasGoalScorers }) => (hasGoalScorers ? theme.spacing.xxxs : 0)};
   margin-left: auto;
   ${({ hasGoalScorers }) => hasGoalScorers && 'margin-right: -10px;'}
 `;

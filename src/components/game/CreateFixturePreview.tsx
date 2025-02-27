@@ -44,13 +44,13 @@ const CreateFixturePreview = ({
     <ClubAvatar
       logoUrl={team.logoUrl}
       clubName={team.name}
-      size={isMobile ? AvatarSize.S : AvatarSize.M}
+      size={AvatarSize.M}
     />
   ) : (
     <NationAvatar
       flagUrl={team.logoUrl}
       nationName={team.name}
-      size={isMobile ? AvatarSize.S : AvatarSize.M}
+      size={AvatarSize.M}
     />
   ));
 
@@ -83,9 +83,11 @@ const CreateFixturePreview = ({
       <Divider />
       <Teams>
         <TeamContainer isHomeTeam>
-          <EmphasisTypography variant="l">
-            {useShortNames && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}
-          </EmphasisTypography>
+          {!isMobile && (
+            <EmphasisTypography variant="l">
+              {useShortNames && Boolean(fixture.homeTeam.shortName) ? fixture.homeTeam.shortName : fixture.homeTeam.name}
+            </EmphasisTypography>
+          )}
           {getAvatar(fixture.homeTeam)}
         </TeamContainer>
         <KickoffDate>
@@ -98,9 +100,11 @@ const CreateFixturePreview = ({
         </KickoffDate>
         <TeamContainer>
           {getAvatar(fixture.awayTeam)}
-          <EmphasisTypography variant="l">
-            {useShortNames && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}
-          </EmphasisTypography>
+          {!isMobile && (
+            <EmphasisTypography variant="l">
+              {useShortNames && Boolean(fixture.awayTeam.shortName) ? fixture.awayTeam.shortName : fixture.awayTeam.name}
+            </EmphasisTypography>
+          )}
         </TeamContainer>
       </Teams>
       <Divider />
