@@ -1,11 +1,13 @@
 import React from 'react';
 import { TrendUp, FireSimple, Target } from '@phosphor-icons/react';
 import styled from 'styled-components';
+import { useHover } from 'react-haiku';
 import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListener';
 import { theme, devices } from '../../theme';
 import { LeagueGameWeek, PredictionLeague, PredictionLeagueStanding } from '../../utils/League';
 import { Section } from '../section/Section';
 import { NormalTypography, EmphasisTypography } from '../typography/Typography';
+import Tooltip from '../tooltip/Tooltip';
 
 interface LeagueStandingsTableProps {
   sortedLeagueStandings: Array<PredictionLeagueStanding>;
@@ -19,6 +21,40 @@ const LeagueStandingsTable = ({
 }: LeagueStandingsTableProps) => {
   const isMobileDevice = useResizeListener(DeviceSizes.MOBILE_DEVICE);
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+
+  const { hovered: lastRoundIconHovered, ref: lastRoundIconRef } = useHover();
+  const { hovered: oddsBonusIconHovered, ref: oddsBonusIconRef } = useHover();
+  const { hovered: correctResultsIconHovered, ref: correctResultsIconRef } = useHover();
+
+  const getHeaderIconTooltip = (icon: 'lastRound' | 'oddsBonus' | 'exactScore') => {
+    let text = '';
+
+    switch (icon) {
+      case 'lastRound':
+        text = 'Senaste omgången';
+        break;
+      case 'oddsBonus':
+        text = 'Oddsbonus';
+        break;
+      case 'exactScore':
+        text = 'Exakta resultat';
+        break;
+      default:
+        text = '';
+    }
+
+    return (
+      <TooltipContainer topOffset={-32}>
+        <Tooltip
+          arrowPosition="bottom"
+          size="small"
+          text={text}
+          textColor={theme.colors.white}
+          show={(icon === 'lastRound' && lastRoundIconHovered) || (icon === 'oddsBonus' && oddsBonusIconHovered) || (icon === 'exactScore' && correctResultsIconHovered)}
+        />
+      </TooltipContainer>
+    );
+  };
 
   const getUserLatestGameWeekTotalPoints = (userId: string) => {
     if (!league || !league.gameWeeks) return 0;
@@ -85,15 +121,18 @@ const LeagueStandingsTable = ({
           <EmphasisTypography variant="s" color={theme.colors.textLight}>Namn</EmphasisTypography>
         </Section>
         {!isMobileDevice && (
-          <CenteredGridItem>
+          <CenteredGridItem ref={lastRoundIconRef as React.RefObject<HTMLDivElement>} pointer>
             <TrendUp size={20} color={theme.colors.textLight} />
+            {!isMobile && getHeaderIconTooltip('lastRound')}
           </CenteredGridItem>
         )}
-        <CenteredGridItem>
+        <CenteredGridItem ref={oddsBonusIconRef as React.RefObject<HTMLDivElement>} pointer>
           <FireSimple size={20} color={theme.colors.textLight} />
+          {!isMobile && getHeaderIconTooltip('oddsBonus')}
         </CenteredGridItem>
-        <CenteredGridItem>
+        <CenteredGridItem ref={correctResultsIconRef as React.RefObject<HTMLDivElement>} pointer>
           <Target size={20} color={theme.colors.textLight} />
+          {!isMobile && getHeaderIconTooltip('exactScore')}
         </CenteredGridItem>
         <CenteredGridItem>
           <EmphasisTypography variant="s" color={theme.colors.textLight} align="center">{isMobile ? 'P' : 'Poäng'}</EmphasisTypography>
@@ -132,9 +171,11 @@ const LeagueStandingsHeader = styled.div`
   }
 `;
 
-const CenteredGridItem = styled.div`
+const CenteredGridItem = styled.div<{ pointer?: boolean }>`
   display: flex;
   justify-content: center;
+  cursor: ${({ pointer }) => (pointer ? 'pointer' : 'default')};
+  position: relative;
 `;
 
 const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
@@ -155,6 +196,14 @@ const UserLeaguePosition = styled.div<{ isLoggedInUser: boolean }>`
   @media ${devices.tablet} {
     grid-template-columns: 4fr 1fr 1fr 1fr 50px;
   }
+`;
+
+const TooltipContainer = styled.div<{ topOffset: number }>`
+  position: absolute;
+  top: ${({ topOffset }) => `${topOffset}px`};
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 `;
 
 export default LeagueStandingsTable;
