@@ -1,3 +1,4 @@
+import { ActiveChip } from './Chips';
 import { Fixture, Prediction } from './Fixture';
 
 export const leagueMaximumParticipants = 24;
@@ -18,6 +19,7 @@ export interface PredictionLeague {
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
+  useChips?: boolean;
 }
 
 export interface LeagueScoringSystemValues {
@@ -96,6 +98,7 @@ export interface LeagueGameWeekInput {
   games: LeagueGameWeekFixtures;
   hasBeenCorrected?: boolean;
   hasEnded?: boolean;
+  activeChips?: Array<ActiveChip>;
 }
 
 export enum ScoringSystemTemplates {

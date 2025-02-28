@@ -1,3 +1,4 @@
+import { ChipEnum } from './Chips';
 import { Player } from './Players';
 import { Team } from './Team';
 
@@ -101,6 +102,7 @@ export interface Prediction {
   points?: PredictionPoints;
   goalScorer?: Player;
   firstTeamToScore?: FirstTeamToScore;
+  activeChip?: ChipEnum;
 }
 
 export interface PredictionInput {
