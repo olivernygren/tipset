@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { StyleSheetManager } from 'styled-components';
 import { AnimatePresence } from 'framer-motion';
+import isPropValid from '@emotion/is-prop-valid';
 import HomePage from './pages/home';
 import LoginPage from './pages/login';
 import Header from './components/header/Header';
@@ -114,19 +115,21 @@ const App = () => {
   );
 
   return (
-    <AnimatePresence>
-      <Root>
-        <Header />
-        <Router>
-          <Content className="App">
-            <Routes>
-              {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
-              {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
-            </Routes>
-          </Content>
-        </Router>
-      </Root>
-    </AnimatePresence>
+    <StyleSheetManager shouldForwardProp={(prop) => isPropValid(prop)}>
+      <AnimatePresence>
+        <Root>
+          <Header />
+          <Router>
+            <Content className="App">
+              <Routes>
+                {pages.map(({ pageComponentElement, path }) => getPage(pageComponentElement, path))}
+                {adminPages.map(({ pageComponentElement, path }) => getAdminPage(pageComponentElement, path))}
+              </Routes>
+            </Content>
+          </Router>
+        </Root>
+      </AnimatePresence>
+    </StyleSheetManager>
   );
 };
 

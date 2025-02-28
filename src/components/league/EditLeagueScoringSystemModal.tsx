@@ -208,6 +208,7 @@ const EditLeagueScoringSystemModal = ({
             </ScoringSystemOption>
           </ScoringSystemSelector>
         </Section>
+        <Divider />
         <Section gap="s">
           <Section gap="xxs">
             <HeadingsTypography variant="h5">Manuell justering</HeadingsTypography>
