@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { PencilSimple } from '@phosphor-icons/react';
-import { Fixture, FixtureOutcomeEnum, TeamType } from '../../utils/Fixture';
+import {
+  Fixture, FixtureOutcomeEnum, FixturePreviewStats, TeamType,
+} from '../../utils/Fixture';
 import { LeagueGameWeek, PredictionLeague } from '../../utils/League';
 import Modal from '../modal/Modal';
 import { theme, devices } from '../../theme';
@@ -23,6 +25,7 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 interface FixtureStatsModalProps {
   fixture: Fixture;
   onClose: () => void;
+  onEdit?: (fixtureId: string, updatedFixtureObj: Fixture) => void;
   isLeagueCreator?: boolean;
   league: PredictionLeague;
   ongoingGameWeek: LeagueGameWeek | undefined;
@@ -30,7 +33,7 @@ interface FixtureStatsModalProps {
 }
 
 const FixtureStatsModal = ({
-  fixture, onClose, isLeagueCreator, league, ongoingGameWeek, refetchLeague,
+  fixture, onClose, isLeagueCreator, league, ongoingGameWeek, refetchLeague, onEdit,
 }: FixtureStatsModalProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -256,6 +259,7 @@ const FixtureStatsModal = ({
         <EditFixtureStatsModalContent
           fixture={fixture}
           onCloseEditView={() => setShowEditView(false)}
+          onSave={onEdit}
           onCloseModal={onClose}
           league={league}
           ongoingGameWeek={ongoingGameWeek}

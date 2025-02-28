@@ -35,13 +35,14 @@ interface EditFixtureStatsModalContentProps {
   fixture: Fixture;
   onCloseEditView: () => void;
   onCloseModal: () => void;
+  onSave?: (fixtureId: string, updatedFixtureObj: Fixture) => void;
   league: PredictionLeague;
   ongoingGameWeek: LeagueGameWeek | undefined;
   refetchLeague: () => void;
 }
 
 const EditFixtureStatsModalContent = ({
-  fixture, onCloseEditView, onCloseModal, league, ongoingGameWeek, refetchLeague,
+  fixture, onCloseEditView, onCloseModal, league, ongoingGameWeek, refetchLeague, onSave,
 }: EditFixtureStatsModalContentProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
 
@@ -146,6 +147,14 @@ const EditFixtureStatsModalContent = ({
       ...(hasAddedOdds && { odds }),
       ...(hasAddedAggregateScore && { aggregateScore: { homeTeamGoals: parseInt(homeTeamAggregateScore), awayTeamGoals: parseInt(awayTeamAggregateScore) } }),
     };
+
+    if (onSave) {
+      onSave(fixture.id, updatedFixture);
+      setSaveLoading(false);
+      onCloseEditView();
+      onCloseModal();
+      return;
+    }
 
     const updatedGameWeek: LeagueGameWeek = {
       ...ongoingGameWeek,

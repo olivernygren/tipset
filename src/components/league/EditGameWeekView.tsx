@@ -14,7 +14,9 @@ import { CollectionEnum } from '../../utils/Firebase';
 import { withDocumentIdOnObject } from '../../utils/helpers';
 import { errorNotify, successNotify } from '../../utils/toast/toastHelpers';
 import { devices, theme } from '../../theme';
-import { Fixture, FixtureInput, TeamType } from '../../utils/Fixture';
+import {
+  Fixture, FixtureInput, FixturePreviewStats, TeamType,
+} from '../../utils/Fixture';
 import { Team } from '../../utils/Team';
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
@@ -85,6 +87,18 @@ const EditGameWeekView = ({
 
     setGameWeekFixtures(updatedFixtures);
     setGameWeekPredictions(updatedPredictions);
+    setEditFixture(null);
+  };
+
+  const handleUpdateFixtureStats = (fixtureId: string, updatedFixtureObj: Fixture) => {
+    const updatedFixtures = gameWeekFixtures.map((fixture) => {
+      if (fixture.id === fixtureId) {
+        return updatedFixtureObj;
+      }
+      return fixture;
+    });
+
+    setGameWeekFixtures(updatedFixtures);
     setEditFixture(null);
   };
 
@@ -425,6 +439,7 @@ const EditGameWeekView = ({
         <FixtureStatsModal
           fixture={gameWeekFixtures.find((fixture) => fixture.id === showEditStatsModal)!}
           onClose={() => setShowEditStatsModal(null)}
+          onEdit={(fixtureId, updatedFixture) => handleUpdateFixtureStats(fixtureId, updatedFixture)}
           league={league}
           refetchLeague={refetch}
           ongoingGameWeek={gameWeek}

@@ -362,7 +362,7 @@ export const getTournamentIcon = (tournament: string) => {
 export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
   const teamNicknames: { [key: string]: string } = {
     'Real Madrid,FC Barcelona': 'El Clásico',
-    'Real Madrid,Atlético Madrid': 'El Derbi Madrileño',
+    'Real Madrid,Atletico Madrid': 'El Derbi Madrileño',
     'Real Sociedad,Athletic Bilbao': 'Euskal Derbia',
     'Real Betis,Sevilla': 'Derbi Sevillano',
     'Sporting Gijón,Real Oviedo': 'Derbi Asturiano',
