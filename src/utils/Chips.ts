@@ -13,8 +13,6 @@ export enum ChipType {
 export interface Chip {
   type: ChipType;
   name: ChipEnum;
-  usedInGameWeek?: number;
-  usedInFixtureId?: string;
 }
 
 export interface ActiveChip {

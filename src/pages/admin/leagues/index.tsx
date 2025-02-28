@@ -61,7 +61,7 @@ const AdminLeaguesPage = () => {
       deadlineToJoin: oneMonthFromNow.toISOString(),
       hasEnded: false,
       preferences: {
-        odds: true, goalScorers: true, firstTeamToScore: false,
+        odds: true, goalScorers: true, firstTeamToScore: true,
       },
     };
 

@@ -115,6 +115,14 @@ const PredictionLeaguesPage = () => {
       deadlineToJoin: oneMonthFromNow.toISOString(),
       hasEnded: false,
       scoringSystem: selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? gamblerScoringSystem : bullseyeScoringSystem,
+      allUsedChips: [],
+      activeChips: [],
+      userChipCounts: {
+        riskTaker: 1,
+        doubleUp: 1,
+        goalFest: 4,
+        cleanSweep: 2,
+      },
     };
 
     try {

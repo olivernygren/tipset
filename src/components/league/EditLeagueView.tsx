@@ -17,6 +17,7 @@ import { Divider } from '../Divider';
 import ActionsModal from '../modal/ActionsModal';
 import InfoDialogue from '../info/InfoDialogue';
 import EditLeagueScoringSystemModal from './EditLeagueScoringSystemModal';
+import EditChipCountModal from './EditChipCountModal';
 
 interface EditLeagueViewProps {
   league: PredictionLeague;
@@ -35,6 +36,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
   const [editBasicInformationModalOpen, setEditBasicInformationModalOpen] = useState<boolean>(false);
   const [editScoringSystemModalOpen, setEditScoringSystemModalOpen] = useState<boolean>(false);
+  const [editChipCountModalOpen, setEditChipCountModalOpen] = useState<boolean>(false);
 
   if (!isCreator) return null;
 
@@ -164,6 +166,21 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
               <Divider />
               <Container>
                 <ContainerText>
+                  <HeadingsTypography variant="h5">Chip</HeadingsTypography>
+                  <NormalTypography variant="m" color={theme.colors.silverDark}>Ändra antalet tillåtna chip per spelare</NormalTypography>
+                </ContainerText>
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditChipCountModalOpen(true)}
+                  size="m"
+                  fullWidth={isMobile}
+                >
+                  Redigera
+                </Button>
+              </Container>
+              <Divider />
+              <Container>
+                <ContainerText>
                   <HeadingsTypography variant="h5">Avsluta liga</HeadingsTypography>
                   <NormalTypography variant="m" color={theme.colors.silverDark}>Avsluta ligan om det inte ska tippas några fler omgångar.</NormalTypography>
                 </ContainerText>
@@ -246,6 +263,13 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
             <NormalTypography variant="m">Är du säker på att du vill avsluta ligan? Detta går inte att ångra.</NormalTypography>
           </Section>
         </ActionsModal>
+      )}
+      {editChipCountModalOpen && (
+        <EditChipCountModal
+          onClose={() => setEditChipCountModalOpen(false)}
+          league={league}
+          refetchLeague={refetchLeague}
+        />
       )}
     </>
   );

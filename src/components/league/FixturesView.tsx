@@ -47,6 +47,7 @@ import FindOtherFixturesModal from './FindOtherFixturesModal';
 import CorrectingFixtureCard from '../game/CorrectingFixtureCard';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import EditFixtureModal from '../game/EditFixtureModal';
+import ChipSelector from '../chips/ChipSelector';
 
 interface FixturesViewProps {
   league: PredictionLeague;
@@ -747,6 +748,16 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
             </OngoingGameWeekHeader>
             {ongoingGameWeek ? (
               <>
+                {/* {league.useChips && ( */}
+                <ChipSelector
+                  allUsedChips={league.allUsedChips?.filter((chip) => chip.userId === user?.documentId)}
+                  activeChip={league.activeChips?.find((chip) => chip.userId === user?.documentId)}
+                  isLeagueCreator={isCreator}
+                  userChipCounts={league.userChipCounts}
+                  leagueId={league.documentId}
+                  refetchLeague={refetchLeague}
+                />
+                {/* )} */}
                 {getOngoingGameWeekContent()}
                 {ongoingGameWeek.games.fixtures.some((f) => f.odds) && !editGameWeekViewOpen && (
                   <Section padding="8px 0">

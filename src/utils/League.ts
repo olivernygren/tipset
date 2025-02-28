@@ -20,6 +20,9 @@ export interface PredictionLeague {
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
   useChips?: boolean;
+  allUsedChips?: Array<ActiveChip>;
+  activeChips?: Array<ActiveChip>;
+  userChipCounts?: LeagueUsersChipCount;
 }
 
 export interface LeagueScoringSystemValues {
@@ -37,6 +40,13 @@ export interface LeagueScoringSystemValues {
   goalFest: number;
   underdogBonus: number;
   firstTeamToScore: number;
+}
+
+export interface LeagueUsersChipCount {
+  riskTaker: number;
+  doubleUp: number;
+  goalFest: number;
+  cleanSweep: number;
 }
 
 export interface LeaguePreferences {
@@ -60,6 +70,10 @@ export interface CreatePredictionLeagueInput {
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
+  useChips?: boolean;
+  allUsedChips?: Array<ActiveChip>;
+  activeChips?: Array<ActiveChip>;
+  userChipCounts?: LeagueUsersChipCount;
 }
 
 export enum LeagueTabs {
