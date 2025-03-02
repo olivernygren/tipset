@@ -25,7 +25,7 @@ const LeagueStandingsTable = ({
 
     const currentGameWeekRound = currentGameWeek?.round;
     const previousGameWeek = league.gameWeeks.find((gameWeek) => currentGameWeekRound !== undefined && gameWeek.round === currentGameWeekRound - 1);
-    const lastGameWeek = league.gameWeeks[league.gameWeeks.length - 1];
+    const lastGameWeek = league.gameWeeks.slice().reverse().find((gameWeek) => gameWeek.hasEnded);
 
     const currentGameWeekHasStarted = currentGameWeek && currentGameWeek.games.predictions.some((g) => g.points !== undefined);
     const gameWeekToUse = currentGameWeekHasStarted ? currentGameWeek : previousGameWeek || lastGameWeek;
