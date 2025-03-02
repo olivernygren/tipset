@@ -305,6 +305,7 @@ const CorrectPredictionsModal = ({
 
     const correctHomeGoals = prediction.homeGoals === parseInt(finalResult.homeGoals);
     const correctAwayGoals = prediction.awayGoals === parseInt(finalResult.awayGoals);
+    const correctResult = correctHomeGoals && correctAwayGoals;
 
     const predictedGoalDifference = prediction.homeGoals - prediction.awayGoals;
     const actualGoalDifference = parseInt(finalResult.homeGoals) - parseInt(finalResult.awayGoals);
@@ -319,7 +320,7 @@ const CorrectPredictionsModal = ({
 
     const correctOutcome = (homeWinPredicted && wasHomeWin) || (awayWinPredicted && wasAwayWin) || (drawPredicted && wasDraw);
     const correctFirstTeamToScore = fixture?.shouldPredictFirstTeamToScore && prediction.firstTeamToScore === firstTeamToScore;
-    const isGoalFest = parseInt(finalResult.homeGoals) + parseInt(finalResult.awayGoals) >= 5;
+    const moreThan5GoalsInFixture = parseInt(finalResult.homeGoals) + parseInt(finalResult.awayGoals) >= 5;
     const isUnderdogBonus = getIsUnderdogBonus(prediction);
 
     const hasPredictedGoalScorer = prediction.goalScorer !== null;
@@ -347,7 +348,7 @@ const CorrectPredictionsModal = ({
       pointDistribution.correctGoalsByAwayTeam += scoringSystem.correctGoalsByTeam;
     }
 
-    if (correctHomeGoals && correctAwayGoals) {
+    if (correctResult) {
       totalPoints += scoringSystem.correctResult;
       pointDistribution.correctResult += scoringSystem.correctResult;
       pointDistribution.correctResultBool = true;
@@ -369,7 +370,7 @@ const CorrectPredictionsModal = ({
       pointDistribution.firstTeamToScore += scoringSystem.firstTeamToScore;
     }
 
-    if (isGoalFest && scoringSystem.goalFest > 0) {
+    if (moreThan5GoalsInFixture && correctResult && scoringSystem.goalFest > 0) {
       totalPoints += scoringSystem.goalFest;
       pointDistribution.goalFest += scoringSystem.goalFest;
     }

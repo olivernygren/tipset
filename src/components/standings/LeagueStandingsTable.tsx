@@ -57,20 +57,19 @@ const LeagueStandingsTable = ({
   };
 
   const getUserLatestGameWeekTotalPoints = (userId: string) => {
-    if (!league || !league.gameWeeks) return 0;
+    if (!league || !league.gameWeeks || league.gameWeeks.length === 0) return 0;
 
     const currentGameWeekRound = currentGameWeek?.round;
     const previousGameWeek = league.gameWeeks.find((gameWeek) => currentGameWeekRound !== undefined && gameWeek.round === currentGameWeekRound - 1);
-    const currentGameWeekHasStarted = currentGameWeek && currentGameWeek?.games.predictions.some((g) => g.points !== undefined);
-    const pointsHaveBeenAwarded = Boolean(currentGameWeekHasStarted || (previousGameWeek && previousGameWeek?.games.predictions.some((g) => g.points !== undefined)));
+    const lastGameWeek = league.gameWeeks[league.gameWeeks.length - 1];
 
-    if (!currentGameWeek && (!league.gameWeeks || !league.gameWeeks.length)) return 0;
-    if (!pointsHaveBeenAwarded) return 0;
+    const currentGameWeekHasStarted = currentGameWeek && currentGameWeek.games.predictions.some((g) => g.points !== undefined);
+    const gameWeekToUse = currentGameWeekHasStarted ? currentGameWeek : previousGameWeek || lastGameWeek;
 
-    const gameWeek = currentGameWeekHasStarted ? currentGameWeek : previousGameWeek;
-    const userPredictions = gameWeek?.games.predictions.filter((prediction) => prediction.userId === userId);
+    if (!gameWeekToUse) return 0;
 
-    return userPredictions?.reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0) ?? '?';
+    const userPredictions = gameWeekToUse.games.predictions.filter((prediction) => prediction.userId === userId);
+    return userPredictions.reduce((acc, curr) => acc + (curr.points?.total ?? 0), 0);
   };
 
   const getUserLeagueStandingsItem = (position: number, place?: PredictionLeagueStanding) => {
