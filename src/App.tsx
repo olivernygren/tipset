@@ -114,6 +114,8 @@ const App = () => {
     />
   );
 
+  // Användningen av StyleSheetManager gör att framer motion inte funkar
+
   return (
     <StyleSheetManager shouldForwardProp={(prop) => isPropValid(prop)}>
       <AnimatePresence>
