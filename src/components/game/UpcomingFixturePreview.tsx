@@ -42,7 +42,7 @@ const UpcomingFixturePreview = ({
 
   const getKickoffDay = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
-    return date.toLocaleDateString('sv-se', { day: '2-digit', month: 'short' }).replaceAll('.', ' ');
+    return date.toLocaleDateString('sv-se', { day: 'numeric', month: 'short' }).replaceAll('.', ' ');
   };
 
   const getTeamAvatar = (team: Team) => (fixture.teamType === TeamType.CLUBS ? (

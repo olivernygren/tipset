@@ -36,7 +36,7 @@ const CreateFixturePreview = ({
 
   const getKickoffDay = (kickoffTime: string) => {
     const date = new Date(kickoffTime);
-    const day = date.toLocaleDateString('sv-SE', { day: '2-digit', month: 'short' }).replaceAll('.', '');
+    const day = date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' }).replaceAll('.', '');
     return day;
   };
 
