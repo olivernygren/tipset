@@ -9,7 +9,12 @@ import {
 } from './Players';
 import { Team, TournamentsEnum } from './Team';
 import { theme } from '../theme';
-import { FotMobMatch } from './Fotmob';
+
+export type FunctionVariables = {
+  onCompleted?: () => void;
+  onError?: (error: string) => void;
+  onFinalize?: () => void;
+};
 
 export const defenderGoalPoints = 5;
 export const midfielderGoalPoints = 3;

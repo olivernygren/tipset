@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  getDocs, collection, where, query, addDoc, updateDoc,
+  getDocs, collection, where, query, updateDoc,
 } from 'firebase/firestore';
 import { motion } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
@@ -13,11 +13,10 @@ import {
 import { db } from '../../config/firebase';
 import { CollectionEnum } from '../../utils/Firebase';
 import {
-  generateLeagueInviteCode, withDocumentIdOnObjectsInArray, withDocumentIdOnObject, gamblerScoringSystem,
-  bullseyeScoringSystem,
+  withDocumentIdOnObjectsInArray, withDocumentIdOnObject, gamblerScoringSystem, bullseyeScoringSystem,
 } from '../../utils/helpers';
 import {
-  CreatePredictionLeagueInput, PredictionLeague, PredictionLeagueStanding, ScoringSystemTemplates, leagueMaximumParticipants,
+  PredictionLeague, PredictionLeagueStanding, ScoringSystemTemplates, leagueMaximumParticipants,
 } from '../../utils/League';
 import { devices, theme } from '../../theme';
 import { EmphasisTypography, HeadingsTypography, NormalTypography } from '../../components/typography/Typography';
@@ -36,6 +35,7 @@ import IconButton from '../../components/buttons/IconButton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CustomSkeleton, { ParagraphSkeleton } from '../../components/skeleton/CustomSkeleton';
 import { Divider } from '../../components/Divider';
+import { createLeague } from '../../utils/functions/Leagues';
 
 const PredictionLeaguesPage = () => {
   const navigate = useNavigate();
@@ -92,44 +92,21 @@ const PredictionLeaguesPage = () => {
   const handleCreateLeague = async () => {
     setCreateLeagueLoading(true);
 
-    const today = new Date();
-    const oneMonthFromNow = new Date(today.setMonth(today.getMonth() + 1));
-
-    if (newLeagueName.length === 0 || !currentUserId) return;
-
-    const newLeague: CreatePredictionLeagueInput = {
-      name: newLeagueName,
-      description: newLeagueDescription,
-      creatorId: currentUserId ?? '',
-      participants: [currentUserId ?? ''],
-      inviteCode: generateLeagueInviteCode(),
-      createdAt: new Date().toISOString(),
-      invitedUsers: [],
-      standings: [{
-        userId: currentUserId ?? '',
-        username: (user?.lastname ? `${user?.firstname} ${user?.lastname}` : user?.firstname) ?? '?',
-        points: 0,
-        correctResults: 0,
-        awardedPointsForFixtures: [],
-      }],
-      deadlineToJoin: oneMonthFromNow.toISOString(),
-      hasEnded: false,
-      scoringSystem: selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? gamblerScoringSystem : bullseyeScoringSystem,
-    };
-
-    try {
-      const leagueCollectionRef = collection(db, CollectionEnum.LEAGUES);
-
-      await addDoc(leagueCollectionRef, newLeague);
-
-      setShowCreateLeagueModal(false);
-      setShowJoinLeagueModal(false);
-      fetchLeagues();
-    } catch (e) {
-      errorNotify('Ett fel uppstod när ligan skulle skapas');
-    } finally {
-      setCreateLeagueLoading(false);
-    }
+    createLeague({
+      input: {
+        name: newLeagueName,
+        description: newLeagueDescription,
+        scoringSystem: selectedScoringSystem === ScoringSystemTemplates.GAMBLER ? gamblerScoringSystem : bullseyeScoringSystem,
+        user,
+      },
+      onError: (message) => errorNotify(message),
+      onFinalize: () => setCreateLeagueLoading(false),
+      onCompleted: () => {
+        setShowCreateLeagueModal(false);
+        setShowJoinLeagueModal(false);
+        fetchLeagues();
+      },
+    });
   };
 
   const handleJoinLeague = async () => {

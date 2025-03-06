@@ -1,3 +1,4 @@
+import { User } from './Auth';
 import { Fixture, Prediction } from './Fixture';
 
 export const leagueMaximumParticipants = 24;
@@ -58,6 +59,12 @@ export interface CreatePredictionLeagueInput {
   slackChannelUrl?: string;
   scoringSystem?: LeagueScoringSystemValues;
   preferences?: LeaguePreferences;
+}
+export interface CreatePredictionLeagueInputV2 {
+  name: string;
+  description: string;
+  scoringSystem?: LeagueScoringSystemValues;
+  user: User | null;
 }
 
 export enum LeagueTabs {
