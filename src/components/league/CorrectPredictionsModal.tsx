@@ -658,6 +658,7 @@ const CorrectPredictionsModal = ({
           multiple
           initialSelectedPlayers={[...homeTeamPlayers, ...awayTeamPlayers].filter((player) => goalScorers.includes(player.name))}
           leagueScoringSystem={league.scoringSystem}
+          isCorrectionMode
         />
       )}
       {showFirstTeamToScoreModal && (
