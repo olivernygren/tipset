@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import {
+  ChartBar,
   CheckCircle, CheckSquare, Square,
   Trash,
 } from '@phosphor-icons/react';
@@ -48,6 +49,7 @@ const EditFixtureModal = ({
   const [fixtureNickname, setFixtureNickname] = useState<string>(fixture?.fixtureNickname ?? '');
   const [includeStats, setIncludeStats] = useState<boolean>(fixture?.includeStats ?? true);
   const [includeFirstTeamToScore, setIncludeFirstTeamToScore] = useState<boolean>(fixture.shouldPredictFirstTeamToScore ?? false);
+  // const [showEditStatsModal, setShowEditStatsModal] = useState<boolean>(false);
 
   const [showSelectTeamModal, setShowSelectTeamModal] = useState<'home' | 'away' | null>(null);
   const [selectTournamentModalOpen, setSelectTournamentModalOpen] = useState<boolean>(false);
@@ -214,6 +216,15 @@ const EditFixtureModal = ({
             )}
           </Section>
         )}
+        {/* <Button
+          size="m"
+          variant="secondary"
+          onClick={() => setShowEditStatsModal}
+          icon={<ChartBar size={24} color={theme.colors.primary} weight="fill" />}
+          fullWidth
+        >
+          Statistik
+        </Button> */}
         <ButtonsContainer>
           <Button
             color="red"
@@ -256,6 +267,13 @@ const EditFixtureModal = ({
           defaultValue={tournament}
         />
       )}
+      {/* {showEditStatsModal && (
+        <FixtureStatsModal
+          fixture={fixture}
+          onClose={() => setShowEditStatsModal(false)}
+          isLeagueCreator
+        />
+      )} */}
     </Modal>
   );
 };

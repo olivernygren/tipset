@@ -9,11 +9,6 @@ import {
 } from './Players';
 import { Team, TournamentsEnum } from './Team';
 import { theme } from '../theme';
-import { FotMobMatch } from './Fotmob';
-
-export const defenderGoalPoints = 5;
-export const midfielderGoalPoints = 3;
-export const forwardGoalPoints = 2;
 
 export const withDocumentIdOnObjectsInArray = <T>(docs: QueryDocumentSnapshot<DocumentData>[]): T[] => docs.map((doc) => ({
   ...(doc.data() as T),

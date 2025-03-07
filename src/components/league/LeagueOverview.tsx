@@ -3,6 +3,7 @@ import {
   ArrowCircleRight, CaretCircleLeft, CaretCircleRight, PencilSimple, PlusCircle,
 } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   LeagueGameWeek, LeagueTabs, PredictionLeague, PredictionLeagueStanding,
 } from '../../utils/League';
@@ -20,6 +21,8 @@ import CompactFixtureResult from '../game/CompactFixtureResult';
 import UpcomingFixturePreview from '../game/UpcomingFixturePreview';
 import LeagueStandingsTable from '../standings/LeagueStandingsTable';
 import { groupFixturesByDate } from '../../utils/helpers';
+import TextButton from '../buttons/TextButton';
+import ViewScoringSystemModal from './ViewScoringSystemModal';
 
 interface LeagueOverviewProps {
   league: PredictionLeague;
@@ -40,6 +43,7 @@ const LeagueOverview = ({
   const [upcomingGameWeeks, setUpcomingGameWeeks] = useState<Array<LeagueGameWeek>>([]);
   const [showCurrentFixturePredictionsModal, setShowCurrentFixturePredictionModal] = useState<string | null>(null);
   const [showPreviousFixturePredictionsModal, setShowPreviousFixturePredictionsModal] = useState<string | null>(null);
+  const [showScoringSystemModal, setShowScoringSystemModal] = useState<boolean>(false);
   const [displayedFixtures, setDisplayedFixtures] = useState<Array<Fixture>>([]);
   const [selectedRound, setSelectedRound] = useState<number | undefined>();
 
@@ -339,6 +343,28 @@ const LeagueOverview = ({
             <EmphasisTypography variant="s" color={theme.colors.textLight}>Deadline för att gå med</EmphasisTypography>
             <NormalTypography variant="m">{getFormattedDeadline()}</NormalTypography>
           </Section>
+          <Section gap="xxxs">
+            <EmphasisTypography variant="s" color={theme.colors.textLight}>Poängsystem</EmphasisTypography>
+            <TextButton size="m" noPadding onClick={() => setShowScoringSystemModal(true)}>
+              Läs mer
+            </TextButton>
+          </Section>
+          {league.slackChannelUrl && (
+            <>
+              <Divider color={theme.colors.silverLight} />
+              <Section gap="xxxs">
+                <StyledLink to={league.slackChannelUrl ?? ''} target="_blank">
+                  <TextButton
+                    size="m"
+                    noPadding
+                    icon={<SlackIcon src="/images/slack-logo.png" alt="slack-icon" />}
+                  >
+                    Slack-kanal
+                  </TextButton>
+                </StyledLink>
+              </Section>
+            </>
+          )}
         </GridSection>
       </Wrapper>
       {showCurrentFixturePredictionsModal && (
@@ -353,6 +379,12 @@ const LeagueOverview = ({
           predictions={previousGameWeek?.games.predictions.filter((prediction) => prediction.fixtureId === showPreviousFixturePredictionsModal) ?? []}
           onClose={() => setShowPreviousFixturePredictionsModal(null)}
           fixture={previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPreviousFixturePredictionsModal) || previousGameWeek?.games.fixtures.find((fixture) => fixture.id === showPreviousFixturePredictionsModal)}
+        />
+      )}
+      {showScoringSystemModal && (
+        <ViewScoringSystemModal
+          onClose={() => setShowScoringSystemModal(false)}
+          scoringSystemValues={league.scoringSystem}
         />
       )}
     </>
@@ -495,6 +527,15 @@ const UpcomingFixturesDateContainer = styled.div`
   overflow: hidden;
   border: 1px solid ${theme.colors.silverLight};
   animation: ${fadeIn} 0.4s ease;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+`;
+
+const SlackIcon = styled.img`
+  width: 18px;
+  height: 18px;
 `;
 
 export default LeagueOverview;
