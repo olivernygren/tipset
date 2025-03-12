@@ -533,16 +533,6 @@ const CorrectPredictionsModal = ({
                           </PlayerPositionTag>
                         </GoalScorerCard>
                       ))}
-                      {hasGoalScorers && isMobile && (
-                        <TextButton
-                          size="s"
-                          icon={<PlusCircle size={24} weight="fill" color={theme.colors.primary} />}
-                          onClick={() => setShowSelectGoalScorerModal(true)}
-                          fullWidth
-                        >
-                          Ändra målskyttar
-                        </TextButton>
-                      )}
                     </ExpandedGoalScorers>
                   </GoalScorersContainer>
                 )}
@@ -606,9 +596,13 @@ const CorrectPredictionsModal = ({
                   .filter((prediction) => prediction.fixtureId === gameId)
                   .map((prediction) => (
                     <TableRow key={prediction.userId}>
-                      <EmphasisTypography variant="m">
-                        <UserName userId={prediction.userId} />
-                      </EmphasisTypography>
+                      {prediction.username ? (
+                        <EmphasisTypography variant="m">{prediction.username}</EmphasisTypography>
+                      ) : (
+                        <EmphasisTypography variant="m">
+                          <UserName userId={prediction.userId} />
+                        </EmphasisTypography>
+                      )}
                       <Outcome>
                         <NormalTypography variant="m" color={theme.colors.primaryDark}>{hasPredictedResult(prediction) ? prediction.outcome : '?'}</NormalTypography>
                       </Outcome>
