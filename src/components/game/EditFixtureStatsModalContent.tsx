@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { updateDoc, doc } from 'firebase/firestore';
+import {
+  updateDoc, collection, getDocs,
+  doc,
+} from 'firebase/firestore';
 import {
   CaretDown, Check, CheckCircle, PlusCircle, Sparkle, XCircle,
 } from '@phosphor-icons/react';
@@ -30,6 +33,8 @@ import useResizeListener, { DeviceSizes } from '../../utils/hooks/useResizeListe
 import ClubAvatar from '../avatar/ClubAvatar';
 import NationAvatar from '../avatar/NationAvatar';
 import { AvatarSize } from '../avatar/Avatar';
+import { useUser } from '../../context/UserContext';
+import { withDocumentIdOnObject } from '../../utils/helpers';
 
 interface EditFixtureStatsModalContentProps {
   fixture: Fixture;
@@ -45,8 +50,12 @@ const EditFixtureStatsModalContent = ({
   fixture, onCloseEditView, onCloseModal, league, ongoingGameWeek, refetchLeague, onSave,
 }: EditFixtureStatsModalContentProps) => {
   const isMobile = useResizeListener(DeviceSizes.MOBILE);
+  const { hasAdminRights } = useUser();
 
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [centralFixtureReference, setCentralFixtureReference] = useState<Fixture | null>(null);
+  const [fixturesCollectionDocId, setFixturesCollectionDocId] = useState<string | null>(null);
+  const [allCentralFixtures, setAllCentralFixtures] = useState<Fixture[]>([]);
 
   // Dropdown states
   const [isFormExpanded, setIsFormExpanded] = useState<boolean>(false);
@@ -97,6 +106,31 @@ const EditFixtureStatsModalContent = ({
 
   const [hasAutoAppliedForm, setHasAutoAppliedForm] = useState({ homeTeam: false, awayTeam: false });
   const [hasAutoAppliedLastFixture, setHasAutoAppliedLastFixture] = useState({ homeTeam: false, awayTeam: false });
+
+  useEffect(() => {
+    const fetchCentralFixtureReference = async () => {
+      const fixturesCollectionRef = collection(db, CollectionEnum.FIXTURES);
+      const querySnapshot = await getDocs(fixturesCollectionRef);
+
+      const fixtureDoc = querySnapshot.docs[0];
+      const fixturesData = withDocumentIdOnObject<{ fixtures: Fixture[] }>(fixtureDoc);
+
+      if (!querySnapshot.empty) {
+        setFixturesCollectionDocId(fixtureDoc.id);
+        setAllCentralFixtures(fixturesData.fixtures);
+
+        const matchingFixture = fixturesData.fixtures.find((f) => f.centralFixtureReferenceId === fixture.centralFixtureReferenceId);
+
+        if (matchingFixture) {
+          setCentralFixtureReference(matchingFixture);
+        }
+      }
+    };
+
+    if (hasAdminRights) {
+      fetchCentralFixtureReference();
+    }
+  }, []);
 
   const hasAddedStandings = (editStandingsPositionValue.homeTeam !== '' && editStandingsPositionPoints.homeTeam !== '') || (editStandingsPositionValue.awayTeam !== '' && editStandingsPositionPoints.awayTeam !== '');
   const hasAddedLastFixture = editLastFixtureOpponents.homeTeamOpponent !== undefined || editLastFixtureOpponents.awayTeamOpponent !== undefined;
@@ -180,6 +214,11 @@ const EditFixtureStatsModalContent = ({
       await updateDoc(doc(db, CollectionEnum.LEAGUES, league.documentId), {
         gameWeeks: updatedGameWeeks,
       });
+
+      if (hasAdminRights) {
+        await handleSaveStatsForCentralFixture(previewStats);
+      }
+
       refetchLeague();
       onCloseEditView();
       onCloseModal();
@@ -188,6 +227,32 @@ const EditFixtureStatsModalContent = ({
       errorNotify('Något gick fel när statistiken skulle sparas');
     } finally {
       setSaveLoading(false);
+    }
+  };
+
+  const handleSaveStatsForCentralFixture = async (previewStats: FixturePreviewStats) => {
+    if (!ongoingGameWeek || !hasAdminRights || !centralFixtureReference || !fixturesCollectionDocId) return;
+
+    const updatedCentralFixture: Fixture = {
+      ...centralFixtureReference,
+      previewStats,
+      ...(hasAddedOdds && { odds }),
+      ...(hasAddedAggregateScore && { aggregateScore: { homeTeamGoals: parseInt(homeTeamAggregateScore), awayTeamGoals: parseInt(awayTeamAggregateScore) } }),
+    };
+
+    try {
+      await updateDoc(doc(db, CollectionEnum.FIXTURES, fixturesCollectionDocId), {
+        fixtures: allCentralFixtures.map((fixture) => {
+          if (fixture.centralFixtureReferenceId === centralFixtureReference.centralFixtureReferenceId) {
+            return updatedCentralFixture;
+          }
+          return fixture;
+        }),
+      });
+
+      successNotify('Sparades till central nivå');
+    } catch (error) {
+      errorNotify('Något gick fel när statistiken skulle sparas till central nivå');
     }
   };
 
