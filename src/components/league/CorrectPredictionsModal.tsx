@@ -41,7 +41,6 @@ import { errorNotify } from '../../utils/toast/toastHelpers';
 import GoalScorerModal from '../game/GoalScorerModal';
 import { Team } from '../../utils/Team';
 import GoalsInput from '../game/GoalsInput';
-import TextButton from '../buttons/TextButton';
 import FirstTeamToScoreModal from '../game/FirstTeamToScoreModal';
 
 interface PredictionsModalProps {
