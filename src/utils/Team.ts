@@ -1753,7 +1753,7 @@ export const Teams: TeamsType = {
   [LeagueEnum.SERIE_A]: [
     {
       name: 'Juventus',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Juventus_FC_-_pictogram_black_%28Italy%2C_2017%29.svg',
+      logoUrl: 'https://images.fotmob.com/image_resources/logo/teamlogo/9885.png',
       stadium: 'Allianz Stadium',
       country: CountryEnum.ITALY,
       teamPrimaryColor: '#000000',
