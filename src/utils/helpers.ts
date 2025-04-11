@@ -343,10 +343,30 @@ export const getTournamentIcon = (tournament: string) => {
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/67.png';
     case TournamentsEnum.SVENSKA_CUPEN:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/171.png';
+    case TournamentsEnum.SUPERETTAN:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/68.png';
     case TournamentsEnum.EREDIVISIE:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/57.png';
     case TournamentsEnum.PRIMEIRA_LIGA:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/61.png';
+    case TournamentsEnum.ELITESERIEN:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/59.png';
+    case TournamentsEnum.SUPERLIGA:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/46.png';
+    case TournamentsEnum.AUSTRIAN_BUNDESLIGA:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/38.png';
+    case TournamentsEnum.TURKISH_SUPER_LIG:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/71.png';
+    case TournamentsEnum.SCOTTISH_PREMIERSHIP:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/64.png';
+    case TournamentsEnum.SWISS_SUPER_LEAGUE:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/69.png';
+    case TournamentsEnum.BELGIAN_PRO_LEAGUE:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/40.png';
+    case TournamentsEnum.GREEK_SUPER_LEAGUE:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/135.png';
+    case TournamentsEnum.CZECH_FIRST_LEAGUE:
+      return 'https://images.fotmob.com/image_resources/logo/leaguelogo/122.png';
     case TournamentsEnum.NATIONS_LEAGUE:
       return 'https://images.fotmob.com/image_resources/logo/leaguelogo/9806.png';
     case TournamentsEnum.WORLD_CUP:
@@ -392,7 +412,7 @@ export const getFixtureNickname = (teams: Array<Team>): string | undefined => {
     'Juventus,Torino': 'Derby della Mole',
     'Genoa,Sampdoria': 'Derby della Lanterna',
     'Atalanta,Brescia': 'Derby della Lombardia',
-    'Borussia Dortmund,Bayern Munich': 'Der Klassiker',
+    'Borussia Dortmund,Bayern München': 'Der Klassiker',
     'Schalke 04,Borussia Dortmund': 'Revierderby',
     'Hamburger SV,St. Pauli': 'Nordderby',
     'Köln,Borussia Mönchengladbach': 'Rheinland Derby',
