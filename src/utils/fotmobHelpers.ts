@@ -120,7 +120,7 @@ export const getFotMobGoalStatsUrl = (tournament: TournamentsEnum) => {
     case TournamentsEnum.CHAMPIONS_LEAGUE:
       return 'https://data.fotmob.com/stats/42/season/24110/goals.json';
     case TournamentsEnum.ALLSVENSKAN:
-      return 'https://data.fotmob.com/stats/67/season/22583/goals.json';
+      return 'https://data.fotmob.com/stats/67/season/24511/goals.json';
     default:
       return '';
   }
