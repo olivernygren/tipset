@@ -97,6 +97,7 @@ export enum TournamentsEnum {
   SWISS_SUPER_LEAGUE = 'Swiss Super League',
   AUSTRIAN_BUNDESLIGA = 'Austrian Bundesliga',
   CZECH_FIRST_LEAGUE = 'Czech First League',
+  CROATIAN_FIRST_FOOTBALL_LEAGUE = 'Prva HNL',
   EUROS = 'EM',
   WORLD_CUP = 'VM',
   NATIONS_LEAGUE = 'Nations League',

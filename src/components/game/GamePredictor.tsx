@@ -35,6 +35,7 @@ import Tooltip from '../tooltip/Tooltip';
 import { LeagueScoringSystemValues } from '../../utils/League';
 import FirstTeamToScoreModal from './FirstTeamToScoreModal';
 import Modal from '../modal/Modal';
+import ValidationModal from './ValidationModal';
 
 interface GamePredictorProps {
   game: Fixture;
@@ -89,6 +90,18 @@ const GamePredictor = ({
   const [awayTeamPlayers, setAwayTeamPlayers] = useState<Array<Player>>([]);
   const [showParticipantsPredictedTooltip, setShowParticipantsPredictedTooltip] = useState<boolean>(false);
   const [showUsersThatPredictedModal, setShowUsersThatPredictedModal] = useState<boolean>(false);
+  const [showValidationModal, setShowValidationModal] = useState<boolean>(false);
+  const [missingFields, setMissingFields] = useState<Array<string>>([]);
+  const [autoSaveAttempted, setAutoSaveAttempted] = useState<boolean>(false);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
+
+  // Store original values for dirty state comparison
+  const [originalValues, setOriginalValues] = useState({
+    homeGoals: predictionValue?.homeGoals.toString() ?? '',
+    awayGoals: predictionValue?.awayGoals.toString() ?? '',
+    predictedPlayerToScore: predictionValue?.goalScorer,
+    predictedFirstTeamToScore: predictionValue?.firstTeamToScore,
+  });
 
   const kickoffTimeHasPassed = new Date(game.kickOffTime) < new Date();
   const hasPredictedHomeWin = homeGoals !== '' && awayGoals !== '' && homeGoals > awayGoals;
@@ -191,6 +204,46 @@ const GamePredictor = ({
     onResultUpdate(gameNumber, updatedHomeGoals, updatedAwayGoals);
   };
 
+  // Check if all required fields are filled
+  const isScoreFilledOut = homeGoals !== '' && awayGoals !== '';
+  const isGoalScorerRequired = game.shouldPredictGoalScorer;
+  const isFirstTeamToScoreRequired = game.shouldPredictFirstTeamToScore;
+  const isGoalScorerFilledOut = !isGoalScorerRequired || (isGoalScorerRequired && predictedPlayerToScore !== undefined);
+  const isFirstTeamToScoreFilledOut = !isFirstTeamToScoreRequired || (isFirstTeamToScoreRequired && predictedFirstTeamToScore !== undefined);
+
+  // Check if all fields (required and optional) are filled
+  const areAllFieldsFilled = isScoreFilledOut && isGoalScorerFilledOut && isFirstTeamToScoreFilledOut;
+
+  // Check if only required fields are filled (score)
+  const areRequiredFieldsFilled = isScoreFilledOut;
+
+  // Auto-save effect when all fields are filled
+  useEffect(() => {
+    if (areAllFieldsFilled && !hasPredicted && !kickoffTimeHasPassed && !loading && autoSaveAttempted) {
+      setTimeout(() => {
+        handleSave();
+      }, 200);
+      setAutoSaveAttempted(false);
+    }
+  }, [areAllFieldsFilled, hasPredicted, kickoffTimeHasPassed, loading, autoSaveAttempted]);
+
+  // Check if prediction has changed from original values
+  useEffect(() => {
+    if (hasPredicted) {
+      const hasHomeGoalsChanged = homeGoals !== originalValues.homeGoals;
+      const hasAwayGoalsChanged = awayGoals !== originalValues.awayGoals;
+      const hasPlayerToScoreChanged = (predictedPlayerToScore?.id !== originalValues.predictedPlayerToScore?.id)
+        || (!predictedPlayerToScore && originalValues.predictedPlayerToScore)
+        || (predictedPlayerToScore && !originalValues.predictedPlayerToScore);
+      const hasFirstTeamToScoreChanged = predictedFirstTeamToScore !== originalValues.predictedFirstTeamToScore;
+
+      setIsDirty(Boolean(hasHomeGoalsChanged || hasAwayGoalsChanged || hasPlayerToScoreChanged || hasFirstTeamToScoreChanged));
+    } else {
+      // If not predicted yet, it's dirty if any field is filled
+      setIsDirty(homeGoals !== '' || awayGoals !== '' || !!predictedPlayerToScore || !!predictedFirstTeamToScore);
+    }
+  }, [homeGoals, awayGoals, predictedPlayerToScore, predictedFirstTeamToScore, hasPredicted, originalValues]);
+
   const getKickoffTime = (mobile: boolean) => {
     const weekday = new Date(game.kickOffTime).toLocaleDateString('sv-SE', { weekday: 'short' });
     const weekdayCapitalized = weekday.charAt(0).toUpperCase() + weekday.slice(1);
@@ -260,22 +313,83 @@ const GamePredictor = ({
       setAwayGoals(value);
     }
     onResultUpdate(gameNumber, homeGoals, awayGoals);
+
+    // Attempt auto-save on input change
+    setAutoSaveAttempted(true);
+  };
+
+  const validateBeforeSave = () => {
+    const missingFieldsList = [];
+
+    if (isGoalScorerRequired && !predictedPlayerToScore) {
+      missingFieldsList.push('Målskytt');
+    }
+
+    if (isFirstTeamToScoreRequired && !predictedFirstTeamToScore) {
+      missingFieldsList.push('Första lag att göra mål');
+    }
+
+    if (missingFieldsList.length > 0) {
+      setMissingFields(missingFieldsList);
+      setShowValidationModal(true);
+      return false;
+    }
+
+    return true;
   };
 
   const handleSave = () => {
+    if (!areRequiredFieldsFilled) {
+      return;
+    }
+
+    // If all fields are filled, save directly
+    if (areAllFieldsFilled) {
+      onSave(homeGoals, awayGoals, predictedPlayerToScore, predictedFirstTeamToScore);
+
+      // Update original values after saving
+      setOriginalValues({
+        homeGoals,
+        awayGoals,
+        predictedPlayerToScore,
+        predictedFirstTeamToScore,
+      });
+
+      setIsDirty(false);
+      return;
+    }
+
+    // If only required fields are filled, validate optional fields
+    if (!validateBeforeSave()) {
+      return;
+    }
+
+    // If validation passes or user confirms to save anyway, save the prediction
     onSave(homeGoals, awayGoals, predictedPlayerToScore, predictedFirstTeamToScore);
+
+    // Update original values after saving
+    setOriginalValues({
+      homeGoals,
+      awayGoals,
+      predictedPlayerToScore,
+      predictedFirstTeamToScore,
+    });
+
+    setIsDirty(false);
   };
 
   const handleUpdatePlayerPrediction = (player?: Player) => {
     if (!player) return;
     setPredictedPlayerToScore(player);
     onPlayerPredictionUpdate(gameNumber, player);
+    setAutoSaveAttempted(true);
   };
 
   const handleUpdateFirstTeamToScore = (firstTeamToScore: FirstTeamToScore) => {
     setPredictedFirstTeamToScore(firstTeamToScore);
     onFirstTeamToScoreUpdate(gameNumber, firstTeamToScore);
     setIsSelectFirstTeamToScoreModalOpen(false);
+    setAutoSaveAttempted(true);
   };
 
   const getGoalScorerIconButtonColor = () => {
@@ -731,11 +845,12 @@ const GamePredictor = ({
               onClick={handleSave}
               color={hasPredicted ? 'gold' : 'primary'}
               loading={loading}
-              disabledInvisible={homeGoals === '' || awayGoals === '' || loading}
+              disabledInvisible={homeGoals === '' || awayGoals === '' || loading || !isDirty}
               textColor={hasPredicted ? theme.colors.textDefault : theme.colors.white}
               fullWidth
+              endIcon={hasPredicted && !isDirty ? <CheckCircle size={20} weight="fill" /> : undefined}
             >
-              Spara
+              {hasPredicted && !isDirty ? 'Sparad' : 'Spara'}
             </Button>
           </SaveButtonSection>
         )}
@@ -759,6 +874,26 @@ const GamePredictor = ({
           onClose={() => setIsSelectFirstTeamToScoreModalOpen(false)}
           selectedTeamValue={predictedFirstTeamToScore}
         />
+      )}
+      {showValidationModal && (
+      <ValidationModal
+        onClose={() => setShowValidationModal(false)}
+        onConfirm={() => {
+          setShowValidationModal(false);
+          onSave(homeGoals, awayGoals, predictedPlayerToScore, predictedFirstTeamToScore);
+
+          // Update original values after saving
+          setOriginalValues({
+            homeGoals,
+            awayGoals,
+            predictedPlayerToScore,
+            predictedFirstTeamToScore,
+          });
+
+          setIsDirty(false);
+        }}
+        missingFields={missingFields}
+      />
       )}
       {showUsersThatPredictedModal && (
         <Modal
