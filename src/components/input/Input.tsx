@@ -76,12 +76,7 @@ const Input = ({
     />
     {maxLength && !maxLengthInvisible && (
       <NormalTypography variant="s" color={theme.colors.textLight}>
-        {value.length}
-        {' '}
-        /
-        {maxLength}
-        {' '}
-        tecken
+        {`${value.length} / ${maxLength} tecken`}
       </NormalTypography>
     )}
     {helperText && helperText.length > 0 && (

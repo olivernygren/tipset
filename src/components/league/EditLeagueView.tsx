@@ -31,6 +31,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
   const [name, setName] = useState<string>(league.name);
   const [description, setDescription] = useState<string>(league.description);
   const [deadlineToJoin, setDeadlineToJoin] = useState(new Date(league.deadlineToJoin));
+  const [slackChannelUrl, setSlackChannelUrl] = useState<string>(league.slackChannelUrl || '');
   const [updateLoading, setUpdateLoading] = useState(false);
   const [showEndLeagueConfirmationModal, setShowEndLeagueConfirmationModal] = useState<boolean>(false);
   const [endLeagueLoading, setEndLeagueLoading] = useState(false);
@@ -48,6 +49,7 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
       name,
       description,
       deadlineToJoin: deadlineToJoin.toISOString(),
+      slackChannelUrl,
     };
 
     try {
@@ -225,6 +227,12 @@ const EditLeagueView = ({ league, refetchLeague, isCreator }: EditLeagueViewProp
                 minDate={new Date()}
               />
             </InputContainer>
+            <Input
+              label="Länk till Slack-kanal"
+              value={slackChannelUrl}
+              onChange={(e) => setSlackChannelUrl(e.target.value)}
+              fullWidth
+            />
             <Textarea
               label="Beskrivning"
               value={description}
@@ -300,7 +308,6 @@ const Container = styled.div`
   @media ${devices.tablet} {
     align-items: center;
     flex-direction: row;
-    /* padding: ${theme.spacing.m} 0; */
   }
 `;
 

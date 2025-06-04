@@ -64,7 +64,7 @@ const ParticipantsView = ({ league, isCreator, refetchLeague }: ParticipantsView
         <HeadingsTypography variant="h4">Deltagare</HeadingsTypography>
         <TableHeader>
           <EmphasisTypography variant="s" color={theme.colors.silverDark}>Namn</EmphasisTypography>
-          {!isMobile && (
+          {!isMobile && (isCreator || hasAdminRights) && (
             <>
               <EmphasisTypography variant="s" color={theme.colors.silverDark}>Email</EmphasisTypography>
               <EmphasisTypography variant="s" color={theme.colors.silverDark}>ID</EmphasisTypography>

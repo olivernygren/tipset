@@ -823,7 +823,7 @@ const FixturesView = ({ league, isCreator, refetchLeague }: FixturesViewProps) =
                     gameWeek={upcomingGameWeeks[0]}
                     onClose={() => setEditUpcomingGameWeekViewOpen(false)}
                     refetch={refetchLeague}
-                    minDate={ongoingGameWeek ? getLastKickoffTimeInGameWeek(ongoingGameWeek) : new Date()}
+                    minDate={ongoingGameWeek ? getLastKickoffTimeInGameWeek(ongoingGameWeek) : undefined}
                     league={league}
                   />
                 ) : (

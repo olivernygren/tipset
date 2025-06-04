@@ -120,7 +120,7 @@ export const getFotMobGoalStatsUrl = (tournament: TournamentsEnum) => {
     case TournamentsEnum.CHAMPIONS_LEAGUE:
       return 'https://data.fotmob.com/stats/42/season/24110/goals.json';
     case TournamentsEnum.ALLSVENSKAN:
-      return 'https://data.fotmob.com/stats/67/season/22583/goals.json';
+      return 'https://data.fotmob.com/stats/67/season/24511/goals.json';
     default:
       return '';
   }
@@ -243,6 +243,22 @@ export const getTournamentNameByFotMobId = (fotMobId: number): TournamentsEnum =
       return TournamentsEnum.PRIMEIRA_LIGA;
     case 57:
       return TournamentsEnum.EREDIVISIE;
+    case 38:
+      return TournamentsEnum.AUSTRIAN_BUNDESLIGA;
+    case 64:
+      return TournamentsEnum.SCOTTISH_PREMIERSHIP;
+    case 135:
+      return TournamentsEnum.GREEK_SUPER_LEAGUE;
+    case 71:
+      return TournamentsEnum.TURKISH_SUPER_LIG;
+    case 252:
+      return TournamentsEnum.CROATIAN_FIRST_FOOTBALL_LEAGUE;
+    case 122:
+      return TournamentsEnum.CZECH_FIRST_LEAGUE;
+    case 40:
+      return TournamentsEnum.BELGIAN_PRO_LEAGUE;
+    case 69:
+      return TournamentsEnum.SWISS_SUPER_LEAGUE;
     case 50:
       return TournamentsEnum.EUROS;
     case 77:
