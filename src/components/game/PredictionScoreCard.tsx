@@ -95,7 +95,13 @@ const PredictionScoreCard = ({ prediction, fixture }: PredictionScoreCardProps) 
   const getGoalScorerName = () => {
     if (prediction.goalScorer) {
       if (isMobile) {
-        return `${prediction.goalScorer.name.split(' ')[0].charAt(0)}. ${prediction.goalScorer.name.split(' ')[1]}`;
+        const nameParts = prediction.goalScorer.name.split(' ');
+        // Handle single-name players (like Raphinha, Ronaldinho, etc.)
+        if (nameParts.length === 1) {
+          return nameParts[0];
+        }
+        // For players with first and last name, return initial + last name
+        return `${nameParts[0].charAt(0)}. ${nameParts[1]}`;
       }
       return prediction.goalScorer.name;
     }

@@ -66,7 +66,7 @@ const InfoDialogue = ({
       <IconContainer>
         {icon || <Info size={24} color={getTextColor()} weight="fill" />}
       </IconContainer>
-      <TextContainer>
+      <TextContainer hasDescription={!!description}>
         <HeadingsTypography variant="h6" color={getTextColor()}>{title}</HeadingsTypography>
         <NormalTypography color={getTextColor()}>{description}</NormalTypography>
       </TextContainer>
@@ -85,11 +85,11 @@ const Container = styled.div<{ bgColor: string, borderColor: string }>`
   box-sizing: border-box;
 `;
 
-const TextContainer = styled.div`
+const TextContainer = styled.div<{ hasDescription?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xxxs};
-  margin-top: 2px;
+  margin-top: ${({ hasDescription }) => (hasDescription ? '2px' : 0)};
 `;
 
 const IconContainer = styled.div`
